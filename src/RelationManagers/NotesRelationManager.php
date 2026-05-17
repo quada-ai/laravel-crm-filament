@@ -8,9 +8,12 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use VentureDrake\LaravelCrmFilament\Concerns\LogsCrmActivity;
 
 class NotesRelationManager extends RelationManager
 {
+    use LogsCrmActivity;
+
     protected static string $relationship = 'notes';
 
     protected static ?string $title = 'Notes';
@@ -45,7 +48,8 @@ class NotesRelationManager extends RelationManager
             ])
             ->defaultSort('created_at', 'desc')
             ->headerActions([
-                Actions\CreateAction::make(),
+                Actions\CreateAction::make()
+                    ->after(fn (\Illuminate\Database\Eloquent\Model $record, \Filament\Resources\RelationManagers\RelationManager $livewire) => static::logCrmActivity($livewire->getOwnerRecord(), $record)),
             ])
             ->recordActions([
                 Actions\EditAction::make(),

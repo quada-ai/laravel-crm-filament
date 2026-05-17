@@ -19,10 +19,16 @@ class EditTask extends EditRecord
         return [Actions\ViewAction::make(), Actions\DeleteAction::make()];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        return TaskResource::loadCrmCustomFieldsInto($data, $this->getRecord());
+    }
+
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Task $record */
         app(TaskService::class)->update(FormPayload::wrap($data), $record);
+        TaskResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
     }

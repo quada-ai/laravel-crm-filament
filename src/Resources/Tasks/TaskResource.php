@@ -10,6 +10,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Task;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\CreateTask;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\EditTask;
@@ -18,6 +19,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\ViewTask;
 
 class TaskResource extends Resource
 {
+    use HasCrmCustomFields;
+
     protected static ?string $model = Task::class;
 
     protected static ?string $slug = 'tasks';
@@ -40,7 +43,7 @@ class TaskResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        $components = [
             Forms\Components\TextInput::make('name')
                 ->required()
                 ->maxLength(255),
@@ -63,7 +66,13 @@ class TaskResource extends Resource
                 ->relationship('assignedToUser', 'name')
                 ->searchable()
                 ->preload(),
-        ]);
+        ];
+
+        if ($customFields = static::crmCustomFieldsSection(Task::class)) {
+            $components[] = $customFields;
+        }
+
+        return $schema->components($components);
     }
 
     public static function table(Table $table): Table

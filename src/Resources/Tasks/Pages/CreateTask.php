@@ -14,7 +14,10 @@ class CreateTask extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(TaskService::class)->create(FormPayload::wrap($data));
+        $record = app(TaskService::class)->create(FormPayload::wrap($data));
+        TaskResource::saveCrmCustomFields($data, $record);
+
+        return $record;
     }
 }
 

@@ -46,6 +46,12 @@ class LaravelCrmPlugin implements Plugin
 
     protected ?string $brand = null;
 
+    protected ?string $brandLogo = null;
+
+    protected ?string $favicon = null;
+
+    protected ?string $primaryColor = null;
+
     public function getId(): string
     {
         return 'laravel-crm';
@@ -112,6 +118,27 @@ class LaravelCrmPlugin implements Plugin
     public function brand(string $brand): static
     {
         $this->brand = $brand;
+
+        return $this;
+    }
+
+    public function brandLogo(string $url): static
+    {
+        $this->brandLogo = $url;
+
+        return $this;
+    }
+
+    public function favicon(string $url): static
+    {
+        $this->favicon = $url;
+
+        return $this;
+    }
+
+    public function primaryColor(string $hex): static
+    {
+        $this->primaryColor = $hex;
 
         return $this;
     }
@@ -208,6 +235,23 @@ class LaravelCrmPlugin implements Plugin
         }
         if ($this->isModuleEnabled('chat')) {
             $resources[] = ChatWidgetResource::class;
+        }
+
+        // Branding overrides: prefer plugin setters, fall back to laravel-crm settings.
+        $settings = app()->bound('laravel-crm.settings') ? app('laravel-crm.settings') : null;
+        $brandName = $this->brand ?? ($settings?->get('organization_name'));
+        if ($brandName) {
+            $panel->brandName($brandName);
+        }
+        $logo = $this->brandLogo ?? ($settings?->get('logo_file'));
+        if ($logo) {
+            $panel->brandLogo($logo);
+        }
+        if ($this->favicon) {
+            $panel->favicon($this->favicon);
+        }
+        if ($this->primaryColor) {
+            $panel->colors(['primary' => $this->primaryColor]);
         }
 
         $panel->resources($resources);

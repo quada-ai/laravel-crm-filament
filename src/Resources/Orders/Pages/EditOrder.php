@@ -79,6 +79,7 @@ class EditOrder extends EditRecord
             $record->organization,
             $record->client,
         );
+        OrderResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
     }

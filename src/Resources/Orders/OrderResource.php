@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\AddressType;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Product;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\CreateOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\EditOrder;
@@ -21,6 +22,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\ViewOrder;
 
 class OrderResource extends Resource
 {
+    use HasCrmCustomFields;
+
     protected static ?string $model = Order::class;
 
     protected static ?string $slug = 'orders';
@@ -43,7 +46,7 @@ class OrderResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        $components = [
             Forms\Components\Textarea::make('description')
                 ->rows(2)
                 ->columnSpanFull(),
@@ -149,7 +152,13 @@ class OrderResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
-        ]);
+        ];
+
+        if ($customFields = static::crmCustomFieldsSection(Order::class)) {
+            $components[] = $customFields;
+        }
+
+        return $schema->components($components);
     }
 
     public static function table(Table $table): Table

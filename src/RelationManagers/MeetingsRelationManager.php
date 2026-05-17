@@ -9,9 +9,12 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use VentureDrake\LaravelCrmFilament\Concerns\LogsCrmActivity;
 
 class MeetingsRelationManager extends RelationManager
 {
+    use LogsCrmActivity;
+
     protected static string $relationship = 'meetings';
 
     protected static ?string $title = 'Meetings';
@@ -58,7 +61,8 @@ class MeetingsRelationManager extends RelationManager
             ])
             ->defaultSort('start_at', 'desc')
             ->headerActions([
-                Actions\CreateAction::make(),
+                Actions\CreateAction::make()
+                    ->after(fn (\Illuminate\Database\Eloquent\Model $record, \Filament\Resources\RelationManagers\RelationManager $livewire) => static::logCrmActivity($livewire->getOwnerRecord(), $record)),
             ])
             ->recordActions([
                 Actions\EditAction::make(),

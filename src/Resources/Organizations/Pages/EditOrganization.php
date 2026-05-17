@@ -50,13 +50,14 @@ class EditOrganization extends EditRecord
             'primary' => (bool) $a->primary,
         ])->values()->toArray();
 
-        return $data;
+        return OrganizationResource::loadCrmCustomFieldsInto($data, $this->getRecord());
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Organization $record */
         app(OrganizationService::class)->update($record, FormPayload::wrap($data));
+        OrganizationResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
     }

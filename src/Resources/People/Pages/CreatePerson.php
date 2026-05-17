@@ -14,7 +14,10 @@ class CreatePerson extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(PersonService::class)->create(FormPayload::wrap($data));
+        $record = app(PersonService::class)->create(FormPayload::wrap($data));
+        PersonResource::saveCrmCustomFields($data, $record);
+
+        return $record;
     }
 }
 

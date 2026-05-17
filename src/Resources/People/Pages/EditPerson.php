@@ -50,13 +50,14 @@ class EditPerson extends EditRecord
             'primary' => (bool) $a->primary,
         ])->values()->toArray();
 
-        return $data;
+        return PersonResource::loadCrmCustomFieldsInto($data, $this->getRecord());
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Person $record */
         app(PersonService::class)->update($record, FormPayload::wrap($data));
+        PersonResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
     }

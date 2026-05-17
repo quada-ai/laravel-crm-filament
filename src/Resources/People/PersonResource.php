@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
@@ -25,6 +26,8 @@ use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ViewPerson;
 
 class PersonResource extends Resource
 {
+    use HasCrmCustomFields;
+
     protected static ?string $model = Person::class;
 
     protected static ?string $slug = 'people';
@@ -47,7 +50,7 @@ class PersonResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        $components = [
             Grid::make(2)->schema([
                 Forms\Components\TextInput::make('first_name')->maxLength(255),
                 Forms\Components\TextInput::make('last_name')->maxLength(255),
@@ -81,7 +84,13 @@ class PersonResource extends Resource
             ContactFieldsSchema::phonesRepeater(),
             ContactFieldsSchema::emailsRepeater(),
             ContactFieldsSchema::addressesRepeater(),
-        ]);
+        ];
+
+        if ($customFields = static::crmCustomFieldsSection(Person::class)) {
+            $components[] = $customFields;
+        }
+
+        return $schema->components($components);
     }
 
     public static function table(Table $table): Table

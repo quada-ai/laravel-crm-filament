@@ -14,6 +14,9 @@ class CreateOrder extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(OrderService::class)->create(FormPayload::wrap($data));
+        $record = app(OrderService::class)->create(FormPayload::wrap($data));
+        OrderResource::saveCrmCustomFields($data, $record);
+
+        return $record;
     }
 }

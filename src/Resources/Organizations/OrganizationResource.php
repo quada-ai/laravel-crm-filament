@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\CreateOrganization;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\EditOrganization;
@@ -25,6 +26,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\ViewOrganizati
 
 class OrganizationResource extends Resource
 {
+    use HasCrmCustomFields;
+
     protected static ?string $model = Organization::class;
 
     protected static ?string $slug = 'organizations';
@@ -47,7 +50,7 @@ class OrganizationResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        $components = [
             Forms\Components\TextInput::make('name')
                 ->required()
                 ->maxLength(255),
@@ -79,7 +82,13 @@ class OrganizationResource extends Resource
             ContactFieldsSchema::phonesRepeater(),
             ContactFieldsSchema::emailsRepeater(),
             ContactFieldsSchema::addressesRepeater(),
-        ]);
+        ];
+
+        if ($customFields = static::crmCustomFieldsSection(Organization::class)) {
+            $components[] = $customFields;
+        }
+
+        return $schema->components($components);
     }
 
     public static function table(Table $table): Table
