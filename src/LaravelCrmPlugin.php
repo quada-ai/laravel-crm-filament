@@ -8,6 +8,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
+use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
 use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
@@ -132,6 +133,10 @@ class LaravelCrmPlugin implements Plugin
 
         if ($this->isModuleEnabled('deals')) {
             $resources[] = DealResource::class;
+        }
+
+        if ($this->isModuleEnabled('quotes')) {
+            $resources[] = QuoteResource::class;
         }
 
         $panel->resources($resources);

@@ -4,6 +4,7 @@ use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
+use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
 
 dataset('resources_with_external_id_routes', [
@@ -11,6 +12,7 @@ dataset('resources_with_external_id_routes', [
     'Person' => [PersonResource::class, \VentureDrake\LaravelCrm\Models\Person::class],
     'Organization' => [OrganizationResource::class, \VentureDrake\LaravelCrm\Models\Organization::class],
     'Task' => [TaskResource::class, \VentureDrake\LaravelCrm\Models\Task::class],
+    'Quote' => [QuoteResource::class, \VentureDrake\LaravelCrm\Models\Quote::class],
 ]);
 
 it('binds the right model and uses external_id for routing', function (string $resource, string $model) {
