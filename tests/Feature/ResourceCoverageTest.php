@@ -1,0 +1,31 @@
+<?php
+
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
+use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
+use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
+use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
+
+dataset('resources_with_external_id_routes', [
+    'Deal' => [DealResource::class, \VentureDrake\LaravelCrm\Models\Deal::class],
+    'Person' => [PersonResource::class, \VentureDrake\LaravelCrm\Models\Person::class],
+    'Organization' => [OrganizationResource::class, \VentureDrake\LaravelCrm\Models\Organization::class],
+    'Task' => [TaskResource::class, \VentureDrake\LaravelCrm\Models\Task::class],
+]);
+
+it('binds the right model and uses external_id for routing', function (string $resource, string $model) {
+    expect($resource::getModel())->toBe($model);
+    expect($resource::getRecordRouteKeyName())->toBe('external_id');
+})->with('resources_with_external_id_routes');
+
+it('always registers contact + activity resources regardless of module flags', function () {
+    $plugin = LaravelCrmPlugin::make()->modules([
+        'leads' => false,
+        'deals' => false,
+    ]);
+
+    // Module-gated entities respect overrides.
+    expect($plugin->isModuleEnabled('leads'))->toBeFalse();
+    expect($plugin->isModuleEnabled('deals'))->toBeFalse();
+});
+

@@ -9,6 +9,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
+use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
+use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
 
 class LaravelCrmPlugin implements Plugin
 {
@@ -133,6 +135,11 @@ class LaravelCrmPlugin implements Plugin
         }
 
         $panel->resources($resources);
+
+        $panel->widgets([
+            CrmStatsOverview::class,
+            LeadsByStageChart::class,
+        ]);
     }
 
     public function boot(Panel $panel): void
@@ -140,6 +147,8 @@ class LaravelCrmPlugin implements Plugin
         //
     }
 }
+
+
 
 
 
