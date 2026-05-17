@@ -72,7 +72,7 @@ class DealResource extends Resource
 
             Forms\Components\Select::make('user_owner_id')
                 ->label('Owner')
-                ->relationship('userOwner', 'name')
+                ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
         ]);
@@ -106,7 +106,7 @@ class DealResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('userOwner.name')
+                Tables\Columns\TextColumn::make('ownerUser.name')
                     ->label('Owner')
                     ->toggleable(),
 

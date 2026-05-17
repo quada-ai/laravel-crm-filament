@@ -54,13 +54,13 @@ class TaskResource extends Resource
 
             Forms\Components\Select::make('user_owner_id')
                 ->label('Owner')
-                ->relationship('userOwner', 'name')
+                ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
 
             Forms\Components\Select::make('user_assigned_id')
                 ->label('Assigned to')
-                ->relationship('userAssigned', 'name')
+                ->relationship('assignedToUser', 'name')
                 ->searchable()
                 ->preload(),
         ]);
@@ -85,11 +85,11 @@ class TaskResource extends Resource
                     ->sortable()
                     ->placeholder('—'),
 
-                Tables\Columns\TextColumn::make('userAssigned.name')
+                Tables\Columns\TextColumn::make('assignedToUser.name')
                     ->label('Assigned')
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('userOwner.name')
+                Tables\Columns\TextColumn::make('ownerUser.name')
                     ->label('Owner')
                     ->toggleable(),
 

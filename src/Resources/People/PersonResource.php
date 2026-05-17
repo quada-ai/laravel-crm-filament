@@ -11,6 +11,8 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Person;
+use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
+use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
@@ -68,25 +70,33 @@ class PersonResource extends Resource
 
             Forms\Components\Select::make('user_owner_id')
                 ->label('Owner')
-                ->relationship('userOwner', 'name')
+                ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
+
+            ContactFieldsSchema::phonesRepeater(),
+            ContactFieldsSchema::emailsRepeater(),
+            ContactFieldsSchema::addressesRepeater(),
         ]);
     }
 
     public static function table(Table $table): Table
     {
+        $encrypted = config('laravel-crm.encrypt_db_fields', false);
+
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('first_name')
-                    ->sortable()
+                    ->sortable(!$encrypted)
+                    ->searchable(!$encrypted)
                     ->limit(40),
 
                 Tables\Columns\TextColumn::make('last_name')
-                    ->sortable()
+                    ->sortable(!$encrypted)
+                    ->searchable(!$encrypted)
                     ->limit(40),
 
-                Tables\Columns\TextColumn::make('userOwner.name')
+                Tables\Columns\TextColumn::make('ownerUser.name')
                     ->label('Owner')
                     ->toggleable(),
 
@@ -96,6 +106,14 @@ class PersonResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
+            ->when(
+                $encrypted,
+                fn (Table $t) => $t->modifyQueryUsing(
+                    HasEncryptedSearch::modifyQuery(
+                        fn ($r) => trim(($r->first_name ?? '').' '.($r->last_name ?? ''))
+                    )
+                )
+            )
             ->recordActions([
                 Actions\ViewAction::make(),
                 Actions\EditAction::make(),

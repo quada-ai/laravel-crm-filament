@@ -19,6 +19,40 @@ class EditPerson extends EditRecord
         return [Actions\ViewAction::make(), Actions\DeleteAction::make()];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        /** @var Person $record */
+        $record = $this->getRecord();
+
+        $data['phones'] = $record->phones->map(fn ($p) => [
+            'id' => $p->id,
+            'number' => $p->number,
+            'type' => $p->type,
+            'primary' => (bool) $p->primary,
+        ])->values()->toArray();
+
+        $data['emails'] = $record->emails->map(fn ($e) => [
+            'id' => $e->id,
+            'address' => $e->address,
+            'type' => $e->type,
+            'primary' => (bool) $e->primary,
+        ])->values()->toArray();
+
+        $data['addresses'] = $record->addresses->map(fn ($a) => [
+            'id' => $a->id,
+            'line1' => $a->line1,
+            'line2' => $a->line2,
+            'line3' => $a->line3,
+            'city' => $a->city,
+            'state' => $a->state,
+            'code' => $a->code,
+            'country' => $a->country,
+            'primary' => (bool) $a->primary,
+        ])->values()->toArray();
+
+        return $data;
+    }
+
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Person $record */
