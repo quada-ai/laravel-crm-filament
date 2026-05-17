@@ -1,0 +1,120 @@
+<?php
+
+namespace VentureDrake\LaravelCrmFilament\Resources\People;
+
+use BackedEnum;
+use Filament\Actions;
+use Filament\Forms;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use VentureDrake\LaravelCrm\Models\Person;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
+use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
+use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ListPeople;
+use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ViewPerson;
+
+class PersonResource extends Resource
+{
+    protected static ?string $model = Person::class;
+
+    protected static ?string $slug = 'people';
+
+    protected static ?string $recordTitleAttribute = 'first_name';
+
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user';
+
+    protected static ?int $navigationSort = 30;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return LaravelCrmPlugin::get()->getNavigationGroup();
+    }
+
+    public static function getRecordRouteKeyName(): ?string
+    {
+        return 'external_id';
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            Grid::make(2)->schema([
+                Forms\Components\TextInput::make('first_name')->maxLength(255),
+                Forms\Components\TextInput::make('last_name')->maxLength(255),
+            ]),
+
+            Grid::make(2)->schema([
+                Forms\Components\TextInput::make('middle_name')->maxLength(255),
+                Forms\Components\TextInput::make('maiden_name')->maxLength(255),
+            ]),
+
+            Grid::make(3)->schema([
+                Forms\Components\TextInput::make('title')->maxLength(50),
+                Forms\Components\Select::make('gender')->options([
+                    'male' => 'Male',
+                    'female' => 'Female',
+                    'other' => 'Other',
+                ]),
+                Forms\Components\DatePicker::make('birthday'),
+            ]),
+
+            Forms\Components\Textarea::make('description')
+                ->rows(3)
+                ->columnSpanFull(),
+
+            Forms\Components\Select::make('user_owner_id')
+                ->label('Owner')
+                ->relationship('userOwner', 'name')
+                ->searchable()
+                ->preload(),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('first_name')
+                    ->sortable()
+                    ->limit(40),
+
+                Tables\Columns\TextColumn::make('last_name')
+                    ->sortable()
+                    ->limit(40),
+
+                Tables\Columns\TextColumn::make('userOwner.name')
+                    ->label('Owner')
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->defaultSort('created_at', 'desc')
+            ->recordActions([
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+            ])
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListPeople::route('/'),
+            'create' => CreatePerson::route('/create'),
+            'view' => ViewPerson::route('/{record}'),
+            'edit' => EditPerson::route('/{record}/edit'),
+        ];
+    }
+}
+

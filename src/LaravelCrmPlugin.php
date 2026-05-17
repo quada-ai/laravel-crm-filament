@@ -4,7 +4,11 @@ namespace VentureDrake\LaravelCrmFilament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
+use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
+use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
+use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
 
 class LaravelCrmPlugin implements Plugin
 {
@@ -112,15 +116,23 @@ class LaravelCrmPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        $resources = [];
+        // Contact + activity entities are always available (no module flag in core).
+        $resources = [
+            PersonResource::class,
+            OrganizationResource::class,
+            TaskResource::class,
+        ];
 
+        // Pipeline / marketing entities are gated by core's `laravel-crm.modules` array.
         if ($this->isModuleEnabled('leads')) {
             $resources[] = LeadResource::class;
         }
 
-        if ($resources !== []) {
-            $panel->resources($resources);
+        if ($this->isModuleEnabled('deals')) {
+            $resources[] = DealResource::class;
         }
+
+        $panel->resources($resources);
     }
 
     public function boot(Panel $panel): void
@@ -128,6 +140,8 @@ class LaravelCrmPlugin implements Plugin
         //
     }
 }
+
+
 
 
 

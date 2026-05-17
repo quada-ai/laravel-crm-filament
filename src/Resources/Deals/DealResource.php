@@ -1,0 +1,145 @@
+<?php
+
+namespace VentureDrake\LaravelCrmFilament\Resources\Deals;
+
+use BackedEnum;
+use Filament\Actions;
+use Filament\Forms;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+use VentureDrake\LaravelCrm\Models\Deal;
+use VentureDrake\LaravelCrm\Models\PipelineStage;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\CreateDeal;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\EditDeal;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\ListDeals;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\ViewDeal;
+
+class DealResource extends Resource
+{
+    protected static ?string $model = Deal::class;
+
+    protected static ?string $slug = 'deals';
+
+    protected static ?string $recordTitleAttribute = 'title';
+
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-currency-dollar';
+
+    protected static ?int $navigationSort = 20;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return LaravelCrmPlugin::get()->getNavigationGroup();
+    }
+
+    public static function getRecordRouteKeyName(): ?string
+    {
+        return 'external_id';
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            Forms\Components\TextInput::make('title')
+                ->required()
+                ->maxLength(255),
+
+            Forms\Components\Textarea::make('description')
+                ->rows(3)
+                ->columnSpanFull(),
+
+            Grid::make(2)->schema([
+                Forms\Components\TextInput::make('amount')
+                    ->numeric()
+                    ->prefix(fn ($get) => $get('currency') ?: config('laravel-crm.default_currency', 'USD')),
+
+                Forms\Components\TextInput::make('currency')
+                    ->maxLength(3)
+                    ->default(config('laravel-crm.default_currency', 'USD')),
+            ]),
+
+            Forms\Components\DatePicker::make('expected_close')
+                ->label('Expected close'),
+
+            Forms\Components\Select::make('pipeline_stage_id')
+                ->label('Pipeline stage')
+                ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id'))
+                ->searchable()
+                ->preload(),
+
+            Forms\Components\Select::make('user_owner_id')
+                ->label('Owner')
+                ->relationship('userOwner', 'name')
+                ->searchable()
+                ->preload(),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('deal_id')
+                    ->label('ID')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('title')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(50),
+
+                Tables\Columns\TextColumn::make('amount')
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('pipelineStage.name')
+                    ->label('Stage')
+                    ->badge()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('expected_close')
+                    ->date()
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('userOwner.name')
+                    ->label('Owner')
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->defaultSort('created_at', 'desc')
+            ->filters([
+                Tables\Filters\SelectFilter::make('pipeline_stage_id')
+                    ->label('Stage')
+                    ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id')),
+            ])
+            ->recordActions([
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+            ])
+            ->toolbarActions([
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListDeals::route('/'),
+            'create' => CreateDeal::route('/create'),
+            'view' => ViewDeal::route('/{record}'),
+            'edit' => EditDeal::route('/{record}/edit'),
+        ];
+    }
+}
+
