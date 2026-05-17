@@ -69,7 +69,11 @@ class SmsCampaignResource extends Resource
                 ->required()
                 ->rows(6)
                 ->maxLength(1530)
-                ->helperText('Max 1530 chars (≈10 SMS segments). Placeholders: {first_name}, {last_name}, {full_name}, {company_name}.')
+                ->live(onBlur: true)
+                ->helperText(function (?string $state): string {
+                    $count = \VentureDrake\LaravelCrm\Sms\SmsCampaignMessage::segmentCount($state ?? '');
+                    return 'Max 1530 chars (≈10 SMS segments). Current estimate: '.$count.' segment(s). Placeholders: {first_name}, {last_name}, {full_name}, {company_name}.';
+                })
                 ->columnSpanFull(),
             Forms\Components\DateTimePicker::make('scheduled_at')
                 ->label('Schedule for')

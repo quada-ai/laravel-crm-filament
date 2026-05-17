@@ -2,7 +2,7 @@
     @php
         /** @var \VentureDrake\LaravelCrm\Models\ChatConversation $record */
         $record = $this->record;
-        $messages = $record->messages()->orderBy('created_at')->get();
+        $messages = $this->messageItems ?? collect();
     @endphp
 
     <div class="fi-section rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">

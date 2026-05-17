@@ -19,6 +19,14 @@ class ViewEmailCampaign extends ViewRecord
         return [
             Actions\EditAction::make()
                 ->visible(fn (EmailCampaign $record) => $record->isEditable()),
+            Actions\Action::make('preview')
+                ->label('Preview')
+                ->icon('heroicon-o-eye')
+                ->color('gray')
+                ->modalHeading(fn (EmailCampaign $record) => 'Preview: '.$record->name)
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Close')
+                ->modalContent(fn (EmailCampaign $record) => new \Illuminate\Support\HtmlString(\VentureDrake\LaravelCrm\Mail\EmailCampaignMessage::renderPreview($record->body ?? '', $record->preview_text ?? '', $record->team_id))),
             Actions\Action::make('schedule')
                 ->label('Schedule')
                 ->icon('heroicon-o-calendar')

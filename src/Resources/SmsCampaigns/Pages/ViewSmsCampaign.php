@@ -19,6 +19,21 @@ class ViewSmsCampaign extends ViewRecord
         return [
             Actions\EditAction::make()
                 ->visible(fn (SmsCampaign $record) => $record->isEditable()),
+            Actions\Action::make('preview')
+                ->label('Preview')
+                ->icon('heroicon-o-eye')
+                ->color('gray')
+                ->modalHeading(fn (SmsCampaign $record) => 'Preview: '.$record->name)
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Close')
+                ->modalContent(function (SmsCampaign $record) {
+                    $rendered = \VentureDrake\LaravelCrm\Sms\SmsCampaignMessage::renderPreview($record->body ?? '');
+                    $segments = \VentureDrake\LaravelCrm\Sms\SmsCampaignMessage::segmentCount($record->body ?? '');
+                    return new \Illuminate\Support\HtmlString(
+                        '<div class="text-sm text-gray-500 mb-2">'.$segments.' SMS segment(s)</div>'.
+                        '<pre class="text-sm whitespace-pre-wrap font-sans">'.e($rendered).'</pre>'
+                    );
+                }),
             Actions\Action::make('schedule')
                 ->label('Schedule')
                 ->icon('heroicon-o-calendar')
