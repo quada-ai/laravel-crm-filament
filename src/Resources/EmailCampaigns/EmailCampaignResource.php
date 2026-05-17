@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Models\EmailTemplate;
+use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\RelationManagers\RecipientsRelationManager;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\CreateEmailCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\EditEmailCampaign;
@@ -111,6 +112,13 @@ class EmailCampaignResource extends Resource
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
             ]);
+    }
+
+public static function getRelations(): array
+    {
+        return [
+            RecipientsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

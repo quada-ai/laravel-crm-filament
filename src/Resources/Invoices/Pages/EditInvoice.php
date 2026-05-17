@@ -51,7 +51,7 @@ class EditInvoice extends EditRecord
             ])
             ->all();
 
-        return $data;
+        return InvoiceResource::loadCrmCustomFieldsInto($data, $this->getRecord());
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
@@ -63,6 +63,7 @@ class EditInvoice extends EditRecord
             $record->person,
             $record->organization,
         );
+        InvoiceResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
     }

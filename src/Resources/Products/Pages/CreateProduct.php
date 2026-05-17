@@ -14,6 +14,9 @@ class CreateProduct extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(ProductService::class)->create(FormPayload::wrap($data));
+        $record = app(ProductService::class)->create(FormPayload::wrap($data));
+        ProductResource::saveCrmCustomFields($data, $record);
+
+        return $record;
     }
 }

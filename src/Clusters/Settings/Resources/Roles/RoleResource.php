@@ -63,10 +63,23 @@ class RoleResource extends Resource
                     ->toggleable(),
             ])
             ->defaultSort('name')
-            ->recordActions([Actions\EditAction::make()])
+            ->recordActions([
+                Actions\EditAction::make()
+                    ->visible(fn ($record) => ! in_array($record->name, ['Owner', 'Admin'], true)),
+            ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
             ]);
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return ! in_array($record->name, ['Owner', 'Admin'], true);
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return ! in_array($record->name, ['Owner', 'Admin'], true);
     }
 
     public static function getPages(): array

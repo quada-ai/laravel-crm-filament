@@ -49,7 +49,7 @@ class EditPurchaseOrder extends EditRecord
             ])
             ->all();
 
-        return $data;
+        return PurchaseOrderResource::loadCrmCustomFieldsInto($data, $this->getRecord());
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
@@ -65,6 +65,7 @@ class EditPurchaseOrder extends EditRecord
             $record->person,
             $record->organization,
         );
+        PurchaseOrderResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
     }

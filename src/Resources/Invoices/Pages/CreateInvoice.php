@@ -14,6 +14,9 @@ class CreateInvoice extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(InvoiceService::class)->create(FormPayload::wrap($data));
+        $record = app(InvoiceService::class)->create(FormPayload::wrap($data));
+        InvoiceResource::saveCrmCustomFields($data, $record);
+
+        return $record;
     }
 }

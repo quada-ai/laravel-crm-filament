@@ -33,13 +33,14 @@ class EditProduct extends EditRecord
             $data['currency'] = $defaultPrice->currency ?: $data['currency'] ?? config('laravel-crm.default_currency', 'USD');
         }
 
-        return $data;
+        return ProductResource::loadCrmCustomFieldsInto($data, $this->getRecord());
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Product $record */
         app(ProductService::class)->update($record, FormPayload::wrap($data));
+        ProductResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
     }

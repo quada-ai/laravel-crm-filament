@@ -14,6 +14,9 @@ class CreatePurchaseOrder extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(PurchaseOrderService::class)->create(FormPayload::wrap($data));
+        $record = app(PurchaseOrderService::class)->create(FormPayload::wrap($data));
+        PurchaseOrderResource::saveCrmCustomFields($data, $record);
+
+        return $record;
     }
 }

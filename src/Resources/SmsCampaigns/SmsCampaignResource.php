@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\SmsCampaign;
 use VentureDrake\LaravelCrm\Models\SmsTemplate;
 use VentureDrake\LaravelCrm\Services\ClickSendService;
+use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\RelationManagers\RecipientsRelationManager;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\CreateSmsCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\EditSmsCampaign;
@@ -117,6 +118,13 @@ class SmsCampaignResource extends Resource
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
             ]);
+    }
+
+public static function getRelations(): array
+    {
+        return [
+            RecipientsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

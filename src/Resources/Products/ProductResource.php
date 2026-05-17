@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\TaxRate;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\CreateProduct;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\EditProduct;
@@ -20,6 +21,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\ViewProduct;
 
 class ProductResource extends Resource
 {
+    use HasCrmCustomFields;
+
     protected static ?string $model = Product::class;
 
     protected static ?string $slug = 'products';
@@ -42,7 +45,7 @@ class ProductResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        $components = [
             Grid::make(2)->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
@@ -91,7 +94,13 @@ class ProductResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
-        ]);
+        ];
+
+        if ($customFields = static::crmCustomFieldsSection(Product::class)) {
+            $components[] = $customFields;
+        }
+
+        return $schema->components($components);
     }
 
     public static function table(Table $table): Table

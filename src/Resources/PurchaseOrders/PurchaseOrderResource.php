@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\CreatePurchaseOrder;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\EditPurchaseOrder;
@@ -21,6 +22,8 @@ use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\ViewPurchaseO
 
 class PurchaseOrderResource extends Resource
 {
+    use HasCrmCustomFields;
+
     protected static ?string $model = PurchaseOrder::class;
 
     protected static ?string $slug = 'purchase-orders';
@@ -43,7 +46,7 @@ class PurchaseOrderResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        $components = [
             Grid::make(3)->schema([
                 Forms\Components\Select::make('order_id')
                     ->label('Order')
@@ -132,7 +135,13 @@ class PurchaseOrderResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
-        ]);
+        ];
+
+        if ($customFields = static::crmCustomFieldsSection(PurchaseOrder::class)) {
+            $components[] = $customFields;
+        }
+
+        return $schema->components($components);
     }
 
     public static function table(Table $table): Table
