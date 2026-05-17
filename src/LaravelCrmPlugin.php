@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
 class LaravelCrmPlugin implements Plugin
 {
@@ -94,7 +95,9 @@ class LaravelCrmPlugin implements Plugin
             return (bool) $this->modules[$module];
         }
 
-        return (bool) config("laravel-crm.modules.{$module}", false);
+        // Core CRM stores enabled modules as a flat array of slugs:
+        //   config('laravel-crm.modules') === ['leads', 'deals', ...]
+        return in_array($module, (array) config('laravel-crm.modules', []), true);
     }
 
     public function getNavigationGroup(): ?string
@@ -109,8 +112,15 @@ class LaravelCrmPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        // Resources, pages, widgets and clusters are registered in later phases.
-        // Phase 0 ships an empty plugin so the host panel boots cleanly.
+        $resources = [];
+
+        if ($this->isModuleEnabled('leads')) {
+            $resources[] = LeadResource::class;
+        }
+
+        if ($resources !== []) {
+            $panel->resources($resources);
+        }
     }
 
     public function boot(Panel $panel): void
@@ -118,4 +128,7 @@ class LaravelCrmPlugin implements Plugin
         //
     }
 }
+
+
+
 
