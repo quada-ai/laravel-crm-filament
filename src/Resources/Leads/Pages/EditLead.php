@@ -22,12 +22,17 @@ class EditLead extends EditRecord
         ];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        return LeadResource::loadCrmCustomFieldsInto($data, $this->record);
+    }
+
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Lead $record */
         app(LeadService::class)->update(FormPayload::wrap($data), $record);
+        LeadResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
     }
 }
-

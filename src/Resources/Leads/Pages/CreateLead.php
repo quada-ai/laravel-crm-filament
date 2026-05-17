@@ -14,7 +14,9 @@ class CreateLead extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(LeadService::class)->create(FormPayload::wrap($data));
+        $record = app(LeadService::class)->create(FormPayload::wrap($data));
+        LeadResource::saveCrmCustomFields($data, $record);
+
+        return $record;
     }
 }
-

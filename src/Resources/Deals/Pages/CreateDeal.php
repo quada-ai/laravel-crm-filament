@@ -14,7 +14,9 @@ class CreateDeal extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(DealService::class)->create(FormPayload::wrap($data));
+        $record = app(DealService::class)->create(FormPayload::wrap($data));
+        DealResource::saveCrmCustomFields($data, $record);
+
+        return $record;
     }
 }
-

@@ -16,15 +16,23 @@ class EditDeal extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [Actions\ViewAction::make(), Actions\DeleteAction::make()];
+        return [
+            Actions\ViewAction::make(),
+            Actions\DeleteAction::make(),
+        ];
+    }
+
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        return DealResource::loadCrmCustomFieldsInto($data, $this->record);
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Deal $record */
         app(DealService::class)->update(FormPayload::wrap($data), $record);
+        DealResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
     }
 }
-

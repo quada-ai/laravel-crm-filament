@@ -13,6 +13,11 @@ use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\LeadSource;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\CreateLead;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\EditLead;
@@ -21,6 +26,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\ViewLead;
 
 class LeadResource extends Resource
 {
+    use HasCrmCustomFields;
+
     protected static ?string $model = Lead::class;
 
     protected static ?string $slug = 'leads';
@@ -43,7 +50,7 @@ class LeadResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        $components = [
             Forms\Components\TextInput::make('title')
                 ->required()
                 ->maxLength(255),
@@ -79,7 +86,13 @@ class LeadResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
-        ]);
+        ];
+
+        if ($customFields = static::crmCustomFieldsSection(Lead::class)) {
+            $components[] = $customFields;
+        }
+
+        return $schema->components($components);
     }
 
     public static function table(Table $table): Table
@@ -129,6 +142,16 @@ class LeadResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+public static function getRelations(): array
+    {
+        return [
+            NotesRelationManager::class,
+            TasksRelationManager::class,
+            CallsRelationManager::class,
+            MeetingsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

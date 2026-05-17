@@ -54,7 +54,7 @@ class EditQuote extends EditRecord
             ])
             ->all();
 
-        return $data;
+        return QuoteResource::loadCrmCustomFieldsInto($data, $quote);
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
@@ -67,6 +67,7 @@ class EditQuote extends EditRecord
             $record->organization,
             $record->client,
         );
+        QuoteResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
     }

@@ -1,0 +1,71 @@
+<?php
+
+namespace VentureDrake\LaravelCrmFilament\RelationManagers;
+
+use Filament\Actions;
+use Filament\Forms;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class TasksRelationManager extends RelationManager
+{
+    protected static string $relationship = 'tasks';
+
+    protected static ?string $title = 'Tasks';
+
+    public function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            Forms\Components\TextInput::make('name')
+                ->required()
+                ->maxLength(255),
+            Forms\Components\Textarea::make('description')
+                ->rows(2)
+                ->columnSpanFull(),
+            Grid::make(2)->schema([
+                Forms\Components\DateTimePicker::make('due_at')->label('Due'),
+                Forms\Components\DateTimePicker::make('completed_at')->label('Completed'),
+            ]),
+            Grid::make(2)->schema([
+                Forms\Components\Select::make('user_owner_id')
+                    ->label('Owner')
+                    ->relationship('ownerUser', 'name')
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\Select::make('user_assigned_id')
+                    ->label('Assigned to')
+                    ->relationship('assignedToUser', 'name')
+                    ->searchable()
+                    ->preload(),
+            ]),
+        ]);
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->recordTitleAttribute('name')
+            ->columns([
+                Tables\Columns\IconColumn::make('completed_at')
+                    ->label('Done')
+                    ->boolean()
+                    ->getStateUsing(fn ($record) => filled($record->completed_at)),
+                Tables\Columns\TextColumn::make('name')->limit(60)->wrap(),
+                Tables\Columns\TextColumn::make('due_at')->dateTime()->sortable(),
+                Tables\Columns\TextColumn::make('assignedToUser.name')
+                    ->label('Assignee')
+                    ->toggleable(),
+            ])
+            ->defaultSort('due_at')
+            ->headerActions([
+                Actions\CreateAction::make(),
+            ])
+            ->recordActions([
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
+            ]);
+    }
+}

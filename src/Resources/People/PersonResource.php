@@ -13,6 +13,10 @@ use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
@@ -123,6 +127,16 @@ class PersonResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+public static function getRelations(): array
+    {
+        return [
+            NotesRelationManager::class,
+            TasksRelationManager::class,
+            CallsRelationManager::class,
+            MeetingsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\Quote;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\CreateQuote;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\EditQuote;
@@ -21,6 +22,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\ViewQuote;
 
 class QuoteResource extends Resource
 {
+    use HasCrmCustomFields;
+
     protected static ?string $model = Quote::class;
 
     protected static ?string $slug = 'quotes';
@@ -43,7 +46,7 @@ class QuoteResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        $components = [
             Forms\Components\TextInput::make('title')
                 ->required()
                 ->maxLength(255),
@@ -135,7 +138,13 @@ class QuoteResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
-        ]);
+        ];
+
+        if ($customFields = static::crmCustomFieldsSection(Quote::class)) {
+            $components[] = $customFields;
+        }
+
+        return $schema->components($components);
     }
 
     public static function table(Table $table): Table

@@ -12,6 +12,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\CreateDeal;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\EditDeal;
@@ -20,6 +25,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\ViewDeal;
 
 class DealResource extends Resource
 {
+    use HasCrmCustomFields;
+
     protected static ?string $model = Deal::class;
 
     protected static ?string $slug = 'deals';
@@ -42,7 +49,7 @@ class DealResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        $components = [
             Forms\Components\TextInput::make('title')
                 ->required()
                 ->maxLength(255),
@@ -75,7 +82,13 @@ class DealResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
-        ]);
+        ];
+
+        if ($customFields = static::crmCustomFieldsSection(Deal::class)) {
+            $components[] = $customFields;
+        }
+
+        return $schema->components($components);
     }
 
     public static function table(Table $table): Table
@@ -130,6 +143,16 @@ class DealResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+public static function getRelations(): array
+    {
+        return [
+            NotesRelationManager::class,
+            TasksRelationManager::class,
+            CallsRelationManager::class,
+            MeetingsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

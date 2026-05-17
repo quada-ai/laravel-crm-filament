@@ -14,7 +14,9 @@ class CreateQuote extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(QuoteService::class)->create(FormPayload::wrap($data));
+        $record = app(QuoteService::class)->create(FormPayload::wrap($data));
+        QuoteResource::saveCrmCustomFields($data, $record);
+
+        return $record;
     }
 }
-
