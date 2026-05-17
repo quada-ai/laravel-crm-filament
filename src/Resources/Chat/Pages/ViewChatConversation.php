@@ -14,6 +14,8 @@ class ViewChatConversation extends ViewRecord
 {
     protected static string $resource = ChatConversationResource::class;
 
+    protected string $view = 'laravel-crm-filament::chat.thread';
+
     protected function getHeaderActions(): array
     {
         return [

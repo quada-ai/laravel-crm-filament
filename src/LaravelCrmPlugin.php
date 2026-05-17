@@ -250,9 +250,9 @@ class LaravelCrmPlugin implements Plugin
         if ($this->favicon) {
             $panel->favicon($this->favicon);
         }
-        if ($this->primaryColor) {
-            $panel->colors(['primary' => $this->primaryColor]);
-        }
+        // Default to the core CRM's signature teal when the host hasn't set its own.
+        $panelColor = $this->primaryColor ?? '#05b3a9';
+        $panel->colors(['primary' => $panelColor]);
 
         $panel->resources($resources);
 
