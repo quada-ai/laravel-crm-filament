@@ -23,7 +23,7 @@ class LeadKanban extends Page
     public function getStages(): Collection
     {
         $pipelineIds = Pipeline::query()
-            ->where('model', 'lead')
+            ->where('model', \VentureDrake\LaravelCrm\Models\Lead::class)
             ->pluck('id');
 
         return PipelineStage::query()

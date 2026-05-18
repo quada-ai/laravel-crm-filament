@@ -41,9 +41,13 @@ class PipelineResource extends Resource
             Forms\Components\Select::make('model')
                 ->label('Applies to')
                 ->options([
-                    'lead' => 'Leads',
-                    'deal' => 'Deals',
-                    'quote' => 'Quotes',
+                    \VentureDrake\LaravelCrm\Models\Lead::class => 'Leads',
+                    \VentureDrake\LaravelCrm\Models\Deal::class => 'Deals',
+                    \VentureDrake\LaravelCrm\Models\Quote::class => 'Quotes',
+                    \VentureDrake\LaravelCrm\Models\Order::class => 'Orders',
+                    \VentureDrake\LaravelCrm\Models\Invoice::class => 'Invoices',
+                    \VentureDrake\LaravelCrm\Models\Delivery::class => 'Deliveries',
+                    \VentureDrake\LaravelCrm\Models\PurchaseOrder::class => 'Purchase Orders',
                 ])
                 ->required(),
         ]);
@@ -54,7 +58,10 @@ class PipelineResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('model')->label('Applies to')->badge(),
+                Tables\Columns\TextColumn::make('model')
+                    ->label('Applies to')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state) => $state ? class_basename($state) : '-'),
                 Tables\Columns\TextColumn::make('pipelineStages_count')
                     ->label('Stages')
                     ->counts('pipelineStages')

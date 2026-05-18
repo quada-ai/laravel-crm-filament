@@ -23,7 +23,7 @@ class DealKanban extends Page
     public function getStages(): Collection
     {
         $pipelineIds = Pipeline::query()
-            ->where('model', 'deal')
+            ->where('model', \VentureDrake\LaravelCrm\Models\Deal::class)
             ->pluck('id');
 
         return PipelineStage::query()
