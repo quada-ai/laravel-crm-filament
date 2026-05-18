@@ -155,6 +155,21 @@ public static function getRelations(): array
         ];
     }
 
+public static function getGloballySearchableAttributes(): array
+    {
+        return ['deal_id', 'title'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return (string) ($record->title ?? $record->getKey());
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return array_filter(['ID' => $record->deal_id]);
+    }
+
     public static function getPages(): array
     {
         return [

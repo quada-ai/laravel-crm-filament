@@ -181,6 +181,21 @@ class InvoiceResource extends Resource
             ]);
     }
 
+public static function getGloballySearchableAttributes(): array
+    {
+        return ['invoice_id', 'reference'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return (string) ($record->invoice_id ?? $record->getKey());
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return array_filter(['Reference' => $record->reference]);
+    }
+
     public static function getPages(): array
     {
         return [

@@ -97,7 +97,23 @@ class ChatConversationResource extends Resource
                     }),
             ])
             ->toolbarActions([
-                Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
+                Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('close')
+                        ->label('Bulk close')
+                        ->icon('heroicon-o-x-mark')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records): void {
+                            $service = app(\VentureDrake\LaravelCrm\Services\ChatService::class);
+                            foreach ($records as $record) {
+                                if ($record->status === 'open') {
+                                    $service->close($record);
+                                }
+                            }
+                            \Filament\Notifications\Notification::make()->title($records->count().' conversation(s) closed')->success()->send();
+                        }),
+                    Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 

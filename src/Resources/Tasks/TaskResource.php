@@ -120,6 +120,20 @@ class TaskResource extends Resource
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
+                    Actions\BulkAction::make('markComplete')
+                        ->label('Mark complete')
+                        ->icon('heroicon-o-check')
+                        ->color('success')
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records): void {
+                            $updated = 0;
+                            foreach ($records as $record) {
+                                if (! $record->completed_at) {
+                                    $record->update(['completed_at' => now()]);
+                                    $updated++;
+                                }
+                            }
+                            \Filament\Notifications\Notification::make()->title($updated.' task(s) marked complete')->success()->send();
+                        }),
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
