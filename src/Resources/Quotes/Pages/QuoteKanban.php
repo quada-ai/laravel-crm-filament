@@ -44,6 +44,30 @@ class QuoteKanban extends Page
         return $quotes->groupBy('pipeline_stage_id')->all();
     }
 
+    public function markAccepted(string $externalId): void
+    {
+        $this->closeQuote($externalId, true);
+    }
+
+    public function markRejected(string $externalId): void
+    {
+        $this->closeQuote($externalId, false);
+    }
+
+    protected function closeQuote(string $externalId, bool $accepted): void
+    {
+        $quote = Quote::query()->where('external_id', $externalId)->first();
+        if (! $quote) {
+            return;
+        }
+        if ($accepted) {
+            $quote->accepted_at = now();
+        } else {
+            $quote->rejected_at = now();
+        }
+        $quote->save();
+    }
+
     public function moveQuote(string $externalId, ?int $stageId): void
     {
         $quote = Quote::query()->where('external_id', $externalId)->first();

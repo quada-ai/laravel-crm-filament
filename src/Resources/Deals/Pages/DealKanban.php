@@ -43,6 +43,31 @@ class DealKanban extends Page
         return $deals->groupBy('pipeline_stage_id')->all();
     }
 
+    public function markWon(string $externalId): void
+    {
+        $this->closeDeal($externalId, true);
+    }
+
+    public function markLost(string $externalId): void
+    {
+        $this->closeDeal($externalId, false);
+    }
+
+    protected function closeDeal(string $externalId, bool $won): void
+    {
+        $deal = Deal::query()->where('external_id', $externalId)->first();
+        if (! $deal) {
+            return;
+        }
+        $deal->forceFill([
+            'closed_at' => now(),
+        ]);
+        if (\Illuminate\Support\Facades\Schema::hasColumn($deal->getTable(), 'won')) {
+            $deal->won = $won;
+        }
+        $deal->save();
+    }
+
     public function moveDeal(string $externalId, ?int $stageId): void
     {
         $deal = Deal::query()->where('external_id', $externalId)->first();

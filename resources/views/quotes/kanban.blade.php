@@ -54,11 +54,19 @@
                         class="space-y-2 min-h-[60px]"
                     >
                         @foreach ($quotesByStage[$stage->id] ?? [] as $quote)
-                            <a
-                                href="{{ route('filament.crm.resources.quotes.edit', ['record' => $quote->external_id]) }}"
+                            <div
                                 data-quote-id="{{ $quote->external_id }}"
-                                class="block rounded-lg bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10 p-3 cursor-grab hover:shadow-md transition"
+                                class="group relative rounded-lg bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10 p-3 cursor-grab hover:shadow-md transition"
                             >
+                                <div class="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                                    <button type="button" title="Mark accepted"
+                                            wire:click.stop="markAccepted('{{ $quote->external_id }}')"
+                                            class="text-[10px] px-1.5 py-0.5 rounded bg-success-500 hover:bg-success-600 text-white">Accept</button>
+                                    <button type="button" title="Mark rejected"
+                                            wire:click.stop="markRejected('{{ $quote->external_id }}')"
+                                            class="text-[10px] px-1.5 py-0.5 rounded bg-danger-500 hover:bg-danger-600 text-white">Reject</button>
+                                </div>
+                                <a href="{{ route('filament.crm.resources.quotes.edit', ['record' => $quote->external_id]) }}" class="block">
                                 <div class="text-xs font-semibold text-gray-500">{{ $quote->quote_id }}</div>
                                 <div class="text-sm font-medium text-gray-950 dark:text-white mt-0.5">{{ $quote->title }}</div>
                                 @if ($quote->total)
@@ -71,7 +79,8 @@
                                         Expires {{ \Carbon\Carbon::parse($quote->expire_at)->format('M j') }}
                                     </div>
                                 @endif
-                            </a>
+                                </a>
+                            </div>
                         @endforeach
                     </div>
                 </div>

@@ -54,11 +54,19 @@
                         class="space-y-2 min-h-[60px]"
                     >
                         @foreach ($dealsByStage[$stage->id] ?? [] as $deal)
-                            <a
-                                href="{{ route('filament.crm.resources.deals.edit', ['record' => $deal->external_id]) }}"
+                            <div
                                 data-deal-id="{{ $deal->external_id }}"
-                                class="block rounded-lg bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10 p-3 cursor-grab hover:shadow-md transition"
+                                class="group relative rounded-lg bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10 p-3 cursor-grab hover:shadow-md transition"
                             >
+                                <div class="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                                    <button type="button" title="Mark won"
+                                            wire:click.stop="markWon('{{ $deal->external_id }}')"
+                                            class="text-[10px] px-1.5 py-0.5 rounded bg-success-500 hover:bg-success-600 text-white">Won</button>
+                                    <button type="button" title="Mark lost"
+                                            wire:click.stop="markLost('{{ $deal->external_id }}')"
+                                            class="text-[10px] px-1.5 py-0.5 rounded bg-danger-500 hover:bg-danger-600 text-white">Lost</button>
+                                </div>
+                                <a href="{{ route('filament.crm.resources.deals.edit', ['record' => $deal->external_id]) }}" class="block">
                                 <div class="text-xs font-semibold text-gray-500">{{ $deal->deal_id }}</div>
                                 <div class="text-sm font-medium text-gray-950 dark:text-white mt-0.5">{{ $deal->title }}</div>
                                 @if ($deal->amount)
@@ -71,7 +79,8 @@
                                         Closes {{ \Carbon\Carbon::parse($deal->expected_close)->format('M j') }}
                                     </div>
                                 @endif
-                            </a>
+                                </a>
+                            </div>
                         @endforeach
                     </div>
                 </div>
