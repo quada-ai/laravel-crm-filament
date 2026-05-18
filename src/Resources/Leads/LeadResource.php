@@ -40,7 +40,18 @@ class LeadResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return LaravelCrmPlugin::get()->getNavigationGroup();
+        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
+    }
+
+public static function getNavigationBadge(): ?string
+    {
+        $count = \VentureDrake\LaravelCrm\Models\Lead::query()->whereNull('converted_at')->count();
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'primary';
     }
 
     public static function getRecordRouteKeyName(): ?string

@@ -33,7 +33,18 @@ class TaskResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return LaravelCrmPlugin::get()->getNavigationGroup();
+        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
+    }
+
+public static function getNavigationBadge(): ?string
+    {
+        $count = \VentureDrake\LaravelCrm\Models\Task::query()->whereNull('completed_at')->count();
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
     }
 
     public static function getRecordRouteKeyName(): ?string

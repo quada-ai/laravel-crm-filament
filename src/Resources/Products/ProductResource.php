@@ -35,7 +35,7 @@ class ProductResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return LaravelCrmPlugin::get()->getNavigationGroup();
+        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Catalog';
     }
 
     public static function getRecordRouteKeyName(): ?string

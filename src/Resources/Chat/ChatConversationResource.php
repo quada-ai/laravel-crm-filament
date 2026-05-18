@@ -30,7 +30,18 @@ class ChatConversationResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return LaravelCrmPlugin::get()->getNavigationGroup();
+        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
+    }
+
+public static function getNavigationBadge(): ?string
+    {
+        $count = \VentureDrake\LaravelCrm\Models\ChatConversation::query()->where('status', 'open')->count();
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 
     public static function getRecordRouteKeyName(): ?string

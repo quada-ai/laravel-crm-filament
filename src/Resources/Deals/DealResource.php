@@ -39,7 +39,18 @@ class DealResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return LaravelCrmPlugin::get()->getNavigationGroup();
+        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
+    }
+
+public static function getNavigationBadge(): ?string
+    {
+        $count = \VentureDrake\LaravelCrm\Models\Deal::query()->whereNull('closed_at')->count();
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 
     public static function getRecordRouteKeyName(): ?string

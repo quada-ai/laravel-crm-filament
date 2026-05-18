@@ -42,7 +42,7 @@ class OrganizationResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return LaravelCrmPlugin::get()->getNavigationGroup();
+        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Contacts';
     }
 
     public static function getRecordRouteKeyName(): ?string

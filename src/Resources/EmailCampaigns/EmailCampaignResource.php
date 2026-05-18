@@ -33,7 +33,7 @@ class EmailCampaignResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return LaravelCrmPlugin::get()->getNavigationGroup();
+        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Marketing';
     }
 
     public static function getRecordRouteKeyName(): ?string
