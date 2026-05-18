@@ -14,6 +14,7 @@ use VentureDrake\LaravelCrm\Models\Invoice;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\CreateInvoice;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\EditInvoice;
@@ -176,6 +177,18 @@ class InvoiceResource extends Resource
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
+                    ExportsCsv::action(
+                        columns: [
+                            'ID' => fn ($r) => $r->invoice_id,
+                            'Reference' => fn ($r) => $r->reference,
+                            'Issue date' => fn ($r) => $r->issue_date,
+                            'Due date' => fn ($r) => $r->due_date,
+                            'Total' => fn ($r) => ($r->total ?? 0) / 100,
+                            'Currency' => fn ($r) => $r->currency,
+                            'Owner' => fn ($r) => optional($r->ownerUser)->name,
+                        ],
+                        filename: 'invoices',
+                    ),
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);

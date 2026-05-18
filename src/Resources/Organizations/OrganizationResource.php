@@ -19,6 +19,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
+use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\CreateOrganization;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\EditOrganization;
@@ -131,6 +132,16 @@ class OrganizationResource extends Resource
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
+                    ExportsCsv::action(
+                        columns: [
+                            'Name' => fn ($r) => $r->name,
+                            'VAT' => fn ($r) => $r->vat,
+                            'Employees' => fn ($r) => $r->employees,
+                            'Revenue' => fn ($r) => $r->revenue,
+                            'Created' => fn ($r) => $r->created_at,
+                        ],
+                        filename: 'organizations',
+                    ),
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);

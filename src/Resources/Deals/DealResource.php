@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
+use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\CreateDeal;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\EditDeal;
@@ -151,6 +152,18 @@ public static function getNavigationBadge(): ?string
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
+                    ExportsCsv::action(
+                        columns: [
+                            'ID' => fn ($r) => $r->deal_id,
+                            'Title' => fn ($r) => $r->title,
+                            'Amount' => fn ($r) => ($r->amount ?? 0) / 100,
+                            'Currency' => fn ($r) => $r->currency,
+                            'Expected close' => fn ($r) => $r->expected_close,
+                            'Owner' => fn ($r) => optional($r->ownerUser)->name,
+                            'Created' => fn ($r) => $r->created_at,
+                        ],
+                        filename: 'deals',
+                    ),
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);

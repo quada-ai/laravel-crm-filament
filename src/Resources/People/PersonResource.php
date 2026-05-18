@@ -19,6 +19,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
+use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
@@ -135,6 +136,16 @@ class PersonResource extends Resource
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
+                    ExportsCsv::action(
+                        columns: [
+                            'First name' => fn ($r) => $r->first_name,
+                            'Last name' => fn ($r) => $r->last_name,
+                            'Organization' => fn ($r) => optional($r->organization)->name,
+                            'Owner' => fn ($r) => optional($r->ownerUser)->name,
+                            'Created' => fn ($r) => $r->created_at,
+                        ],
+                        filename: 'people',
+                    ),
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
