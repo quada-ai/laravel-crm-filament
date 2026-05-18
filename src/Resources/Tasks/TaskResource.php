@@ -119,12 +119,7 @@ public static function getNavigationBadge(): ?string
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('due_at', 'asc')
-            ->filters([
-                Tables\Filters\Filter::make('open')
-                    ->label('Open only')
-                    ->query(fn ($query) => $query->whereNull('completed_at'))
-                    ->default(),
-            ])
+            ->filters([])
             ->recordActions([
                 Actions\ViewAction::make(),
                 Actions\EditAction::make(),
