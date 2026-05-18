@@ -21,6 +21,7 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\P
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Pipelines\PipelineResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ProductCategories\ProductCategoryResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\TaxRates\TaxRateResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\UserResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\DeliveryResource;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
 use VentureDrake\LaravelCrmFilament\Resources\Products\ProductResource;
@@ -230,6 +231,7 @@ class LaravelCrmPlugin implements Plugin
         $resources[] = FieldGroupResource::class;
         $resources[] = FieldResource::class;
         $resources[] = RoleResource::class;
+        $resources[] = UserResource::class;
         if ($this->isModuleEnabled('email-marketing')) {
             $resources[] = EmailTemplateResource::class;
         }
