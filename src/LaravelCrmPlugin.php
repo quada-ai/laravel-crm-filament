@@ -31,6 +31,9 @@ use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
 use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
+use VentureDrake\LaravelCrmFilament\Widgets\DealsValueStat;
+use VentureDrake\LaravelCrmFilament\Widgets\MonthlyRevenueChart;
+use VentureDrake\LaravelCrmFilament\Widgets\TasksDueTodayList;
 use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
 
 class LaravelCrmPlugin implements Plugin
@@ -263,7 +266,10 @@ class LaravelCrmPlugin implements Plugin
 
         $panel->widgets([
             CrmStatsOverview::class,
+            DealsValueStat::class,
             LeadsByStageChart::class,
+            MonthlyRevenueChart::class,
+            TasksDueTodayList::class,
         ]);
     }
 
