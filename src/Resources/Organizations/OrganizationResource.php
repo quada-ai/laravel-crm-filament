@@ -18,6 +18,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\CreateOrganization;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\EditOrganization;
@@ -27,6 +28,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\ViewOrganizati
 class OrganizationResource extends Resource
 {
     use HasCrmCustomFields;
+    use HasEncryptedGlobalSearch;
 
     protected static ?string $model = Organization::class;
 
@@ -142,6 +144,21 @@ public static function getRelations(): array
             CallsRelationManager::class,
             MeetingsRelationManager::class,
         ];
+    }
+
+public static function getGloballySearchableAttributes(): array
+    {
+        return ['name'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return (string) ($record->name ?? '');
+    }
+
+    protected static function crmEncryptedSearchAccessor(): \Closure
+    {
+        return fn ($r) => (string) ($r->name ?? '');
     }
 
     public static function getPages(): array

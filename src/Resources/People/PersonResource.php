@@ -18,6 +18,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
@@ -27,6 +28,7 @@ use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ViewPerson;
 class PersonResource extends Resource
 {
     use HasCrmCustomFields;
+    use HasEncryptedGlobalSearch;
 
     protected static ?string $model = Person::class;
 
@@ -146,6 +148,21 @@ public static function getRelations(): array
             CallsRelationManager::class,
             MeetingsRelationManager::class,
         ];
+    }
+
+public static function getGloballySearchableAttributes(): array
+    {
+        return ['first_name', 'last_name', 'middle_name', 'maiden_name'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return trim((string) ($record->name ?? ($record->first_name.' '.$record->last_name)));
+    }
+
+    protected static function crmEncryptedSearchAccessor(): \Closure
+    {
+        return fn ($r) => trim((($r->first_name ?? '').' '.($r->middle_name ?? '').' '.($r->last_name ?? '').' '.($r->maiden_name ?? '')));
     }
 
     public static function getPages(): array
