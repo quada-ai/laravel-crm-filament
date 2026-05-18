@@ -22,6 +22,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\CreateLead;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\EditLead;
+use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\LeadKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\ListLeads;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\ViewLead;
 
@@ -197,6 +198,7 @@ public static function getGloballySearchableAttributes(): array
     {
         return [
             'index' => ListLeads::route('/'),
+            'kanban' => LeadKanban::route('/kanban'),
             'create' => CreateLead::route('/create'),
             'view' => ViewLead::route('/{record}'),
             'edit' => EditLead::route('/{record}/edit'),

@@ -20,6 +20,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\CreateDeal;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\DealKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\EditDeal;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\ListDeals;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\ViewDeal;
@@ -198,6 +199,7 @@ public static function getGloballySearchableAttributes(): array
     {
         return [
             'index' => ListDeals::route('/'),
+            'kanban' => DealKanban::route('/kanban'),
             'create' => CreateDeal::route('/create'),
             'view' => ViewDeal::route('/{record}'),
             'edit' => EditDeal::route('/{record}/edit'),
