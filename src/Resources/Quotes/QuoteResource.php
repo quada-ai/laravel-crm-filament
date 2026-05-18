@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\CreateQuote;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\EditQuote;
+use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\QuoteKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\ListQuotes;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\ViewQuote;
 
@@ -217,6 +218,7 @@ public static function getGloballySearchableAttributes(): array
     {
         return [
             'index' => ListQuotes::route('/'),
+            'kanban' => QuoteKanban::route('/kanban'),
             'create' => CreateQuote::route('/create'),
             'view' => ViewQuote::route('/{record}'),
             'edit' => EditQuote::route('/{record}/edit'),

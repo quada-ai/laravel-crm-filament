@@ -15,7 +15,14 @@ class ListQuotes extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [Actions\CreateAction::make()];
+        return [
+            Actions\Action::make('kanban')
+                ->label('Kanban')
+                ->icon('heroicon-o-view-columns')
+                ->color('gray')
+                ->url(\VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource::getUrl('kanban')),
+            Actions\CreateAction::make(),
+        ];
     }
 
     public function getTabs(): array
