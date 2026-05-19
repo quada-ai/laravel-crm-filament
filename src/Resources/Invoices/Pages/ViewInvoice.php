@@ -8,8 +8,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
 
 class ViewInvoice extends ViewRecord
 {
-    use Concerns\HasInvoiceSendAction;
     use Concerns\HasInvoicePortalAction;
+    use Concerns\HasInvoiceSendAction;
 
     protected static string $resource = InvoiceResource::class;
 
@@ -18,6 +18,7 @@ class ViewInvoice extends ViewRecord
         return [
             Actions\EditAction::make(),
             $this->invoiceSendAction(),
+            $this->invoiceDownloadPdfAction(),
             $this->invoicePortalAction(),
         ];
     }

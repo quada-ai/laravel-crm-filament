@@ -8,8 +8,9 @@ use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 
 class ViewQuote extends ViewRecord
 {
-    use Concerns\HasQuoteSendAction;
+    use Concerns\HasQuoteConvertToOrderAction;
     use Concerns\HasQuotePortalAction;
+    use Concerns\HasQuoteSendAction;
 
     protected static string $resource = QuoteResource::class;
 
@@ -18,7 +19,9 @@ class ViewQuote extends ViewRecord
         return [
             Actions\EditAction::make(),
             $this->quoteSendAction(),
+            $this->quoteDownloadPdfAction(),
             $this->quotePortalAction(),
+            $this->quoteConvertToOrderAction(),
         ];
     }
 }

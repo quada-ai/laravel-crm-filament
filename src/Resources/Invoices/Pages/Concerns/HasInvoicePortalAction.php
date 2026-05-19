@@ -13,7 +13,7 @@ trait HasInvoicePortalAction
             ->label('Open portal')
             ->icon('heroicon-o-arrow-top-right-on-square')
             ->color('gray')
-            ->url(fn (Invoice $record): string => url('p/invoices/'.$record->external_id))
+            ->url(fn (Invoice $record): string => url('p/invoices/' . $record->external_id))
             ->openUrlInNewTab();
     }
 }

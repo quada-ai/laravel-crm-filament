@@ -2,20 +2,21 @@
 
 namespace VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\Concerns;
 
-use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use VentureDrake\LaravelCrm\Mail\SendInvoice;
 use VentureDrake\LaravelCrm\Models\Invoice;
+use VentureDrake\LaravelCrmFilament\Concerns\DownloadsPdf;
 
 trait HasInvoiceSendAction
 {
+    use DownloadsPdf;
+
     protected function invoiceSendAction(): Action
     {
         return Action::make('send')
@@ -32,7 +33,7 @@ trait HasInvoiceSendAction
                     ->default(fn () => optional($record->person)->getPrimaryEmail()?->address),
                 TextInput::make('subject')
                     ->required()
-                    ->default(fn () => 'Invoice '.$record->invoice_id),
+                    ->default(fn () => 'Invoice ' . $record->invoice_id),
                 Textarea::make('message')
                     ->rows(8)
                     ->default("Hi,\n\nPlease find your invoice here: [Online Invoice Link]\n\nThanks."),
@@ -47,6 +48,19 @@ trait HasInvoiceSendAction
                     ->success()
                     ->send();
             });
+    }
+
+    protected function invoiceDownloadPdfAction(): Action
+    {
+        return $this->downloadPdfAction(
+            fn (Invoice $record) => $this->streamPdfDownload(
+                $record,
+                'invoice',
+                'invoice',
+                'laravel-crm::invoices.pdf',
+                $this->invoicePdfViewData($record),
+            ),
+        );
     }
 
     protected function dispatchInvoice(Invoice $record, array $data): void
@@ -71,26 +85,28 @@ trait HasInvoiceSendAction
 
     protected function generateInvoicePdf(Invoice $record): string
     {
-        $relativeDir = 'laravel-crm/invoice/'.$record->id;
-        Storage::makeDirectory($relativeDir);
+        return $this->renderPdfToDisk(
+            $record,
+            'invoice',
+            'invoice',
+            'laravel-crm::invoices.pdf',
+            $this->invoicePdfViewData($record),
+        );
+    }
 
-        $pdfRelative = 'app/'.$relativeDir.'/invoice-'.strtolower((string) $record->invoice_id).'.pdf';
-
+    protected function invoicePdfViewData(Invoice $record): array
+    {
         $settings = app('laravel-crm.settings');
 
-        Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
-            ->loadView('laravel-crm::invoices.pdf', [
-                'invoice' => $record,
-                'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
-                'email' => optional($record->person)->getPrimaryEmail(),
-                'phone' => optional($record->person)->getPrimaryPhone(),
-                'address' => optional($record->person)->getPrimaryAddress(),
-                'organization_address' => optional($record->organization)->getPrimaryAddress(),
-                'fromName' => $settings->get('organization_name'),
-                'logo' => $settings->get('logo_file'),
-            ])
-            ->save(storage_path($pdfRelative));
-
-        return $pdfRelative;
+        return [
+            'invoice' => $record,
+            'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
+            'email' => optional($record->person)->getPrimaryEmail(),
+            'phone' => optional($record->person)->getPrimaryPhone(),
+            'address' => optional($record->person)->getPrimaryAddress(),
+            'organization_address' => optional($record->organization)->getPrimaryAddress(),
+            'fromName' => $settings->get('organization_name'),
+            'logo' => $settings->get('logo_file'),
+        ];
     }
 }

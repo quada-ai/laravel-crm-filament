@@ -13,7 +13,7 @@ trait HasQuotePortalAction
             ->label('Open portal')
             ->icon('heroicon-o-arrow-top-right-on-square')
             ->color('gray')
-            ->url(fn (Quote $record): string => url('p/quotes/'.$record->external_id))
+            ->url(fn (Quote $record): string => url('p/quotes/' . $record->external_id))
             ->openUrlInNewTab();
     }
 }

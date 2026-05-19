@@ -17,6 +17,7 @@ class ViewPurchaseOrder extends ViewRecord
         return [
             Actions\EditAction::make(),
             $this->purchaseOrderSendAction(),
+            $this->purchaseOrderDownloadPdfAction(),
         ];
     }
 }

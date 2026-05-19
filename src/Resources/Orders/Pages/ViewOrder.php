@@ -8,10 +8,19 @@ use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 
 class ViewOrder extends ViewRecord
 {
+    use Concerns\HasOrderConvertToDeliveryAction;
+    use Concerns\HasOrderConvertToInvoiceAction;
+    use Concerns\HasOrderConvertToPurchaseOrderAction;
+
     protected static string $resource = OrderResource::class;
 
     protected function getHeaderActions(): array
     {
-        return [Actions\EditAction::make()];
+        return [
+            Actions\EditAction::make(),
+            $this->orderConvertToInvoiceAction(),
+            $this->orderConvertToDeliveryAction(),
+            $this->orderConvertToPurchaseOrderAction(),
+        ];
     }
 }

@@ -2,20 +2,21 @@
 
 namespace VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\Concerns;
 
-use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use VentureDrake\LaravelCrm\Mail\SendQuote;
 use VentureDrake\LaravelCrm\Models\Quote;
+use VentureDrake\LaravelCrmFilament\Concerns\DownloadsPdf;
 
 trait HasQuoteSendAction
 {
+    use DownloadsPdf;
+
     protected function quoteSendAction(): Action
     {
         return Action::make('send')
@@ -32,7 +33,7 @@ trait HasQuoteSendAction
                     ->default(fn () => optional($record->person)->getPrimaryEmail()?->address),
                 TextInput::make('subject')
                     ->required()
-                    ->default(fn () => 'Quote '.$record->quote_id),
+                    ->default(fn () => 'Quote ' . $record->quote_id),
                 Textarea::make('message')
                     ->rows(8)
                     ->default("Hi,\n\nPlease find your quote here: [Online Quote Link]\n\nThanks."),
@@ -47,6 +48,19 @@ trait HasQuoteSendAction
                     ->success()
                     ->send();
             });
+    }
+
+    protected function quoteDownloadPdfAction(): Action
+    {
+        return $this->downloadPdfAction(
+            fn (Quote $record) => $this->streamPdfDownload(
+                $record,
+                'quote',
+                'quote',
+                'laravel-crm::quotes.pdf',
+                $this->quotePdfViewData($record),
+            ),
+        );
     }
 
     protected function dispatchQuote(Quote $record, array $data): void
@@ -71,26 +85,28 @@ trait HasQuoteSendAction
 
     protected function generateQuotePdf(Quote $record): string
     {
-        $relativeDir = 'laravel-crm/quote/'.$record->id;
-        Storage::makeDirectory($relativeDir);
+        return $this->renderPdfToDisk(
+            $record,
+            'quote',
+            'quote',
+            'laravel-crm::quotes.pdf',
+            $this->quotePdfViewData($record),
+        );
+    }
 
-        $pdfRelative = 'app/'.$relativeDir.'/quote-'.strtolower((string) $record->quote_id).'.pdf';
-
+    protected function quotePdfViewData(Quote $record): array
+    {
         $settings = app('laravel-crm.settings');
 
-        Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
-            ->loadView('laravel-crm::quotes.pdf', [
-                'quote' => $record,
-                'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
-                'email' => optional($record->person)->getPrimaryEmail(),
-                'phone' => optional($record->person)->getPrimaryPhone(),
-                'address' => optional($record->person)->getPrimaryAddress(),
-                'organization_address' => optional($record->organization)->getPrimaryAddress(),
-                'fromName' => $settings->get('organization_name'),
-                'logo' => $settings->get('logo_file'),
-            ])
-            ->save(storage_path($pdfRelative));
-
-        return $pdfRelative;
+        return [
+            'quote' => $record,
+            'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
+            'email' => optional($record->person)->getPrimaryEmail(),
+            'phone' => optional($record->person)->getPrimaryPhone(),
+            'address' => optional($record->person)->getPrimaryAddress(),
+            'organization_address' => optional($record->organization)->getPrimaryAddress(),
+            'fromName' => $settings->get('organization_name'),
+            'logo' => $settings->get('logo_file'),
+        ];
     }
 }
