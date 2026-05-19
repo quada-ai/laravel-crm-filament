@@ -4,6 +4,17 @@
         $dealsByStage = $this->getDealsByStage();
     @endphp
 
+    <div class="flex items-center gap-3 mb-4">
+        <label class="text-xs text-gray-500">Owner</label>
+        <select wire:model.live="ownerFilter"
+                class="text-sm border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:ring-primary-500 focus:border-primary-500">
+            <option value="">Everyone</option>
+            @foreach ($this->getOwners() as $id => $name)
+                <option value="{{ $id }}">{{ $name }}</option>
+            @endforeach
+        </select>
+    </div>
+
     <div
         x-data="{
             initSortables() {
@@ -44,8 +55,11 @@
                 <div class="fi-section rounded-xl bg-gray-50 dark:bg-gray-900/40 p-3 min-h-[200px]">
                     <div class="flex items-center justify-between mb-3">
                         <div class="font-semibold text-sm">{{ $stage->name }}</div>
-                        <div class="text-xs text-gray-500">
-                            {{ ($dealsByStage[$stage->id] ?? collect())->count() }}
+                        <div class="text-xs text-gray-500 text-right">
+                            <div>{{ ($dealsByStage[$stage->id] ?? collect())->count() }}</div>
+                            <div class="text-[10px] text-gray-400">
+                                {{ number_format($this->getStageTotal($stage->id, $dealsByStage), 0) }} {{ config("laravel-crm.default_currency", "USD") }}
+                            </div>
                         </div>
                     </div>
                     <div

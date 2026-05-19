@@ -20,6 +20,14 @@ class DealKanban extends Page
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-view-columns';
 
+    public ?int $ownerFilter = null;
+
+    public function getOwners(): \Illuminate\Support\Collection
+    {
+        $userClass = config('auth.providers.users.model');
+        return $userClass::query()->orderBy('name')->pluck('name', 'id');
+    }
+
     public function getStages(): Collection
     {
         $pipelineIds = Pipeline::query()
@@ -36,6 +44,7 @@ class DealKanban extends Page
     {
         $deals = Deal::query()
             ->whereNull('closed_at')
+            ->when($this->ownerFilter, fn ($q) => $q->where('user_owner_id', $this->ownerFilter))
             ->whereNotNull('pipeline_stage_id')
             ->orderByDesc('updated_at')
             ->get();
@@ -80,5 +89,14 @@ class DealKanban extends Page
             $deal->pipeline_id = $stage?->pipeline_id;
         }
         $deal->save();
+    }
+    public function getStageTotal(int $stageId, array $byStage): float
+    {
+        $rows = $byStage[$stageId] ?? collect();
+        $sum = 0;
+        foreach ($rows as $row) {
+            $sum += (int) ($row->amount ?? 0);
+        }
+        return $sum / 100;
     }
 }
