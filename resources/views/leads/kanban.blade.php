@@ -2,12 +2,61 @@
     @php
         $stages = $this->getStages();
         $leadsByStage = $this->getLeadsByStage();
+        $currency = config('laravel-crm.default_currency', 'USD');
     @endphp
 
-    <div class="flex items-center gap-3 mb-4">
-        <label class="text-xs text-gray-500">Owner</label>
+    <style>
+        .crm-kanban { display: grid; gap: 1rem; overflow-x: auto; }
+        .crm-kanban-col {
+            background: rgba(0,0,0,0.04);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            min-height: 200px;
+        }
+        html.dark .crm-kanban-col { background: rgba(255,255,255,0.04); }
+        .crm-kanban-col-head {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        .crm-kanban-col-title { font-weight: 600; font-size: 0.875rem; }
+        .crm-kanban-col-meta { text-align: right; font-size: 0.75rem; color: #6b7280; line-height: 1.2; }
+        .crm-kanban-col-total { font-size: 0.65rem; color: #9ca3af; margin-top: 0.125rem; }
+        .crm-kanban-list { display: flex; flex-direction: column; gap: 0.5rem; min-height: 60px; }
+        .crm-kanban-card {
+            position: relative;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 0.5rem;
+            padding: 0.625rem 0.75rem;
+            cursor: grab;
+            transition: box-shadow 120ms ease, transform 120ms ease;
+        }
+        html.dark .crm-kanban-card { background: rgb(31,41,55); border-color: rgba(255,255,255,0.08); }
+        .crm-kanban-card:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .crm-kanban-card-link { display: block; text-decoration: none; color: inherit; }
+        .crm-kanban-card-id { font-size: 0.7rem; font-weight: 600; color: #6b7280; }
+        .crm-kanban-card-title { font-size: 0.875rem; font-weight: 500; margin-top: 0.125rem; }
+        .crm-kanban-card-amount { font-size: 0.7rem; color: #6b7280; margin-top: 0.25rem; }
+        .crm-kanban-actions {
+            position: absolute; top: 0.375rem; right: 0.375rem;
+            display: flex; gap: 0.25rem;
+            opacity: 0; transition: opacity 120ms ease;
+        }
+        .crm-kanban-card:hover .crm-kanban-actions { opacity: 1; }
+        .crm-kanban-btn {
+            font-size: 0.65rem; padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem; border: 0; cursor: pointer;
+            color: #fff;
+        }
+        .crm-kanban-btn-primary { background: #05b3a9; }
+        .crm-kanban-btn-primary:hover { background: #047d75; }
+        .crm-kanban-empty { color: #6b7280; font-size: 0.875rem; text-align: center; padding: 3rem 1rem; grid-column: 1 / -1; }
+    </style>
+
+    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+        <label style="font-size:0.75rem; color:#6b7280;">Owner</label>
         <select wire:model.live="ownerFilter"
-                class="text-sm border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 focus:ring-primary-500 focus:border-primary-500">
+                style="font-size:0.875rem; padding:0.375rem 0.5rem; border-radius:0.375rem; border:1px solid #d1d5db; background:#fff;">
             <option value="">Everyone</option>
             @foreach ($this->getOwners() as $id => $name)
                 <option value="{{ $id }}">{{ $name }}</option>
@@ -46,59 +95,48 @@
             }
         "
     >
-        <div
-            x-ref="board"
-            class="grid gap-4 overflow-x-auto"
-            style="grid-template-columns: repeat({{ max($stages->count(), 1) }}, minmax(260px, 1fr));"
-        >
+        <div x-ref="board" class="crm-kanban"
+             style="grid-template-columns: repeat({{ max($stages->count(), 1) }}, minmax(260px, 1fr));">
             @forelse ($stages as $stage)
-                <div class="fi-section rounded-xl bg-gray-50 dark:bg-gray-900/40 p-3 min-h-[200px]">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="font-semibold text-sm">{{ $stage->name }}</div>
-                        <div class="text-xs text-gray-500 text-right">
-                            <div>{{ ($leadsByStage[$stage->id] ?? collect())->count() }}</div>
-                            <div class="text-[10px] text-gray-400">
-                                {{ number_format($this->getStageTotal($stage->id, $leadsByStage), 0) }} {{ config("laravel-crm.default_currency", "USD") }}
+                @php $stageLeads = $leadsByStage[$stage->id] ?? collect(); @endphp
+                <div class="crm-kanban-col">
+                    <div class="crm-kanban-col-head">
+                        <div class="crm-kanban-col-title">{{ $stage->name }}</div>
+                        <div class="crm-kanban-col-meta">
+                            <div>{{ $stageLeads->count() }}</div>
+                            <div class="crm-kanban-col-total">
+                                {{ number_format($this->getStageTotal($stage->id, $leadsByStage), 0) }} {{ $currency }}
                             </div>
                         </div>
                     </div>
-                    <div
-                        data-kanban-column
-                        data-stage-id="{{ $stage->id }}"
-                        class="space-y-2 min-h-[60px]"
-                    >
-                        @foreach ($leadsByStage[$stage->id] ?? [] as $lead)
-                            <div
-                                data-lead-id="{{ $lead->external_id }}"
-                                class="group relative rounded-lg bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10 p-3 cursor-grab hover:shadow-md transition"
-                            >
-                                <div class="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-                                    <button type="button" title="Convert to deal"
+                    <div data-kanban-column data-stage-id="{{ $stage->id }}" class="crm-kanban-list">
+                        @foreach ($stageLeads as $lead)
+                            <div data-lead-id="{{ $lead->external_id }}" class="crm-kanban-card">
+                                <div class="crm-kanban-actions">
+                                    <button type="button"
                                             wire:click.stop="convertToDeal('{{ $lead->external_id }}')"
                                             wire:confirm="Convert this lead into a deal?"
-                                            class="text-[10px] px-1.5 py-0.5 rounded bg-primary-500 hover:bg-primary-600 text-white">Convert</button>
+                                            class="crm-kanban-btn crm-kanban-btn-primary"
+                                            title="Convert to deal">Convert</button>
                                 </div>
-                                <a href="{{ route('filament.crm.resources.leads.edit', ['record' => $lead->external_id]) }}" class="block">
-                                <div class="text-xs font-semibold text-gray-500">
-                                    {{ $lead->lead_id }}
-                                </div>
-                                <div class="text-sm font-medium text-gray-950 dark:text-white mt-0.5">
-                                    {{ $lead->title }}
-                                </div>
-                                @if ($lead->amount)
-                                    <div class="text-xs text-gray-500 mt-1">
-                                        {{ ($lead->amount / 100) }} {{ $lead->currency }}
-                                    </div>
-                                @endif
+                                <a href="{{ route('filament.crm.resources.leads.edit', ['record' => $lead->external_id]) }}"
+                                   class="crm-kanban-card-link">
+                                    <div class="crm-kanban-card-id">{{ $lead->lead_id }}</div>
+                                    <div class="crm-kanban-card-title">{{ $lead->title }}</div>
+                                    @if ($lead->amount)
+                                        <div class="crm-kanban-card-amount">
+                                            {{ ($lead->amount / 100) }} {{ $lead->currency }}
+                                        </div>
+                                    @endif
                                 </a>
                             </div>
                         @endforeach
                     </div>
                 </div>
             @empty
-                <div class="col-span-full text-sm text-gray-500 text-center py-12">
+                <div class="crm-kanban-empty">
                     No pipeline stages configured for Leads.
-                    <a class="text-primary-600 underline" href="{{ route('filament.crm.settings.resources.pipelines.index') }}">
+                    <a style="color:#05b3a9;" href="{{ route('filament.crm.settings.resources.pipelines.index') }}">
                         Configure pipelines
                     </a>.
                 </div>
