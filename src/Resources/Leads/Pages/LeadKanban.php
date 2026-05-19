@@ -52,6 +52,30 @@ class LeadKanban extends Page
         return $leads->groupBy('pipeline_stage_id')->all();
     }
 
+    public function convertToDeal(string $externalId): void
+    {
+        $lead = Lead::query()->where('external_id', $externalId)->first();
+        if (! $lead || $lead->converted_at) {
+            return;
+        }
+
+        $payload = new \Illuminate\Support\Fluent([
+            'title' => $lead->title,
+            'description' => $lead->description,
+            'amount' => ($lead->amount ?? 0) / 100,
+            'currency' => $lead->currency,
+            'user_owner_id' => $lead->user_owner_id,
+        ]);
+
+        app(\VentureDrake\LaravelCrm\Services\DealService::class)->create(
+            $payload,
+            $lead->person,
+            $lead->organization,
+        );
+
+        $lead->forceFill(['converted_at' => now()])->save();
+    }
+
     public function moveLead(string $externalId, ?int $stageId): void
     {
         $lead = Lead::query()->where('external_id', $externalId)->first();

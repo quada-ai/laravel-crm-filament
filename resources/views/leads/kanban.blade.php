@@ -68,11 +68,17 @@
                         class="space-y-2 min-h-[60px]"
                     >
                         @foreach ($leadsByStage[$stage->id] ?? [] as $lead)
-                            <a
-                                href="{{ route('filament.crm.resources.leads.edit', ['record' => $lead->external_id]) }}"
+                            <div
                                 data-lead-id="{{ $lead->external_id }}"
-                                class="block rounded-lg bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10 p-3 cursor-grab hover:shadow-md transition"
+                                class="group relative rounded-lg bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-950/5 dark:ring-white/10 p-3 cursor-grab hover:shadow-md transition"
                             >
+                                <div class="absolute top-1.5 right-1.5 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                                    <button type="button" title="Convert to deal"
+                                            wire:click.stop="convertToDeal('{{ $lead->external_id }}')"
+                                            wire:confirm="Convert this lead into a deal?"
+                                            class="text-[10px] px-1.5 py-0.5 rounded bg-primary-500 hover:bg-primary-600 text-white">Convert</button>
+                                </div>
+                                <a href="{{ route('filament.crm.resources.leads.edit', ['record' => $lead->external_id]) }}" class="block">
                                 <div class="text-xs font-semibold text-gray-500">
                                     {{ $lead->lead_id }}
                                 </div>
@@ -84,7 +90,8 @@
                                         {{ ($lead->amount / 100) }} {{ $lead->currency }}
                                     </div>
                                 @endif
-                            </a>
+                                </a>
+                            </div>
                         @endforeach
                     </div>
                 </div>
