@@ -160,6 +160,13 @@ return [
         'visitor' => 'Visiteur',
         'public_key' => 'Clé publique',
         'allowed_origins' => 'Origines autorisées',
+        'thread' => 'Conversation',
+        'reply_form_heading' => 'Répondre',
+        'agent' => 'Agent',
+        'no_messages' => 'Aucun message pour le moment.',
+        'status_open' => 'Ouverte',
+        'status_pending' => 'Répondue (en attente du visiteur)',
+        'status_closed' => 'Fermée',
     ],
 
     'file' => [
@@ -235,6 +242,10 @@ return [
         'enable_two_factor' => 'Activer l’authentification à deux facteurs',
         'disable_two_factor' => 'Désactiver l’authentification à deux facteurs',
         'log_out_other_sessions' => 'Déconnecter les autres sessions',
+        'mark_replied' => 'Marquer comme répondu',
+        'bulk_mark_replied' => 'Marquer en lot comme répondu',
+        'reopen' => 'Rouvrir',
+        'change_status' => 'Changer le statut',
     ],
 
     'import' => [

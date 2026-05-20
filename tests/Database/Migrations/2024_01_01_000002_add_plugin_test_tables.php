@@ -295,28 +295,55 @@ return new class extends Migration
             Schema::create($prefix . 'chat_conversations', function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->string('external_id')->nullable();
+                $table->string('chat_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
                 $table->unsignedBigInteger('chat_widget_id')->nullable();
+                $table->unsignedBigInteger('chat_visitor_id')->nullable();
                 $table->unsignedBigInteger('lead_id')->nullable();
-                $table->string('visitor_name')->nullable();
-                $table->string('visitor_email')->nullable();
+                $table->string('subject')->nullable();
                 $table->string('status')->nullable();
                 $table->unsignedBigInteger('user_assigned_id')->nullable();
-                $table->unsignedBigInteger('team_id')->nullable();
+                $table->timestamp('last_message_at')->nullable();
+                $table->timestamp('closed_at')->nullable();
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('user_deleted_id')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'chat_visitors')) {
+            Schema::create($prefix . 'chat_visitors', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->unsignedBigInteger('chat_widget_id')->nullable();
+                $table->string('visitor_token', 64)->nullable()->unique();
+                $table->string('name')->nullable();
+                $table->string('email')->nullable();
+                $table->string('ip_address', 64)->nullable();
+                $table->string('user_agent', 512)->nullable();
+                $table->string('current_url', 1024)->nullable();
+                $table->string('country_code', 8)->nullable();
+                $table->timestamp('last_seen_at')->nullable();
+                $table->unsignedBigInteger('person_id')->nullable();
+                $table->timestamps();
             });
         }
 
         if (! Schema::hasTable($prefix . 'chat_messages')) {
             Schema::create($prefix . 'chat_messages', function (Blueprint $table) {
                 $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
                 $table->unsignedBigInteger('chat_conversation_id');
-                $table->text('message');
                 $table->string('sender_type')->nullable();
                 $table->unsignedBigInteger('sender_id')->nullable();
-                $table->dateTime('visitor_read_at')->nullable();
+                $table->text('body');
+                $table->timestamp('read_at')->nullable();
+                $table->timestamp('visitor_read_at')->nullable();
                 $table->timestamps();
-                $table->softDeletes();
             });
         }
 

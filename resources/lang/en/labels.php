@@ -166,6 +166,13 @@ return [
         'visitor' => 'Visitor',
         'public_key' => 'Public key',
         'allowed_origins' => 'Allowed origins',
+        'thread' => 'Conversation',
+        'reply_form_heading' => 'Reply',
+        'agent' => 'Agent',
+        'no_messages' => 'No messages yet.',
+        'status_open' => 'Open',
+        'status_pending' => 'Replied (waiting on visitor)',
+        'status_closed' => 'Closed',
     ],
 
     // File / upload
@@ -244,6 +251,10 @@ return [
         'enable_two_factor' => 'Enable two-factor',
         'disable_two_factor' => 'Disable two-factor',
         'log_out_other_sessions' => 'Log out other browser sessions',
+        'mark_replied' => 'Mark replied',
+        'bulk_mark_replied' => 'Bulk mark replied',
+        'reopen' => 'Reopen',
+        'change_status' => 'Change status',
     ],
 
     // CSV import

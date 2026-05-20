@@ -160,6 +160,13 @@ return [
         'visitor' => 'Visitante',
         'public_key' => 'Clave pública',
         'allowed_origins' => 'Orígenes permitidos',
+        'thread' => 'Conversación',
+        'reply_form_heading' => 'Responder',
+        'agent' => 'Agente',
+        'no_messages' => 'Aún no hay mensajes.',
+        'status_open' => 'Abierta',
+        'status_pending' => 'Respondida (esperando al visitante)',
+        'status_closed' => 'Cerrada',
     ],
 
     'file' => [
@@ -235,6 +242,10 @@ return [
         'enable_two_factor' => 'Activar dos factores',
         'disable_two_factor' => 'Desactivar dos factores',
         'log_out_other_sessions' => 'Cerrar otras sesiones',
+        'mark_replied' => 'Marcar respondida',
+        'bulk_mark_replied' => 'Marcar en lote como respondidas',
+        'reopen' => 'Reabrir',
+        'change_status' => 'Cambiar estado',
     ],
 
     'import' => [
