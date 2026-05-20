@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\TaxRate;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\ProductVariationsRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\CreateProduct;
@@ -23,6 +24,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\ViewProduct;
 class ProductResource extends Resource
 {
     use HasCrmCustomFields;
+    use HasLabels;
 
     protected static ?string $model = Product::class;
 
@@ -95,6 +97,8 @@ class ProductResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
+
+            static::labelsField(),
         ];
 
         if ($customFields = static::crmCustomFieldsSection(Product::class)) {

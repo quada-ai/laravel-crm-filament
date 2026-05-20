@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrm\Models\LeadStatus;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
@@ -32,6 +33,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\ViewLead;
 class LeadResource extends Resource
 {
     use HasCrmCustomFields;
+    use HasLabels;
 
     protected static ?string $model = Lead::class;
 
@@ -109,6 +111,8 @@ class LeadResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
+
+            static::labelsField(),
         ];
 
         if ($customFields = static::crmCustomFieldsSection(Lead::class)) {

@@ -51,6 +51,7 @@ return [
         'template' => 'Plantilla',
         'last_activity' => 'Última actividad',
         'fields' => 'Campos',
+        'labels' => 'Etiquetas',
     ],
 
     'contact' => [

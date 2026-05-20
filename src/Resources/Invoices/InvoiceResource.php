@@ -16,6 +16,7 @@ use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\CreateInvoice;
@@ -26,6 +27,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\ViewInvoice;
 class InvoiceResource extends Resource
 {
     use HasCrmCustomFields;
+    use HasLabels;
 
     protected static ?string $model = Invoice::class;
 
@@ -130,6 +132,8 @@ class InvoiceResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
+
+            static::labelsField(),
         ];
 
         if ($customFields = static::crmCustomFieldsSection(Invoice::class)) {

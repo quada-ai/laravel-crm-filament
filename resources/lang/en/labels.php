@@ -52,6 +52,7 @@ return [
         'template' => 'Template',
         'last_activity' => 'Last activity',
         'fields' => 'Fields',
+        'labels' => 'Labels',
     ],
 
     // Contact / address fields

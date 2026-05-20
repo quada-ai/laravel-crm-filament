@@ -15,6 +15,7 @@ use VentureDrake\LaravelCrm\Models\AddressType;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\CreateOrder;
@@ -25,6 +26,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\ViewOrder;
 class OrderResource extends Resource
 {
     use HasCrmCustomFields;
+    use HasLabels;
 
     protected static ?string $model = Order::class;
 
@@ -154,6 +156,8 @@ class OrderResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
+
+            static::labelsField(),
         ];
 
         if ($customFields = static::crmCustomFieldsSection(Order::class)) {

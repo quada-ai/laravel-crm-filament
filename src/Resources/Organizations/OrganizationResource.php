@@ -19,6 +19,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
@@ -34,6 +35,7 @@ class OrganizationResource extends Resource
 {
     use HasCrmCustomFields;
     use HasEncryptedGlobalSearch;
+    use HasLabels;
 
     protected static ?string $model = Organization::class;
 
@@ -91,6 +93,8 @@ class OrganizationResource extends Resource
                 ->options(fn () => User::query()->orderBy('name')->pluck('name', 'id'))
                 ->searchable()
                 ->preload(),
+
+            static::labelsField(),
 
             ContactFieldsSchema::phonesRepeater(),
             ContactFieldsSchema::emailsRepeater(),

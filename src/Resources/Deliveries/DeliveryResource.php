@@ -15,6 +15,7 @@ use VentureDrake\LaravelCrm\Models\AddressType;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\OrderProduct;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\CreateDelivery;
@@ -24,6 +25,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\ViewDelivery;
 
 class DeliveryResource extends Resource
 {
+    use HasLabels;
+
     protected static ?string $model = Delivery::class;
 
     protected static ?string $slug = 'deliveries';
@@ -126,6 +129,8 @@ class DeliveryResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
+
+            static::labelsField(),
         ]);
     }
 

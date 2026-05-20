@@ -15,6 +15,7 @@ use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\CreateQuote;
@@ -26,6 +27,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\ViewQuote;
 class QuoteResource extends Resource
 {
     use HasCrmCustomFields;
+    use HasLabels;
 
     protected static ?string $model = Quote::class;
 
@@ -141,6 +143,8 @@ class QuoteResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
+
+            static::labelsField(),
         ];
 
         if ($customFields = static::crmCustomFieldsSection(Quote::class)) {

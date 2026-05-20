@@ -51,6 +51,7 @@ return [
         'template' => 'Modèle',
         'last_activity' => 'Dernière activité',
         'fields' => 'Champs',
+        'labels' => 'Étiquettes',
     ],
 
     'contact' => [

@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
@@ -32,6 +33,7 @@ class PersonResource extends Resource
 {
     use HasCrmCustomFields;
     use HasEncryptedGlobalSearch;
+    use HasLabels;
 
     protected static ?string $model = Person::class;
 
@@ -85,6 +87,8 @@ class PersonResource extends Resource
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
+
+            static::labelsField(),
 
             ContactFieldsSchema::phonesRepeater(),
             ContactFieldsSchema::emailsRepeater(),
