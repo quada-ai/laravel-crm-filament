@@ -13,6 +13,7 @@ use VentureDrake\LaravelCrm\Sms\SmsCampaignMessage;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\Concerns\HasSmsCampaignSendNowAction;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 use VentureDrake\LaravelCrmFilament\Widgets\SmsCampaignSendsOverTimeChart;
+use VentureDrake\LaravelCrmFilament\Widgets\SmsCampaignTopUrlsWidget;
 
 class ViewSmsCampaign extends ViewRecord
 {
@@ -73,6 +74,7 @@ class ViewSmsCampaign extends ViewRecord
     {
         return [
             SmsCampaignSendsOverTimeChart::class,
+            SmsCampaignTopUrlsWidget::class,
         ];
     }
 }

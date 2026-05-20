@@ -320,6 +320,42 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasTable($prefix . 'email_campaign_recipients') && ! Schema::hasColumn($prefix . 'email_campaign_recipients', 'tracking_token')) {
+            Schema::table($prefix . 'email_campaign_recipients', function (Blueprint $table) {
+                $table->string('tracking_token', 64)->nullable()->index();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'sms_campaign_recipients') && ! Schema::hasColumn($prefix . 'sms_campaign_recipients', 'tracking_token')) {
+            Schema::table($prefix . 'sms_campaign_recipients', function (Blueprint $table) {
+                $table->string('tracking_token', 64)->nullable()->index();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'email_campaign_clicks')) {
+            Schema::create($prefix . 'email_campaign_clicks', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('email_campaign_recipient_id')->index();
+                $table->text('original_url');
+                $table->timestamp('clicked_at')->nullable();
+                $table->string('ip', 64)->nullable();
+                $table->string('user_agent', 512)->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'sms_campaign_clicks')) {
+            Schema::create($prefix . 'sms_campaign_clicks', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('sms_campaign_recipient_id')->index();
+                $table->text('original_url');
+                $table->timestamp('clicked_at')->nullable();
+                $table->string('ip', 64)->nullable();
+                $table->string('user_agent', 512)->nullable();
+                $table->timestamps();
+            });
+        }
+
         if (! Schema::hasTable('audits')) {
             Schema::create('audits', function (Blueprint $table) {
                 $table->bigIncrements('id');

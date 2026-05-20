@@ -22,6 +22,7 @@ use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\CreateSmsCampai
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\EditSmsCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\ListSmsCampaigns;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\ViewSmsCampaign;
+use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\RelationManagers\ClicksRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\RelationManagers\RecipientsRelationManager;
 
 class SmsCampaignResource extends Resource
@@ -166,6 +167,7 @@ class SmsCampaignResource extends Resource
     {
         return [
             RecipientsRelationManager::class,
+            ClicksRelationManager::class,
         ];
     }
 

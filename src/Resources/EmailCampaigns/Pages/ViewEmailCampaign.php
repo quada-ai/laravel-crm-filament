@@ -13,6 +13,7 @@ use VentureDrake\LaravelCrm\Services\EmailCampaignService;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\Concerns\HasEmailCampaignSendNowAction;
 use VentureDrake\LaravelCrmFilament\Widgets\EmailCampaignSendsOverTimeChart;
+use VentureDrake\LaravelCrmFilament\Widgets\EmailCampaignTopUrlsWidget;
 
 class ViewEmailCampaign extends ViewRecord
 {
@@ -65,6 +66,7 @@ class ViewEmailCampaign extends ViewRecord
     {
         return [
             EmailCampaignSendsOverTimeChart::class,
+            EmailCampaignTopUrlsWidget::class,
         ];
     }
 }

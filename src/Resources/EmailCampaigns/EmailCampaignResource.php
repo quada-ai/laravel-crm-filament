@@ -20,6 +20,7 @@ use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\CreateEmailCa
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\EditEmailCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\ListEmailCampaigns;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\ViewEmailCampaign;
+use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\RelationManagers\ClicksRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\RelationManagers\RecipientsRelationManager;
 
 class EmailCampaignResource extends Resource
@@ -154,6 +155,7 @@ class EmailCampaignResource extends Resource
     {
         return [
             RecipientsRelationManager::class,
+            ClicksRelationManager::class,
         ];
     }
 

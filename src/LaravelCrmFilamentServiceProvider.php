@@ -7,6 +7,9 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Delivery;
+use VentureDrake\LaravelCrm\Models\EmailCampaign;
+use VentureDrake\LaravelCrm\Models\EmailCampaignClick;
+use VentureDrake\LaravelCrm\Models\EmailCampaignRecipient;
 use VentureDrake\LaravelCrm\Models\Invoice;
 use VentureDrake\LaravelCrm\Models\Label;
 use VentureDrake\LaravelCrm\Models\Lead;
@@ -16,6 +19,9 @@ use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrm\Models\Quote;
+use VentureDrake\LaravelCrm\Models\SmsCampaign;
+use VentureDrake\LaravelCrm\Models\SmsCampaignClick;
+use VentureDrake\LaravelCrm\Models\SmsCampaignRecipient;
 use VentureDrake\LaravelCrmFilament\Console\InstallCommand;
 use VentureDrake\LaravelCrmFilament\Models\Audit;
 
@@ -73,6 +79,33 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
                 return $model->morphMany(Audit::class, 'auditable');
             });
         }
+
+        // Core CRM declares `clicks()` on EmailCampaignRecipient / SmsCampaignRecipient
+        // but not on the campaign model itself. The ClicksRelationManager binds
+        // to the campaign, so we resolve a hasManyThrough that walks
+        // campaign -> recipient -> click. That gives a single `clicks` relation
+        // we can hang the RelationManager + TopUrls widget off.
+        EmailCampaign::resolveRelationUsing('clicks', function ($model) {
+            return $model->hasManyThrough(
+                EmailCampaignClick::class,
+                EmailCampaignRecipient::class,
+                'email_campaign_id',
+                'email_campaign_recipient_id',
+                'id',
+                'id',
+            );
+        });
+
+        SmsCampaign::resolveRelationUsing('clicks', function ($model) {
+            return $model->hasManyThrough(
+                SmsCampaignClick::class,
+                SmsCampaignRecipient::class,
+                'sms_campaign_id',
+                'sms_campaign_recipient_id',
+                'id',
+                'id',
+            );
+        });
 
         // Publish PanelProvider stub used by the install command.
         if ($this->app->runningInConsole()) {

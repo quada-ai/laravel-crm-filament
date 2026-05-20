@@ -147,6 +147,12 @@ return [
         'to' => 'Para',
         'send_me_a_copy' => 'Enviarme una copia',
         'schedule_for' => 'Programar para',
+        'url' => 'URL',
+        'clicked_at' => 'Clic en',
+        'recipient_clicks' => 'Clics del destinatario',
+        'ip' => 'IP',
+        'top_urls' => 'URLs más clicadas',
+        'unique_recipients' => 'Destinatarios únicos',
     ],
 
     'chat' => [

@@ -152,6 +152,12 @@ return [
         'to' => 'To',
         'send_me_a_copy' => 'Send me a copy',
         'schedule_for' => 'Schedule for',
+        'url' => 'URL',
+        'clicked_at' => 'Clicked at',
+        'recipient_clicks' => 'Recipient clicks',
+        'ip' => 'IP',
+        'top_urls' => 'Top URLs',
+        'unique_recipients' => 'Unique recipients',
     ],
 
     // Chat
