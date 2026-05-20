@@ -1,5 +1,6 @@
 <?php
 
+use Spatie\Permission\Models\Role;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\ChatWidgetResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\EmailTemplates\EmailTemplateResource;
@@ -7,8 +8,8 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FieldGroups\Fiel
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Fields\FieldResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Labels\LabelResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadSources\LeadSourceResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\PipelineStageResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Pipelines\PipelineResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\PipelineStageResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ProductCategories\ProductCategoryResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Roles\RoleResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\SmsTemplates\SmsTemplateResource;
@@ -39,10 +40,10 @@ it('routes TaxRate by integer id since it has no external_id column', function (
 
 it('routes other settings resources by external_id', function () {
     foreach ([PipelineResource::class, PipelineStageResource::class, LabelResource::class,
-              LeadSourceResource::class, ProductCategoryResource::class,
-              FieldGroupResource::class, FieldResource::class,
-              EmailTemplateResource::class, SmsTemplateResource::class,
-              ChatWidgetResource::class] as $r) {
+        LeadSourceResource::class, ProductCategoryResource::class,
+        FieldGroupResource::class, FieldResource::class,
+        EmailTemplateResource::class, SmsTemplateResource::class,
+        ChatWidgetResource::class] as $r) {
         expect($r::getRecordRouteKeyName())->toBe('external_id');
     }
 });
@@ -52,9 +53,9 @@ it('declares the Settings cluster nav icon', function () {
 });
 
 it('protects Owner/Admin Spatie roles from edit/delete on RoleResource', function () {
-    $owner = new \Spatie\Permission\Models\Role(['name' => 'Owner']);
-    $admin = new \Spatie\Permission\Models\Role(['name' => 'Admin']);
-    $custom = new \Spatie\Permission\Models\Role(['name' => 'Custom']);
+    $owner = new Role(['name' => 'Owner']);
+    $admin = new Role(['name' => 'Admin']);
+    $custom = new Role(['name' => 'Custom']);
 
     expect(RoleResource::canEdit($owner))->toBeFalse();
     expect(RoleResource::canEdit($admin))->toBeFalse();

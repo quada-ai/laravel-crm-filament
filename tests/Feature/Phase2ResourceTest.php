@@ -1,5 +1,12 @@
 <?php
 
+use VentureDrake\LaravelCrm\Models\Delivery;
+use VentureDrake\LaravelCrm\Models\EmailCampaign;
+use VentureDrake\LaravelCrm\Models\Invoice;
+use VentureDrake\LaravelCrm\Models\Order;
+use VentureDrake\LaravelCrm\Models\Product;
+use VentureDrake\LaravelCrm\Models\PurchaseOrder;
+use VentureDrake\LaravelCrm\Models\SmsCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\DeliveryResource;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
@@ -23,11 +30,11 @@ it('routes Phase 2/4 resources by external_id', function (string $resource) {
 })->with('externalIdRoutedResources');
 
 it('uses the matching core CRM model FQCN for each resource', function () {
-    expect(OrderResource::getModel())->toBe(\VentureDrake\LaravelCrm\Models\Order::class);
-    expect(InvoiceResource::getModel())->toBe(\VentureDrake\LaravelCrm\Models\Invoice::class);
-    expect(PurchaseOrderResource::getModel())->toBe(\VentureDrake\LaravelCrm\Models\PurchaseOrder::class);
-    expect(DeliveryResource::getModel())->toBe(\VentureDrake\LaravelCrm\Models\Delivery::class);
-    expect(ProductResource::getModel())->toBe(\VentureDrake\LaravelCrm\Models\Product::class);
-    expect(EmailCampaignResource::getModel())->toBe(\VentureDrake\LaravelCrm\Models\EmailCampaign::class);
-    expect(SmsCampaignResource::getModel())->toBe(\VentureDrake\LaravelCrm\Models\SmsCampaign::class);
+    expect(OrderResource::getModel())->toBe(Order::class);
+    expect(InvoiceResource::getModel())->toBe(Invoice::class);
+    expect(PurchaseOrderResource::getModel())->toBe(PurchaseOrder::class);
+    expect(DeliveryResource::getModel())->toBe(Delivery::class);
+    expect(ProductResource::getModel())->toBe(Product::class);
+    expect(EmailCampaignResource::getModel())->toBe(EmailCampaign::class);
+    expect(SmsCampaignResource::getModel())->toBe(SmsCampaign::class);
 });

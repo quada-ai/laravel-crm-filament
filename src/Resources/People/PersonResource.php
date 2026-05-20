@@ -10,17 +10,19 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
+use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
-use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
-use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
-use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
-use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ListPeople;
@@ -37,7 +39,7 @@ class PersonResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'first_name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user';
 
     protected static ?int $navigationSort = 30;
 
@@ -103,13 +105,13 @@ class PersonResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('first_name')
-                    ->sortable(!$encrypted)
-                    ->searchable(!$encrypted)
+                    ->sortable(! $encrypted)
+                    ->searchable(! $encrypted)
                     ->limit(40),
 
                 Tables\Columns\TextColumn::make('last_name')
-                    ->sortable(!$encrypted)
-                    ->searchable(!$encrypted)
+                    ->sortable(! $encrypted)
+                    ->searchable(! $encrypted)
                     ->limit(40),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
@@ -126,7 +128,7 @@ class PersonResource extends Resource
                 $encrypted,
                 fn (Table $t) => $t->modifyQueryUsing(
                     HasEncryptedSearch::modifyQuery(
-                        fn ($r) => trim(($r->first_name ?? '').' '.($r->last_name ?? ''))
+                        fn ($r) => trim(($r->first_name ?? '') . ' ' . ($r->last_name ?? ''))
                     )
                 )
             )
@@ -151,29 +153,30 @@ class PersonResource extends Resource
             ]);
     }
 
-public static function getRelations(): array
+    public static function getRelations(): array
     {
         return [
             NotesRelationManager::class,
             TasksRelationManager::class,
             CallsRelationManager::class,
             MeetingsRelationManager::class,
+            FilesRelationManager::class,
         ];
     }
 
-public static function getGloballySearchableAttributes(): array
+    public static function getGloballySearchableAttributes(): array
     {
         return ['first_name', 'last_name', 'middle_name', 'maiden_name'];
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
-        return trim((string) ($record->name ?? ($record->first_name.' '.$record->last_name)));
+        return trim((string) ($record->name ?? ($record->first_name . ' ' . $record->last_name)));
     }
 
     protected static function crmEncryptedSearchAccessor(): \Closure
     {
-        return fn ($r) => trim((($r->first_name ?? '').' '.($r->middle_name ?? '').' '.($r->last_name ?? '').' '.($r->maiden_name ?? '')));
+        return fn ($r) => trim((($r->first_name ?? '') . ' ' . ($r->middle_name ?? '') . ' ' . ($r->last_name ?? '') . ' ' . ($r->maiden_name ?? '')));
     }
 
     public static function getPages(): array
@@ -186,4 +189,3 @@ public static function getGloballySearchableAttributes(): array
         ];
     }
 }
-

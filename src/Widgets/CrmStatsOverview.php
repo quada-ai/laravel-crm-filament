@@ -32,5 +32,3 @@ class CrmStatsOverview extends StatsOverviewWidget
         ];
     }
 }
-
-

@@ -20,4 +20,3 @@ class CreatePerson extends CreateRecord
         return $record;
     }
 }
-

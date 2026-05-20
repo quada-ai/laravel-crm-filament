@@ -31,7 +31,7 @@ class HasEncryptedSearch
         Closure $accessor,
         array $sqlSearchColumns = []
     ): Closure {
-        return function (Builder $query) use ($accessor, $sqlSearchColumns) {
+        return function (Builder $query) use ($accessor) {
             if (! config('laravel-crm.encrypt_db_fields', false)) {
                 return $query;
             }
@@ -54,4 +54,3 @@ class HasEncryptedSearch
         };
     }
 }
-

@@ -29,16 +29,16 @@ it('attaches Notes/Tasks/Calls/Meetings RMs to all contact-activity parents', fu
 })->with('contactActivityParents');
 
 it('uses the polymorphic relationship names that match HasCrmActivities', function () {
-    $rm = new \ReflectionClass(NotesRelationManager::class);
+    $rm = new ReflectionClass(NotesRelationManager::class);
     expect($rm->getStaticPropertyValue('relationship'))->toBe('notes');
 
-    $rm = new \ReflectionClass(TasksRelationManager::class);
+    $rm = new ReflectionClass(TasksRelationManager::class);
     expect($rm->getStaticPropertyValue('relationship'))->toBe('tasks');
 
-    $rm = new \ReflectionClass(CallsRelationManager::class);
+    $rm = new ReflectionClass(CallsRelationManager::class);
     expect($rm->getStaticPropertyValue('relationship'))->toBe('calls');
 
-    $rm = new \ReflectionClass(MeetingsRelationManager::class);
+    $rm = new ReflectionClass(MeetingsRelationManager::class);
     expect($rm->getStaticPropertyValue('relationship'))->toBe('meetings');
 });
 

@@ -5,6 +5,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Deals\Pages;
 use BackedEnum;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
@@ -18,20 +19,21 @@ class DealKanban extends Page
 
     protected static ?string $title = 'Deal pipeline';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-view-columns';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-view-columns';
 
     public ?int $ownerFilter = null;
 
-    public function getOwners(): \Illuminate\Support\Collection
+    public function getOwners(): Collection
     {
         $userClass = config('auth.providers.users.model');
+
         return $userClass::query()->orderBy('name')->pluck('name', 'id');
     }
 
     public function getStages(): Collection
     {
         $pipelineIds = Pipeline::query()
-            ->where('model', \VentureDrake\LaravelCrm\Models\Deal::class)
+            ->where('model', Deal::class)
             ->pluck('id');
 
         return PipelineStage::query()
@@ -71,7 +73,7 @@ class DealKanban extends Page
         $deal->forceFill([
             'closed_at' => now(),
         ]);
-        if (\Illuminate\Support\Facades\Schema::hasColumn($deal->getTable(), 'won')) {
+        if (Schema::hasColumn($deal->getTable(), 'won')) {
             $deal->won = $won;
         }
         $deal->save();
@@ -90,6 +92,7 @@ class DealKanban extends Page
         }
         $deal->save();
     }
+
     public function getStageTotal(int $stageId, array $byStage): float
     {
         $rows = $byStage[$stageId] ?? collect();
@@ -97,6 +100,7 @@ class DealKanban extends Page
         foreach ($rows as $row) {
             $sum += (int) ($row->amount ?? 0);
         }
+
         return $sum / 100;
     }
 }

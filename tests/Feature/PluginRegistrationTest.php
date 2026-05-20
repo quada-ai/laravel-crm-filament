@@ -10,4 +10,3 @@ it('registers the service provider', function () {
 it('exposes a plugin with the laravel-crm id', function () {
     expect(LaravelCrmPlugin::make()->getId())->toBe('laravel-crm');
 });
-

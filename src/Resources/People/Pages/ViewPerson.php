@@ -15,4 +15,3 @@ class ViewPerson extends ViewRecord
         return [Actions\EditAction::make()];
     }
 }
-

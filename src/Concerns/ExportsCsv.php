@@ -37,13 +37,13 @@ class ExportsCsv
             ->deselectRecordsAfterCompletion()
             ->action(function (Collection $records) use ($columns, $filename): StreamedResponse {
                 $stamp = now()->format('Ymd-His');
-                $name = $filename.'-'.$stamp.'.csv';
+                $name = $filename . '-' . $stamp . '.csv';
 
                 $response = new StreamedResponse(function () use ($records, $columns): void {
                     $out = fopen('php://output', 'w');
 
                     // BOM for Excel UTF-8 compatibility.
-                    fwrite($out, chr(0xEF).chr(0xBB).chr(0xBF));
+                    fwrite($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
                     fputcsv($out, array_keys($columns));
 

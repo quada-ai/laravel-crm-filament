@@ -15,4 +15,3 @@ class ViewTask extends ViewRecord
         return [Actions\EditAction::make()];
     }
 }
-

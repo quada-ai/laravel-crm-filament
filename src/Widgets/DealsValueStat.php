@@ -46,6 +46,6 @@ class DealsValueStat extends StatsOverviewWidget
 
         return function_exists('money')
             ? (string) money($amount, $currency)
-            : number_format($amount, 2).' '.$currency;
+            : number_format($amount, 2) . ' ' . $currency;
     }
 }

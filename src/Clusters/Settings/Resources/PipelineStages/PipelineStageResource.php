@@ -27,7 +27,7 @@ class PipelineStageResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-bars-3-bottom-left';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-bars-3-bottom-left';
 
     public static function getRecordRouteKeyName(): ?string
     {

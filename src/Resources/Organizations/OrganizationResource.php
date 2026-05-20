@@ -2,6 +2,7 @@
 
 namespace VentureDrake\LaravelCrmFilament\Resources\Organizations;
 
+use App\Models\User;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
@@ -10,17 +11,19 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Organization;
 use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
+use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
-use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
-use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
-use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
-use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\CreateOrganization;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\EditOrganization;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\ListOrganizations;
@@ -37,7 +40,7 @@ class OrganizationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
 
     protected static ?int $navigationSort = 40;
 
@@ -78,7 +81,7 @@ class OrganizationResource extends Resource
 
             Forms\Components\Select::make('user_owner_id')
                 ->label('Owner')
-                ->options(fn () => \App\Models\User::query()->orderBy('name')->pluck('name', 'id'))
+                ->options(fn () => User::query()->orderBy('name')->pluck('name', 'id'))
                 ->searchable()
                 ->preload(),
 
@@ -101,13 +104,13 @@ class OrganizationResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->sortable(!$encrypted)
-                    ->searchable(!$encrypted)
+                    ->sortable(! $encrypted)
+                    ->searchable(! $encrypted)
                     ->limit(60),
 
                 Tables\Columns\TextColumn::make('user_owner_id')
                     ->label('Owner')
-                    ->formatStateUsing(fn ($state) => \App\Models\User::find($state)?->name ?? '—')
+                    ->formatStateUsing(fn ($state) => User::find($state)?->name ?? '—')
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('number_of_employees')
@@ -147,22 +150,23 @@ class OrganizationResource extends Resource
             ]);
     }
 
-public static function getRelations(): array
+    public static function getRelations(): array
     {
         return [
             NotesRelationManager::class,
             TasksRelationManager::class,
             CallsRelationManager::class,
             MeetingsRelationManager::class,
+            FilesRelationManager::class,
         ];
     }
 
-public static function getGloballySearchableAttributes(): array
+    public static function getGloballySearchableAttributes(): array
     {
         return ['name'];
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return (string) ($record->name ?? '');
     }
@@ -182,4 +186,3 @@ public static function getGloballySearchableAttributes(): array
         ];
     }
 }
-

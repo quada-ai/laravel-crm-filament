@@ -14,12 +14,12 @@ dataset('kanbanPages', [
 ]);
 
 it('declares each kanban page as a sub-resource page', function (string $page, string $resource) {
-    expect((new \ReflectionClass($page))->getStaticPropertyValue('resource'))->toBe($resource);
+    expect((new ReflectionClass($page))->getStaticPropertyValue('resource'))->toBe($resource);
 })->with('kanbanPages');
 
 it('exposes the move method that Livewire calls on drop', function (string $page, string $resource, string $method) {
     expect(method_exists($page, $method))->toBeTrue();
-    $reflection = new \ReflectionMethod($page, $method);
+    $reflection = new ReflectionMethod($page, $method);
     expect($reflection->isPublic())->toBeTrue();
     expect($reflection->getNumberOfRequiredParameters())->toBe(2);
 })->with('kanbanPages');

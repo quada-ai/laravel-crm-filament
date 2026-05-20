@@ -26,7 +26,7 @@ class ChatWidgetResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-window';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-window';
 
     public static function getRecordRouteKeyName(): ?string
     {

@@ -14,7 +14,7 @@ class InstallCommand extends Command
 
     public function handle(Filesystem $files): int
     {
-        $stub = __DIR__.'/../../stubs/CrmPanelProvider.php.stub';
+        $stub = __DIR__ . '/../../stubs/CrmPanelProvider.php.stub';
         $target = app_path('Providers/Filament/CrmPanelProvider.php');
 
         if (! $files->exists($stub)) {
@@ -81,4 +81,3 @@ class InstallCommand extends Command
         $this->info('Registered CrmPanelProvider in bootstrap/providers.php.');
     }
 }
-

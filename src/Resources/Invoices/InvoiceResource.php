@@ -10,12 +10,14 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Invoice;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Product;
-use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\CreateInvoice;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\EditInvoice;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\ListInvoices;
@@ -31,7 +33,7 @@ class InvoiceResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'invoice_id';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-currency-dollar';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-document-currency-dollar';
 
     protected static ?int $navigationSort = 52;
 
@@ -194,19 +196,26 @@ class InvoiceResource extends Resource
             ]);
     }
 
-public static function getGloballySearchableAttributes(): array
+    public static function getGloballySearchableAttributes(): array
     {
         return ['invoice_id', 'reference'];
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return (string) ($record->invoice_id ?? $record->getKey());
     }
 
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return array_filter(['Reference' => $record->reference]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            FilesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

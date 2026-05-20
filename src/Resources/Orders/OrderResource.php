@@ -10,11 +10,13 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\AddressType;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\CreateOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\EditOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\ListOrders;
@@ -30,7 +32,7 @@ class OrderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'order_id';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?int $navigationSort = 51;
 
@@ -199,19 +201,26 @@ class OrderResource extends Resource
             ]);
     }
 
-public static function getGloballySearchableAttributes(): array
+    public static function getGloballySearchableAttributes(): array
     {
         return ['order_id', 'reference'];
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return (string) ($record->order_id ?? $record->getKey());
     }
 
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return array_filter(['Reference' => $record->reference]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            FilesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

@@ -12,7 +12,7 @@ class RecentActivityList extends TableWidget
 {
     protected static ?string $heading = 'Recent activity';
 
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -62,9 +62,9 @@ class RecentActivityList extends TableWidget
         $label = class_basename($type);
         $title = $parent->title
             ?? $parent->name
-            ?? trim(($parent->first_name ?? '').' '.($parent->last_name ?? ''))
-            ?? '#'.$parent->getKey();
+            ?? trim(($parent->first_name ?? '') . ' ' . ($parent->last_name ?? ''))
+            ?? '#' . $parent->getKey();
 
-        return $label.' · '.trim((string) $title);
+        return $label . ' · ' . trim((string) $title);
     }
 }

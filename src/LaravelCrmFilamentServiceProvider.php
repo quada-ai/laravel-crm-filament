@@ -39,8 +39,8 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
         if ($this->app->runningInConsole()) {
             $files = new Filesystem;
 
-            if ($files->isDirectory(__DIR__.'/../stubs')) {
-                foreach ($files->files(__DIR__.'/../stubs') as $file) {
+            if ($files->isDirectory(__DIR__ . '/../stubs')) {
+                foreach ($files->files(__DIR__ . '/../stubs') as $file) {
                     $this->publishes([
                         $file->getRealPath() => base_path("stubs/laravel-crm-filament/{$file->getFilename()}"),
                     ], 'laravel-crm-filament-stubs');
@@ -59,4 +59,3 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
         ];
     }
 }
-

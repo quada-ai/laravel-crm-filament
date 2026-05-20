@@ -7,6 +7,7 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,6 +16,7 @@ use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\OrderProduct;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\CreateDelivery;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\EditDelivery;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\ListDeliveries;
@@ -26,7 +28,7 @@ class DeliveryResource extends Resource
 
     protected static ?string $slug = 'deliveries';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-truck';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-truck';
 
     protected static ?int $navigationSort = 54;
 
@@ -62,17 +64,18 @@ class DeliveryResource extends Resource
                 ->schema([
                     Forms\Components\Select::make('order_product_id')
                         ->label('Order line')
-                        ->options(function (\Filament\Schemas\Components\Utilities\Get $get) {
+                        ->options(function (Get $get) {
                             $orderId = $get('../../order_id');
                             if (! $orderId) {
                                 return [];
                             }
+
                             return OrderProduct::query()
                                 ->where('order_id', $orderId)
                                 ->with('product')
                                 ->get()
                                 ->mapWithKeys(fn ($op) => [
-                                    $op->id => ($op->product?->name ?? 'Line '.$op->id).' (qty '.$op->quantity.')',
+                                    $op->id => ($op->product?->name ?? 'Line ' . $op->id) . ' (qty ' . $op->quantity . ')',
                                 ])
                                 ->all();
                         })
@@ -169,6 +172,13 @@ class DeliveryResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            FilesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

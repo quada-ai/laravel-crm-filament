@@ -26,7 +26,7 @@ class EmailTemplateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-envelope';
 
     public static function getRecordRouteKeyName(): ?string
     {

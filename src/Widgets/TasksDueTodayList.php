@@ -10,9 +10,9 @@ use VentureDrake\LaravelCrm\Models\Task;
 
 class TasksDueTodayList extends TableWidget
 {
-    protected static ?string $heading = "Tasks due today";
+    protected static ?string $heading = 'Tasks due today';
 
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {

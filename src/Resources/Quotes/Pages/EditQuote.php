@@ -12,8 +12,8 @@ use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
 class EditQuote extends EditRecord
 {
-    use Concerns\HasQuoteSendAction;
     use Concerns\HasQuotePortalAction;
+    use Concerns\HasQuoteSendAction;
 
     protected static string $resource = QuoteResource::class;
 

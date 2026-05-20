@@ -7,11 +7,22 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Field;
 use VentureDrake\LaravelCrm\Models\FieldGroup;
+use VentureDrake\LaravelCrm\Models\Invoice;
+use VentureDrake\LaravelCrm\Models\Lead;
+use VentureDrake\LaravelCrm\Models\Order;
+use VentureDrake\LaravelCrm\Models\Organization;
+use VentureDrake\LaravelCrm\Models\Person;
+use VentureDrake\LaravelCrm\Models\Product;
+use VentureDrake\LaravelCrm\Models\PurchaseOrder;
+use VentureDrake\LaravelCrm\Models\Quote;
+use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Fields\Pages\CreateField;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Fields\Pages\EditField;
@@ -31,16 +42,16 @@ class FieldResource extends Resource
     ];
 
     public const MODELS = [
-        \VentureDrake\LaravelCrm\Models\Lead::class => 'Lead',
-        \VentureDrake\LaravelCrm\Models\Deal::class => 'Deal',
-        \VentureDrake\LaravelCrm\Models\Person::class => 'Person',
-        \VentureDrake\LaravelCrm\Models\Organization::class => 'Organization',
-        \VentureDrake\LaravelCrm\Models\Task::class => 'Task',
-        \VentureDrake\LaravelCrm\Models\Quote::class => 'Quote',
-        \VentureDrake\LaravelCrm\Models\Order::class => 'Order',
-        \VentureDrake\LaravelCrm\Models\Invoice::class => 'Invoice',
-        \VentureDrake\LaravelCrm\Models\PurchaseOrder::class => 'Purchase Order',
-        \VentureDrake\LaravelCrm\Models\Product::class => 'Product',
+        Lead::class => 'Lead',
+        Deal::class => 'Deal',
+        Person::class => 'Person',
+        Organization::class => 'Organization',
+        Task::class => 'Task',
+        Quote::class => 'Quote',
+        Order::class => 'Order',
+        Invoice::class => 'Invoice',
+        PurchaseOrder::class => 'Purchase Order',
+        Product::class => 'Product',
     ];
 
     protected static ?string $model = Field::class;
@@ -51,7 +62,7 @@ class FieldResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-adjustments-horizontal';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
     public static function getRecordRouteKeyName(): ?string
     {
@@ -100,7 +111,7 @@ class FieldResource extends Resource
                 ->columns(3)
                 ->defaultItems(0)
                 ->addActionLabel('Add option')
-                ->visible(fn (\Filament\Schemas\Components\Utilities\Get $get) => in_array($get('type'), ['select', 'select_multiple', 'radio', 'checkbox_multiple'], true))
+                ->visible(fn (Get $get) => in_array($get('type'), ['select', 'select_multiple', 'radio', 'checkbox_multiple'], true))
                 ->columnSpanFull(),
         ]);
     }

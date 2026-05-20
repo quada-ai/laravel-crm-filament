@@ -20,7 +20,7 @@ class ListDeals extends ListRecords
                 ->label('Kanban')
                 ->icon('heroicon-o-view-columns')
                 ->color('gray')
-                ->url(\VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource::getUrl('kanban')),
+                ->url(DealResource::getUrl('kanban')),
             Actions\CreateAction::make(),
         ];
     }

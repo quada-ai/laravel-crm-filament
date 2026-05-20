@@ -3,6 +3,7 @@
 namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Pages;
 
 use BackedEnum;
+use Dcblogdev\Xero\Facades\Xero;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -20,7 +21,7 @@ class Integrations extends Page implements HasForms
 
     protected static ?string $cluster = Settings::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-puzzle-piece';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-puzzle-piece';
 
     protected static ?string $title = 'Integrations';
 
@@ -68,15 +69,17 @@ class Integrations extends Page implements HasForms
     protected function xeroStatusLine(): string
     {
         try {
-            if (class_exists(\Dcblogdev\Xero\Facades\Xero::class) && \Dcblogdev\Xero\Facades\Xero::isConnected()) {
-                $tenant = method_exists(\Dcblogdev\Xero\Facades\Xero::class, 'getTenantName')
-                    ? \Dcblogdev\Xero\Facades\Xero::getTenantName()
+            if (class_exists(Xero::class) && Xero::isConnected()) {
+                $tenant = method_exists(Xero::class, 'getTenantName')
+                    ? Xero::getTenantName()
                     : 'Connected';
+
                 return "Connected to Xero: {$tenant}";
             }
         } catch (\Throwable $e) {
             return 'Xero status unavailable';
         }
+
         return 'Not connected to Xero.';
     }
 
@@ -88,10 +91,11 @@ class Integrations extends Page implements HasForms
         }
         $check = $cs->verifyCredentials();
         if (! ($check['ok'] ?? false)) {
-            return 'ClickSend credentials configured but verification failed: '.($check['error'] ?? 'unknown error');
+            return 'ClickSend credentials configured but verification failed: ' . ($check['error'] ?? 'unknown error');
         }
         $balance = $check['balance'] ?? null;
-        return 'ClickSend connected. Balance: '.($balance !== null ? $balance : 'unknown').'.';
+
+        return 'ClickSend connected. Balance: ' . ($balance !== null ? $balance : 'unknown') . '.';
     }
 
     protected function getHeaderActions(): array
@@ -116,8 +120,8 @@ class Integrations extends Page implements HasForms
     protected function xeroIsConnected(): bool
     {
         try {
-            return class_exists(\Dcblogdev\Xero\Facades\Xero::class)
-                && \Dcblogdev\Xero\Facades\Xero::isConnected();
+            return class_exists(Xero::class)
+                && Xero::isConnected();
         } catch (\Throwable $e) {
             return false;
         }

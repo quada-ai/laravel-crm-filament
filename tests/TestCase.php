@@ -48,4 +48,3 @@ class TestCase extends Orchestra
         $app['config']->set('database.default', 'testing');
     }
 }
-

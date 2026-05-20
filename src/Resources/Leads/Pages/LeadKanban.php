@@ -5,9 +5,11 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Leads\Pages;
 use BackedEnum;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Fluent;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
+use VentureDrake\LaravelCrm\Services\DealService;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
 class LeadKanban extends Page
@@ -18,20 +20,21 @@ class LeadKanban extends Page
 
     protected static ?string $title = 'Lead pipeline';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-view-columns';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-view-columns';
 
     public ?int $ownerFilter = null;
 
-    public function getOwners(): \Illuminate\Support\Collection
+    public function getOwners(): Collection
     {
         $userClass = config('auth.providers.users.model');
+
         return $userClass::query()->orderBy('name')->pluck('name', 'id');
     }
 
     public function getStages(): Collection
     {
         $pipelineIds = Pipeline::query()
-            ->where('model', \VentureDrake\LaravelCrm\Models\Lead::class)
+            ->where('model', Lead::class)
             ->pluck('id');
 
         return PipelineStage::query()
@@ -59,7 +62,7 @@ class LeadKanban extends Page
             return;
         }
 
-        $payload = new \Illuminate\Support\Fluent([
+        $payload = new Fluent([
             'title' => $lead->title,
             'description' => $lead->description,
             'amount' => ($lead->amount ?? 0) / 100,
@@ -67,7 +70,7 @@ class LeadKanban extends Page
             'user_owner_id' => $lead->user_owner_id,
         ]);
 
-        app(\VentureDrake\LaravelCrm\Services\DealService::class)->create(
+        app(DealService::class)->create(
             $payload,
             $lead->person,
             $lead->organization,
@@ -90,6 +93,7 @@ class LeadKanban extends Page
         }
         $lead->save();
     }
+
     public function getStageTotal(int $stageId, array $byStage): float
     {
         $rows = $byStage[$stageId] ?? collect();
@@ -97,6 +101,7 @@ class LeadKanban extends Page
         foreach ($rows as $row) {
             $sum += (int) ($row->amount ?? 0);
         }
+
         return $sum / 100;
     }
 }

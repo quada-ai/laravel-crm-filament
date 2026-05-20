@@ -62,4 +62,3 @@ class EditOrganization extends EditRecord
         return $record->refresh();
     }
 }
-

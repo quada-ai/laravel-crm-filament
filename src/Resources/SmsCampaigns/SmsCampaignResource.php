@@ -13,12 +13,13 @@ use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\SmsCampaign;
 use VentureDrake\LaravelCrm\Models\SmsTemplate;
 use VentureDrake\LaravelCrm\Services\ClickSendService;
-use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\RelationManagers\RecipientsRelationManager;
+use VentureDrake\LaravelCrm\Sms\SmsCampaignMessage;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\CreateSmsCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\EditSmsCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\ListSmsCampaigns;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\ViewSmsCampaign;
+use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\RelationManagers\RecipientsRelationManager;
 
 class SmsCampaignResource extends Resource
 {
@@ -28,7 +29,7 @@ class SmsCampaignResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-device-phone-mobile';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-device-phone-mobile';
 
     protected static ?int $navigationSort = 71;
 
@@ -71,8 +72,9 @@ class SmsCampaignResource extends Resource
                 ->maxLength(1530)
                 ->live(onBlur: true)
                 ->helperText(function (?string $state): string {
-                    $count = \VentureDrake\LaravelCrm\Sms\SmsCampaignMessage::segmentCount($state ?? '');
-                    return 'Max 1530 chars (≈10 SMS segments). Current estimate: '.$count.' segment(s). Placeholders: {first_name}, {last_name}, {full_name}, {company_name}.';
+                    $count = SmsCampaignMessage::segmentCount($state ?? '');
+
+                    return 'Max 1530 chars (≈10 SMS segments). Current estimate: ' . $count . ' segment(s). Placeholders: {first_name}, {last_name}, {full_name}, {company_name}.';
                 })
                 ->columnSpanFull(),
             Forms\Components\DateTimePicker::make('scheduled_at')
@@ -124,7 +126,7 @@ class SmsCampaignResource extends Resource
             ]);
     }
 
-public static function getRelations(): array
+    public static function getRelations(): array
     {
         return [
             RecipientsRelationManager::class,

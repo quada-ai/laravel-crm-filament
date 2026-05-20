@@ -62,4 +62,3 @@ class EditPerson extends EditRecord
         return $record->refresh();
     }
 }
-

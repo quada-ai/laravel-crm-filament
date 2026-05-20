@@ -20,4 +20,3 @@ class CreateTask extends CreateRecord
         return $record;
     }
 }
-

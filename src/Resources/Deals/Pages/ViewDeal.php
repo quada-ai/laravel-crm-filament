@@ -15,4 +15,3 @@ class ViewDeal extends ViewRecord
         return [Actions\EditAction::make()];
     }
 }
-

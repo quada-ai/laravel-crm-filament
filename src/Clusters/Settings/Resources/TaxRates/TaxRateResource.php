@@ -26,7 +26,7 @@ class TaxRateResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-percent-badge';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-percent-badge';
 
     public static function form(Schema $schema): Schema
     {

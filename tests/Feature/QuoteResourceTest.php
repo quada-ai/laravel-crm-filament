@@ -1,10 +1,11 @@
 <?php
 
+use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 
 it('resolves the quote resource to the Quote model', function () {
-    expect(QuoteResource::getModel())->toBe(\VentureDrake\LaravelCrm\Models\Quote::class);
+    expect(QuoteResource::getModel())->toBe(Quote::class);
 });
 
 it('routes quote records by external_id', function () {

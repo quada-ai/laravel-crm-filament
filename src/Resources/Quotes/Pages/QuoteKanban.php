@@ -18,13 +18,14 @@ class QuoteKanban extends Page
 
     protected static ?string $title = 'Quote pipeline';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-view-columns';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-view-columns';
 
     public ?int $ownerFilter = null;
 
-    public function getOwners(): \Illuminate\Support\Collection
+    public function getOwners(): Collection
     {
         $userClass = config('auth.providers.users.model');
+
         return $userClass::query()->orderBy('name')->pluck('name', 'id');
     }
 
@@ -90,6 +91,7 @@ class QuoteKanban extends Page
         }
         $quote->save();
     }
+
     public function getStageTotal(int $stageId, array $byStage): float
     {
         $rows = $byStage[$stageId] ?? collect();
@@ -97,6 +99,7 @@ class QuoteKanban extends Page
         foreach ($rows as $row) {
             $sum += (int) ($row->total ?? 0);
         }
+
         return $sum / 100;
     }
 }

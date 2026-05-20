@@ -2,6 +2,7 @@
 
 namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users;
 
+use App\Models\User;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
@@ -24,13 +25,13 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-users';
 
     public static function getModel(): string
     {
         // Defer to host's configured user model so this works even when
         // the host extends App\Models\User from elsewhere.
-        return config('auth.providers.users.model', \App\Models\User::class);
+        return config('auth.providers.users.model', User::class);
     }
 
     public static function form(Schema $schema): Schema

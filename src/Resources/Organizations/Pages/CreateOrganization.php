@@ -20,4 +20,3 @@ class CreateOrganization extends CreateRecord
         return $record;
     }
 }
-

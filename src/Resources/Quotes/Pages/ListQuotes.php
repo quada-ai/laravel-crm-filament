@@ -20,7 +20,7 @@ class ListQuotes extends ListRecords
                 ->label('Kanban')
                 ->icon('heroicon-o-view-columns')
                 ->color('gray')
-                ->url(\VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource::getUrl('kanban')),
+                ->url(QuoteResource::getUrl('kanban')),
             Actions\CreateAction::make(),
         ];
     }

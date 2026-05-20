@@ -33,4 +33,3 @@ class EditTask extends EditRecord
         return $record->refresh();
     }
 }
-

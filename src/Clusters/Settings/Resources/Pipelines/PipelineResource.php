@@ -9,7 +9,14 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use VentureDrake\LaravelCrm\Models\Deal;
+use VentureDrake\LaravelCrm\Models\Delivery;
+use VentureDrake\LaravelCrm\Models\Invoice;
+use VentureDrake\LaravelCrm\Models\Lead;
+use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Pipeline;
+use VentureDrake\LaravelCrm\Models\PurchaseOrder;
+use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Pipelines\Pages\CreatePipeline;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Pipelines\Pages\EditPipeline;
@@ -25,7 +32,7 @@ class PipelineResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-funnel';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-funnel';
 
     public static function getRecordRouteKeyName(): ?string
     {
@@ -41,13 +48,13 @@ class PipelineResource extends Resource
             Forms\Components\Select::make('model')
                 ->label('Applies to')
                 ->options([
-                    \VentureDrake\LaravelCrm\Models\Lead::class => 'Leads',
-                    \VentureDrake\LaravelCrm\Models\Deal::class => 'Deals',
-                    \VentureDrake\LaravelCrm\Models\Quote::class => 'Quotes',
-                    \VentureDrake\LaravelCrm\Models\Order::class => 'Orders',
-                    \VentureDrake\LaravelCrm\Models\Invoice::class => 'Invoices',
-                    \VentureDrake\LaravelCrm\Models\Delivery::class => 'Deliveries',
-                    \VentureDrake\LaravelCrm\Models\PurchaseOrder::class => 'Purchase Orders',
+                    Lead::class => 'Leads',
+                    Deal::class => 'Deals',
+                    Quote::class => 'Quotes',
+                    Order::class => 'Orders',
+                    Invoice::class => 'Invoices',
+                    Delivery::class => 'Deliveries',
+                    PurchaseOrder::class => 'Purchase Orders',
                 ])
                 ->required(),
         ]);

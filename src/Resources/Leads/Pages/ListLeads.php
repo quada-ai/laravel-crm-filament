@@ -20,7 +20,7 @@ class ListLeads extends ListRecords
                 ->label('Kanban')
                 ->icon('heroicon-o-view-columns')
                 ->color('gray')
-                ->url(\VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource::getUrl('kanban')),
+                ->url(LeadResource::getUrl('kanban')),
             Actions\CreateAction::make(),
         ];
     }

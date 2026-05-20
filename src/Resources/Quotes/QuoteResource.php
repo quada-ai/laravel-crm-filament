@@ -10,15 +10,17 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\CreateQuote;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\EditQuote;
-use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\QuoteKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\ListQuotes;
+use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\QuoteKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\ViewQuote;
 
 class QuoteResource extends Resource
@@ -31,7 +33,7 @@ class QuoteResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 50;
 
@@ -199,19 +201,26 @@ class QuoteResource extends Resource
             ]);
     }
 
-public static function getGloballySearchableAttributes(): array
+    public static function getGloballySearchableAttributes(): array
     {
         return ['quote_id', 'title'];
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return (string) ($record->title ?? $record->getKey());
     }
 
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return array_filter(['ID' => $record->quote_id]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            FilesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
@@ -225,4 +234,3 @@ public static function getGloballySearchableAttributes(): array
         ];
     }
 }
-

@@ -6,8 +6,10 @@ use Filament\Actions;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrm\Models\SmsCampaign;
 use VentureDrake\LaravelCrm\Services\SmsCampaignService;
+use VentureDrake\LaravelCrm\Sms\SmsCampaignMessage;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 
 class ViewSmsCampaign extends ViewRecord
@@ -23,15 +25,16 @@ class ViewSmsCampaign extends ViewRecord
                 ->label('Preview')
                 ->icon('heroicon-o-eye')
                 ->color('gray')
-                ->modalHeading(fn (SmsCampaign $record) => 'Preview: '.$record->name)
+                ->modalHeading(fn (SmsCampaign $record) => 'Preview: ' . $record->name)
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Close')
                 ->modalContent(function (SmsCampaign $record) {
-                    $rendered = \VentureDrake\LaravelCrm\Sms\SmsCampaignMessage::renderPreview($record->body ?? '');
-                    $segments = \VentureDrake\LaravelCrm\Sms\SmsCampaignMessage::segmentCount($record->body ?? '');
-                    return new \Illuminate\Support\HtmlString(
-                        '<div class="text-sm text-gray-500 mb-2">'.$segments.' SMS segment(s)</div>'.
-                        '<pre class="text-sm whitespace-pre-wrap font-sans">'.e($rendered).'</pre>'
+                    $rendered = SmsCampaignMessage::renderPreview($record->body ?? '');
+                    $segments = SmsCampaignMessage::segmentCount($record->body ?? '');
+
+                    return new HtmlString(
+                        '<div class="text-sm text-gray-500 mb-2">' . $segments . ' SMS segment(s)</div>' .
+                        '<pre class="text-sm whitespace-pre-wrap font-sans">' . e($rendered) . '</pre>'
                     );
                 }),
             Actions\Action::make('schedule')

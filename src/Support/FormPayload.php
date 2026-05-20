@@ -19,4 +19,3 @@ final class FormPayload
         return new Fluent($data);
     }
 }
-

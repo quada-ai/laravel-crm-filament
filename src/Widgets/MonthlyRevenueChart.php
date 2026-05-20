@@ -3,7 +3,6 @@
 namespace VentureDrake\LaravelCrmFilament\Widgets;
 
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Carbon;
 use VentureDrake\LaravelCrm\Models\Invoice;
 
 class MonthlyRevenueChart extends ChartWidget

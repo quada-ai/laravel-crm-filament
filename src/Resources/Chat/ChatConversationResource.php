@@ -4,12 +4,12 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Chat;
 
 use BackedEnum;
 use Filament\Actions;
-use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use VentureDrake\LaravelCrm\Models\ChatConversation;
 use VentureDrake\LaravelCrm\Services\ChatService;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
@@ -24,7 +24,7 @@ class ChatConversationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'chat_id';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
     protected static ?int $navigationSort = 80;
 
@@ -33,9 +33,10 @@ class ChatConversationResource extends Resource
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
     }
 
-public static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): ?string
     {
-        $count = \VentureDrake\LaravelCrm\Models\ChatConversation::query()->where('status', 'open')->count();
+        $count = ChatConversation::query()->where('status', 'open')->count();
+
         return $count > 0 ? (string) $count : null;
     }
 
@@ -114,14 +115,14 @@ public static function getNavigationBadge(): ?string
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->action(function (\Illuminate\Database\Eloquent\Collection $records): void {
-                            $service = app(\VentureDrake\LaravelCrm\Services\ChatService::class);
+                        ->action(function (Collection $records): void {
+                            $service = app(ChatService::class);
                             foreach ($records as $record) {
                                 if ($record->status === 'open') {
                                     $service->close($record);
                                 }
                             }
-                            \Filament\Notifications\Notification::make()->title($records->count().' conversation(s) closed')->success()->send();
+                            Notification::make()->title($records->count() . ' conversation(s) closed')->success()->send();
                         }),
                     Actions\DeleteBulkAction::make(),
                 ]),

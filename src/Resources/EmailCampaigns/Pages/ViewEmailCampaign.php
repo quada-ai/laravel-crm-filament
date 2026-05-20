@@ -6,6 +6,8 @@ use Filament\Actions;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\HtmlString;
+use VentureDrake\LaravelCrm\Mail\EmailCampaignMessage;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Services\EmailCampaignService;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
@@ -23,10 +25,10 @@ class ViewEmailCampaign extends ViewRecord
                 ->label('Preview')
                 ->icon('heroicon-o-eye')
                 ->color('gray')
-                ->modalHeading(fn (EmailCampaign $record) => 'Preview: '.$record->name)
+                ->modalHeading(fn (EmailCampaign $record) => 'Preview: ' . $record->name)
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Close')
-                ->modalContent(fn (EmailCampaign $record) => new \Illuminate\Support\HtmlString(\VentureDrake\LaravelCrm\Mail\EmailCampaignMessage::renderPreview($record->body ?? '', $record->preview_text ?? '', $record->team_id))),
+                ->modalContent(fn (EmailCampaign $record) => new HtmlString(EmailCampaignMessage::renderPreview($record->body ?? '', $record->preview_text ?? '', $record->team_id))),
             Actions\Action::make('schedule')
                 ->label('Schedule')
                 ->icon('heroicon-o-calendar')

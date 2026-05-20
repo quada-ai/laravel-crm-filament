@@ -10,15 +10,17 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
+use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
-use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
-use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\CreateDeal;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\DealKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\EditDeal;
@@ -35,7 +37,7 @@ class DealResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-currency-dollar';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-currency-dollar';
 
     protected static ?int $navigationSort = 20;
 
@@ -44,9 +46,10 @@ class DealResource extends Resource
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
     }
 
-public static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): ?string
     {
-        $count = \VentureDrake\LaravelCrm\Models\Deal::query()->whereNull('closed_at')->count();
+        $count = Deal::query()->whereNull('closed_at')->count();
+
         return $count > 0 ? (string) $count : null;
     }
 
@@ -170,27 +173,28 @@ public static function getNavigationBadge(): ?string
             ]);
     }
 
-public static function getRelations(): array
+    public static function getRelations(): array
     {
         return [
             NotesRelationManager::class,
             TasksRelationManager::class,
             CallsRelationManager::class,
             MeetingsRelationManager::class,
+            FilesRelationManager::class,
         ];
     }
 
-public static function getGloballySearchableAttributes(): array
+    public static function getGloballySearchableAttributes(): array
     {
         return ['deal_id', 'title'];
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return (string) ($record->title ?? $record->getKey());
     }
 
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return array_filter(['ID' => $record->deal_id]);
     }
@@ -206,4 +210,3 @@ public static function getGloballySearchableAttributes(): array
         ];
     }
 }
-

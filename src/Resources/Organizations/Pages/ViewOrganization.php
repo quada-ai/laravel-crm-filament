@@ -15,4 +15,3 @@ class ViewOrganization extends ViewRecord
         return [Actions\EditAction::make()];
     }
 }
-

@@ -5,10 +5,12 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Tasks;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
@@ -27,7 +29,7 @@ class TaskResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-check-circle';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-check-circle';
 
     protected static ?int $navigationSort = 60;
 
@@ -36,9 +38,10 @@ class TaskResource extends Resource
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
     }
 
-public static function getNavigationBadge(): ?string
+    public static function getNavigationBadge(): ?string
     {
-        $count = \VentureDrake\LaravelCrm\Models\Task::query()->whereNull('completed_at')->count();
+        $count = Task::query()->whereNull('completed_at')->count();
+
         return $count > 0 ? (string) $count : null;
     }
 
@@ -130,7 +133,7 @@ public static function getNavigationBadge(): ?string
                         ->label('Mark complete')
                         ->icon('heroicon-o-check')
                         ->color('success')
-                        ->action(function (\Illuminate\Database\Eloquent\Collection $records): void {
+                        ->action(function (Collection $records): void {
                             $updated = 0;
                             foreach ($records as $record) {
                                 if (! $record->completed_at) {
@@ -138,7 +141,7 @@ public static function getNavigationBadge(): ?string
                                     $updated++;
                                 }
                             }
-                            \Filament\Notifications\Notification::make()->title($updated.' task(s) marked complete')->success()->send();
+                            Notification::make()->title($updated . ' task(s) marked complete')->success()->send();
                         }),
                     Actions\DeleteBulkAction::make(),
                 ]),
@@ -155,4 +158,3 @@ public static function getNavigationBadge(): ?string
         ];
     }
 }
-

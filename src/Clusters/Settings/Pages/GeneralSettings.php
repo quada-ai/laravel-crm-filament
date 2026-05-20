@@ -26,7 +26,7 @@ class GeneralSettings extends Page implements HasForms
 
     protected static ?string $cluster = Settings::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-adjustments-vertical';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-vertical';
 
     protected static ?string $title = 'General';
 

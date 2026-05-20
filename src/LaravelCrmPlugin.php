@@ -4,39 +4,45 @@ namespace VentureDrake\LaravelCrmFilament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
-use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\ChatWidgetResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\EmailTemplates\EmailTemplateResource;
-use VentureDrake\LaravelCrmFilament\Resources\Chat\ChatConversationResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FieldGroups\FieldGroupResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\SmsTemplates\SmsTemplateResource;
-use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
-use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Fields\FieldResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Labels\LabelResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Roles\RoleResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadSources\LeadSourceResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\PipelineStageResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Pipelines\PipelineResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\PipelineStageResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ProductCategories\ProductCategoryResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Roles\RoleResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\SmsTemplates\SmsTemplateResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\TaxRates\TaxRateResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\UserResource;
+use VentureDrake\LaravelCrmFilament\Resources\Activities\ActivityResource;
+use VentureDrake\LaravelCrmFilament\Resources\Calls\CallResource;
+use VentureDrake\LaravelCrmFilament\Resources\Chat\ChatConversationResource;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\DeliveryResource;
+use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
+use VentureDrake\LaravelCrmFilament\Resources\Files\FileResource;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
-use VentureDrake\LaravelCrmFilament\Resources\Products\ProductResource;
-use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResource;
+use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
+use VentureDrake\LaravelCrmFilament\Resources\Lunches\LunchResource;
+use VentureDrake\LaravelCrmFilament\Resources\Meetings\MeetingResource;
+use VentureDrake\LaravelCrmFilament\Resources\Notes\NoteResource;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
+use VentureDrake\LaravelCrmFilament\Resources\Products\ProductResource;
+use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
+use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
 use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsValueStat;
+use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
 use VentureDrake\LaravelCrmFilament\Widgets\MonthlyRevenueChart;
 use VentureDrake\LaravelCrmFilament\Widgets\RecentActivityList;
 use VentureDrake\LaravelCrmFilament\Widgets\TasksDueTodayList;
-use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
 
 class LaravelCrmPlugin implements Plugin
 {
@@ -176,6 +182,12 @@ class LaravelCrmPlugin implements Plugin
             PersonResource::class,
             OrganizationResource::class,
             TaskResource::class,
+            NoteResource::class,
+            CallResource::class,
+            MeetingResource::class,
+            LunchResource::class,
+            FileResource::class,
+            ActivityResource::class,
         ];
 
         // Pipeline / marketing entities are gated by core's `laravel-crm.modules` array.
@@ -263,7 +275,7 @@ class LaravelCrmPlugin implements Plugin
         $panel->resources($resources);
 
         $panel->discoverClusters(
-            in: __DIR__.'/Clusters',
+            in: __DIR__ . '/Clusters',
             for: 'VentureDrake\\LaravelCrmFilament\\Clusters',
         );
 
@@ -282,11 +294,3 @@ class LaravelCrmPlugin implements Plugin
         //
     }
 }
-
-
-
-
-
-
-
-

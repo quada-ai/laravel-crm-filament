@@ -1,10 +1,11 @@
 <?php
 
+use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
 it('resolves the lead resource to the Lead model', function () {
-    expect(LeadResource::getModel())->toBe(\VentureDrake\LaravelCrm\Models\Lead::class);
+    expect(LeadResource::getModel())->toBe(Lead::class);
 });
 
 it('routes lead records by external_id', function () {
@@ -17,4 +18,3 @@ it('respects the modules() override on the plugin', function () {
     expect($plugin->isModuleEnabled('leads'))->toBeFalse();
     expect($plugin->isModuleEnabled('deals'))->toBeTrue();
 });
-

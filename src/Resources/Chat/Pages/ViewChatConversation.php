@@ -7,7 +7,10 @@ use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Database\Eloquent\Collection;
+use Ramsey\Uuid\Uuid;
 use VentureDrake\LaravelCrm\Models\ChatConversation;
+use VentureDrake\LaravelCrm\Models\Lead;
+use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Services\ChatService;
 use VentureDrake\LaravelCrmFilament\Resources\Chat\ChatConversationResource;
 
@@ -24,7 +27,7 @@ class ViewChatConversation extends ViewRecord
      */
     public Collection $messageItems;
 
-    public function mount(int|string $record): void
+    public function mount(int | string $record): void
     {
         parent::mount($record);
         $this->refreshMessages();
@@ -47,7 +50,7 @@ class ViewChatConversation extends ViewRecord
      */
     public function getListeners(): array
     {
-        $channel = 'crm-chat.'.$this->record->external_id;
+        $channel = 'crm-chat.' . $this->record->external_id;
 
         return [
             "echo:{$channel},.chat.message" => 'refreshMessages',
@@ -93,8 +96,8 @@ class ViewChatConversation extends ViewRecord
 
                     if (! $person && ($visitor?->name || $visitor?->email)) {
                         $parts = $visitor->name ? explode(' ', trim($visitor->name), 2) : [];
-                        $person = \VentureDrake\LaravelCrm\Models\Person::create([
-                            'external_id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
+                        $person = Person::create([
+                            'external_id' => Uuid::uuid4()->toString(),
                             'first_name' => $parts[0] ?? null,
                             'last_name' => $parts[1] ?? null,
                             'user_created_id' => auth()->id(),
@@ -112,11 +115,11 @@ class ViewChatConversation extends ViewRecord
                     }
 
                     $title = $visitor?->name
-                        ? 'Chat with '.$visitor->name
+                        ? 'Chat with ' . $visitor->name
                         : 'Chat with anonymous visitor';
 
-                    $lead = \VentureDrake\LaravelCrm\Models\Lead::create([
-                        'external_id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
+                    $lead = Lead::create([
+                        'external_id' => Uuid::uuid4()->toString(),
                         'title' => $title,
                         'person_id' => $person?->id,
                         'lead_status_id' => 1,

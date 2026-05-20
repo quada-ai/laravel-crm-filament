@@ -4,12 +4,12 @@ namespace VentureDrake\LaravelCrmFilament\Concerns;
 
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Schemas\Components\Component;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Section;
 use VentureDrake\LaravelCrm\Models\Field;
 use VentureDrake\LaravelCrm\Models\FieldModel;

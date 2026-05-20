@@ -10,6 +10,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings;
@@ -27,7 +28,7 @@ class RoleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shield-check';
 
     public static function form(Schema $schema): Schema
     {
@@ -72,12 +73,12 @@ class RoleResource extends Resource
             ]);
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return ! in_array($record->name, ['Owner', 'Admin'], true);
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return ! in_array($record->name, ['Owner', 'Admin'], true);
     }

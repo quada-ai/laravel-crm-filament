@@ -12,8 +12,8 @@ use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
 class EditInvoice extends EditRecord
 {
-    use Concerns\HasInvoiceSendAction;
     use Concerns\HasInvoicePortalAction;
+    use Concerns\HasInvoiceSendAction;
 
     protected static string $resource = InvoiceResource::class;
 

@@ -12,12 +12,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Models\EmailTemplate;
-use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\RelationManagers\RecipientsRelationManager;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\CreateEmailCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\EditEmailCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\ListEmailCampaigns;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\ViewEmailCampaign;
+use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\RelationManagers\RecipientsRelationManager;
 
 class EmailCampaignResource extends Resource
 {
@@ -27,7 +27,7 @@ class EmailCampaignResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-megaphone';
 
     protected static ?int $navigationSort = 70;
 
@@ -114,7 +114,7 @@ class EmailCampaignResource extends Resource
             ]);
     }
 
-public static function getRelations(): array
+    public static function getRelations(): array
     {
         return [
             RecipientsRelationManager::class,

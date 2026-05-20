@@ -97,5 +97,3 @@ class ContactFieldsSchema
             ->columnSpanFull();
     }
 }
-
-

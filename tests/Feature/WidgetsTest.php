@@ -1,6 +1,8 @@
 <?php
 
-use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use Filament\Widgets\ChartWidget;
+use Filament\Widgets\StatsOverviewWidget;
+use Filament\Widgets\TableWidget;
 use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsValueStat;
 use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
@@ -9,12 +11,12 @@ use VentureDrake\LaravelCrmFilament\Widgets\RecentActivityList;
 use VentureDrake\LaravelCrmFilament\Widgets\TasksDueTodayList;
 
 dataset('widgets', [
-    'CrmStatsOverview' => [CrmStatsOverview::class, \Filament\Widgets\StatsOverviewWidget::class],
-    'DealsValueStat' => [DealsValueStat::class, \Filament\Widgets\StatsOverviewWidget::class],
-    'LeadsByStageChart' => [LeadsByStageChart::class, \Filament\Widgets\ChartWidget::class],
-    'MonthlyRevenueChart' => [MonthlyRevenueChart::class, \Filament\Widgets\ChartWidget::class],
-    'TasksDueTodayList' => [TasksDueTodayList::class, \Filament\Widgets\TableWidget::class],
-    'RecentActivityList' => [RecentActivityList::class, \Filament\Widgets\TableWidget::class],
+    'CrmStatsOverview' => [CrmStatsOverview::class, StatsOverviewWidget::class],
+    'DealsValueStat' => [DealsValueStat::class, StatsOverviewWidget::class],
+    'LeadsByStageChart' => [LeadsByStageChart::class, ChartWidget::class],
+    'MonthlyRevenueChart' => [MonthlyRevenueChart::class, ChartWidget::class],
+    'TasksDueTodayList' => [TasksDueTodayList::class, TableWidget::class],
+    'RecentActivityList' => [RecentActivityList::class, TableWidget::class],
 ]);
 
 it('each dashboard widget extends the expected Filament widget base', function (string $widget, string $base) {
