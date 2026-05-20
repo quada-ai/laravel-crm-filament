@@ -52,6 +52,7 @@ return [
         'last_activity' => 'Dernière activité',
         'fields' => 'Champs',
         'labels' => 'Étiquettes',
+        'timestamp' => 'Horodatage',
     ],
 
     'contact' => [
@@ -152,6 +153,14 @@ return [
         'file_type' => 'Type de fichier',
         'uploaded_by' => 'Téléversé par',
         'avatar' => 'Avatar',
+    ],
+
+    // Audit / history (owen-it/laravel-auditing)
+    'audit' => [
+        'history' => 'Historique',
+        'event' => 'Événement',
+        'user' => 'Utilisateur',
+        'changes' => 'Modifications',
     ],
 
     'sections' => [

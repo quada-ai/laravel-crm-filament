@@ -5,10 +5,19 @@ namespace VentureDrake\LaravelCrmFilament;
 use Illuminate\Filesystem\Filesystem;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Delivery;
+use VentureDrake\LaravelCrm\Models\Invoice;
 use VentureDrake\LaravelCrm\Models\Label;
+use VentureDrake\LaravelCrm\Models\Lead;
+use VentureDrake\LaravelCrm\Models\Order;
+use VentureDrake\LaravelCrm\Models\Organization;
+use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Models\Product;
+use VentureDrake\LaravelCrm\Models\PurchaseOrder;
+use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrmFilament\Console\InstallCommand;
+use VentureDrake\LaravelCrmFilament\Models\Audit;
 
 class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
 {
@@ -54,6 +63,17 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             return $model->morphToMany(Label::class, $morphName);
         });
 
+        // Core CRM's base Model does not implement OwenIt\Auditing\Auditable
+        // even though the audits table ships with the install. Resolve an
+        // `audits()` morphMany on every primary model so the
+        // AuditsRelationManager can hang off the standard
+        // `protected static string $relationship = 'audits'` contract.
+        foreach (static::auditableModels() as $auditableModel) {
+            $auditableModel::resolveRelationUsing('audits', function ($model) {
+                return $model->morphMany(Audit::class, 'auditable');
+            });
+        }
+
         // Publish PanelProvider stub used by the install command.
         if ($this->app->runningInConsole()) {
             $files = new Filesystem;
@@ -66,6 +86,25 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
                 }
             }
         }
+    }
+
+    /**
+     * @return array<class-string>
+     */
+    public static function auditableModels(): array
+    {
+        return [
+            Lead::class,
+            Deal::class,
+            Quote::class,
+            Order::class,
+            Invoice::class,
+            Delivery::class,
+            PurchaseOrder::class,
+            Person::class,
+            Organization::class,
+            Product::class,
+        ];
     }
 
     /**

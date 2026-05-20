@@ -53,6 +53,7 @@ return [
         'last_activity' => 'Last activity',
         'fields' => 'Fields',
         'labels' => 'Labels',
+        'timestamp' => 'Timestamp',
     ],
 
     // Contact / address fields
@@ -159,6 +160,14 @@ return [
         'file_type' => 'File type',
         'uploaded_by' => 'Uploaded by',
         'avatar' => 'Avatar',
+    ],
+
+    // Audit / history (owen-it/laravel-auditing)
+    'audit' => [
+        'history' => 'History',
+        'event' => 'Event',
+        'user' => 'User',
+        'changes' => 'Changes',
     ],
 
     // Sections (top-level grouping headings on forms / infolists)

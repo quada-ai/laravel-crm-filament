@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\OrderProduct;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\CreateDelivery;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\EditDelivery;
@@ -182,6 +183,7 @@ class DeliveryResource extends Resource
     public static function getRelations(): array
     {
         return [
+            AuditsRelationManager::class,
             FilesRelationManager::class,
         ];
     }

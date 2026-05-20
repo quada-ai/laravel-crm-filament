@@ -52,6 +52,7 @@ return [
         'last_activity' => 'Última actividad',
         'fields' => 'Campos',
         'labels' => 'Etiquetas',
+        'timestamp' => 'Marca de tiempo',
     ],
 
     'contact' => [
@@ -152,6 +153,14 @@ return [
         'file_type' => 'Tipo de archivo',
         'uploaded_by' => 'Subido por',
         'avatar' => 'Avatar',
+    ],
+
+    // Audit / history (owen-it/laravel-auditing)
+    'audit' => [
+        'history' => 'Historial',
+        'event' => 'Evento',
+        'user' => 'Usuario',
+        'changes' => 'Cambios',
     ],
 
     'sections' => [

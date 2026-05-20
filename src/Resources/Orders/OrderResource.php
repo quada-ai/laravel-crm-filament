@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\CreateOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\EditOrder;
@@ -223,6 +224,7 @@ class OrderResource extends Resource
     public static function getRelations(): array
     {
         return [
+            AuditsRelationManager::class,
             FilesRelationManager::class,
         ];
     }

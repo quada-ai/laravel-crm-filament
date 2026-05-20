@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
@@ -184,6 +185,7 @@ class DealResource extends Resource
             TasksRelationManager::class,
             CallsRelationManager::class,
             MeetingsRelationManager::class,
+            AuditsRelationManager::class,
             FilesRelationManager::class,
         ];
     }
