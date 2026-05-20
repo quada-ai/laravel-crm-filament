@@ -10,10 +10,14 @@ use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrm\Models\SmsCampaign;
 use VentureDrake\LaravelCrm\Services\SmsCampaignService;
 use VentureDrake\LaravelCrm\Sms\SmsCampaignMessage;
+use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\Concerns\HasSmsCampaignSendNowAction;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
+use VentureDrake\LaravelCrmFilament\Widgets\SmsCampaignSendsOverTimeChart;
 
 class ViewSmsCampaign extends ViewRecord
 {
+    use HasSmsCampaignSendNowAction;
+
     protected static string $resource = SmsCampaignResource::class;
 
     protected function getHeaderActions(): array
@@ -37,6 +41,7 @@ class ViewSmsCampaign extends ViewRecord
                         '<pre class="text-sm whitespace-pre-wrap font-sans">' . e($rendered) . '</pre>'
                     );
                 }),
+            $this->smsCampaignSendNowAction(),
             Actions\Action::make('schedule')
                 ->label('Schedule')
                 ->icon('heroicon-o-calendar')
@@ -61,6 +66,13 @@ class ViewSmsCampaign extends ViewRecord
                     app(SmsCampaignService::class)->cancel($record);
                     Notification::make()->title('Campaign cancelled')->success()->send();
                 }),
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            SmsCampaignSendsOverTimeChart::class,
         ];
     }
 }

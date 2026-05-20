@@ -5,12 +5,15 @@ namespace VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
+use VentureDrake\LaravelCrm\Models\EmailCampaignRecipient;
 use VentureDrake\LaravelCrm\Models\EmailTemplate;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\CreateEmailCampaign;
@@ -67,6 +70,39 @@ class EmailCampaignResource extends Resource
             Forms\Components\DateTimePicker::make('scheduled_at')
                 ->label('Schedule for')
                 ->helperText('Leave blank to keep as draft; use the Schedule action after saving.'),
+        ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('Performance')
+                ->key('campaign_performance')
+                ->description('Engagement metrics for this campaign')
+                ->columns(3)
+                ->schema([
+                    TextEntry::make('sent_count_state')
+                        ->label('Sent')
+                        ->state(fn (EmailCampaign $record) => EmailCampaignRecipient::where('email_campaign_id', $record->id)->where('status', 'sent')->count())
+                        ->numeric(),
+                    TextEntry::make('failed_count_state')
+                        ->label('Failed')
+                        ->state(fn (EmailCampaign $record) => EmailCampaignRecipient::where('email_campaign_id', $record->id)->whereIn('status', ['failed', 'bounced'])->count())
+                        ->numeric(),
+                    TextEntry::make('skipped_count_state')
+                        ->label('Skipped')
+                        ->state(fn (EmailCampaign $record) => EmailCampaignRecipient::where('email_campaign_id', $record->id)->where('status', 'skipped')->count())
+                        ->numeric(),
+                    TextEntry::make('open_rate')
+                        ->label('Open rate')
+                        ->state(fn (EmailCampaign $record): string => $record->openRate() . '%'),
+                    TextEntry::make('click_rate')
+                        ->label('Click rate')
+                        ->state(fn (EmailCampaign $record): string => $record->clickRate() . '%'),
+                    TextEntry::make('unsubscribe_rate')
+                        ->label('Unsubscribe rate')
+                        ->state(fn (EmailCampaign $record): string => $record->unsubscribeRate() . '%'),
+                ]),
         ]);
     }
 

@@ -32,10 +32,21 @@ class RecipientsRelationManager extends RelationManager
                         'failed' => 'danger', 'bounced' => 'danger',
                         'skipped' => 'warning', default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('clicks_count')->label('Clicks')->numeric()->toggleable(),
-                Tables\Columns\TextColumn::make('sent_at')->dateTime()->toggleable(),
-                Tables\Columns\TextColumn::make('delivered_at')->dateTime()->toggleable(),
+                Tables\Columns\TextColumn::make('delivered_count_state')
+                    ->label('Delivered')
+                    ->state(fn ($record): int => $record->status === 'delivered' ? 1 : 0)
+                    ->numeric()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('clicks_count')->label('Clicks')->numeric()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('sent_at')->dateTime()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('delivered_at')->dateTime()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('unsubscribed_at')->dateTime()->toggleable()->label('Unsubscribed'),
+                Tables\Columns\TextColumn::make('clicksend_message_id')
+                    ->label('Message ID')
+                    ->copyable()
+                    ->copyMessage('Message ID copied')
+                    ->limit(20)
+                    ->toggleable(),
             ])
             ->defaultSort('sent_at', 'desc')
             ->filters([

@@ -32,10 +32,20 @@ class RecipientsRelationManager extends RelationManager
                         'failed' => 'danger', 'bounced' => 'danger',
                         'skipped' => 'warning', default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('opens_count')->label('Opens')->numeric()->toggleable(),
-                Tables\Columns\TextColumn::make('clicks_count')->label('Clicks')->numeric()->toggleable(),
+                Tables\Columns\TextColumn::make('opens_count')->label('Opens')->numeric()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('clicks_count')->label('Clicks')->numeric()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('last_opened_at')->label('Last opened')->dateTime()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('first_clicked_at')->label('First clicked')->dateTime()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('sent_at')->dateTime()->toggleable(),
                 Tables\Columns\TextColumn::make('unsubscribed_at')->dateTime()->toggleable()->label('Unsubscribed'),
+                Tables\Columns\TextColumn::make('bounce_status')
+                    ->label('Bounce')
+                    ->state(fn ($record): string => in_array($record->status, ['bounced', 'failed'], true) ? ucfirst($record->status) : '—')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Bounced', 'Failed' => 'danger', default => 'gray',
+                    })
+                    ->toggleable(),
             ])
             ->defaultSort('sent_at', 'desc')
             ->filters([

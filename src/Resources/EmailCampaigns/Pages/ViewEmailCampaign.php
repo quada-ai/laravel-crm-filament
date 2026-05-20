@@ -11,9 +11,13 @@ use VentureDrake\LaravelCrm\Mail\EmailCampaignMessage;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Services\EmailCampaignService;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
+use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\Concerns\HasEmailCampaignSendNowAction;
+use VentureDrake\LaravelCrmFilament\Widgets\EmailCampaignSendsOverTimeChart;
 
 class ViewEmailCampaign extends ViewRecord
 {
+    use HasEmailCampaignSendNowAction;
+
     protected static string $resource = EmailCampaignResource::class;
 
     protected function getHeaderActions(): array
@@ -29,6 +33,7 @@ class ViewEmailCampaign extends ViewRecord
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Close')
                 ->modalContent(fn (EmailCampaign $record) => new HtmlString(EmailCampaignMessage::renderPreview($record->body ?? '', $record->preview_text ?? '', $record->team_id))),
+            $this->emailCampaignSendNowAction(),
             Actions\Action::make('schedule')
                 ->label('Schedule')
                 ->icon('heroicon-o-calendar')
@@ -53,6 +58,13 @@ class ViewEmailCampaign extends ViewRecord
                     app(EmailCampaignService::class)->cancel($record);
                     Notification::make()->title('Campaign cancelled')->success()->send();
                 }),
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            EmailCampaignSendsOverTimeChart::class,
         ];
     }
 }

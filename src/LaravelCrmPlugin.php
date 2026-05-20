@@ -37,6 +37,7 @@ use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResour
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
+use VentureDrake\LaravelCrmFilament\Widgets\CampaignPerformanceChart;
 use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsValueStat;
 use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
@@ -279,14 +280,20 @@ class LaravelCrmPlugin implements Plugin
             for: 'VentureDrake\\LaravelCrmFilament\\Clusters',
         );
 
-        $panel->widgets([
+        $widgets = [
             CrmStatsOverview::class,
             DealsValueStat::class,
             LeadsByStageChart::class,
             MonthlyRevenueChart::class,
             TasksDueTodayList::class,
             RecentActivityList::class,
-        ]);
+        ];
+
+        if ($this->isModuleEnabled('email-marketing')) {
+            $widgets[] = CampaignPerformanceChart::class;
+        }
+
+        $panel->widgets($widgets);
     }
 
     public function boot(Panel $panel): void
