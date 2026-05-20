@@ -106,12 +106,14 @@ return new class extends Migration
             Schema::create($prefix . 'calls', function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->string('external_id')->nullable();
-                $table->morphs('callable');
+                $table->string('name')->nullable();
+                $table->nullableMorphs('callable');
                 $table->text('description')->nullable();
                 $table->dateTime('start_at')->nullable();
                 $table->dateTime('finish_at')->nullable();
                 $table->dateTime('called_at')->nullable();
                 $table->boolean('completed')->default(false);
+                $table->unsignedBigInteger('user_owner_id')->nullable();
                 $table->unsignedBigInteger('user_assigned_id')->nullable();
                 $table->unsignedBigInteger('user_created_id')->nullable();
                 $table->unsignedBigInteger('user_updated_id')->nullable();

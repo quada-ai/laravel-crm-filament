@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\Call;
 use VentureDrake\LaravelCrmFilament\Concerns\StandaloneActivityResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\Resources\Calls\Pages\CallKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Calls\Pages\ListCalls;
 use VentureDrake\LaravelCrmFilament\Resources\Calls\Pages\ViewCall;
 use VentureDrake\LaravelCrmFilament\Support\ParentTypeOptions;
@@ -96,6 +97,7 @@ class CallResource extends Resource
     {
         return [
             'index' => ListCalls::route('/'),
+            'kanban' => CallKanban::route('/kanban'),
             'view' => ViewCall::route('/{record}'),
         ];
     }
