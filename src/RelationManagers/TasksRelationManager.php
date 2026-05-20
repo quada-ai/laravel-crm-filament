@@ -30,17 +30,17 @@ class TasksRelationManager extends RelationManager
                 ->rows(2)
                 ->columnSpanFull(),
             Grid::make(2)->schema([
-                Forms\Components\DateTimePicker::make('due_at')->label('Due'),
-                Forms\Components\DateTimePicker::make('completed_at')->label('Completed'),
+                Forms\Components\DateTimePicker::make('due_at')->label(__('laravel-crm-filament::labels.money.due')),
+                Forms\Components\DateTimePicker::make('completed_at')->label(__('laravel-crm-filament::labels.money.completed')),
             ]),
             Grid::make(2)->schema([
                 Forms\Components\Select::make('user_owner_id')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->relationship('ownerUser', 'name')
                     ->searchable()
                     ->preload(),
                 Forms\Components\Select::make('user_assigned_id')
-                    ->label('Assigned to')
+                    ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
                     ->relationship('assignedToUser', 'name')
                     ->searchable()
                     ->preload(),
@@ -54,13 +54,13 @@ class TasksRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\IconColumn::make('completed_at')
-                    ->label('Done')
+                    ->label(__('laravel-crm-filament::labels.money.done'))
                     ->boolean()
                     ->getStateUsing(fn ($record) => filled($record->completed_at)),
                 Tables\Columns\TextColumn::make('name')->limit(60)->wrap(),
                 Tables\Columns\TextColumn::make('due_at')->dateTime()->sortable(),
                 Tables\Columns\TextColumn::make('assignedToUser.name')
-                    ->label('Assignee')
+                    ->label(__('laravel-crm-filament::labels.fields.assignee'))
                     ->toggleable(),
             ])
             ->defaultSort('due_at')

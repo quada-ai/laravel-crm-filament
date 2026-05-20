@@ -26,7 +26,7 @@ class ViewSmsCampaign extends ViewRecord
             Actions\EditAction::make()
                 ->visible(fn (SmsCampaign $record) => $record->isEditable()),
             Actions\Action::make('preview')
-                ->label('Preview')
+                ->label(__('laravel-crm-filament::labels.actions.preview'))
                 ->icon('heroicon-o-eye')
                 ->color('gray')
                 ->modalHeading(fn (SmsCampaign $record) => 'Preview: ' . $record->name)
@@ -43,13 +43,13 @@ class ViewSmsCampaign extends ViewRecord
                 }),
             $this->smsCampaignSendNowAction(),
             Actions\Action::make('schedule')
-                ->label('Schedule')
+                ->label(__('laravel-crm-filament::labels.actions.schedule'))
                 ->icon('heroicon-o-calendar')
                 ->color('primary')
                 ->visible(fn (SmsCampaign $record) => $record->isEditable())
                 ->schema([
                     DateTimePicker::make('scheduled_at')
-                        ->label('Send at')
+                        ->label(__('laravel-crm-filament::labels.campaign.send_at'))
                         ->required(),
                 ])
                 ->action(function (array $data, SmsCampaign $record): void {
@@ -57,7 +57,7 @@ class ViewSmsCampaign extends ViewRecord
                     Notification::make()->title('Campaign scheduled')->success()->send();
                 }),
             Actions\Action::make('cancel')
-                ->label('Cancel')
+                ->label(__('laravel-crm-filament::labels.actions.cancel'))
                 ->icon('heroicon-o-x-circle')
                 ->color('danger')
                 ->requiresConfirmation()

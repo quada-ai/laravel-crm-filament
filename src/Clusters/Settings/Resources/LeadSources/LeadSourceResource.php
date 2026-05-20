@@ -51,7 +51,7 @@ class LeadSourceResource extends Resource
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('description')->limit(60)->toggleable(),
                 Tables\Columns\TextColumn::make('leads_count')
-                    ->label('Leads')
+                    ->label(__('laravel-crm-filament::labels.sales.leads'))
                     ->counts('leads')
                     ->toggleable(),
             ])

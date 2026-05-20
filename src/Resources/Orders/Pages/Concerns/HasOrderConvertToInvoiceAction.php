@@ -19,7 +19,7 @@ trait HasOrderConvertToInvoiceAction
     protected function orderConvertToInvoiceAction(): Action
     {
         return Action::make('convertToInvoice')
-            ->label('Convert to invoice')
+            ->label(__('laravel-crm-filament::labels.actions.convert_to_invoice'))
             ->icon('heroicon-o-receipt-percent')
             ->color('success')
             ->requiresConfirmation()
@@ -43,7 +43,7 @@ trait HasOrderConvertToInvoiceAction
                     ->success()
                     ->actions([
                         \Filament\Notifications\Actions\Action::make('open')
-                            ->label('Open invoice')
+                            ->label(__('laravel-crm-filament::labels.actions.open_invoice'))
                             ->url($url),
                     ])
                     ->send();

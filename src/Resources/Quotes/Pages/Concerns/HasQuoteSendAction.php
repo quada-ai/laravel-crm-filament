@@ -20,14 +20,14 @@ trait HasQuoteSendAction
     protected function quoteSendAction(): Action
     {
         return Action::make('send')
-            ->label('Send quote')
+            ->label(__('laravel-crm-filament::labels.actions.send_quote'))
             ->icon('heroicon-o-paper-airplane')
             ->color('primary')
             ->modalHeading('Send quote')
             ->modalSubmitActionLabel('Send')
             ->schema(fn (Quote $record): array => [
                 TextInput::make('to')
-                    ->label('To')
+                    ->label(__('laravel-crm-filament::labels.campaign.to'))
                     ->email()
                     ->required()
                     ->default(fn () => optional($record->person)->getPrimaryEmail()?->address),
@@ -38,7 +38,7 @@ trait HasQuoteSendAction
                     ->rows(8)
                     ->default("Hi,\n\nPlease find your quote here: [Online Quote Link]\n\nThanks."),
                 Checkbox::make('cc')
-                    ->label('Send me a copy'),
+                    ->label(__('laravel-crm-filament::labels.campaign.send_me_a_copy')),
             ])
             ->action(function (array $data, Quote $record): void {
                 $this->dispatchQuote($record, $data);

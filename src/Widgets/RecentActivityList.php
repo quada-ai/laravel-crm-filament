@@ -22,16 +22,16 @@ class RecentActivityList extends TableWidget
                 ->orderByDesc('created_at'))
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('When')
+                    ->label(__('laravel-crm-filament::labels.fields.when'))
                     ->since(),
                 Tables\Columns\TextColumn::make('causeable.name')
-                    ->label('User')
+                    ->label(__('laravel-crm-filament::labels.fields.user'))
                     ->placeholder('System'),
                 Tables\Columns\TextColumn::make('recordable_type')
-                    ->label('Action')
+                    ->label(__('laravel-crm-filament::labels.fields.action'))
                     ->formatStateUsing(fn (?string $state, $record) => static::describeAction($state, $record)),
                 Tables\Columns\TextColumn::make('timelineable_type')
-                    ->label('On')
+                    ->label(__('laravel-crm-filament::labels.fields.on'))
                     ->formatStateUsing(fn (?string $state, $record) => static::describeTimelineable($state, $record)),
             ])
             ->paginated([10, 25])

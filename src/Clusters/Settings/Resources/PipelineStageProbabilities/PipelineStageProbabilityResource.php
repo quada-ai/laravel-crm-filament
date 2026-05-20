@@ -41,7 +41,7 @@ class PipelineStageProbabilityResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('percent')
-                    ->label('Probability %')
+                    ->label(__('laravel-crm-filament::labels.sales.probability_percent'))
                     ->numeric()
                     ->minValue(0)
                     ->maxValue(100)
@@ -57,7 +57,7 @@ class PipelineStageProbabilityResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('percent')
-                    ->label('Probability')
+                    ->label(__('laravel-crm-filament::labels.sales.probability'))
                     ->formatStateUsing(fn ($state) => $state . '%')
                     ->sortable(),
             ])

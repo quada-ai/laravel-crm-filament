@@ -23,8 +23,8 @@ class RecipientsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('address')
             ->columns([
-                Tables\Columns\TextColumn::make('address')->label('Email')->searchable(),
-                Tables\Columns\TextColumn::make('person.name')->label('Person')->toggleable(),
+                Tables\Columns\TextColumn::make('address')->label(__('laravel-crm-filament::labels.contact.email'))->searchable(),
+                Tables\Columns\TextColumn::make('person.name')->label(__('laravel-crm-filament::labels.money.person'))->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -32,14 +32,14 @@ class RecipientsRelationManager extends RelationManager
                         'failed' => 'danger', 'bounced' => 'danger',
                         'skipped' => 'warning', default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('opens_count')->label('Opens')->numeric()->sortable()->toggleable(),
-                Tables\Columns\TextColumn::make('clicks_count')->label('Clicks')->numeric()->sortable()->toggleable(),
-                Tables\Columns\TextColumn::make('last_opened_at')->label('Last opened')->dateTime()->sortable()->toggleable(),
-                Tables\Columns\TextColumn::make('first_clicked_at')->label('First clicked')->dateTime()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('opens_count')->label(__('laravel-crm-filament::labels.campaign.opens'))->numeric()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('clicks_count')->label(__('laravel-crm-filament::labels.campaign.clicks'))->numeric()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('last_opened_at')->label(__('laravel-crm-filament::labels.campaign.last_opened'))->dateTime()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('first_clicked_at')->label(__('laravel-crm-filament::labels.campaign.first_clicked'))->dateTime()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('sent_at')->dateTime()->toggleable(),
-                Tables\Columns\TextColumn::make('unsubscribed_at')->dateTime()->toggleable()->label('Unsubscribed'),
+                Tables\Columns\TextColumn::make('unsubscribed_at')->dateTime()->toggleable()->label(__('laravel-crm-filament::labels.campaign.unsubscribed')),
                 Tables\Columns\TextColumn::make('bounce_status')
-                    ->label('Bounce')
+                    ->label(__('laravel-crm-filament::labels.campaign.bounce'))
                     ->state(fn ($record): string => in_array($record->status, ['bounced', 'failed'], true) ? ucfirst($record->status) : '—')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

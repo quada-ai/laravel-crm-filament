@@ -46,7 +46,7 @@ class MeetingResource extends Resource
         return $schema->components([
             Forms\Components\TextInput::make('name')->disabled(),
             Forms\Components\Textarea::make('description')->rows(3)->disabled()->columnSpanFull(),
-            Forms\Components\TextInput::make('meetingable_type')->label('Parent type')->disabled(),
+            Forms\Components\TextInput::make('meetingable_type')->label(__('laravel-crm-filament::labels.fields.parent_type'))->disabled(),
             Forms\Components\DateTimePicker::make('start_at')->disabled(),
             Forms\Components\DateTimePicker::make('finish_at')->disabled(),
         ]);
@@ -58,20 +58,20 @@ class MeetingResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->limit(60),
                 Tables\Columns\TextColumn::make('meetingable_type')
-                    ->label('Parent')
+                    ->label(__('laravel-crm-filament::labels.fields.parent'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => $state ? (ParentTypeOptions::all()[$state] ?? class_basename($state)) : '—'),
-                Tables\Columns\TextColumn::make('ownerUser.name')->label('Owner')->toggleable(),
+                Tables\Columns\TextColumn::make('ownerUser.name')->label(__('laravel-crm-filament::labels.fields.owner'))->toggleable(),
                 Tables\Columns\TextColumn::make('start_at')->dateTime()->sortable(),
                 Tables\Columns\TextColumn::make('finish_at')->dateTime()->toggleable(),
             ])
             ->defaultSort('start_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('meetingable_type')
-                    ->label('Parent type')
+                    ->label(__('laravel-crm-filament::labels.fields.parent_type'))
                     ->options(ParentTypeOptions::all()),
                 Tables\Filters\SelectFilter::make('user_owner_id')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->relationship('ownerUser', 'name')
                     ->searchable()
                     ->preload(),

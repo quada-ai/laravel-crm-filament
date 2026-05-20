@@ -51,7 +51,7 @@ class ProductCategoryResource extends Resource
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('description')->limit(60)->toggleable(),
                 Tables\Columns\TextColumn::make('products_count')
-                    ->label('Products')
+                    ->label(__('laravel-crm-filament::labels.money.products'))
                     ->counts('products')
                     ->toggleable(),
             ])

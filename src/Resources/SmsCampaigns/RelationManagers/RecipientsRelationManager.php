@@ -23,8 +23,8 @@ class RecipientsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('phone.number')
             ->columns([
-                Tables\Columns\TextColumn::make('phone.number')->label('Phone')->searchable(),
-                Tables\Columns\TextColumn::make('person.name')->label('Person')->toggleable(),
+                Tables\Columns\TextColumn::make('phone.number')->label(__('laravel-crm-filament::labels.contact.phone'))->searchable(),
+                Tables\Columns\TextColumn::make('person.name')->label(__('laravel-crm-filament::labels.money.person'))->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -33,16 +33,16 @@ class RecipientsRelationManager extends RelationManager
                         'skipped' => 'warning', default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('delivered_count_state')
-                    ->label('Delivered')
+                    ->label(__('laravel-crm-filament::labels.money.delivered'))
                     ->state(fn ($record): int => $record->status === 'delivered' ? 1 : 0)
                     ->numeric()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('clicks_count')->label('Clicks')->numeric()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('clicks_count')->label(__('laravel-crm-filament::labels.campaign.clicks'))->numeric()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('sent_at')->dateTime()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('delivered_at')->dateTime()->sortable()->toggleable(),
-                Tables\Columns\TextColumn::make('unsubscribed_at')->dateTime()->toggleable()->label('Unsubscribed'),
+                Tables\Columns\TextColumn::make('unsubscribed_at')->dateTime()->toggleable()->label(__('laravel-crm-filament::labels.campaign.unsubscribed')),
                 Tables\Columns\TextColumn::make('clicksend_message_id')
-                    ->label('Message ID')
+                    ->label(__('laravel-crm-filament::labels.campaign.message_id'))
                     ->copyable()
                     ->copyMessage('Message ID copied')
                     ->limit(20)

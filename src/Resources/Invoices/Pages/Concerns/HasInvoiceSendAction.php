@@ -20,14 +20,14 @@ trait HasInvoiceSendAction
     protected function invoiceSendAction(): Action
     {
         return Action::make('send')
-            ->label('Send invoice')
+            ->label(__('laravel-crm-filament::labels.actions.send_invoice'))
             ->icon('heroicon-o-paper-airplane')
             ->color('primary')
             ->modalHeading('Send invoice')
             ->modalSubmitActionLabel('Send')
             ->schema(fn (Invoice $record): array => [
                 TextInput::make('to')
-                    ->label('To')
+                    ->label(__('laravel-crm-filament::labels.campaign.to'))
                     ->email()
                     ->required()
                     ->default(fn () => optional($record->person)->getPrimaryEmail()?->address),
@@ -38,7 +38,7 @@ trait HasInvoiceSendAction
                     ->rows(8)
                     ->default("Hi,\n\nPlease find your invoice here: [Online Invoice Link]\n\nThanks."),
                 Checkbox::make('cc')
-                    ->label('Send me a copy'),
+                    ->label(__('laravel-crm-filament::labels.campaign.send_me_a_copy')),
             ])
             ->action(function (array $data, Invoice $record): void {
                 $this->dispatchInvoice($record, $data);

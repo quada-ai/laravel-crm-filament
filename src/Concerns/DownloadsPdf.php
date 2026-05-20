@@ -65,7 +65,7 @@ trait DownloadsPdf
     protected function downloadPdfAction(callable $build): Action
     {
         return Action::make('downloadPdf')
-            ->label('Download PDF')
+            ->label(__('laravel-crm-filament::labels.actions.download_pdf'))
             ->icon('heroicon-o-arrow-down-tray')
             ->color('gray')
             ->action($build);

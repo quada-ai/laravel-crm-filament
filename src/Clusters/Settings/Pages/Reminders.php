@@ -74,7 +74,7 @@ class Reminders extends Page implements HasForms
                         Checkbox::make("{$type}_enabled")
                             ->label("Email me before each {$type}"),
                         TextInput::make("{$type}_hours")
-                            ->label('Hours before')
+                            ->label(__('laravel-crm-filament::labels.misc.hours_before'))
                             ->numeric()
                             ->minValue(0)
                             ->maxValue(168)
@@ -90,7 +90,7 @@ class Reminders extends Page implements HasForms
     {
         return [
             Action::make('save')
-                ->label('Save')
+                ->label(__('laravel-crm-filament::labels.actions.save'))
                 ->icon('heroicon-o-check')
                 ->action('save'),
         ];

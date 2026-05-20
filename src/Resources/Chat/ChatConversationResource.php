@@ -71,11 +71,11 @@ class ChatConversationResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('chat_id')
-                    ->label('ID')
+                    ->label(__('laravel-crm-filament::labels.fields.id'))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('visitor.name')
-                    ->label('Visitor')
+                    ->label(__('laravel-crm-filament::labels.chat.visitor'))
                     ->placeholder('Anonymous')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('subject')->limit(40)->toggleable(),
@@ -83,10 +83,10 @@ class ChatConversationResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => $state === 'open' ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('assignedToUser.name')
-                    ->label('Assigned')
+                    ->label(__('laravel-crm-filament::labels.fields.assigned'))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('last_message_at')
-                    ->label('Last activity')
+                    ->label(__('laravel-crm-filament::labels.fields.last_activity'))
                     ->since()
                     ->sortable(),
             ])
@@ -98,7 +98,7 @@ class ChatConversationResource extends Resource
             ->recordActions([
                 Actions\ViewAction::make(),
                 Actions\Action::make('close')
-                    ->label('Close')
+                    ->label(__('laravel-crm-filament::labels.actions.close'))
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
                     ->requiresConfirmation()
@@ -111,7 +111,7 @@ class ChatConversationResource extends Resource
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
                     Actions\BulkAction::make('close')
-                        ->label('Bulk close')
+                        ->label(__('laravel-crm-filament::labels.actions.bulk_close'))
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->requiresConfirmation()

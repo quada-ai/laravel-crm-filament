@@ -10,7 +10,7 @@ trait HasInvoicePortalAction
     protected function invoicePortalAction(): Action
     {
         return Action::make('previewPortal')
-            ->label('Preview portal')
+            ->label(__('laravel-crm-filament::labels.actions.preview_portal'))
             ->icon('heroicon-o-arrow-top-right-on-square')
             ->color('primary')
             ->url(fn (Invoice $record): string => url('p/invoices/' . $record->external_id))

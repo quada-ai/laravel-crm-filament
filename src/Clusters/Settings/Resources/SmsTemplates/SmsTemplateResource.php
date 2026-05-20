@@ -53,7 +53,7 @@ class SmsTemplateResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('body')->limit(80)->wrap()->toggleable(),
-                Tables\Columns\IconColumn::make('is_system')->label('System')->boolean(),
+                Tables\Columns\IconColumn::make('is_system')->label(__('laravel-crm-filament::labels.fields.system'))->boolean(),
             ])
             ->defaultSort('name')
             ->recordActions([Actions\EditAction::make()])

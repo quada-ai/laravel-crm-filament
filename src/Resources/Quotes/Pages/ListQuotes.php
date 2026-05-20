@@ -17,7 +17,7 @@ class ListQuotes extends ListRecords
     {
         return [
             Actions\Action::make('kanban')
-                ->label('Kanban')
+                ->label(__('laravel-crm-filament::labels.actions.kanban'))
                 ->icon('heroicon-o-view-columns')
                 ->color('gray')
                 ->url(QuoteResource::getUrl('kanban')),

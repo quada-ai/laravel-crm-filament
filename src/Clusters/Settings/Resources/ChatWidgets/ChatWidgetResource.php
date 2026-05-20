@@ -39,10 +39,10 @@ class ChatWidgetResource extends Resource
         return $schema->components([
             Grid::make(2)->schema([
                 Forms\Components\TextInput::make('name')->required()->maxLength(255),
-                Forms\Components\Toggle::make('is_active')->label('Active')->default(true),
+                Forms\Components\Toggle::make('is_active')->label(__('laravel-crm-filament::labels.fields.active'))->default(true),
             ]),
             Forms\Components\TagsInput::make('allowed_origins')
-                ->label('Allowed origins')
+                ->label(__('laravel-crm-filament::labels.chat.allowed_origins'))
                 ->placeholder('https://example.com')
                 ->helperText('Hostnames permitted to embed this widget; leave empty to allow all.')
                 ->columnSpanFull(),
@@ -54,15 +54,15 @@ class ChatWidgetResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\IconColumn::make('is_active')->label('Active')->boolean(),
+                Tables\Columns\IconColumn::make('is_active')->label(__('laravel-crm-filament::labels.fields.active'))->boolean(),
                 Tables\Columns\TextColumn::make('public_key')
-                    ->label('Public key')
+                    ->label(__('laravel-crm-filament::labels.chat.public_key'))
                     ->copyable()
                     ->limit(20)
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('conversations_count')
                     ->counts('conversations')
-                    ->label('Conversations')
+                    ->label(__('laravel-crm-filament::labels.chat.conversations'))
                     ->toggleable(),
             ])
             ->defaultSort('name')

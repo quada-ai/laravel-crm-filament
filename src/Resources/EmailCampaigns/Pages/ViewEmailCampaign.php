@@ -26,7 +26,7 @@ class ViewEmailCampaign extends ViewRecord
             Actions\EditAction::make()
                 ->visible(fn (EmailCampaign $record) => $record->isEditable()),
             Actions\Action::make('preview')
-                ->label('Preview')
+                ->label(__('laravel-crm-filament::labels.actions.preview'))
                 ->icon('heroicon-o-eye')
                 ->color('gray')
                 ->modalHeading(fn (EmailCampaign $record) => 'Preview: ' . $record->name)
@@ -35,13 +35,13 @@ class ViewEmailCampaign extends ViewRecord
                 ->modalContent(fn (EmailCampaign $record) => new HtmlString(EmailCampaignMessage::renderPreview($record->body ?? '', $record->preview_text ?? '', $record->team_id))),
             $this->emailCampaignSendNowAction(),
             Actions\Action::make('schedule')
-                ->label('Schedule')
+                ->label(__('laravel-crm-filament::labels.actions.schedule'))
                 ->icon('heroicon-o-calendar')
                 ->color('primary')
                 ->visible(fn (EmailCampaign $record) => $record->isEditable())
                 ->schema([
                     DateTimePicker::make('scheduled_at')
-                        ->label('Send at')
+                        ->label(__('laravel-crm-filament::labels.campaign.send_at'))
                         ->required(),
                 ])
                 ->action(function (array $data, EmailCampaign $record): void {
@@ -49,7 +49,7 @@ class ViewEmailCampaign extends ViewRecord
                     Notification::make()->title('Campaign scheduled')->success()->send();
                 }),
             Actions\Action::make('cancel')
-                ->label('Cancel')
+                ->label(__('laravel-crm-filament::labels.actions.cancel'))
                 ->icon('heroicon-o-x-circle')
                 ->color('danger')
                 ->requiresConfirmation()

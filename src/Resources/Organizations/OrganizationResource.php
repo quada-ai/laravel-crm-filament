@@ -73,7 +73,7 @@ class OrganizationResource extends Resource
             ]),
 
             Forms\Components\Select::make('industry_id')
-                ->label('Industry')
+                ->label(__('laravel-crm-filament::labels.money.industry'))
                 ->options(fn () => Industry::query()->orderBy('name')->pluck('name', 'id'))
                 ->searchable()
                 ->preload(),
@@ -87,7 +87,7 @@ class OrganizationResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\Select::make('user_owner_id')
-                ->label('Owner')
+                ->label(__('laravel-crm-filament::labels.fields.owner'))
                 ->options(fn () => User::query()->orderBy('name')->pluck('name', 'id'))
                 ->searchable()
                 ->preload(),
@@ -116,12 +116,12 @@ class OrganizationResource extends Resource
                     ->limit(60),
 
                 Tables\Columns\TextColumn::make('user_owner_id')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->formatStateUsing(fn ($state) => User::find($state)?->name ?? '—')
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('number_of_employees')
-                    ->label('Employees')
+                    ->label(__('laravel-crm-filament::labels.money.employees'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('created_at')

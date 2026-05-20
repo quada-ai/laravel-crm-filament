@@ -54,7 +54,7 @@ class FieldGroupResource extends Resource
                 Tables\Columns\TextColumn::make('handle')->toggleable(),
                 Tables\Columns\TextColumn::make('fields_count')
                     ->counts('fields')
-                    ->label('Fields')
+                    ->label(__('laravel-crm-filament::labels.fields.fields'))
                     ->toggleable(),
             ])
             ->defaultSort('name')

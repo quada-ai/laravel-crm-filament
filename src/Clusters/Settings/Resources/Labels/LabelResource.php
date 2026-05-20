@@ -40,7 +40,7 @@ class LabelResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\ColorPicker::make('hex')->label('Color'),
+                Forms\Components\ColorPicker::make('hex')->label(__('laravel-crm-filament::labels.fields.color')),
             ]),
             Forms\Components\Textarea::make('description')
                 ->rows(2)
@@ -53,7 +53,7 @@ class LabelResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\ColorColumn::make('hex')->label('Color'),
+                Tables\Columns\ColorColumn::make('hex')->label(__('laravel-crm-filament::labels.fields.color')),
             ])
             ->defaultSort('name')
             ->recordActions([

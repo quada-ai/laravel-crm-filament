@@ -34,7 +34,7 @@ it('exposes the chat embed and iframe URLs from ViewChatWidget', function () {
 
 it('promotes the Quote portal action as a primary "Preview portal" header action', function () {
     $source = file_get_contents((new ReflectionClass(HasQuotePortalAction::class))->getFileName());
-    expect($source)->toContain("'Preview portal'");
+    expect($source)->toContain('actions.preview_portal');
     expect($source)->toContain("->color('primary')");
     expect($source)->toContain('openUrlInNewTab');
     expect($source)->toContain('p/quotes/');
@@ -44,7 +44,7 @@ it('promotes the Quote portal action as a primary "Preview portal" header action
 
 it('promotes the Invoice portal action as a primary "Preview portal" header action', function () {
     $source = file_get_contents((new ReflectionClass(HasInvoicePortalAction::class))->getFileName());
-    expect($source)->toContain("'Preview portal'");
+    expect($source)->toContain('actions.preview_portal');
     expect($source)->toContain("->color('primary')");
     expect($source)->toContain('openUrlInNewTab');
     expect($source)->toContain('p/invoices/');

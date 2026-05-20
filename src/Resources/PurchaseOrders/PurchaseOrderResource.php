@@ -50,7 +50,7 @@ class PurchaseOrderResource extends Resource
         $components = [
             Grid::make(3)->schema([
                 Forms\Components\Select::make('order_id')
-                    ->label('Order')
+                    ->label(__('laravel-crm-filament::labels.fields.order'))
                     ->options(fn () => Order::query()->orderByDesc('id')->limit(50)->get()->mapWithKeys(fn ($o) => [$o->id => $o->order_id])->all())
                     ->searchable()
                     ->preload(),
@@ -61,8 +61,8 @@ class PurchaseOrderResource extends Resource
             ]),
 
             Grid::make(2)->schema([
-                Forms\Components\DatePicker::make('issue_date')->label('Issue date'),
-                Forms\Components\DatePicker::make('delivery_date')->label('Delivery date'),
+                Forms\Components\DatePicker::make('issue_date')->label(__('laravel-crm-filament::labels.money.issue_date')),
+                Forms\Components\DatePicker::make('delivery_date')->label(__('laravel-crm-filament::labels.money.delivery_date')),
             ]),
 
             Grid::make(2)->schema([
@@ -74,12 +74,12 @@ class PurchaseOrderResource extends Resource
             ]),
 
             Forms\Components\Repeater::make('products')
-                ->label('Line items')
+                ->label(__('laravel-crm-filament::labels.money.line_items'))
                 ->schema([
                     Forms\Components\Hidden::make('purchase_order_line_id'),
                     Forms\Components\Hidden::make('order_product_id'),
                     Forms\Components\Select::make('id')
-                        ->label('Product')
+                        ->label(__('laravel-crm-filament::labels.money.product'))
                         ->options(fn () => Product::query()->where('active', true)->orderBy('name')->pluck('name', 'id'))
                         ->searchable()
                         ->live()
@@ -99,7 +99,7 @@ class PurchaseOrderResource extends Resource
                             $set('amount', (float) $state * (float) $get('unit_price'));
                         }),
                     Forms\Components\TextInput::make('unit_price')
-                        ->label('Unit price')
+                        ->label(__('laravel-crm-filament::labels.money.unit_price'))
                         ->numeric()
                         ->live()
                         ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
@@ -119,7 +119,7 @@ class PurchaseOrderResource extends Resource
 
             Grid::make(3)->schema([
                 Forms\Components\TextInput::make('sub_total')
-                    ->label('Subtotal')
+                    ->label(__('laravel-crm-filament::labels.money.subtotal'))
                     ->numeric(),
                 Forms\Components\TextInput::make('tax')
                     ->numeric(),
@@ -132,7 +132,7 @@ class PurchaseOrderResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\Select::make('user_owner_id')
-                ->label('Owner')
+                ->label(__('laravel-crm-filament::labels.fields.owner'))
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
@@ -150,7 +150,7 @@ class PurchaseOrderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('purchase_order_id')
-                    ->label('ID')
+                    ->label(__('laravel-crm-filament::labels.fields.id'))
                     ->sortable()
                     ->searchable(),
 
@@ -169,7 +169,7 @@ class PurchaseOrderResource extends Resource
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')

@@ -68,16 +68,16 @@ class TaskResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\DateTimePicker::make('due_at')
-                ->label('Due at'),
+                ->label(__('laravel-crm-filament::labels.money.due_at')),
 
             Forms\Components\Select::make('user_owner_id')
-                ->label('Owner')
+                ->label(__('laravel-crm-filament::labels.fields.owner'))
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
 
             Forms\Components\Select::make('user_assigned_id')
-                ->label('Assigned to')
+                ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
                 ->relationship('assignedToUser', 'name')
                 ->searchable()
                 ->preload(),
@@ -95,7 +95,7 @@ class TaskResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\IconColumn::make('completed_at')
-                    ->label('Done')
+                    ->label(__('laravel-crm-filament::labels.money.done'))
                     ->boolean()
                     ->getStateUsing(fn (Task $record): bool => $record->completed_at !== null),
 
@@ -110,11 +110,11 @@ class TaskResource extends Resource
                     ->placeholder('—'),
 
                 Tables\Columns\TextColumn::make('assignedToUser.name')
-                    ->label('Assigned')
+                    ->label(__('laravel-crm-filament::labels.fields.assigned'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -131,7 +131,7 @@ class TaskResource extends Resource
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
                     Actions\BulkAction::make('markComplete')
-                        ->label('Mark complete')
+                        ->label(__('laravel-crm-filament::labels.actions.mark_complete'))
                         ->icon('heroicon-o-check')
                         ->color('success')
                         ->action(function (Collection $records): void {

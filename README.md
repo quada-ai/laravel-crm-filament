@@ -47,6 +47,7 @@ use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
         // ->withChat()
         // ->withEmailMarketing()
         // ->withSmsMarketing()
+        // ->withCustomers()
         // ->withXero()
         // ->navigationGroup('CRM')
         // ->brand('Acme CRM')
@@ -59,6 +60,67 @@ use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 By default the plugin reads `config('laravel-crm.modules')` to decide which gated resources to register. Use `->modules([...])` to override per-panel.
 
 If no `brand()` / `brandLogo()` is set the plugin falls back to the core CRM's `laravel-crm.settings`: `organization_name` and `logo_file`. If no `primaryColor()` is set the panel defaults to `#05b3a9` (the CRM's teal accent).
+
+## Feature catalog
+
+The panel was built up in phases. Each phase below maps to a chunk of functionality in the plugin.
+
+### v0.5 — Pipeline conversion actions + PDF download
+
+- **Quote → Order**, **Order → Invoice**, **Order → Delivery**, **Order → Purchase Order** conversion actions on the respective View pages, all routed through the core CRM services (`OrderService`, `InvoiceService`, `DeliveryService`, `PurchaseOrderService`) so observers, audits, and Xero sync still fire.
+- Each conversion stamps the back-link FK (`quote.accepted_at`, `order.quote_id`, `invoice.order_id`, etc.), opens an in-app notification with a deep link to the new record, and hides itself once the downstream record exists.
+- Shared `Concerns\DownloadsPdf` trait powers both the `Send …` mail action and a standalone **Download PDF** header action on Quote / Invoice / Purchase Order View pages.
+
+### v0.6 — CSV bulk imports
+
+Header **Import CSV** action on People, Organizations, Products, and Users list pages. The action exposes:
+
+- File upload + header-row toggle.
+- Reactive column-mapping selects populated from the uploaded CSV's headers.
+- Dedupe field (e.g. lowercased email, `code`).
+- Chunk size for batch processing.
+- **Download sample CSV** footer action that streams a UTF-8-BOM template.
+
+Importers route through the core CRM services (`PersonService`, `OrganizationService`, `ProductService`) and respect the encryption-at-rest setting (`laravel-crm.encrypt_db_fields`).
+
+### v0.7 — Standalone activity/file resources + polymorphic Files RM
+
+- Top-level read-only resources: **Notes**, **Calls**, **Meetings**, **Lunches**, **Files**, **Activities** — each shows global lists of the entity across all parents, with an **Open parent** record action that deep-links back into the owning resource.
+- **FilesRelationManager** added to every parent resource (Lead, Deal, Person, Organization, Quote, Order, Invoice, Purchase Order, Delivery). Uploads write a `File` model row with full metadata and log an entry on the parent's activity timeline.
+
+### v0.8 — Campaign send-now, per-recipient analytics, performance widgets
+
+- **Send now** header action on Email + SMS Campaign View pages (with recipient-count confirmation modal).
+- **Performance** infolist section with sent / failed / skipped counts and open-rate / click-rate / unsubscribe-rate (email) or delivery-rate / click-rate / unsubscribe-rate (SMS).
+- Per-recipient RelationManager columns: `last_opened_at`, `first_clicked_at`, `bounce_status` (email); `delivered_at`, `clicksend_message_id` with copy-to-clipboard (SMS).
+- Footer **Sends over time** chart on each campaign View page (auto-hides for sub-hour spans).
+- Dashboard **CampaignPerformanceChart** widget for the last 5 sent email campaigns.
+
+### v0.9a — Customer resource + lookup resources
+
+- **CustomerResource** (slug `customers`) — full CRUD with encrypted global search, Files RM, gated on the `customers` module (`->withCustomers()`).
+- Settings-cluster lookup resources: **Contact Types**, **Address Types**, **Organization Types**, **Industries**, **Timezones**, **Product Attributes** (all List+Create+Edit).
+- **Industry** select on `OrganizationResource::form()`.
+- **ProductVariationsRelationManager** on the Product resource (name + description + attribute select).
+
+### v0.9b — Lead/pipeline lookups + Teams + Updates page
+
+- **LeadStatus** + **PipelineStageProbability** lookup resources in the Settings cluster.
+- **`lead_status_id`** Select on the Lead form; **`pipeline_stage_probability_id`** Select on the Pipeline Stage form.
+- **CrmTeams** resource in the Settings cluster with a **TeamMembersRelationManager** for attaching multiple users via `crm_team_user`.
+- **Updates** page (Settings cluster) showing current vs latest version + a **Check for updates** action that queues `laravelcrm:update`.
+
+### v0.10 — Calendar, Task kanban, Reminders settings
+
+- Standalone **Calendar** page rendering Tasks (by `due_at`) + Calls/Meetings/Lunches (by `start_at`) in a FullCalendar month/week grid. Drag-to-reschedule updates the underlying record and writes an activity row.
+- **Task Kanban** sub-resource page (Open / Today / Overdue / Completed columns) with drag-to-complete.
+- **Reminders** settings page — per-type (Task / Call / Meeting / Lunch) checkbox + `hours_before` input, persisted as user-scoped `Setting` rows.
+
+### v0.11 — Chat widget embed UI, portal preview, branded auth
+
+- ChatWidget **View** page renders the embed `<script>` snippet with copy-to-clipboard and a live `<iframe>` preview of the widget.
+- Quote / Invoice **Preview portal** action promoted to a primary header action.
+- Branded **Login** + **Profile** auth pages: avatar upload (persisted to `Setting`), section grouping, link to the Reminders settings, and panel-level brand pickup from `SettingService` (`organization_name`, `logo_file`, `primary_color`) in `CrmPanelProvider`.
 
 ## What's in the panel
 
@@ -76,53 +138,119 @@ If no `brand()` / `brandLogo()` is set the plugin falls back to the core CRM's `
 | Email Campaign | `/admin/email-campaigns` | `email-marketing` |
 | SMS Campaign | `/admin/sms-campaigns` | `sms-marketing` |
 | Chat | `/admin/chat` | `chat` |
+| Customer | `/admin/customers` | `customers` |
 | Person | `/admin/people` | always |
 | Organization | `/admin/organizations` | always |
 | Task | `/admin/tasks` | always |
 | Product | `/admin/products` | always |
+| Notes / Calls / Meetings / Lunches / Files / Activities | `/admin/{slug}` | always (read-only global views) |
 
-**Dashboard widgets**: open leads / open deals / tasks due today + open-leads-by-stage chart.
+**Standalone pages**:
+
+- `/admin/calendar` — month/week grid for tasks + calls + meetings + lunches.
+- `/admin/leads/kanban`, `/admin/deals/kanban`, `/admin/quotes/kanban`, `/admin/tasks/kanban`.
+
+**Dashboard widgets**: open leads / open deals / tasks due today + open-leads-by-stage chart + recent activity list + (when email-marketing is enabled) CampaignPerformanceChart.
 
 **Settings cluster** at `/admin/settings`:
 
-- Pipelines, Pipeline Stages, Labels, Lead Sources, Tax Rates, Product Categories
-- Field Groups + Fields (custom field definitions, including option lists and per-model scoping)
-- Roles (Spatie\Permission, with Owner/Admin protected from edit/delete)
-- Email Templates, SMS Templates, Chat Widgets
-- General settings page (key/value via `SettingService`)
-- Integrations page (Xero connect/disconnect + sync toggles, ClickSend status)
+- Pipelines, Pipeline Stages, Pipeline Stage Probabilities, Lead Statuses, Lead Sources, Labels, Tax Rates, Product Categories, Product Attributes.
+- Contact Types, Address Types, Organization Types, Industries, Timezones.
+- Field Groups + Fields (custom field definitions, including option lists and per-model scoping).
+- Roles (Spatie\Permission, with Owner/Admin protected from edit/delete).
+- Email Templates, SMS Templates, Chat Widgets.
+- CRM Teams (with Team Members relation manager).
+- General settings page (key/value via `SettingService`).
+- Integrations page (Xero connect/disconnect + sync toggles, ClickSend status).
+- Reminders page (per-user activity reminders).
+- Updates page (version check + `laravelcrm:update`).
 
-**RelationManagers**: Notes, Tasks, Calls, Meetings inline on Lead / Deal / Person / Organization edit pages (polymorphic via `HasCrmActivities`). Each new entry logs to the core CRM `Activity` table for the timeline feed. Email/SMS campaign view pages get a per-recipient RelationManager showing per-row send/open/click/unsubscribe state.
+**RelationManagers**: Notes, Tasks, Calls, Meetings, Files inline on Lead / Deal / Person / Organization / Customer edit pages (polymorphic via `HasCrmActivities`). Files RM also on Quote / Order / Invoice / Purchase Order / Delivery. Each new entry logs to the core CRM `Activity` table for the timeline feed. Email/SMS campaign view pages get a per-recipient RelationManager showing per-row send/open/click/unsubscribe state.
 
 **Per-resource actions**:
 
-- Quote / Invoice / Purchase Order: **Send** (generates dompdf PDF, sends signed-portal mailable via the core's `Mail\SendQuote` / `SendInvoice` / `SendPurchaseOrder`)
-- Quote / Invoice: **Open portal** (jumps to `/p/quotes/...` or `/p/invoices/...`)
-- Email Campaign: **Preview** (renders `EmailCampaignMessage::renderPreview()` in a modal), **Schedule** (datetime modal → `service->schedule()`), **Cancel**
-- SMS Campaign: **Preview** (rendered body + segment count via `SmsCampaignMessage::renderPreview()` / `::segmentCount()`), **Schedule**, **Cancel`. Body Textarea on the form shows a live segment-count estimate via `helperText`.
+- Quote / Invoice / Purchase Order: **Send** (generates dompdf PDF, sends signed-portal mailable via the core's `Mail\SendQuote` / `SendInvoice` / `SendPurchaseOrder`) + **Download PDF**.
+- Quote / Invoice: **Preview portal** (jumps to `/p/quotes/...` or `/p/invoices/...`).
+- Quote: **Convert to order**. Order: **Convert to invoice / delivery / purchase order**.
+- Email Campaign: **Send now**, **Preview** (renders `EmailCampaignMessage::renderPreview()` in a modal), **Schedule**, **Cancel**.
+- SMS Campaign: **Send now**, **Preview** (rendered body + segment count via `SmsCampaignMessage::renderPreview()` / `::segmentCount()`), **Schedule**, **Cancel**. Body Textarea on the form shows a live segment-count estimate via `helperText`.
 - Chat: **Reply**, **Close conversation**, **Convert to lead** (creates Person + Lead from visitor); thread view subscribes to `echo:crm-chat.{external_id},.chat.message` for realtime message refresh when Laravel Echo is configured.
+- Tasks: **Mark complete** bulk action; Task kanban drag-to-complete.
 
 ## Custom fields
 
 Models with the core's `HasCrmFields` trait (Lead, Deal, Quote, Order, Invoice, PurchaseOrder, Person, Organization, Task, Product) automatically get a "Custom fields" section in their Filament forms when `Field` rows are scoped to the model via `FieldModel`. The plugin's `Concerns\HasCrmCustomFields` trait handles:
 
-- Mapping `Field::type` (text / textarea / date / checkbox / select / select_multiple / radio / checkbox_multiple) to the right Filament component
-- Loading `FieldValue` rows on edit
-- Saving `FieldValue` rows on create / update via `updateOrCreate`
+- Mapping `Field::type` (text / textarea / date / checkbox / select / select_multiple / radio / checkbox_multiple) to the right Filament component.
+- Loading `FieldValue` rows on edit.
+- Saving `FieldValue` rows on create / update via `updateOrCreate`.
 
 Define fields via the Settings cluster (`/admin/settings/fields`).
 
-## Coexistence
+## Localization
 
-The plugin doesn't touch the core CRM's `/crm` Livewire UI. Both UIs run side-by-side against the same database. Disabling the legacy UI (if you only want Filament) is host-side configuration outside the plugin's scope.
+All user-visible Resource strings (form/column labels, section headings, action labels) are routed through `__('laravel-crm-filament::labels.…')`. The plugin ships three locale files under `resources/lang/`:
+
+| Locale | Path |
+|---|---|
+| English (canonical) | `resources/lang/en/labels.php` |
+| French (starter) | `resources/lang/fr/labels.php` |
+| Spanish (starter) | `resources/lang/es/labels.php` |
+
+`labels.php` is grouped into namespaces: `fields`, `contact`, `sales`, `money`, `campaign`, `chat`, `file`, `sections`, `actions`, `import`, `misc`.
+
+### Overriding a translation
+
+Publish the translation files into the host app:
+
+```bash
+php artisan vendor:publish --tag=laravel-crm-filament-translations
+```
+
+This copies the plugin's `resources/lang/{locale}/labels.php` into the host app's `lang/vendor/laravel-crm-filament/{locale}/labels.php` (Laravel's default vendor-translation location). Edit any key in the published file — Laravel will pick up the override automatically without touching the plugin source.
+
+You can also add a brand-new locale by dropping a `labels.php` with the same structure as `en/labels.php` into `lang/vendor/laravel-crm-filament/{your-locale}/`. Make sure the structure mirrors `en/labels.php` exactly — any key the plugin asks for that's missing falls back to the English value via Laravel's translation fallback.
+
+### Switching the panel locale
+
+The panel respects the application locale set by `app()->setLocale($locale)`. To switch on a per-user basis, set the locale early in the request (e.g. in a middleware or `User::booted()`):
+
+```php
+Auth::user() && app()->setLocale(Auth::user()->locale ?? config('app.locale'));
+```
+
+## Migrating from the `/crm` Livewire UI
+
+The plugin doesn't touch the core CRM's `/crm` Livewire UI — both UIs run side-by-side against the same database. This is the recommended path during a transition:
+
+1. **Install the plugin alongside** the existing UI. There is no schema migration required; the plugin reads and writes the same `crm_*` tables as the Livewire UI.
+2. **Verify access control still works.** The Filament panel uses the same `HasCrmAccess` trait and the same Spatie roles/permissions seeded by `php artisan laravelcrm:permissions`. A user who can see `/crm` can see `/admin`; a user who can edit a Lead in the Livewire UI can edit the same Lead in Filament.
+3. **Pilot with a single team / role.** Give a subset of users `canAccessPanel()` returning `true` so they land on `/admin`. Leave everyone else on `/crm`.
+4. **Side-by-side data parity.** All writes from either UI go through the same observers (`Observers/`), services (`Services/`), and audit listeners. Records created in `/admin` show up in `/crm` and vice-versa on next page load. Encrypted columns continue to be transparently encrypted/decrypted via `HasEncryptableFields`.
+5. **When ready, decommission the Livewire UI.** Either set `Route::prefix(config('laravel-crm.route_prefix'))` to a no-op, or remove the `LaravelCrmServiceProvider`'s route loading in the host app's `bootstrap/providers.php`. The plugin will continue to work standalone.
+
+### Differences hosts should know about
+
+| Behaviour | Livewire UI (`/crm`) | Filament panel (`/admin`) |
+|---|---|---|
+| Routing key | mixed `id` / `external_id` | always `external_id` for entity resources, integer `id` for lookup tables that lack `external_id` |
+| Branding source | `laravel-crm.settings` (org name + logo) | `LaravelCrmPlugin::brand()` / `brandLogo()` or fallback to the same settings |
+| Custom fields | Livewire `HasCrmFields` partial | `Concerns\HasCrmCustomFields` trait via `static::crmCustomFieldsSection(...)` |
+| Files | per-model uploads | unified `FilesRelationManager` + read-only `/admin/files` global view |
+| Activities | per-entity timeline | per-entity timeline **plus** global `/admin/activities` |
+| Calendar | none | `/admin/calendar` aggregating tasks/calls/meetings/lunches |
+| Reminders | global config | per-user `/admin/settings/reminders` |
+| Updates | `laravelcrm:update` artisan only | `/admin/settings/updates` UI |
+
+Nothing about the Filament panel disables the Livewire UI; if you want to run only Filament, remove the host-app routes or middleware that expose `/crm` after you have confirmed parity.
 
 ## Testing
 
 ```bash
-composer test
+./vendor/bin/pest --no-coverage
 ```
 
-74 Pest tests cover routing, model binding, cluster wiring, RelationManager attachment, custom-fields trait integration, plugin module gating, branding setters, and role protection.
+The Pest test suite covers routing, model binding, cluster wiring, RelationManager attachment, custom-fields trait integration, plugin module gating, branding setters, role protection, localization key parity, and structural assertions for every phase's resources/actions/widgets. As of v1.0a the suite is 227 tests.
 
 ## License
 

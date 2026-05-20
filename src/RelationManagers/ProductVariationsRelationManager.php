@@ -29,7 +29,7 @@ class ProductVariationsRelationManager extends RelationManager
                 ->maxLength(255),
 
             Forms\Components\Select::make('product_attribute_id')
-                ->label('Attribute')
+                ->label(__('laravel-crm-filament::labels.misc.attribute'))
                 ->options(fn () => ProductAttribute::query()->orderBy('name')->pluck('name', 'id'))
                 ->searchable()
                 ->preload(),

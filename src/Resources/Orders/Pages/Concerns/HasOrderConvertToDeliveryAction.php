@@ -19,7 +19,7 @@ trait HasOrderConvertToDeliveryAction
     protected function orderConvertToDeliveryAction(): Action
     {
         return Action::make('convertToDelivery')
-            ->label('Convert to delivery')
+            ->label(__('laravel-crm-filament::labels.actions.convert_to_delivery'))
             ->icon('heroicon-o-truck')
             ->color('success')
             ->requiresConfirmation()
@@ -42,7 +42,7 @@ trait HasOrderConvertToDeliveryAction
                     ->success()
                     ->actions([
                         \Filament\Notifications\Actions\Action::make('open')
-                            ->label('Open delivery')
+                            ->label(__('laravel-crm-filament::labels.actions.open_delivery'))
                             ->url($url),
                     ])
                     ->send();

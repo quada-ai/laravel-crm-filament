@@ -30,17 +30,17 @@ class MeetingsRelationManager extends RelationManager
                 ->rows(2)
                 ->columnSpanFull(),
             Grid::make(2)->schema([
-                Forms\Components\DateTimePicker::make('start_at')->label('Start'),
-                Forms\Components\DateTimePicker::make('finish_at')->label('Finish'),
+                Forms\Components\DateTimePicker::make('start_at')->label(__('laravel-crm-filament::labels.money.start')),
+                Forms\Components\DateTimePicker::make('finish_at')->label(__('laravel-crm-filament::labels.money.finish')),
             ]),
             Grid::make(2)->schema([
                 Forms\Components\Select::make('user_owner_id')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->relationship('ownerUser', 'name')
                     ->searchable()
                     ->preload(),
                 Forms\Components\Select::make('user_assigned_id')
-                    ->label('Assigned to')
+                    ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
                     ->relationship('assignedToUser', 'name')
                     ->searchable()
                     ->preload(),
@@ -57,7 +57,7 @@ class MeetingsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('start_at')->dateTime()->sortable(),
                 Tables\Columns\TextColumn::make('finish_at')->dateTime()->toggleable(),
                 Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->toggleable(),
             ])
             ->defaultSort('start_at', 'desc')

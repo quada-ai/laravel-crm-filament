@@ -24,7 +24,7 @@ trait StandaloneActivityResource
     protected static function openParentAction(string $typeColumn, string $idColumn): Actions\Action
     {
         return Actions\Action::make('openParent')
-            ->label('Open parent')
+            ->label(__('laravel-crm-filament::labels.actions.open_parent'))
             ->icon('heroicon-o-arrow-top-right-on-square')
             ->url(fn (Model $record): ?string => static::buildParentUrl($record->{$typeColumn}, $record->{$idColumn}))
             ->openUrlInNewTab()

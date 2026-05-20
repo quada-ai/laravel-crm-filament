@@ -87,25 +87,25 @@ class LeadResource extends Resource
             ]),
 
             Forms\Components\Select::make('pipeline_stage_id')
-                ->label('Pipeline stage')
+                ->label(__('laravel-crm-filament::labels.sales.pipeline_stage'))
                 ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id'))
                 ->searchable()
                 ->preload(),
 
             Forms\Components\Select::make('lead_source_id')
-                ->label('Lead source')
+                ->label(__('laravel-crm-filament::labels.sales.lead_source'))
                 ->options(fn () => LeadSource::query()->pluck('name', 'id'))
                 ->searchable()
                 ->preload(),
 
             Forms\Components\Select::make('lead_status_id')
-                ->label('Lead status')
+                ->label(__('laravel-crm-filament::labels.sales.lead_status'))
                 ->options(fn () => LeadStatus::query()->orderBy('order')->pluck('name', 'id'))
                 ->searchable()
                 ->preload(),
 
             Forms\Components\Select::make('user_owner_id')
-                ->label('Owner')
+                ->label(__('laravel-crm-filament::labels.fields.owner'))
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
@@ -123,7 +123,7 @@ class LeadResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('lead_id')
-                    ->label('ID')
+                    ->label(__('laravel-crm-filament::labels.fields.id'))
                     ->searchable()
                     ->sortable(),
 
@@ -137,12 +137,12 @@ class LeadResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('pipelineStage.name')
-                    ->label('Stage')
+                    ->label(__('laravel-crm-filament::labels.sales.stage'))
                     ->badge()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -153,7 +153,7 @@ class LeadResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('pipeline_stage_id')
-                    ->label('Stage')
+                    ->label(__('laravel-crm-filament::labels.sales.stage'))
                     ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id')),
             ])
             ->recordActions([

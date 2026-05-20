@@ -52,8 +52,8 @@ class ActivityResource extends Resource
         return $schema->components([
             Forms\Components\TextInput::make('description')->disabled(),
             Forms\Components\TextInput::make('event')->disabled(),
-            Forms\Components\TextInput::make('timelineable_type')->label('Parent type')->disabled(),
-            Forms\Components\TextInput::make('recordable_type')->label('Record type')->disabled(),
+            Forms\Components\TextInput::make('timelineable_type')->label(__('laravel-crm-filament::labels.fields.parent_type'))->disabled(),
+            Forms\Components\TextInput::make('recordable_type')->label(__('laravel-crm-filament::labels.fields.record_type'))->disabled(),
             Forms\Components\TextInput::make('log_name')->disabled(),
         ]);
     }
@@ -66,23 +66,23 @@ class ActivityResource extends Resource
                 Tables\Columns\TextColumn::make('description')->limit(60)->toggleable(),
                 Tables\Columns\TextColumn::make('event')->badge()->toggleable(),
                 Tables\Columns\TextColumn::make('recordable_type')
-                    ->label('Record')
+                    ->label(__('laravel-crm-filament::labels.fields.record'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => $state ? class_basename($state) : '—')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('timelineable_type')
-                    ->label('Parent')
+                    ->label(__('laravel-crm-filament::labels.fields.parent'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => $state ? (ParentTypeOptions::all()[$state] ?? class_basename($state)) : '—'),
-                Tables\Columns\TextColumn::make('causeable_id')->label('By user')->toggleable(),
+                Tables\Columns\TextColumn::make('causeable_id')->label(__('laravel-crm-filament::labels.fields.by_user'))->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('timelineable_type')
-                    ->label('Parent type')
+                    ->label(__('laravel-crm-filament::labels.fields.parent_type'))
                     ->options(ParentTypeOptions::all()),
                 Tables\Filters\SelectFilter::make('recordable_type')
-                    ->label('Record type')
+                    ->label(__('laravel-crm-filament::labels.fields.record_type'))
                     ->options([
                         Note::class => 'Note',
                         Task::class => 'Task',

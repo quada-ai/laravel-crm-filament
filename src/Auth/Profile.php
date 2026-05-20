@@ -31,11 +31,11 @@ class Profile extends EditProfile
     {
         return $schema
             ->components([
-                Section::make('Avatar')
+                Section::make('Avatar')->heading(__('laravel-crm-filament::labels.sections.avatar'))
                     ->description('Upload a profile photo. Saved alongside your user record.')
                     ->schema([
                         FileUpload::make('avatar')
-                            ->label('Avatar')
+                            ->label(__('laravel-crm-filament::labels.file.avatar'))
                             ->image()
                             ->avatar()
                             ->disk(config('laravel-crm.upload_disk', 'public'))
@@ -44,7 +44,7 @@ class Profile extends EditProfile
                             ->visibility('public'),
                     ]),
 
-                Section::make('Account')
+                Section::make('Account')->heading(__('laravel-crm-filament::labels.sections.account'))
                     ->schema([
                         $this->getNameFormComponent(),
                         $this->getEmailFormComponent(),
@@ -53,7 +53,7 @@ class Profile extends EditProfile
                         $this->getCurrentPasswordFormComponent(),
                     ]),
 
-                Section::make('Notification preferences')
+                Section::make('Notification preferences')->heading(__('laravel-crm-filament::labels.sections.notification_preferences'))
                     ->description('Manage which CRM reminders you receive and how far in advance.')
                     ->schema([
                         Placeholder::make('reminders_link')

@@ -21,14 +21,14 @@ trait HasPurchaseOrderSendAction
     protected function purchaseOrderSendAction(): Action
     {
         return Action::make('send')
-            ->label('Send PO')
+            ->label(__('laravel-crm-filament::labels.actions.send_purchase_order'))
             ->icon('heroicon-o-paper-airplane')
             ->color('primary')
             ->modalHeading('Send purchase order')
             ->modalSubmitActionLabel('Send')
             ->schema(fn (PurchaseOrder $record): array => [
                 TextInput::make('to')
-                    ->label('To')
+                    ->label(__('laravel-crm-filament::labels.campaign.to'))
                     ->email()
                     ->required(),
                 TextInput::make('subject')
@@ -38,7 +38,7 @@ trait HasPurchaseOrderSendAction
                     ->rows(8)
                     ->default("Hi,\n\nPlease find the purchase order here: [Online Purchase Order Link]\n\nThanks."),
                 Checkbox::make('cc')
-                    ->label('Send me a copy'),
+                    ->label(__('laravel-crm-filament::labels.campaign.send_me_a_copy')),
             ])
             ->action(function (array $data, PurchaseOrder $record): void {
                 $this->dispatchPurchaseOrder($record, $data);

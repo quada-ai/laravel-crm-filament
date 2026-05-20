@@ -20,7 +20,7 @@ trait HasOrderConvertToPurchaseOrderAction
     protected function orderConvertToPurchaseOrderAction(): Action
     {
         return Action::make('convertToPurchaseOrder')
-            ->label('Convert to purchase order')
+            ->label(__('laravel-crm-filament::labels.actions.convert_to_purchase_order'))
             ->icon('heroicon-o-clipboard-document-list')
             ->color('success')
             ->requiresConfirmation()
@@ -43,7 +43,7 @@ trait HasOrderConvertToPurchaseOrderAction
                     ->success()
                     ->actions([
                         \Filament\Notifications\Actions\Action::make('open')
-                            ->label('Open purchase order')
+                            ->label(__('laravel-crm-filament::labels.actions.open_purchase_order'))
                             ->url($url),
                     ])
                     ->send();

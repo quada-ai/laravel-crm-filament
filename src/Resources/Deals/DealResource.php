@@ -85,16 +85,16 @@ class DealResource extends Resource
             ]),
 
             Forms\Components\DatePicker::make('expected_close')
-                ->label('Expected close'),
+                ->label(__('laravel-crm-filament::labels.sales.expected_close')),
 
             Forms\Components\Select::make('pipeline_stage_id')
-                ->label('Pipeline stage')
+                ->label(__('laravel-crm-filament::labels.sales.pipeline_stage'))
                 ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id'))
                 ->searchable()
                 ->preload(),
 
             Forms\Components\Select::make('user_owner_id')
-                ->label('Owner')
+                ->label(__('laravel-crm-filament::labels.fields.owner'))
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
@@ -112,7 +112,7 @@ class DealResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('deal_id')
-                    ->label('ID')
+                    ->label(__('laravel-crm-filament::labels.fields.id'))
                     ->searchable()
                     ->sortable(),
 
@@ -126,7 +126,7 @@ class DealResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('pipelineStage.name')
-                    ->label('Stage')
+                    ->label(__('laravel-crm-filament::labels.sales.stage'))
                     ->badge()
                     ->sortable(),
 
@@ -136,7 +136,7 @@ class DealResource extends Resource
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -147,7 +147,7 @@ class DealResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('pipeline_stage_id')
-                    ->label('Stage')
+                    ->label(__('laravel-crm-filament::labels.sales.stage'))
                     ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id')),
             ])
             ->recordActions([

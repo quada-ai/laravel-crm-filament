@@ -21,7 +21,7 @@ trait HasQuoteConvertToOrderAction
     protected function quoteConvertToOrderAction(): Action
     {
         return Action::make('convertToOrder')
-            ->label('Convert to order')
+            ->label(__('laravel-crm-filament::labels.actions.convert_to_order'))
             ->icon('heroicon-o-arrow-right-circle')
             ->color('success')
             ->requiresConfirmation()
@@ -50,7 +50,7 @@ trait HasQuoteConvertToOrderAction
                     ->success()
                     ->actions([
                         \Filament\Notifications\Actions\Action::make('open')
-                            ->label('Open order')
+                            ->label(__('laravel-crm-filament::labels.actions.open_order'))
                             ->url($url),
                     ])
                     ->send();

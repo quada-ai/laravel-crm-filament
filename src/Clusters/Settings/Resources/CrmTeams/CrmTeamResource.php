@@ -49,10 +49,10 @@ class CrmTeamResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('users_count')
-                    ->label('Members')
+                    ->label(__('laravel-crm-filament::labels.fields.members'))
                     ->counts('users'),
                 Tables\Columns\TextColumn::make('userCreated.name')
-                    ->label('Created by')
+                    ->label(__('laravel-crm-filament::labels.fields.created_by'))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

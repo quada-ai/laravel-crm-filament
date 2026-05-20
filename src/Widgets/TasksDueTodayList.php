@@ -23,10 +23,10 @@ class TasksDueTodayList extends TableWidget
                 ->orderBy('due_at'))
             ->columns([
                 Tables\Columns\TextColumn::make('name')->limit(60)->wrap(),
-                Tables\Columns\TextColumn::make('due_at')->time()->label('Due'),
-                Tables\Columns\TextColumn::make('assignedToUser.name')->label('Assignee')->placeholder('Unassigned'),
+                Tables\Columns\TextColumn::make('due_at')->time()->label(__('laravel-crm-filament::labels.money.due')),
+                Tables\Columns\TextColumn::make('assignedToUser.name')->label(__('laravel-crm-filament::labels.fields.assignee'))->placeholder('Unassigned'),
                 Tables\Columns\TextColumn::make('taskable_type')
-                    ->label('Linked to')
+                    ->label(__('laravel-crm-filament::labels.fields.linked_to'))
                     ->formatStateUsing(fn ($state) => class_basename($state ?? '')),
             ])
             ->paginated([5, 10])

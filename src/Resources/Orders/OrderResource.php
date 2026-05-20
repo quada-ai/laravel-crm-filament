@@ -62,11 +62,11 @@ class OrderResource extends Resource
 
             // Line items
             Forms\Components\Repeater::make('products')
-                ->label('Line items')
+                ->label(__('laravel-crm-filament::labels.money.line_items'))
                 ->schema([
                     Forms\Components\Hidden::make('order_product_id'),
                     Forms\Components\Select::make('id')
-                        ->label('Product')
+                        ->label(__('laravel-crm-filament::labels.money.product'))
                         ->options(fn () => Product::query()->where('active', true)->orderBy('name')->pluck('name', 'id'))
                         ->searchable()
                         ->live()
@@ -86,7 +86,7 @@ class OrderResource extends Resource
                             $set('amount', (float) $state * (float) $get('unit_price'));
                         }),
                     Forms\Components\TextInput::make('unit_price')
-                        ->label('Unit price')
+                        ->label(__('laravel-crm-filament::labels.money.unit_price'))
                         ->numeric()
                         ->live()
                         ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
@@ -106,25 +106,25 @@ class OrderResource extends Resource
 
             // Addresses
             Forms\Components\Repeater::make('addresses')
-                ->label('Addresses')
+                ->label(__('laravel-crm-filament::labels.contact.addresses'))
                 ->schema([
                     Forms\Components\Hidden::make('id'),
                     Grid::make(2)->schema([
                         Forms\Components\Select::make('address_type_id')
-                            ->label('Type')
+                            ->label(__('laravel-crm-filament::labels.fields.type'))
                             ->options(fn () => AddressType::query()->pluck('name', 'id'))
                             ->required(),
                         Forms\Components\TextInput::make('name')->maxLength(255),
                     ]),
                     Grid::make(3)->schema([
-                        Forms\Components\TextInput::make('line1')->label('Line 1')->maxLength(255),
-                        Forms\Components\TextInput::make('line2')->label('Line 2')->maxLength(255),
-                        Forms\Components\TextInput::make('line3')->label('Line 3')->maxLength(255),
+                        Forms\Components\TextInput::make('line1')->label(__('laravel-crm-filament::labels.contact.line1'))->maxLength(255),
+                        Forms\Components\TextInput::make('line2')->label(__('laravel-crm-filament::labels.contact.line2'))->maxLength(255),
+                        Forms\Components\TextInput::make('line3')->label(__('laravel-crm-filament::labels.contact.line3'))->maxLength(255),
                     ]),
                     Grid::make(4)->schema([
                         Forms\Components\TextInput::make('city')->maxLength(255),
                         Forms\Components\TextInput::make('state')->maxLength(255),
-                        Forms\Components\TextInput::make('code')->label('Postal code')->maxLength(20),
+                        Forms\Components\TextInput::make('code')->label(__('laravel-crm-filament::labels.contact.postal_code'))->maxLength(20),
                         Forms\Components\TextInput::make('country')->maxLength(255),
                     ]),
                     Grid::make(2)->schema([
@@ -139,7 +139,7 @@ class OrderResource extends Resource
             // Totals
             Grid::make(4)->schema([
                 Forms\Components\TextInput::make('sub_total')
-                    ->label('Subtotal')
+                    ->label(__('laravel-crm-filament::labels.money.subtotal'))
                     ->numeric(),
                 Forms\Components\TextInput::make('discount')
                     ->numeric(),
@@ -150,7 +150,7 @@ class OrderResource extends Resource
             ]),
 
             Forms\Components\Select::make('user_owner_id')
-                ->label('Owner')
+                ->label(__('laravel-crm-filament::labels.fields.owner'))
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
@@ -168,7 +168,7 @@ class OrderResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('order_id')
-                    ->label('ID')
+                    ->label(__('laravel-crm-filament::labels.fields.id'))
                     ->sortable()
                     ->searchable(),
 
@@ -181,7 +181,7 @@ class OrderResource extends Resource
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')

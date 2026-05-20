@@ -61,7 +61,7 @@ class ViewChatConversation extends ViewRecord
     {
         return [
             Actions\Action::make('reply')
-                ->label('Reply')
+                ->label(__('laravel-crm-filament::labels.actions.reply'))
                 ->icon('heroicon-o-paper-airplane')
                 ->color('primary')
                 ->visible(fn (ChatConversation $record) => $record->status === 'open')
@@ -76,7 +76,7 @@ class ViewChatConversation extends ViewRecord
                     Notification::make()->title('Reply sent')->success()->send();
                 }),
             Actions\Action::make('close')
-                ->label('Close conversation')
+                ->label(__('laravel-crm-filament::labels.actions.close_conversation'))
                 ->icon('heroicon-o-x-mark')
                 ->color('danger')
                 ->requiresConfirmation()
@@ -86,7 +86,7 @@ class ViewChatConversation extends ViewRecord
                     Notification::make()->title('Closed')->success()->send();
                 }),
             Actions\Action::make('convertToLead')
-                ->label('Convert to lead')
+                ->label(__('laravel-crm-filament::labels.actions.convert_to_lead'))
                 ->icon('heroicon-o-arrow-right-circle')
                 ->color('success')
                 ->visible(fn (ChatConversation $record) => ! $record->lead_id)

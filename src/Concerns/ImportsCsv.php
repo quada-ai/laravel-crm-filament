@@ -69,7 +69,7 @@ class ImportsCsv
     public static function sampleDownloadAction(Importer $importer): Action
     {
         return Action::make('downloadSample')
-            ->label('Download sample CSV')
+            ->label(__('laravel-crm-filament::labels.actions.download_sample_csv'))
             ->icon('heroicon-o-document-arrow-down')
             ->color('gray')
             ->action(fn (): StreamedResponse => self::streamSample($importer));
@@ -140,7 +140,7 @@ class ImportsCsv
 
         return [
             FileUpload::make('file')
-                ->label('CSV file')
+                ->label(__('laravel-crm-filament::labels.import.csv_file'))
                 ->required()
                 ->disk('local')
                 ->directory('crm-imports')
@@ -164,21 +164,21 @@ class ImportsCsv
                 }),
             Hidden::make('csv_headers')->default([]),
             Toggle::make('has_headers')
-                ->label('CSV has a header row')
+                ->label(__('laravel-crm-filament::labels.import.csv_has_header_row'))
                 ->default(true),
             TextInput::make('chunk_size')
-                ->label('Chunk size')
+                ->label(__('laravel-crm-filament::labels.import.chunk_size'))
                 ->numeric()
                 ->minValue(1)
                 ->maxValue(5000)
                 ->default(500),
             Select::make('dedupe_field')
-                ->label('Skip duplicates by')
+                ->label(__('laravel-crm-filament::labels.import.skip_duplicates_by'))
                 ->options($dedupeOptions)
                 ->default($importer->dedupeField())
                 ->required()
                 ->native(false),
-            Section::make('Column mapping')
+            Section::make('Column mapping')->heading(__('laravel-crm-filament::labels.sections.column_mapping'))
                 ->description('Match each CRM field to a column in your CSV.')
                 ->schema($mappingFields)
                 ->columns(2),

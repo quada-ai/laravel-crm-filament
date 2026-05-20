@@ -56,7 +56,7 @@ class Updates extends Page
     {
         return [
             Action::make('checkForUpdates')
-                ->label('Check for updates')
+                ->label(__('laravel-crm-filament::labels.actions.check_for_updates'))
                 ->icon('heroicon-o-arrow-path')
                 ->action(function () {
                     Artisan::queue('laravelcrm:update');

@@ -45,7 +45,7 @@ class NoteResource extends Resource
     {
         return $schema->components([
             Forms\Components\Textarea::make('content')->rows(4)->disabled()->columnSpanFull(),
-            Forms\Components\TextInput::make('noteable_type')->label('Parent type')->disabled(),
+            Forms\Components\TextInput::make('noteable_type')->label(__('laravel-crm-filament::labels.fields.parent_type'))->disabled(),
             Forms\Components\Toggle::make('pinned')->disabled(),
             Forms\Components\DateTimePicker::make('noted_at')->disabled(),
         ]);
@@ -61,12 +61,12 @@ class NoteResource extends Resource
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('noteable_type')
-                    ->label('Parent')
+                    ->label(__('laravel-crm-filament::labels.fields.parent'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => $state ? (ParentTypeOptions::all()[$state] ?? class_basename($state)) : '—'),
 
                 Tables\Columns\TextColumn::make('createdByUser.name')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->toggleable(),
 
                 Tables\Columns\IconColumn::make('pinned')->boolean()->toggleable(),
@@ -83,10 +83,10 @@ class NoteResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('noteable_type')
-                    ->label('Parent type')
+                    ->label(__('laravel-crm-filament::labels.fields.parent_type'))
                     ->options(ParentTypeOptions::all()),
                 Tables\Filters\SelectFilter::make('user_created_id')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->relationship('createdByUser', 'name')
                     ->searchable()
                     ->preload(),

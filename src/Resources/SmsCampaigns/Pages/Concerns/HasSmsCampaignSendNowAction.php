@@ -14,7 +14,7 @@ trait HasSmsCampaignSendNowAction
     protected function smsCampaignSendNowAction(): Action
     {
         return Action::make('sendNow')
-            ->label('Send now')
+            ->label(__('laravel-crm-filament::labels.actions.send_now'))
             ->icon('heroicon-o-paper-airplane')
             ->color('primary')
             ->requiresConfirmation()

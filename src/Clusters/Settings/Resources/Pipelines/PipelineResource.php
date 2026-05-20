@@ -46,7 +46,7 @@ class PipelineResource extends Resource
                 ->required()
                 ->maxLength(255),
             Forms\Components\Select::make('model')
-                ->label('Applies to')
+                ->label(__('laravel-crm-filament::labels.fields.applies_to'))
                 ->options([
                     Lead::class => 'Leads',
                     Deal::class => 'Deals',
@@ -66,11 +66,11 @@ class PipelineResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('model')
-                    ->label('Applies to')
+                    ->label(__('laravel-crm-filament::labels.fields.applies_to'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state) => $state ? class_basename($state) : '-'),
                 Tables\Columns\TextColumn::make('pipelineStages_count')
-                    ->label('Stages')
+                    ->label(__('laravel-crm-filament::labels.sales.stages'))
                     ->counts('pipelineStages')
                     ->toggleable(),
             ])

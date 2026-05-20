@@ -39,7 +39,7 @@ class TimezoneResource extends Resource
                     ->required()
                     ->maxLength(50),
                 Forms\Components\TextInput::make('diff_from_gtm')
-                    ->label('Diff from GMT')
+                    ->label(__('laravel-crm-filament::labels.misc.diff_from_gmt'))
                     ->required()
                     ->maxLength(50),
             ]),
@@ -52,7 +52,7 @@ class TimezoneResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('offset')->toggleable(),
-                Tables\Columns\TextColumn::make('diff_from_gtm')->label('Diff from GMT')->toggleable(),
+                Tables\Columns\TextColumn::make('diff_from_gtm')->label(__('laravel-crm-filament::labels.misc.diff_from_gmt'))->toggleable(),
             ])
             ->defaultSort('name')
             ->recordActions([

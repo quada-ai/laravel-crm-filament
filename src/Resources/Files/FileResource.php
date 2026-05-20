@@ -46,9 +46,9 @@ class FileResource extends Resource
     {
         return $schema->components([
             Forms\Components\TextInput::make('name')->disabled(),
-            Forms\Components\TextInput::make('title')->label('Description')->disabled(),
-            Forms\Components\TextInput::make('format')->label('File type')->disabled(),
-            Forms\Components\TextInput::make('fileable_type')->label('Parent type')->disabled(),
+            Forms\Components\TextInput::make('title')->label(__('laravel-crm-filament::labels.fields.description'))->disabled(),
+            Forms\Components\TextInput::make('format')->label(__('laravel-crm-filament::labels.file.file_type'))->disabled(),
+            Forms\Components\TextInput::make('fileable_type')->label(__('laravel-crm-filament::labels.fields.parent_type'))->disabled(),
             Forms\Components\TextInput::make('mime')->disabled(),
             Forms\Components\TextInput::make('filesize')->disabled(),
         ]);
@@ -59,22 +59,22 @@ class FileResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->limit(60),
-                Tables\Columns\TextColumn::make('title')->label('Description')->limit(50)->toggleable(),
-                Tables\Columns\TextColumn::make('format')->label('Type')->badge()->toggleable(),
+                Tables\Columns\TextColumn::make('title')->label(__('laravel-crm-filament::labels.fields.description'))->limit(50)->toggleable(),
+                Tables\Columns\TextColumn::make('format')->label(__('laravel-crm-filament::labels.fields.type'))->badge()->toggleable(),
                 Tables\Columns\TextColumn::make('fileable_type')
-                    ->label('Parent')
+                    ->label(__('laravel-crm-filament::labels.fields.parent'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => $state ? (ParentTypeOptions::all()[$state] ?? class_basename($state)) : '—'),
-                Tables\Columns\TextColumn::make('createdByUser.name')->label('Owner')->toggleable(),
+                Tables\Columns\TextColumn::make('createdByUser.name')->label(__('laravel-crm-filament::labels.fields.owner'))->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('fileable_type')
-                    ->label('Parent type')
+                    ->label(__('laravel-crm-filament::labels.fields.parent_type'))
                     ->options(ParentTypeOptions::all()),
                 Tables\Filters\SelectFilter::make('user_created_id')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->relationship('createdByUser', 'name')
                     ->searchable()
                     ->preload(),
@@ -92,7 +92,7 @@ class FileResource extends Resource
             ->recordActions([
                 Actions\ViewAction::make(),
                 Actions\Action::make('download')
-                    ->label('Download')
+                    ->label(__('laravel-crm-filament::labels.actions.download'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->url(fn (File $record): ?string => static::buildDownloadUrl($record))
                     ->openUrlInNewTab()

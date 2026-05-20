@@ -47,23 +47,23 @@ class DeliveryResource extends Resource
         return $schema->components([
             Grid::make(3)->schema([
                 Forms\Components\Select::make('order_id')
-                    ->label('Order')
+                    ->label(__('laravel-crm-filament::labels.fields.order'))
                     ->options(fn () => Order::query()->orderByDesc('id')->limit(50)->get()->mapWithKeys(fn ($o) => [$o->id => $o->order_id])->all())
                     ->searchable()
                     ->preload()
                     ->required(),
                 Forms\Components\DatePicker::make('delivery_expected')
-                    ->label('Expected'),
+                    ->label(__('laravel-crm-filament::labels.money.expected')),
                 Forms\Components\DatePicker::make('delivered_on')
-                    ->label('Delivered on'),
+                    ->label(__('laravel-crm-filament::labels.money.delivered_on')),
             ]),
 
             // Delivery line items: only order_product_id + quantity per service contract.
             Forms\Components\Repeater::make('products')
-                ->label('Items delivered')
+                ->label(__('laravel-crm-filament::labels.money.items_delivered'))
                 ->schema([
                     Forms\Components\Select::make('order_product_id')
-                        ->label('Order line')
+                        ->label(__('laravel-crm-filament::labels.money.order_line'))
                         ->options(function (Get $get) {
                             $orderId = $get('../../order_id');
                             if (! $orderId) {
@@ -92,24 +92,24 @@ class DeliveryResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\Repeater::make('addresses')
-                ->label('Delivery addresses')
+                ->label(__('laravel-crm-filament::labels.money.delivery_addresses'))
                 ->schema([
                     Forms\Components\Hidden::make('id'),
                     Grid::make(2)->schema([
                         Forms\Components\Select::make('address_type_id')
-                            ->label('Type')
+                            ->label(__('laravel-crm-filament::labels.fields.type'))
                             ->options(fn () => AddressType::query()->pluck('name', 'id')),
                         Forms\Components\TextInput::make('name')->maxLength(255),
                     ]),
                     Grid::make(3)->schema([
-                        Forms\Components\TextInput::make('line1')->label('Line 1')->maxLength(255),
-                        Forms\Components\TextInput::make('line2')->label('Line 2')->maxLength(255),
-                        Forms\Components\TextInput::make('line3')->label('Line 3')->maxLength(255),
+                        Forms\Components\TextInput::make('line1')->label(__('laravel-crm-filament::labels.contact.line1'))->maxLength(255),
+                        Forms\Components\TextInput::make('line2')->label(__('laravel-crm-filament::labels.contact.line2'))->maxLength(255),
+                        Forms\Components\TextInput::make('line3')->label(__('laravel-crm-filament::labels.contact.line3'))->maxLength(255),
                     ]),
                     Grid::make(4)->schema([
                         Forms\Components\TextInput::make('city')->maxLength(255),
                         Forms\Components\TextInput::make('state')->maxLength(255),
-                        Forms\Components\TextInput::make('code')->label('Postal code')->maxLength(20),
+                        Forms\Components\TextInput::make('code')->label(__('laravel-crm-filament::labels.contact.postal_code'))->maxLength(20),
                         Forms\Components\TextInput::make('country')->maxLength(255),
                     ]),
                     Grid::make(2)->schema([
@@ -122,7 +122,7 @@ class DeliveryResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\Select::make('user_owner_id')
-                ->label('Owner')
+                ->label(__('laravel-crm-filament::labels.fields.owner'))
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
@@ -134,27 +134,27 @@ class DeliveryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
+                    ->label(__('laravel-crm-filament::labels.fields.id'))
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('order.order_id')
-                    ->label('Order')
+                    ->label(__('laravel-crm-filament::labels.fields.order'))
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('delivery_expected')
-                    ->label('Expected')
+                    ->label(__('laravel-crm-filament::labels.money.expected'))
                     ->date()
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('delivered_on')
-                    ->label('Delivered')
+                    ->label(__('laravel-crm-filament::labels.money.delivered'))
                     ->date()
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')

@@ -59,12 +59,12 @@ class UserResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\Toggle::make('crm_access')
-                ->label('CRM access')
+                ->label(__('laravel-crm-filament::labels.misc.crm_access'))
                 ->helperText('Required for the user to reach the Filament panel.')
                 ->default(true),
 
             Forms\Components\Select::make('roles')
-                ->label('Roles')
+                ->label(__('laravel-crm-filament::labels.fields.roles'))
                 ->multiple()
                 ->relationship('roles', 'name')
                 ->options(fn () => Role::query()->orderBy('name')->pluck('name', 'id'))
@@ -80,13 +80,13 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('email')->sortable()->searchable()->toggleable(),
-                Tables\Columns\IconColumn::make('crm_access')->label('CRM')->boolean(),
+                Tables\Columns\IconColumn::make('crm_access')->label(__('laravel-crm-filament::labels.misc.crm'))->boolean(),
                 Tables\Columns\TextColumn::make('roles.name')
-                    ->label('Roles')
+                    ->label(__('laravel-crm-filament::labels.fields.roles'))
                     ->badge()
                     ->color('gray'),
                 Tables\Columns\TextColumn::make('email_verified_at')
-                    ->label('Verified')
+                    ->label(__('laravel-crm-filament::labels.fields.verified'))
                     ->dateTime()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
@@ -96,7 +96,7 @@ class UserResource extends Resource
             ])
             ->defaultSort('name')
             ->filters([
-                Tables\Filters\TernaryFilter::make('crm_access')->label('Has CRM access'),
+                Tables\Filters\TernaryFilter::make('crm_access')->label(__('laravel-crm-filament::labels.misc.has_crm_access')),
             ])
             ->recordActions([Actions\EditAction::make()])
             ->toolbarActions([

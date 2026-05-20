@@ -40,11 +40,11 @@ class TaxRateResource extends Resource
                     ->required()
                     ->suffix('%'),
                 Forms\Components\TextInput::make('tax_type')
-                    ->label('Type')
+                    ->label(__('laravel-crm-filament::labels.fields.type'))
                     ->placeholder('GST / VAT / Sales tax')
                     ->maxLength(50),
             ]),
-            Forms\Components\Toggle::make('default')->label('Default tax rate'),
+            Forms\Components\Toggle::make('default')->label(__('laravel-crm-filament::labels.money.default_tax_rate')),
             Forms\Components\Textarea::make('description')
                 ->rows(2)
                 ->columnSpanFull(),
@@ -57,7 +57,7 @@ class TaxRateResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('rate')->suffix('%')->sortable(),
-                Tables\Columns\TextColumn::make('tax_type')->label('Type')->toggleable(),
+                Tables\Columns\TextColumn::make('tax_type')->label(__('laravel-crm-filament::labels.fields.type'))->toggleable(),
                 Tables\Columns\IconColumn::make('default')->boolean(),
             ])
             ->defaultSort('name')

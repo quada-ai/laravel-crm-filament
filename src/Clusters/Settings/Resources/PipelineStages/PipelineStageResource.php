@@ -40,7 +40,7 @@ class PipelineStageResource extends Resource
         return $schema->components([
             Grid::make(2)->schema([
                 Forms\Components\Select::make('pipeline_id')
-                    ->label('Pipeline')
+                    ->label(__('laravel-crm-filament::labels.sales.pipeline'))
                     ->options(fn () => Pipeline::query()->orderBy('name')->pluck('name', 'id'))
                     ->required()
                     ->searchable(),
@@ -56,7 +56,7 @@ class PipelineStageResource extends Resource
                 Forms\Components\ColorPicker::make('color'),
             ]),
             Forms\Components\Select::make('pipeline_stage_probability_id')
-                ->label('Probability')
+                ->label(__('laravel-crm-filament::labels.sales.probability'))
                 ->options(fn () => PipelineStageProbability::query()->orderBy('percent')->get()->mapWithKeys(fn ($p) => [$p->id => $p->name . ' (' . $p->percent . '%)']))
                 ->searchable()
                 ->preload(),
@@ -71,7 +71,7 @@ class PipelineStageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('pipeline.name')
-                    ->label('Pipeline')
+                    ->label(__('laravel-crm-filament::labels.sales.pipeline'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('order')->sortable(),

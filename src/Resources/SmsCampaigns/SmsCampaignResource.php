@@ -52,7 +52,7 @@ class SmsCampaignResource extends Resource
             Grid::make(2)->schema([
                 Forms\Components\TextInput::make('name')->required()->maxLength(255),
                 Forms\Components\Select::make('sms_template_id')
-                    ->label('Template')
+                    ->label(__('laravel-crm-filament::labels.fields.template'))
                     ->options(fn () => SmsTemplate::query()->orderBy('name')->pluck('name', 'id'))
                     ->searchable()
                     ->preload()
@@ -65,7 +65,7 @@ class SmsCampaignResource extends Resource
                     }),
             ]),
             Forms\Components\TextInput::make('from')
-                ->label('From')
+                ->label(__('laravel-crm-filament::labels.campaign.from'))
                 ->default(fn () => app(ClickSendService::class)->defaultFrom())
                 ->maxLength(11)
                 ->helperText('Sender ID (alphanumeric, ≤11 chars) or leave blank for ClickSend default.'),
@@ -81,7 +81,7 @@ class SmsCampaignResource extends Resource
                 })
                 ->columnSpanFull(),
             Forms\Components\DateTimePicker::make('scheduled_at')
-                ->label('Schedule for')
+                ->label(__('laravel-crm-filament::labels.campaign.schedule_for'))
                 ->helperText('Leave blank to keep as draft; use the Schedule action after saving.'),
         ]);
     }
@@ -89,31 +89,31 @@ class SmsCampaignResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('Performance')
+            Section::make('Performance')->heading(__('laravel-crm-filament::labels.sections.performance'))
                 ->key('campaign_performance')
                 ->description('Engagement metrics for this campaign')
                 ->columns(3)
                 ->schema([
                     TextEntry::make('sent_count')
-                        ->label('Sent')
+                        ->label(__('laravel-crm-filament::labels.campaign.sent'))
                         ->state(fn (SmsCampaign $record) => SmsCampaignRecipient::where('sms_campaign_id', $record->id)->whereIn('status', ['sent', 'delivered'])->count())
                         ->numeric(),
                     TextEntry::make('failed_count_state')
-                        ->label('Failed')
+                        ->label(__('laravel-crm-filament::labels.campaign.failed'))
                         ->state(fn (SmsCampaign $record) => SmsCampaignRecipient::where('sms_campaign_id', $record->id)->whereIn('status', ['failed', 'bounced'])->count())
                         ->numeric(),
                     TextEntry::make('skipped_count_state')
-                        ->label('Skipped')
+                        ->label(__('laravel-crm-filament::labels.campaign.skipped'))
                         ->state(fn (SmsCampaign $record) => SmsCampaignRecipient::where('sms_campaign_id', $record->id)->where('status', 'skipped')->count())
                         ->numeric(),
                     TextEntry::make('delivery_rate')
-                        ->label('Delivery rate')
+                        ->label(__('laravel-crm-filament::labels.campaign.delivery_rate'))
                         ->state(fn (SmsCampaign $record): string => $record->deliveryRate() . '%'),
                     TextEntry::make('click_rate')
-                        ->label('Click rate')
+                        ->label(__('laravel-crm-filament::labels.campaign.click_rate'))
                         ->state(fn (SmsCampaign $record): string => $record->clickRate() . '%'),
                     TextEntry::make('unsubscribe_rate')
-                        ->label('Unsubscribe rate')
+                        ->label(__('laravel-crm-filament::labels.campaign.unsubscribe_rate'))
                         ->state(fn (SmsCampaign $record): string => $record->unsubscribeRate() . '%'),
                 ]),
         ]);
@@ -135,9 +135,9 @@ class SmsCampaignResource extends Resource
                         'failed' => 'danger',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('total_recipients')->label('Recipients')->numeric()->toggleable(),
-                Tables\Columns\TextColumn::make('delivered_count')->label('Delivered')->numeric()->toggleable(),
-                Tables\Columns\TextColumn::make('failed_count')->label('Failed')->numeric()->toggleable(),
+                Tables\Columns\TextColumn::make('total_recipients')->label(__('laravel-crm-filament::labels.campaign.recipients'))->numeric()->toggleable(),
+                Tables\Columns\TextColumn::make('delivered_count')->label(__('laravel-crm-filament::labels.money.delivered'))->numeric()->toggleable(),
+                Tables\Columns\TextColumn::make('failed_count')->label(__('laravel-crm-filament::labels.campaign.failed'))->numeric()->toggleable(),
                 Tables\Columns\TextColumn::make('scheduled_at')->dateTime()->toggleable(),
                 Tables\Columns\TextColumn::make('sent_at')->dateTime()->toggleable(),
             ])

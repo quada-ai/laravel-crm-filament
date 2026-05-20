@@ -53,14 +53,14 @@ class Integrations extends Page implements HasForms
         return $schema
             ->statePath('data')
             ->components([
-                Section::make('Xero')
+                Section::make('Xero')->heading(__('laravel-crm-filament::labels.sections.xero'))
                     ->description($this->xeroStatusLine())
                     ->schema([
                         Toggle::make('xero_contacts')->label(static::KEYS['xero_contacts']),
                         Toggle::make('xero_products')->label(static::KEYS['xero_products']),
                         Toggle::make('xero_invoices')->label(static::KEYS['xero_invoices']),
                     ]),
-                Section::make('ClickSend (SMS)')
+                Section::make('ClickSend (SMS)')->heading(__('laravel-crm-filament::labels.sections.clicksend'))
                     ->description($this->clickSendStatusLine())
                     ->schema([]),
             ]);
@@ -102,13 +102,13 @@ class Integrations extends Page implements HasForms
     {
         return [
             Action::make('connectXero')
-                ->label('Connect Xero')
+                ->label(__('laravel-crm-filament::labels.actions.connect_xero'))
                 ->icon('heroicon-o-link')
                 ->color('primary')
                 ->url(fn () => route('laravel-crm.integrations.xero.connect'))
                 ->visible(fn () => ! $this->xeroIsConnected()),
             Action::make('disconnectXero')
-                ->label('Disconnect Xero')
+                ->label(__('laravel-crm-filament::labels.actions.disconnect_xero'))
                 ->icon('heroicon-o-link-slash')
                 ->color('danger')
                 ->requiresConfirmation()
@@ -130,7 +130,7 @@ class Integrations extends Page implements HasForms
     protected function getFormActions(): array
     {
         return [
-            Action::make('save')->label('Save sync settings')->submit('save'),
+            Action::make('save')->label(__('laravel-crm-filament::labels.actions.save_sync_settings'))->submit('save'),
         ];
     }
 

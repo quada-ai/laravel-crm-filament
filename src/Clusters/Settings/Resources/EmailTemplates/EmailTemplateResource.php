@@ -54,7 +54,7 @@ class EmailTemplateResource extends Resource
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('subject')->limit(60)->toggleable(),
                 Tables\Columns\IconColumn::make('is_system')
-                    ->label('System')
+                    ->label(__('laravel-crm-filament::labels.fields.system'))
                     ->boolean(),
             ])
             ->defaultSort('name')

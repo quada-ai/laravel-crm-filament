@@ -52,13 +52,13 @@ class ProductResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('code')
-                    ->label('SKU')
+                    ->label(__('laravel-crm-filament::labels.money.sku'))
                     ->maxLength(100),
             ]),
 
             Grid::make(3)->schema([
                 Forms\Components\TextInput::make('barcode')
-                    ->label('Barcode (ISBN/UPC/GTIN)')
+                    ->label(__('laravel-crm-filament::labels.money.barcode'))
                     ->maxLength(100),
                 Forms\Components\TextInput::make('product_category')
                     ->maxLength(255),
@@ -68,13 +68,13 @@ class ProductResource extends Resource
 
             Grid::make(3)->schema([
                 Forms\Components\TextInput::make('unit_price')
-                    ->label('Unit price')
+                    ->label(__('laravel-crm-filament::labels.money.unit_price'))
                     ->numeric(),
                 Forms\Components\TextInput::make('currency')
                     ->maxLength(3)
                     ->default(config('laravel-crm.default_currency', 'USD')),
                 Forms\Components\Select::make('tax_rate_id')
-                    ->label('Tax rate')
+                    ->label(__('laravel-crm-filament::labels.money.tax_rate'))
                     ->options(fn () => TaxRate::query()->orderBy('name')->pluck('name', 'id'))
                     ->searchable(),
             ]),
@@ -91,7 +91,7 @@ class ProductResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\Select::make('user_owner_id')
-                ->label('Owner')
+                ->label(__('laravel-crm-filament::labels.fields.owner'))
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
@@ -113,17 +113,17 @@ class ProductResource extends Resource
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('code')
-                    ->label('SKU')
+                    ->label(__('laravel-crm-filament::labels.money.sku'))
                     ->sortable()
                     ->searchable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('product_category')
-                    ->label('Category')
+                    ->label(__('laravel-crm-filament::labels.fields.category'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label('Owner')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->toggleable(),
 
                 Tables\Columns\IconColumn::make('active')

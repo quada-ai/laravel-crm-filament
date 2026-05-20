@@ -41,7 +41,7 @@ class NotesRelationManager extends RelationManager
                     ->wrap(),
                 Tables\Columns\IconColumn::make('pinned')->boolean()->toggleable(),
                 Tables\Columns\TextColumn::make('createdByUser.name')
-                    ->label('By')
+                    ->label(__('laravel-crm-filament::labels.fields.by'))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->since()

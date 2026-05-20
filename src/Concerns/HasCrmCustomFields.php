@@ -45,7 +45,7 @@ trait HasCrmCustomFields
             ->map(fn (Field $field) => static::buildCrmFieldComponent($field))
             ->all();
 
-        return Section::make('Custom fields')
+        return Section::make('Custom fields')->heading(__('laravel-crm-filament::labels.sections.custom_fields'))
             ->schema($components)
             ->collapsible()
             ->columnSpanFull();

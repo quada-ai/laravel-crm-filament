@@ -83,7 +83,7 @@ class FieldResource extends Resource
                     ->required()
                     ->live(),
                 Forms\Components\Select::make('field_group_id')
-                    ->label('Group')
+                    ->label(__('laravel-crm-filament::labels.fields.group'))
                     ->options(fn () => FieldGroup::query()->orderBy('name')->pluck('name', 'id'))
                     ->searchable(),
             ]),
@@ -94,7 +94,7 @@ class FieldResource extends Resource
             ]),
 
             Forms\Components\Select::make('models')
-                ->label('Available on')
+                ->label(__('laravel-crm-filament::labels.fields.available_on'))
                 ->multiple()
                 ->options(self::MODELS)
                 ->searchable()
@@ -102,7 +102,7 @@ class FieldResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\Repeater::make('options')
-                ->label('Options')
+                ->label(__('laravel-crm-filament::labels.fields.options'))
                 ->schema([
                     Forms\Components\TextInput::make('label')->required(),
                     Forms\Components\TextInput::make('value'),
@@ -122,7 +122,7 @@ class FieldResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('type')->badge(),
-                Tables\Columns\TextColumn::make('fieldGroup.name')->label('Group')->toggleable(),
+                Tables\Columns\TextColumn::make('fieldGroup.name')->label(__('laravel-crm-filament::labels.fields.group'))->toggleable(),
                 Tables\Columns\IconColumn::make('required')->boolean(),
             ])
             ->defaultSort('name')

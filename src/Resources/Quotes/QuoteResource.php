@@ -64,24 +64,24 @@ class QuoteResource extends Resource
                     ->maxLength(3)
                     ->default(config('laravel-crm.default_currency', 'USD')),
                 Forms\Components\Select::make('pipeline_stage_id')
-                    ->label('Stage')
+                    ->label(__('laravel-crm-filament::labels.sales.stage'))
                     ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id'))
                     ->searchable()
                     ->preload(),
             ]),
 
             Grid::make(2)->schema([
-                Forms\Components\DatePicker::make('issue_at')->label('Issue date'),
-                Forms\Components\DatePicker::make('expire_at')->label('Expiry date'),
+                Forms\Components\DatePicker::make('issue_at')->label(__('laravel-crm-filament::labels.money.issue_date')),
+                Forms\Components\DatePicker::make('expire_at')->label(__('laravel-crm-filament::labels.money.expiry_date')),
             ]),
 
             // Line items
             Forms\Components\Repeater::make('products')
-                ->label('Line items')
+                ->label(__('laravel-crm-filament::labels.money.line_items'))
                 ->schema([
                     Forms\Components\Hidden::make('quote_product_id'),
                     Forms\Components\Select::make('id')
-                        ->label('Product')
+                        ->label(__('laravel-crm-filament::labels.money.product'))
                         ->options(fn () => Product::query()->where('active', true)->orderBy('name')->pluck('name', 'id'))
                         ->searchable()
                         ->live()
@@ -101,7 +101,7 @@ class QuoteResource extends Resource
                             $set('amount', (float) $state * (float) $get('unit_price'));
                         }),
                     Forms\Components\TextInput::make('unit_price')
-                        ->label('Unit price')
+                        ->label(__('laravel-crm-filament::labels.money.unit_price'))
                         ->numeric()
                         ->live()
                         ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
@@ -122,7 +122,7 @@ class QuoteResource extends Resource
             // Totals
             Grid::make(4)->schema([
                 Forms\Components\TextInput::make('sub_total')
-                    ->label('Subtotal')
+                    ->label(__('laravel-crm-filament::labels.money.subtotal'))
                     ->numeric(),
                 Forms\Components\TextInput::make('discount')
                     ->numeric(),
@@ -137,7 +137,7 @@ class QuoteResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\Select::make('user_owner_id')
-                ->label('Owner')
+                ->label(__('laravel-crm-filament::labels.fields.owner'))
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
@@ -155,7 +155,7 @@ class QuoteResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('quote_id')
-                    ->label('ID')
+                    ->label(__('laravel-crm-filament::labels.fields.id'))
                     ->sortable()
                     ->searchable(),
 
@@ -169,12 +169,12 @@ class QuoteResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('pipelineStage.name')
-                    ->label('Stage')
+                    ->label(__('laravel-crm-filament::labels.sales.stage'))
                     ->badge()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('expire_at')
-                    ->label('Expires')
+                    ->label(__('laravel-crm-filament::labels.money.expires'))
                     ->date()
                     ->sortable()
                     ->toggleable(),
@@ -187,7 +187,7 @@ class QuoteResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('pipeline_stage_id')
-                    ->label('Stage')
+                    ->label(__('laravel-crm-filament::labels.sales.stage'))
                     ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id')),
             ])
             ->recordActions([

@@ -28,17 +28,17 @@ class FilesRelationManager extends RelationManager
 
         return $schema->components([
             Forms\Components\FileUpload::make('file')
-                ->label('File')
+                ->label(__('laravel-crm-filament::labels.file.file'))
                 ->disk($disk)
                 ->directory(fn (RelationManager $livewire): string => 'laravel-crm/' . strtolower(class_basename($livewire->getOwnerRecord())) . '/' . $livewire->getOwnerRecord()->id . '/files')
                 ->required()
                 ->preserveFilenames()
                 ->columnSpanFull(),
             Forms\Components\TextInput::make('title')
-                ->label('Description')
+                ->label(__('laravel-crm-filament::labels.fields.description'))
                 ->maxLength(255),
             Forms\Components\TextInput::make('format')
-                ->label('File type')
+                ->label(__('laravel-crm-filament::labels.file.file_type'))
                 ->maxLength(255)
                 ->helperText('Optional category, e.g. contract, invoice, photo.'),
         ]);
@@ -50,11 +50,11 @@ class FilesRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')->limit(60)->wrap(),
-                Tables\Columns\TextColumn::make('title')->label('Description')->limit(40)->toggleable(),
-                Tables\Columns\TextColumn::make('format')->label('Type')->badge()->toggleable(),
+                Tables\Columns\TextColumn::make('title')->label(__('laravel-crm-filament::labels.fields.description'))->limit(40)->toggleable(),
+                Tables\Columns\TextColumn::make('format')->label(__('laravel-crm-filament::labels.fields.type'))->badge()->toggleable(),
                 Tables\Columns\TextColumn::make('mime')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('createdByUser.name')
-                    ->label('Uploaded by')
+                    ->label(__('laravel-crm-filament::labels.file.uploaded_by'))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->since()
@@ -97,7 +97,7 @@ class FilesRelationManager extends RelationManager
             ])
             ->recordActions([
                 Actions\Action::make('download')
-                    ->label('Download')
+                    ->label(__('laravel-crm-filament::labels.actions.download'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->url(fn (File $record): ?string => static::buildDownloadUrl($record))
                     ->openUrlInNewTab()

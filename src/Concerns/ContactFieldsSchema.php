@@ -20,11 +20,11 @@ class ContactFieldsSchema
     public static function phonesRepeater(string $name = 'phones'): Forms\Components\Repeater
     {
         return Forms\Components\Repeater::make($name)
-            ->label('Phone numbers')
+            ->label(__('laravel-crm-filament::labels.contact.phone_numbers'))
             ->schema([
                 Forms\Components\Hidden::make('id'),
                 Forms\Components\TextInput::make('number')
-                    ->label('Number')
+                    ->label(__('laravel-crm-filament::labels.contact.number'))
                     ->required()
                     ->tel()
                     ->maxLength(50),
@@ -37,7 +37,7 @@ class ContactFieldsSchema
                         'other' => 'Other',
                     ]),
                 Forms\Components\Toggle::make('primary')
-                    ->label('Primary')
+                    ->label(__('laravel-crm-filament::labels.fields.primary'))
                     ->default(false),
             ])
             ->columns(4)
@@ -50,11 +50,11 @@ class ContactFieldsSchema
     public static function emailsRepeater(string $name = 'emails'): Forms\Components\Repeater
     {
         return Forms\Components\Repeater::make($name)
-            ->label('Email addresses')
+            ->label(__('laravel-crm-filament::labels.contact.email_addresses'))
             ->schema([
                 Forms\Components\Hidden::make('id'),
                 Forms\Components\TextInput::make('address')
-                    ->label('Email')
+                    ->label(__('laravel-crm-filament::labels.contact.email'))
                     ->required()
                     ->email()
                     ->maxLength(255),
@@ -65,7 +65,7 @@ class ContactFieldsSchema
                         'other' => 'Other',
                     ]),
                 Forms\Components\Toggle::make('primary')
-                    ->label('Primary')
+                    ->label(__('laravel-crm-filament::labels.fields.primary'))
                     ->default(false),
             ])
             ->columns(4)
@@ -78,17 +78,17 @@ class ContactFieldsSchema
     public static function addressesRepeater(string $name = 'addresses'): Forms\Components\Repeater
     {
         return Forms\Components\Repeater::make($name)
-            ->label('Addresses')
+            ->label(__('laravel-crm-filament::labels.contact.addresses'))
             ->schema([
                 Forms\Components\Hidden::make('id'),
-                Forms\Components\TextInput::make('line1')->label('Line 1')->maxLength(255),
-                Forms\Components\TextInput::make('line2')->label('Line 2')->maxLength(255),
-                Forms\Components\TextInput::make('line3')->label('Line 3')->maxLength(255),
-                Forms\Components\TextInput::make('city')->label('City')->maxLength(100),
-                Forms\Components\TextInput::make('state')->label('State / Province')->maxLength(100),
-                Forms\Components\TextInput::make('code')->label('Post code')->maxLength(20),
-                Forms\Components\TextInput::make('country')->label('Country')->maxLength(100),
-                Forms\Components\Toggle::make('primary')->label('Primary')->default(false),
+                Forms\Components\TextInput::make('line1')->label(__('laravel-crm-filament::labels.contact.line1'))->maxLength(255),
+                Forms\Components\TextInput::make('line2')->label(__('laravel-crm-filament::labels.contact.line2'))->maxLength(255),
+                Forms\Components\TextInput::make('line3')->label(__('laravel-crm-filament::labels.contact.line3'))->maxLength(255),
+                Forms\Components\TextInput::make('city')->label(__('laravel-crm-filament::labels.contact.city'))->maxLength(100),
+                Forms\Components\TextInput::make('state')->label(__('laravel-crm-filament::labels.contact.state'))->maxLength(100),
+                Forms\Components\TextInput::make('code')->label(__('laravel-crm-filament::labels.contact.post_code'))->maxLength(20),
+                Forms\Components\TextInput::make('country')->label(__('laravel-crm-filament::labels.contact.country'))->maxLength(100),
+                Forms\Components\Toggle::make('primary')->label(__('laravel-crm-filament::labels.fields.primary'))->default(false),
             ])
             ->columns(2)
             ->addActionLabel('Add address')

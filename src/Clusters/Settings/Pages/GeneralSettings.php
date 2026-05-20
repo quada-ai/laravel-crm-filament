@@ -68,14 +68,14 @@ class GeneralSettings extends Page implements HasForms
         return $schema
             ->statePath('data')
             ->components([
-                Section::make('Branding')
+                Section::make('Branding')->heading(__('laravel-crm-filament::labels.sections.branding'))
                     ->schema([
                         Grid::make(2)->schema([
                             TextInput::make('organization_name')->label(static::KEYS['organization_name'])->maxLength(255),
                             TextInput::make('logo_file')->label(static::KEYS['logo_file'])->maxLength(255),
                         ]),
                     ]),
-                Section::make('Formatting')
+                Section::make('Formatting')->heading(__('laravel-crm-filament::labels.sections.formatting'))
                     ->schema([
                         Grid::make(2)->schema([
                             Select::make('date_format')
@@ -88,7 +88,7 @@ class GeneralSettings extends Page implements HasForms
                             TextInput::make('default_currency')->label(static::KEYS['default_currency'])->maxLength(3),
                         ]),
                     ]),
-                Section::make('Prefixes')
+                Section::make('Prefixes')->heading(__('laravel-crm-filament::labels.sections.prefixes'))
                     ->schema([
                         Grid::make(2)->schema([
                             TextInput::make('quote_prefix')->label(static::KEYS['quote_prefix'])->maxLength(10),
@@ -97,7 +97,7 @@ class GeneralSettings extends Page implements HasForms
                             TextInput::make('purchase_order_prefix')->label(static::KEYS['purchase_order_prefix'])->maxLength(10),
                         ]),
                     ]),
-                Section::make('Tax')
+                Section::make('Tax')->heading(__('laravel-crm-filament::labels.sections.tax'))
                     ->schema([
                         TextInput::make('tax_rate')->label(static::KEYS['tax_rate'])->numeric()->suffix('%'),
                     ]),
@@ -108,7 +108,7 @@ class GeneralSettings extends Page implements HasForms
     {
         return [
             Action::make('save')
-                ->label('Save')
+                ->label(__('laravel-crm-filament::labels.actions.save'))
                 ->submit('save'),
         ];
     }

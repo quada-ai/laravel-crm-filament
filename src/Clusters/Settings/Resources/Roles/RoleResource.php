@@ -60,7 +60,7 @@ class RoleResource extends Resource
                 Tables\Columns\TextColumn::make('guard_name')->toggleable(),
                 Tables\Columns\TextColumn::make('permissions_count')
                     ->counts('permissions')
-                    ->label('Permissions')
+                    ->label(__('laravel-crm-filament::labels.fields.permissions'))
                     ->toggleable(),
             ])
             ->defaultSort('name')
