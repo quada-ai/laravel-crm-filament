@@ -53,6 +53,11 @@ return [
         'fields' => 'Champs',
         'labels' => 'Étiquettes',
         'timestamp' => 'Horodatage',
+        'message' => 'Message',
+        'phone_number' => 'Numéro de téléphone',
+        'clicksend_default_from' => 'Expéditeur par défaut',
+        'clicksend_api_key' => 'Clé API ClickSend',
+        'clicksend_username' => 'Identifiant ClickSend',
     ],
 
     'contact' => [
@@ -212,6 +217,8 @@ return [
         'check_for_updates' => 'Vérifier les mises à jour',
         'connect_xero' => 'Connecter Xero',
         'disconnect_xero' => 'Déconnecter Xero',
+        'manage_clicksend' => 'Gérer ClickSend',
+        'send_test_sms' => 'Envoyer un SMS test',
     ],
 
     'import' => [

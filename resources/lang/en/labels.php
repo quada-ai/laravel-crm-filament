@@ -54,6 +54,11 @@ return [
         'fields' => 'Fields',
         'labels' => 'Labels',
         'timestamp' => 'Timestamp',
+        'message' => 'Message',
+        'phone_number' => 'Phone number',
+        'clicksend_default_from' => 'Default sender ID',
+        'clicksend_api_key' => 'ClickSend API key',
+        'clicksend_username' => 'ClickSend username',
     ],
 
     // Contact / address fields
@@ -221,6 +226,8 @@ return [
         'check_for_updates' => 'Check for updates',
         'connect_xero' => 'Connect Xero',
         'disconnect_xero' => 'Disconnect Xero',
+        'manage_clicksend' => 'Manage ClickSend',
+        'send_test_sms' => 'Send test SMS',
     ],
 
     // CSV import

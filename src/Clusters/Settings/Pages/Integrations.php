@@ -12,7 +12,6 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use VentureDrake\LaravelCrm\Services\ClickSendService;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 
 class Integrations extends Page implements HasForms
@@ -60,9 +59,6 @@ class Integrations extends Page implements HasForms
                         Toggle::make('xero_products')->label(static::KEYS['xero_products']),
                         Toggle::make('xero_invoices')->label(static::KEYS['xero_invoices']),
                     ]),
-                Section::make('ClickSend (SMS)')->heading(__('laravel-crm-filament::labels.sections.clicksend'))
-                    ->description($this->clickSendStatusLine())
-                    ->schema([]),
             ]);
     }
 
@@ -83,21 +79,6 @@ class Integrations extends Page implements HasForms
         return 'Not connected to Xero.';
     }
 
-    protected function clickSendStatusLine(): string
-    {
-        $cs = app(ClickSendService::class);
-        if (! $cs->isConfigured()) {
-            return 'ClickSend credentials not configured.';
-        }
-        $check = $cs->verifyCredentials();
-        if (! ($check['ok'] ?? false)) {
-            return 'ClickSend credentials configured but verification failed: ' . ($check['error'] ?? 'unknown error');
-        }
-        $balance = $check['balance'] ?? null;
-
-        return 'ClickSend connected. Balance: ' . ($balance !== null ? $balance : 'unknown') . '.';
-    }
-
     protected function getHeaderActions(): array
     {
         return [
@@ -114,6 +95,10 @@ class Integrations extends Page implements HasForms
                 ->requiresConfirmation()
                 ->url(fn () => route('laravel-crm.integrations.xero.disconnect'))
                 ->visible(fn () => $this->xeroIsConnected()),
+            Action::make('manageClickSend')
+                ->label(__('laravel-crm-filament::labels.actions.manage_clicksend'))
+                ->icon('heroicon-o-chat-bubble-bottom-center-text')
+                ->url(fn () => ClickSendIntegration::getUrl()),
         ];
     }
 
