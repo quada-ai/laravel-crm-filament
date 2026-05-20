@@ -15,6 +15,7 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\Pages\CreateChatWidget;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\Pages\EditChatWidget;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\Pages\ListChatWidgets;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\Pages\ViewChatWidget;
 
 class ChatWidgetResource extends Resource
 {
@@ -65,7 +66,10 @@ class ChatWidgetResource extends Resource
                     ->toggleable(),
             ])
             ->defaultSort('name')
-            ->recordActions([Actions\EditAction::make()])
+            ->recordActions([
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+            ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
             ]);
@@ -76,6 +80,7 @@ class ChatWidgetResource extends Resource
         return [
             'index' => ListChatWidgets::route('/'),
             'create' => CreateChatWidget::route('/create'),
+            'view' => ViewChatWidget::route('/{record}'),
             'edit' => EditChatWidget::route('/{record}/edit'),
         ];
     }

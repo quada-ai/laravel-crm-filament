@@ -9,10 +9,10 @@ trait HasQuotePortalAction
 {
     protected function quotePortalAction(): Action
     {
-        return Action::make('portal')
-            ->label('Open portal')
+        return Action::make('previewPortal')
+            ->label('Preview portal')
             ->icon('heroicon-o-arrow-top-right-on-square')
-            ->color('gray')
+            ->color('primary')
             ->url(fn (Quote $record): string => url('p/quotes/' . $record->external_id))
             ->openUrlInNewTab();
     }

@@ -81,9 +81,9 @@ it('routes all Send concerns through the shared DownloadsPdf trait', function ()
 
 it('registers the expected header actions on each View page', function () {
     $expectations = [
-        ViewQuote::class => ['send', 'downloadPdf', 'portal', 'convertToOrder'],
+        ViewQuote::class => ['send', 'downloadPdf', 'previewPortal', 'convertToOrder'],
         ViewOrder::class => ['convertToInvoice', 'convertToDelivery', 'convertToPurchaseOrder'],
-        ViewInvoice::class => ['send', 'downloadPdf', 'portal'],
+        ViewInvoice::class => ['send', 'downloadPdf', 'previewPortal'],
         ViewPurchaseOrder::class => ['send', 'downloadPdf'],
     ];
 

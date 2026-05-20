@@ -17,10 +17,10 @@ class ViewQuote extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            $this->quotePortalAction(),
             Actions\EditAction::make(),
             $this->quoteSendAction(),
             $this->quoteDownloadPdfAction(),
-            $this->quotePortalAction(),
             $this->quoteConvertToOrderAction(),
         ];
     }

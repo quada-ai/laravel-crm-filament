@@ -16,10 +16,10 @@ class ViewInvoice extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            $this->invoicePortalAction(),
             Actions\EditAction::make(),
             $this->invoiceSendAction(),
             $this->invoiceDownloadPdfAction(),
-            $this->invoicePortalAction(),
         ];
     }
 }

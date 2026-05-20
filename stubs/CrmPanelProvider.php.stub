@@ -17,18 +17,28 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use VentureDrake\LaravelCrmFilament\Auth\Login;
+use VentureDrake\LaravelCrmFilament\Auth\Profile;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 class CrmPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $settings = app('laravel-crm.settings');
+        $brandName = $settings->get('organization_name') ?: config('app.name');
+        $brandLogo = $settings->get('logo_file');
+        $primary = $settings->get('primary_color') ?: '#05b3a9';
+
         return $panel
             ->id('crm')
             ->path('admin')
-            ->login()
+            ->login(Login::class)
+            ->profile(Profile::class)
+            ->brandName($brandName)
+            ->brandLogo($brandLogo ? url($brandLogo) : null)
             ->colors([
-                'primary' => Color::hex('#05b3a9'),
+                'primary' => Color::hex($primary),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -60,9 +70,9 @@ class CrmPanelProvider extends PanelProvider
                 // ->withChat()
                 // ->withEmailMarketing()
                 // ->withSmsMarketing()
+                // ->withCustomers()
                 // ->withXero()
                 // ->navigationGroup('CRM')
             );
     }
 }
-
