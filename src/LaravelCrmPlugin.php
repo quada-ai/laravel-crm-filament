@@ -27,6 +27,7 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\TaxRates\TaxRate
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Timezones\TimezoneResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\UserResource;
 use VentureDrake\LaravelCrmFilament\Pages\CalendarPage;
+use VentureDrake\LaravelCrmFilament\Pages\Dashboard;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\ActivityResource;
 use VentureDrake\LaravelCrmFilament\Resources\Calls\CallResource;
 use VentureDrake\LaravelCrmFilament\Resources\Chat\ChatConversationResource;
@@ -64,6 +65,8 @@ class LaravelCrmPlugin implements Plugin
      * @var array<string,bool>|null
      */
     protected ?array $modules = null;
+
+    protected bool $registerDashboard = true;
 
     protected ?string $navigationGroup = null;
 
@@ -134,6 +137,13 @@ class LaravelCrmPlugin implements Plugin
     public function withCustomers(bool $enabled = true): static
     {
         $this->modules['customers'] = $enabled;
+
+        return $this;
+    }
+
+    public function withDashboard(bool $enabled = true): static
+    {
+        $this->registerDashboard = $enabled;
 
         return $this;
     }
@@ -306,9 +316,15 @@ class LaravelCrmPlugin implements Plugin
 
         $panel->resources($resources);
 
-        $panel->pages([
+        $pages = [
             CalendarPage::class,
-        ]);
+        ];
+
+        if ($this->registerDashboard && ! $this->panelHasDashboard($panel)) {
+            $pages[] = Dashboard::class;
+        }
+
+        $panel->pages($pages);
 
         $panel->discoverClusters(
             in: __DIR__ . '/Clusters',
@@ -329,6 +345,18 @@ class LaravelCrmPlugin implements Plugin
         }
 
         $panel->widgets($widgets);
+    }
+
+    protected function panelHasDashboard(Panel $panel): bool
+    {
+        foreach ($panel->getPages() as $page) {
+            if ($page === \Filament\Pages\Dashboard::class
+                || is_subclass_of($page, \Filament\Pages\Dashboard::class)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function boot(Panel $panel): void
