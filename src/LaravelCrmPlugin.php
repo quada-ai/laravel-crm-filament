@@ -4,22 +4,29 @@ namespace VentureDrake\LaravelCrmFilament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\AddressTypes\AddressTypeResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\ChatWidgetResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ContactTypes\ContactTypeResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\EmailTemplates\EmailTemplateResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FieldGroups\FieldGroupResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Fields\FieldResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Industries\IndustryResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Labels\LabelResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadSources\LeadSourceResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\OrganizationTypes\OrganizationTypeResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Pipelines\PipelineResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\PipelineStageResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ProductAttributes\ProductAttributeResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ProductCategories\ProductCategoryResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Roles\RoleResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\SmsTemplates\SmsTemplateResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\TaxRates\TaxRateResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Timezones\TimezoneResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\UserResource;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\ActivityResource;
 use VentureDrake\LaravelCrmFilament\Resources\Calls\CallResource;
 use VentureDrake\LaravelCrmFilament\Resources\Chat\ChatConversationResource;
+use VentureDrake\LaravelCrmFilament\Resources\Customers\CustomerResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\DeliveryResource;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
@@ -116,6 +123,13 @@ class LaravelCrmPlugin implements Plugin
     public function withXero(bool $enabled = true): static
     {
         $this->modules['xero'] = $enabled;
+
+        return $this;
+    }
+
+    public function withCustomers(bool $enabled = true): static
+    {
+        $this->modules['customers'] = $enabled;
 
         return $this;
     }
@@ -220,6 +234,10 @@ class LaravelCrmPlugin implements Plugin
             $resources[] = PurchaseOrderResource::class;
         }
 
+        if ($this->isModuleEnabled('customers')) {
+            $resources[] = CustomerResource::class;
+        }
+
         // Products aren't a gated module in core; surface them whenever the panel runs.
         $resources[] = ProductResource::class;
 
@@ -242,6 +260,12 @@ class LaravelCrmPlugin implements Plugin
         $resources[] = LeadSourceResource::class;
         $resources[] = TaxRateResource::class;
         $resources[] = ProductCategoryResource::class;
+        $resources[] = ContactTypeResource::class;
+        $resources[] = AddressTypeResource::class;
+        $resources[] = OrganizationTypeResource::class;
+        $resources[] = IndustryResource::class;
+        $resources[] = TimezoneResource::class;
+        $resources[] = ProductAttributeResource::class;
         $resources[] = FieldGroupResource::class;
         $resources[] = FieldResource::class;
         $resources[] = RoleResource::class;

@@ -12,6 +12,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use VentureDrake\LaravelCrm\Models\Industry;
 use VentureDrake\LaravelCrm\Models\Organization;
 use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
@@ -70,6 +71,12 @@ class OrganizationResource extends Resource
                 Forms\Components\TextInput::make('annual_revenue')->numeric(),
                 Forms\Components\TextInput::make('total_money_raised')->numeric(),
             ]),
+
+            Forms\Components\Select::make('industry_id')
+                ->label('Industry')
+                ->options(fn () => Industry::query()->orderBy('name')->pluck('name', 'id'))
+                ->searchable()
+                ->preload(),
 
             Forms\Components\TextInput::make('linkedin')
                 ->url()

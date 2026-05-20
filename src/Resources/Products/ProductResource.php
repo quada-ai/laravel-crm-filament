@@ -14,6 +14,7 @@ use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\TaxRate;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\ProductVariationsRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\CreateProduct;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\EditProduct;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\ListProducts;
@@ -144,6 +145,13 @@ class ProductResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            ProductVariationsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
