@@ -8,6 +8,7 @@ use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResour
 
 class ViewPurchaseOrder extends ViewRecord
 {
+    use Concerns\HasPurchaseOrderPortalAction;
     use Concerns\HasPurchaseOrderSendAction;
 
     protected static string $resource = PurchaseOrderResource::class;
@@ -15,6 +16,7 @@ class ViewPurchaseOrder extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            $this->purchaseOrderPortalAction(),
             Actions\EditAction::make(),
             $this->purchaseOrderSendAction(),
             $this->purchaseOrderDownloadPdfAction(),

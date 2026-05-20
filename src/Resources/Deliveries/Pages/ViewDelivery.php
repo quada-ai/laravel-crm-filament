@@ -8,10 +8,15 @@ use VentureDrake\LaravelCrmFilament\Resources\Deliveries\DeliveryResource;
 
 class ViewDelivery extends ViewRecord
 {
+    use Concerns\HasDeliveryPortalAction;
+
     protected static string $resource = DeliveryResource::class;
 
     protected function getHeaderActions(): array
     {
-        return [Actions\EditAction::make()];
+        return [
+            $this->deliveryPortalAction(),
+            Actions\EditAction::make(),
+        ];
     }
 }

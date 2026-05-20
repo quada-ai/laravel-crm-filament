@@ -190,11 +190,12 @@ return new class extends Migration
                 $table->bigIncrements('id');
                 $table->string('external_id')->nullable();
                 $table->unsignedBigInteger('delivery_id');
-                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('product_id')->nullable();
                 $table->unsignedBigInteger('order_product_id')->nullable();
                 $table->integer('quantity')->default(1);
                 $table->text('comments')->nullable();
                 $table->timestamps();
+                $table->softDeletes();
             });
         }
 
@@ -237,7 +238,7 @@ return new class extends Migration
                 $table->bigIncrements('id');
                 $table->string('external_id')->nullable();
                 $table->unsignedBigInteger('purchase_order_id');
-                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('product_id')->nullable();
                 $table->integer('quantity')->default(1);
                 $table->decimal('unit_price', 15, 2)->nullable();
                 $table->decimal('amount', 15, 2)->nullable();
@@ -249,6 +250,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('tax_rate_id')->nullable();
                 $table->text('comments')->nullable();
                 $table->timestamps();
+                $table->softDeletes();
             });
         }
 
