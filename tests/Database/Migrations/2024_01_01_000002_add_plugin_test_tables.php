@@ -359,6 +359,18 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasTable($prefix . 'email_campaign_recipients') && ! Schema::hasColumn($prefix . 'email_campaign_recipients', 'error')) {
+            Schema::table($prefix . 'email_campaign_recipients', function (Blueprint $table) {
+                $table->text('error')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'sms_campaign_recipients') && ! Schema::hasColumn($prefix . 'sms_campaign_recipients', 'error')) {
+            Schema::table($prefix . 'sms_campaign_recipients', function (Blueprint $table) {
+                $table->text('error')->nullable();
+            });
+        }
+
         if (! Schema::hasTable($prefix . 'email_campaign_clicks')) {
             Schema::create($prefix . 'email_campaign_clicks', function (Blueprint $table) {
                 $table->bigIncrements('id');

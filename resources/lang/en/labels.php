@@ -255,6 +255,11 @@ return [
         'bulk_mark_replied' => 'Bulk mark replied',
         'reopen' => 'Reopen',
         'change_status' => 'Change status',
+        'assign_owner' => 'Assign owner',
+        'change_pipeline_stage' => 'Change pipeline stage',
+        'apply_labels' => 'Apply labels',
+        'archive' => 'Archive',
+        'resend_to_failed' => 'Resend to failed',
     ],
 
     // CSV import

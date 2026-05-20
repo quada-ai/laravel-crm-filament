@@ -246,6 +246,11 @@ return [
         'bulk_mark_replied' => 'Marquer en lot comme répondu',
         'reopen' => 'Rouvrir',
         'change_status' => 'Changer le statut',
+        'assign_owner' => 'Attribuer le propriétaire',
+        'change_pipeline_stage' => 'Changer l’étape',
+        'apply_labels' => 'Appliquer des étiquettes',
+        'archive' => 'Archiver',
+        'resend_to_failed' => 'Renvoyer aux échoués',
     ],
 
     'import' => [

@@ -16,6 +16,7 @@ use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
@@ -29,6 +30,7 @@ class QuoteResource extends Resource
 {
     use HasCrmCustomFields;
     use HasLabels;
+    use HasPrimaryBulkActions;
 
     protected static ?string $model = Quote::class;
 
@@ -200,9 +202,7 @@ class QuoteResource extends Resource
                 Actions\EditAction::make(),
             ])
             ->toolbarActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
-                ]),
+                static::primaryBulkActionGroup(),
             ]);
     }
 

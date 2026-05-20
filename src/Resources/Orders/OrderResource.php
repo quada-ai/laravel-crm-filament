@@ -16,6 +16,7 @@ use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
@@ -28,6 +29,7 @@ class OrderResource extends Resource
 {
     use HasCrmCustomFields;
     use HasLabels;
+    use HasPrimaryBulkActions;
 
     protected static ?string $model = Order::class;
 
@@ -200,9 +202,7 @@ class OrderResource extends Resource
                 Actions\EditAction::make(),
             ])
             ->toolbarActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
-                ]),
+                static::primaryBulkActionGroup(),
             ]);
     }
 

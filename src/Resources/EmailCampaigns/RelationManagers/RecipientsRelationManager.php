@@ -2,10 +2,15 @@
 
 namespace VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\RelationManagers;
 
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
+use VentureDrake\LaravelCrm\Jobs\SendEmailCampaignRecipient;
 
 class RecipientsRelationManager extends RelationManager
 {
@@ -56,6 +61,36 @@ class RecipientsRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([])
-            ->recordActions([]);
+            ->recordActions([])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    BulkAction::make('resendToFailed')
+                        ->label(__('laravel-crm-filament::labels.actions.resend_to_failed'))
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('warning')
+                        ->requiresConfirmation()
+                        ->action(function (Collection $records): void {
+                            $count = 0;
+                            foreach ($records as $recipient) {
+                                if (! in_array($recipient->status, ['failed', 'bounced'], true)) {
+                                    continue;
+                                }
+                                $recipient->update([
+                                    'status' => 'pending',
+                                    'error' => null,
+                                ]);
+                                SendEmailCampaignRecipient::dispatch($recipient);
+                                $count++;
+                            }
+
+                            Notification::make()
+                                ->title(__('laravel-crm-filament::labels.actions.resend_to_failed'))
+                                ->body($count . ' recipient job(s) re-queued')
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                ]),
+            ]);
     }
 }

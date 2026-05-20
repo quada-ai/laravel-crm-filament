@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
@@ -29,6 +30,7 @@ class InvoiceResource extends Resource
 {
     use HasCrmCustomFields;
     use HasLabels;
+    use HasPrimaryBulkActions;
 
     protected static ?string $model = Invoice::class;
 
@@ -183,6 +185,7 @@ class InvoiceResource extends Resource
                 Actions\EditAction::make(),
             ])
             ->toolbarActions([
+                static::primaryBulkActionGroup(),
                 Actions\BulkActionGroup::make([
                     ExportsCsv::action(
                         columns: [
@@ -196,7 +199,6 @@ class InvoiceResource extends Resource
                         ],
                         filename: 'invoices',
                     ),
-                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

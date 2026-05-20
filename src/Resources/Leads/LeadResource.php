@@ -18,6 +18,7 @@ use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
@@ -35,6 +36,7 @@ class LeadResource extends Resource
 {
     use HasCrmCustomFields;
     use HasLabels;
+    use HasPrimaryBulkActions;
 
     protected static ?string $model = Lead::class;
 
@@ -166,6 +168,7 @@ class LeadResource extends Resource
                 Actions\EditAction::make(),
             ])
             ->toolbarActions([
+                static::primaryBulkActionGroup(withPipelineStage: true),
                 Actions\BulkActionGroup::make([
                     ExportsCsv::action(
                         columns: [
@@ -179,7 +182,6 @@ class LeadResource extends Resource
                         ],
                         filename: 'leads',
                     ),
-                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
