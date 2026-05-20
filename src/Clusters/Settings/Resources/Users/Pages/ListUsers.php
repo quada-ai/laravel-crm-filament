@@ -5,6 +5,8 @@ namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\Page
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\UserResource;
+use VentureDrake\LaravelCrmFilament\Concerns\Imports\UserImporter;
+use VentureDrake\LaravelCrmFilament\Concerns\ImportsCsv;
 
 class ListUsers extends ListRecords
 {
@@ -12,6 +14,9 @@ class ListUsers extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [Actions\CreateAction::make()];
+        return [
+            ImportsCsv::action(UserImporter::class),
+            Actions\CreateAction::make(),
+        ];
     }
 }

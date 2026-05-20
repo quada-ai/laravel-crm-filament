@@ -4,6 +4,8 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Products\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use VentureDrake\LaravelCrmFilament\Concerns\Imports\ProductImporter;
+use VentureDrake\LaravelCrmFilament\Concerns\ImportsCsv;
 use VentureDrake\LaravelCrmFilament\Resources\Products\ProductResource;
 
 class ListProducts extends ListRecords
@@ -12,6 +14,9 @@ class ListProducts extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [Actions\CreateAction::make()];
+        return [
+            ImportsCsv::action(ProductImporter::class),
+            Actions\CreateAction::make(),
+        ];
     }
 }
