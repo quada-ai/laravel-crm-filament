@@ -59,6 +59,9 @@ return [
         'clicksend_default_from' => 'Default sender ID',
         'clicksend_api_key' => 'ClickSend API key',
         'clicksend_username' => 'ClickSend username',
+        'current_password' => 'Current password',
+        'new_password' => 'New password',
+        'confirm_password' => 'Confirm password',
     ],
 
     // Contact / address fields
@@ -189,6 +192,9 @@ return [
         'formatting' => 'Formatting',
         'prefixes' => 'Prefixes',
         'tax' => 'Tax',
+        'update_password' => 'Update password',
+        'two_factor_authentication' => 'Two-factor authentication',
+        'browser_sessions' => 'Browser sessions',
     ],
 
     // Actions
@@ -228,6 +234,10 @@ return [
         'disconnect_xero' => 'Disconnect Xero',
         'manage_clicksend' => 'Manage ClickSend',
         'send_test_sms' => 'Send test SMS',
+        'update_password' => 'Update password',
+        'enable_two_factor' => 'Enable two-factor',
+        'disable_two_factor' => 'Disable two-factor',
+        'log_out_other_sessions' => 'Log out other browser sessions',
     ],
 
     // CSV import

@@ -58,6 +58,9 @@ return [
         'clicksend_default_from' => 'Remitente predeterminado',
         'clicksend_api_key' => 'Clave de API de ClickSend',
         'clicksend_username' => 'Usuario de ClickSend',
+        'current_password' => 'Contraseña actual',
+        'new_password' => 'Contraseña nueva',
+        'confirm_password' => 'Confirmar contraseña',
     ],
 
     'contact' => [
@@ -181,6 +184,9 @@ return [
         'formatting' => 'Formato',
         'prefixes' => 'Prefijos',
         'tax' => 'Impuesto',
+        'update_password' => 'Actualizar contraseña',
+        'two_factor_authentication' => 'Autenticación de dos factores',
+        'browser_sessions' => 'Sesiones del navegador',
     ],
 
     'actions' => [
@@ -219,6 +225,10 @@ return [
         'disconnect_xero' => 'Desconectar Xero',
         'manage_clicksend' => 'Gestionar ClickSend',
         'send_test_sms' => 'Enviar SMS de prueba',
+        'update_password' => 'Actualizar contraseña',
+        'enable_two_factor' => 'Activar dos factores',
+        'disable_two_factor' => 'Desactivar dos factores',
+        'log_out_other_sessions' => 'Cerrar otras sesiones',
     ],
 
     'import' => [

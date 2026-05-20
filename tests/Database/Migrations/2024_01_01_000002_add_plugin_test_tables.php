@@ -338,6 +338,25 @@ return new class extends Migration
                 $table->index(['user_id', 'user_type']);
             });
         }
+
+        if (Schema::hasTable('users') && ! Schema::hasColumn('users', 'two_factor_secret')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->text('two_factor_secret')->nullable();
+                $table->text('two_factor_recovery_codes')->nullable();
+                $table->timestamp('two_factor_confirmed_at')->nullable();
+            });
+        }
+
+        if (! Schema::hasTable('sessions')) {
+            Schema::create('sessions', function (Blueprint $table) {
+                $table->string('id')->primary();
+                $table->unsignedBigInteger('user_id')->nullable()->index();
+                $table->string('ip_address', 45)->nullable();
+                $table->text('user_agent')->nullable();
+                $table->longText('payload');
+                $table->integer('last_activity')->index();
+            });
+        }
     }
 
     public function down(): void
