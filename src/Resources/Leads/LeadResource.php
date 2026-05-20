@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\LeadSource;
+use VentureDrake\LaravelCrm\Models\LeadStatus;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
@@ -94,6 +95,12 @@ class LeadResource extends Resource
             Forms\Components\Select::make('lead_source_id')
                 ->label('Lead source')
                 ->options(fn () => LeadSource::query()->pluck('name', 'id'))
+                ->searchable()
+                ->preload(),
+
+            Forms\Components\Select::make('lead_status_id')
+                ->label('Lead status')
+                ->options(fn () => LeadStatus::query()->orderBy('order')->pluck('name', 'id'))
                 ->searchable()
                 ->preload(),
 

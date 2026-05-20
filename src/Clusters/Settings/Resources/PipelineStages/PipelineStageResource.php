@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
+use VentureDrake\LaravelCrm\Models\PipelineStageProbability;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\Pages\CreatePipelineStage;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\Pages\EditPipelineStage;
@@ -54,6 +55,11 @@ class PipelineStageResource extends Resource
                     ->default(0),
                 Forms\Components\ColorPicker::make('color'),
             ]),
+            Forms\Components\Select::make('pipeline_stage_probability_id')
+                ->label('Probability')
+                ->options(fn () => PipelineStageProbability::query()->orderBy('percent')->get()->mapWithKeys(fn ($p) => [$p->id => $p->name . ' (' . $p->percent . '%)']))
+                ->searchable()
+                ->preload(),
             Forms\Components\Textarea::make('description')
                 ->rows(2)
                 ->columnSpanFull(),

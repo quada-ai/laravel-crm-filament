@@ -7,14 +7,17 @@ use Filament\Panel;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\AddressTypes\AddressTypeResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\ChatWidgetResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ContactTypes\ContactTypeResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\CrmTeamResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\EmailTemplates\EmailTemplateResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FieldGroups\FieldGroupResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Fields\FieldResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Industries\IndustryResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Labels\LabelResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadSources\LeadSourceResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadStatuses\LeadStatusResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\OrganizationTypes\OrganizationTypeResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Pipelines\PipelineResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStageProbabilities\PipelineStageProbabilityResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\PipelineStageResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ProductAttributes\ProductAttributeResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ProductCategories\ProductCategoryResource;
@@ -256,6 +259,9 @@ class LaravelCrmPlugin implements Plugin
         // Settings cluster lookups — always available; admins manage CRM-wide config.
         $resources[] = PipelineResource::class;
         $resources[] = PipelineStageResource::class;
+        $resources[] = PipelineStageProbabilityResource::class;
+        $resources[] = LeadStatusResource::class;
+        $resources[] = CrmTeamResource::class;
         $resources[] = LabelResource::class;
         $resources[] = LeadSourceResource::class;
         $resources[] = TaxRateResource::class;
