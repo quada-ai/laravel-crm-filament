@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\CreateTask;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\EditTask;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\ListTasks;
+use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\TaskKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\ViewTask;
 
 class TaskResource extends Resource
@@ -152,6 +153,7 @@ class TaskResource extends Resource
     {
         return [
             'index' => ListTasks::route('/'),
+            'kanban' => TaskKanban::route('/kanban'),
             'create' => CreateTask::route('/create'),
             'view' => ViewTask::route('/{record}'),
             'edit' => EditTask::route('/{record}/edit'),

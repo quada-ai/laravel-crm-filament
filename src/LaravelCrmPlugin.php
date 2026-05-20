@@ -26,6 +26,7 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\SmsTemplates\Sms
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\TaxRates\TaxRateResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Timezones\TimezoneResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\UserResource;
+use VentureDrake\LaravelCrmFilament\Pages\CalendarPage;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\ActivityResource;
 use VentureDrake\LaravelCrmFilament\Resources\Calls\CallResource;
 use VentureDrake\LaravelCrmFilament\Resources\Chat\ChatConversationResource;
@@ -304,6 +305,10 @@ class LaravelCrmPlugin implements Plugin
         $panel->colors(['primary' => $panelColor]);
 
         $panel->resources($resources);
+
+        $panel->pages([
+            CalendarPage::class,
+        ]);
 
         $panel->discoverClusters(
             in: __DIR__ . '/Clusters',
