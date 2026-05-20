@@ -416,6 +416,94 @@ return new class extends Migration
             });
         }
 
+        if (! Schema::hasTable($prefix . 'xero_contacts')) {
+            Schema::create($prefix . 'xero_contacts', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('team_id')->index()->nullable();
+                $table->unsignedBigInteger('organization_id')->nullable();
+                $table->string('contact_id')->nullable();
+                $table->string('name')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'xero_items')) {
+            Schema::create($prefix . 'xero_items', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('team_id')->index()->nullable();
+                $table->unsignedBigInteger('product_id')->nullable();
+                $table->string('item_id')->nullable();
+                $table->string('code')->nullable();
+                $table->string('name')->nullable();
+                $table->boolean('inventory_tracked')->default(false);
+                $table->boolean('is_purchased')->default(false);
+                $table->integer('purchase_price')->nullable();
+                $table->string('purchase_description')->nullable();
+                $table->boolean('is_sold')->default(false);
+                $table->integer('sell_price')->nullable();
+                $table->string('sell_description')->nullable();
+                $table->integer('quantity_on_hand')->nullable();
+                $table->dateTime('updated_date')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'xero_invoices')) {
+            Schema::create($prefix . 'xero_invoices', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('team_id')->index()->nullable();
+                $table->unsignedBigInteger('invoice_id')->nullable();
+                $table->string('xero_type')->nullable();
+                $table->string('xero_id')->nullable();
+                $table->string('number')->nullable();
+                $table->string('reference')->nullable();
+                $table->integer('subtotal')->nullable();
+                $table->integer('total_tax')->nullable();
+                $table->integer('total')->nullable();
+                $table->string('status')->nullable();
+                $table->integer('amount_due')->nullable();
+                $table->integer('amount_paid')->nullable();
+                $table->integer('amount_credited')->nullable();
+                $table->date('issue_date')->nullable();
+                $table->date('due_date')->nullable();
+                $table->string('line_amount_types')->nullable();
+                $table->string('currency_code', 3)->nullable();
+                $table->dateTime('fully_paid_at')->nullable();
+                $table->dateTime('xero_updated_at')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'xero_purchase_orders')) {
+            Schema::create($prefix . 'xero_purchase_orders', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('team_id')->index()->nullable();
+                $table->unsignedBigInteger('purchase_order_id')->nullable();
+                $table->string('xero_type')->nullable();
+                $table->string('xero_id')->nullable();
+                $table->string('number')->nullable();
+                $table->string('reference')->nullable();
+                $table->integer('subtotal')->nullable();
+                $table->integer('total_tax')->nullable();
+                $table->integer('total')->nullable();
+                $table->string('status')->nullable();
+                $table->date('issue_date')->nullable();
+                $table->date('delivery_date')->nullable();
+                $table->string('line_amount_types')->nullable();
+                $table->string('currency_code', 3)->nullable();
+                $table->dateTime('xero_updated_at')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
         if (Schema::hasTable('users') && ! Schema::hasColumn('users', 'two_factor_secret')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->text('two_factor_secret')->nullable();

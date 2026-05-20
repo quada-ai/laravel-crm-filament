@@ -49,6 +49,10 @@ use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResour
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
+use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroContactResource;
+use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroInvoiceResource;
+use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroItemResource;
+use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroPurchaseOrderResource;
 use VentureDrake\LaravelCrmFilament\Widgets\CampaignPerformanceChart;
 use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsValueStat;
@@ -295,6 +299,13 @@ class LaravelCrmPlugin implements Plugin
         }
         if ($this->isModuleEnabled('chat')) {
             $resources[] = ChatWidgetResource::class;
+        }
+
+        if ($this->isModuleEnabled('xero')) {
+            $resources[] = XeroContactResource::class;
+            $resources[] = XeroItemResource::class;
+            $resources[] = XeroInvoiceResource::class;
+            $resources[] = XeroPurchaseOrderResource::class;
         }
 
         // Branding overrides: prefer plugin setters, fall back to laravel-crm settings.
