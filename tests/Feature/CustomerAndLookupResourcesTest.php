@@ -93,7 +93,8 @@ it('registers the Customer module gate and resource on the panel', function () {
 
 it('omits CustomerResource from the panel when the customers module is disabled', function () {
     $plugin = LaravelCrmPlugin::make()->modules(['customers' => false]);
-    $panel = Filament::getPanel('admin', false) ?? Panel::make()->id('admin')->default();
+    // Force a fresh panel so the TestPanelProvider's customer registration doesn't bleed in.
+    $panel = Panel::make()->id('admin-customers-off');
     $plugin->register($panel);
 
     expect($panel->getResources())->not->toContain(CustomerResource::class);

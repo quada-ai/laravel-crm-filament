@@ -1,0 +1,328 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Supplements TestSchema with the tables the Filament plugin's
+ * resources reference but the core CRM's TestSchema doesn't ship —
+ * primarily auxiliary lookup, communication, and pipeline-conversion
+ * tables exposed in v0.x of the plugin (Lunches, Meetings, Calls,
+ * Deliveries, Purchase Orders, Files, lookup tables, etc.).
+ */
+return new class extends Migration
+{
+    public function up(): void
+    {
+        $prefix = config('laravel-crm.db_table_prefix');
+
+        if (! Schema::hasTable($prefix . 'industries')) {
+            Schema::create($prefix . 'industries', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'contact_types')) {
+            Schema::create($prefix . 'contact_types', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('name');
+                $table->string('description')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'address_types')) {
+            Schema::create($prefix . 'address_types', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('name');
+                $table->string('description')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'organization_types')) {
+            Schema::create($prefix . 'organization_types', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('name');
+                $table->string('description')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'timezones')) {
+            Schema::create($prefix . 'timezones', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('name');
+                $table->string('offset')->nullable();
+                $table->string('diff_from_gtm')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'product_attributes')) {
+            Schema::create($prefix . 'product_attributes', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'pipeline_stage_probabilities')) {
+            Schema::create($prefix . 'pipeline_stage_probabilities', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->string('name');
+                $table->integer('percent')->default(0);
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable('teams')) {
+            Schema::create('teams', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('user_id');
+                $table->string('name');
+                $table->boolean('personal_team')->default(false);
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'team_user')) {
+            Schema::create($prefix . 'team_user', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('team_id');
+                $table->unsignedBigInteger('user_id');
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'calls')) {
+            Schema::create($prefix . 'calls', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->morphs('callable');
+                $table->text('description')->nullable();
+                $table->dateTime('start_at')->nullable();
+                $table->dateTime('finish_at')->nullable();
+                $table->dateTime('called_at')->nullable();
+                $table->boolean('completed')->default(false);
+                $table->unsignedBigInteger('user_assigned_id')->nullable();
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'meetings')) {
+            Schema::create($prefix . 'meetings', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->morphs('meetingable');
+                $table->string('name')->nullable();
+                $table->text('description')->nullable();
+                $table->dateTime('start_at')->nullable();
+                $table->dateTime('finish_at')->nullable();
+                $table->string('location')->nullable();
+                $table->boolean('completed')->default(false);
+                $table->unsignedBigInteger('user_assigned_id')->nullable();
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'lunches')) {
+            Schema::create($prefix . 'lunches', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->morphs('lunchable');
+                $table->string('name')->nullable();
+                $table->text('description')->nullable();
+                $table->dateTime('start_at')->nullable();
+                $table->dateTime('finish_at')->nullable();
+                $table->string('location')->nullable();
+                $table->boolean('completed')->default(false);
+                $table->unsignedBigInteger('user_assigned_id')->nullable();
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'deliveries')) {
+            Schema::create($prefix . 'deliveries', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->string('delivery_id')->nullable();
+                $table->string('prefix')->nullable();
+                $table->unsignedInteger('number')->nullable();
+                $table->unsignedBigInteger('order_id')->nullable();
+                $table->unsignedBigInteger('person_id')->nullable();
+                $table->unsignedBigInteger('organization_id')->nullable();
+                $table->unsignedBigInteger('customer_id')->nullable();
+                $table->date('delivery_date')->nullable();
+                $table->date('delivered_at')->nullable();
+                $table->text('notes')->nullable();
+                $table->string('status')->nullable();
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('user_assigned_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'delivery_products')) {
+            Schema::create($prefix . 'delivery_products', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('delivery_id');
+                $table->unsignedBigInteger('product_id');
+                $table->unsignedBigInteger('order_product_id')->nullable();
+                $table->integer('quantity')->default(1);
+                $table->text('comments')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'purchase_orders')) {
+            Schema::create($prefix . 'purchase_orders', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->string('purchase_order_id')->nullable();
+                $table->string('prefix')->nullable();
+                $table->unsignedInteger('number')->nullable();
+                $table->unsignedBigInteger('order_id')->nullable();
+                $table->unsignedBigInteger('person_id')->nullable();
+                $table->unsignedBigInteger('organization_id')->nullable();
+                $table->unsignedBigInteger('customer_id')->nullable();
+                $table->date('issue_date')->nullable();
+                $table->date('expected_at')->nullable();
+                $table->date('delivered_at')->nullable();
+                $table->unsignedBigInteger('currency')->nullable();
+                $table->unsignedBigInteger('sub_total')->nullable();
+                $table->unsignedBigInteger('discount')->nullable();
+                $table->unsignedBigInteger('tax')->nullable();
+                $table->unsignedBigInteger('total')->nullable();
+                $table->string('reference')->nullable();
+                $table->text('notes')->nullable();
+                $table->text('terms')->nullable();
+                $table->string('delivery_type')->nullable();
+                $table->string('status')->nullable();
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('user_owner_id')->nullable();
+                $table->unsignedBigInteger('user_assigned_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'purchase_order_lines')) {
+            Schema::create($prefix . 'purchase_order_lines', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('purchase_order_id');
+                $table->unsignedBigInteger('product_id');
+                $table->integer('quantity')->default(1);
+                $table->decimal('unit_price', 15, 2)->nullable();
+                $table->decimal('amount', 15, 2)->nullable();
+                $table->string('currency')->nullable();
+                $table->decimal('discount', 15, 2)->nullable();
+                $table->decimal('tax', 15, 2)->nullable();
+                $table->decimal('price', 15, 2)->nullable();
+                $table->decimal('cost_per_unit', 15, 2)->nullable();
+                $table->unsignedBigInteger('tax_rate_id')->nullable();
+                $table->text('comments')->nullable();
+                $table->timestamps();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'files')) {
+            Schema::create($prefix . 'files', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->morphs('fileable');
+                $table->string('filename');
+                $table->string('original_filename')->nullable();
+                $table->string('disk')->nullable();
+                $table->string('mime')->nullable();
+                $table->string('file_type')->nullable();
+                $table->string('format')->nullable();
+                $table->unsignedBigInteger('filesize')->nullable();
+                $table->string('title')->nullable();
+                $table->text('description')->nullable();
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'chat_widgets')) {
+            Schema::create($prefix . 'chat_widgets', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->string('public_key')->unique();
+                $table->string('name');
+                $table->text('allowed_origins')->nullable();
+                $table->string('primary_color')->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'chat_conversations')) {
+            Schema::create($prefix . 'chat_conversations', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('chat_widget_id')->nullable();
+                $table->unsignedBigInteger('lead_id')->nullable();
+                $table->string('visitor_name')->nullable();
+                $table->string('visitor_email')->nullable();
+                $table->string('status')->nullable();
+                $table->unsignedBigInteger('user_assigned_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'chat_messages')) {
+            Schema::create($prefix . 'chat_messages', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('chat_conversation_id');
+                $table->text('message');
+                $table->string('sender_type')->nullable();
+                $table->unsignedBigInteger('sender_id')->nullable();
+                $table->dateTime('visitor_read_at')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+    }
+
+    public function down(): void
+    {
+        // No-op: the test database is dropped between test runs.
+    }
+};
