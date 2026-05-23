@@ -195,6 +195,24 @@ class LeadResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                Tables\Filters\SelectFilter::make('user_owner_id')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->multiple()
+                    ->relationship('ownerUser', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('labels')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->multiple()
+                    ->relationship('labels', 'name')
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('lead_source_id')
+                    ->label(__('laravel-crm-filament::labels.sales.lead_source'))
+                    ->multiple()
+                    ->options(fn () => LeadSource::query()->orderBy('name')->pluck('name', 'id')),
+
                 Tables\Filters\SelectFilter::make('pipeline_stage_id')
                     ->label(__('laravel-crm-filament::labels.sales.stage'))
                     ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id')),
