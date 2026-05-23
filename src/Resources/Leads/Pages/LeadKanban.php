@@ -3,6 +3,7 @@
 namespace VentureDrake\LaravelCrmFilament\Resources\Leads\Pages;
 
 use BackedEnum;
+use Filament\Actions;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Collection;
 use VentureDrake\LaravelCrm\Models\Lead;
@@ -21,6 +22,15 @@ class LeadKanban extends Page
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-view-columns';
 
     public ?int $ownerFilter = null;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            ...LeadResource::listKanbanToggleActions('kanban'),
+            Actions\CreateAction::make()
+                ->url(LeadResource::getUrl('create')),
+        ];
+    }
 
     public function getOwners(): Collection
     {

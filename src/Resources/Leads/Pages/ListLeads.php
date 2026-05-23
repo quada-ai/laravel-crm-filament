@@ -16,11 +16,7 @@ class ListLeads extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('kanban')
-                ->label(__('laravel-crm-filament::labels.actions.kanban'))
-                ->icon('heroicon-o-view-columns')
-                ->color('gray')
-                ->url(LeadResource::getUrl('kanban')),
+            ...LeadResource::listKanbanToggleActions('list'),
             Actions\CreateAction::make(),
         ];
     }
