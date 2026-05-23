@@ -12,6 +12,10 @@
 return [
     'fields' => [
         'id' => 'ID',
+        'code' => 'Código',
+        'number' => 'Número',
+        'reference' => 'Referencia',
+        'currency' => 'Moneda',
         'name' => 'Nombre',
         'description' => 'Descripción',
         'type' => 'Tipo',
@@ -55,6 +59,8 @@ return [
         'timestamp' => 'Marca de tiempo',
         'message' => 'Mensaje',
         'phone_number' => 'Número de teléfono',
+        'contact' => 'Contacto',
+        'organization' => 'Organización',
         'clicksend_default_from' => 'Remitente predeterminado',
         'clicksend_api_key' => 'Clave de API de ClickSend',
         'clicksend_username' => 'Usuario de ClickSend',
@@ -95,6 +101,7 @@ return [
 
     'money' => [
         'subtotal' => 'Subtotal',
+        'total' => 'Total',
         'tax_rate' => 'Tasa de impuesto',
         'default_tax_rate' => 'Tasa de impuesto por defecto',
         'unit_price' => 'Precio unitario',
@@ -223,6 +230,7 @@ return [
         'convert_to_invoice' => 'Convertir en factura',
         'convert_to_delivery' => 'Convertir en entrega',
         'convert_to_purchase_order' => 'Convertir en orden de compra',
+        'convert_to_deal' => 'Convertir en negocio',
         'open_invoice' => 'Abrir factura',
         'open_order' => 'Abrir pedido',
         'open_delivery' => 'Abrir entrega',
@@ -230,6 +238,8 @@ return [
         'open_parent' => 'Abrir padre',
         'mark_complete' => 'Marcar como completado',
         'kanban' => 'Kanban',
+        'list_view' => 'Vista de lista',
+        'kanban_view' => 'Vista kanban',
         'download' => 'Descargar',
         'download_pdf' => 'Descargar PDF',
         'download_sample_csv' => 'Descargar CSV de ejemplo',

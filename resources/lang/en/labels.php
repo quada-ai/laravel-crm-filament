@@ -13,6 +13,10 @@ return [
     // Generic field / column labels
     'fields' => [
         'id' => 'ID',
+        'code' => 'Code',
+        'number' => 'Number',
+        'reference' => 'Reference',
+        'currency' => 'Currency',
         'name' => 'Name',
         'description' => 'Description',
         'type' => 'Type',
@@ -56,6 +60,8 @@ return [
         'timestamp' => 'Timestamp',
         'message' => 'Message',
         'phone_number' => 'Phone number',
+        'contact' => 'Contact',
+        'organization' => 'Organization',
         'clicksend_default_from' => 'Default sender ID',
         'clicksend_api_key' => 'ClickSend API key',
         'clicksend_username' => 'ClickSend username',
@@ -99,6 +105,7 @@ return [
     // Money / orders / lines
     'money' => [
         'subtotal' => 'Subtotal',
+        'total' => 'Total',
         'tax_rate' => 'Tax rate',
         'default_tax_rate' => 'Default tax rate',
         'unit_price' => 'Unit price',
@@ -268,6 +275,7 @@ return [
         'convert_to_invoice' => 'Convert to invoice',
         'convert_to_delivery' => 'Convert to delivery',
         'convert_to_purchase_order' => 'Convert to purchase order',
+        'convert_to_deal' => 'Convert to deal',
         'open_invoice' => 'Open invoice',
         'open_order' => 'Open order',
         'open_delivery' => 'Open delivery',
@@ -275,6 +283,8 @@ return [
         'open_parent' => 'Open parent',
         'mark_complete' => 'Mark complete',
         'kanban' => 'Kanban',
+        'list_view' => 'List view',
+        'kanban_view' => 'Kanban view',
         'download' => 'Download',
         'download_pdf' => 'Download PDF',
         'download_sample_csv' => 'Download sample CSV',
