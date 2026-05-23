@@ -5,6 +5,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Leads;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
@@ -247,5 +248,43 @@ class LeadResource extends Resource
         );
 
         $lead->forceFill(['converted_at' => now()])->save();
+    }
+
+    public static function convertAction(): Actions\Action
+    {
+        return Actions\Action::make('convertToDeal')
+            ->label(__('laravel-crm-filament::labels.actions.convert_to_deal'))
+            ->icon('heroicon-o-arrow-right-circle')
+            ->color('success')
+            ->requiresConfirmation()
+            ->visible(fn (?Lead $record): bool => $record !== null && $record->converted_at === null)
+            ->action(function (Lead $record): void {
+                static::doConvertToDeal($record);
+
+                Notification::make()
+                    ->title(__('laravel-crm-filament::labels.actions.convert_to_deal'))
+                    ->success()
+                    ->send();
+            });
+    }
+
+    /**
+     * @return array<int, Actions\Action>
+     */
+    public static function listKanbanToggleActions(string $current): array
+    {
+        return [
+            Actions\Action::make('view_list')
+                ->label(__('laravel-crm-filament::labels.actions.list_view'))
+                ->icon('heroicon-o-list-bullet')
+                ->color($current === 'list' ? 'primary' : 'gray')
+                ->url(static::getUrl('index')),
+
+            Actions\Action::make('view_kanban')
+                ->label(__('laravel-crm-filament::labels.actions.kanban_view'))
+                ->icon('heroicon-o-view-columns')
+                ->color($current === 'kanban' ? 'primary' : 'gray')
+                ->url(static::getUrl('kanban')),
+        ];
     }
 }
