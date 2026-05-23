@@ -5,11 +5,9 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Leads\Pages;
 use BackedEnum;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Fluent;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
-use VentureDrake\LaravelCrm\Services\DealService;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
 class LeadKanban extends Page
@@ -58,25 +56,11 @@ class LeadKanban extends Page
     public function convertToDeal(string $externalId): void
     {
         $lead = Lead::query()->where('external_id', $externalId)->first();
-        if (! $lead || $lead->converted_at) {
+        if (! $lead) {
             return;
         }
 
-        $payload = new Fluent([
-            'title' => $lead->title,
-            'description' => $lead->description,
-            'amount' => ($lead->amount ?? 0) / 100,
-            'currency' => $lead->currency,
-            'user_owner_id' => $lead->user_owner_id,
-        ]);
-
-        app(DealService::class)->create(
-            $payload,
-            $lead->person,
-            $lead->organization,
-        );
-
-        $lead->forceFill(['converted_at' => now()])->save();
+        LeadResource::doConvertToDeal($lead);
     }
 
     public function moveLead(string $externalId, ?int $stageId): void

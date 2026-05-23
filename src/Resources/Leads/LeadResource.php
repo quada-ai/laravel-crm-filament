@@ -11,10 +11,12 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Fluent;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\LeadSource;
 use VentureDrake\LaravelCrm\Models\LeadStatus;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
+use VentureDrake\LaravelCrm\Services\DealService;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
@@ -222,5 +224,28 @@ class LeadResource extends Resource
             'view' => ViewLead::route('/{record}'),
             'edit' => EditLead::route('/{record}/edit'),
         ];
+    }
+
+    public static function doConvertToDeal(Lead $lead): void
+    {
+        if ($lead->converted_at) {
+            return;
+        }
+
+        $payload = new Fluent([
+            'title' => $lead->title,
+            'description' => $lead->description,
+            'amount' => ($lead->amount ?? 0) / 100,
+            'currency' => $lead->currency,
+            'user_owner_id' => $lead->user_owner_id,
+        ]);
+
+        app(DealService::class)->create(
+            $payload,
+            $lead->person,
+            $lead->organization,
+        );
+
+        $lead->forceFill(['converted_at' => now()])->save();
     }
 }
