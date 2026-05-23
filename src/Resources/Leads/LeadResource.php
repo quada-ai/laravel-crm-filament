@@ -11,6 +11,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Fluent;
 use VentureDrake\LaravelCrm\Models\Lead;
@@ -138,25 +139,57 @@ class LeadResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('title')
-                    ->searchable()
                     ->sortable()
-                    ->limit(50),
+                    ->limit(50)
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query
+                            ->where('title', 'like', "%{$search}%")
+                            ->orWhereHas('person', function (Builder $q) use ($search): void {
+                                $q->where('first_name', 'like', "%{$search}%")
+                                    ->orWhere('last_name', 'like', "%{$search}%")
+                                    ->orWhere('middle_name', 'like', "%{$search}%")
+                                    ->orWhere('maiden_name', 'like', "%{$search}%");
+                            })
+                            ->orWhereHas('organization', function (Builder $q) use ($search): void {
+                                $q->where('name', 'like', "%{$search}%");
+                            });
+                    }),
+
+                Tables\Columns\TextColumn::make('labels.name')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->badge()
+                    ->limitList(3),
 
                 Tables\Columns\TextColumn::make('amount')
+                    ->label(__('laravel-crm-filament::labels.money.amount'))
                     ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('person.name')
+                    ->label(__('laravel-crm-filament::labels.fields.contact'))
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('organization.name')
+                    ->label(__('laravel-crm-filament::labels.fields.organization'))
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('pipelineStage.name')
                     ->label(__('laravel-crm-filament::labels.sales.stage'))
                     ->badge()
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('leadSource.name')
+                    ->label(__('laravel-crm-filament::labels.sales.lead_source'))
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('ownerUser.name')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label(__('laravel-crm-filament::labels.fields.created_at'))
+                    ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

@@ -104,6 +104,7 @@ return [
 
     // Money / orders / lines
     'money' => [
+        'amount' => 'Amount',
         'subtotal' => 'Subtotal',
         'total' => 'Total',
         'tax_rate' => 'Tax rate',
@@ -318,6 +319,7 @@ return [
 
     // Misc / settings
     'misc' => [
+        'unallocated' => 'Unallocated',
         'crm' => 'CRM',
         'crm_access' => 'CRM access',
         'has_crm_access' => 'Has CRM access',

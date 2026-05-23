@@ -100,6 +100,7 @@ return [
     ],
 
     'money' => [
+        'amount' => 'Montant',
         'subtotal' => 'Sous-total',
         'total' => 'Total',
         'tax_rate' => 'Taux de taxe',
@@ -271,6 +272,7 @@ return [
     ],
 
     'misc' => [
+        'unallocated' => 'Non attribué',
         'crm' => 'CRM',
         'crm_access' => 'Accès au CRM',
         'has_crm_access' => 'A accès au CRM',
