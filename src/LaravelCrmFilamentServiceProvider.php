@@ -48,7 +48,17 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
-        //
+        // Spatie's PackageServiceProvider derives the translation namespace
+        // from Package::shortName(), which strips the `laravel-` prefix —
+        // so $package->hasTranslations() registers the namespace as
+        // `crm-filament::*`. Every call site in the plugin uses the
+        // fully-qualified `laravel-crm-filament::*` namespace, so register
+        // it explicitly here. Without this, every __() call falls back to
+        // returning the raw key string verbatim in the host app.
+        $this->loadTranslationsFrom(
+            __DIR__ . '/../resources/lang',
+            'laravel-crm-filament',
+        );
     }
 
     public function packageBooted(): void

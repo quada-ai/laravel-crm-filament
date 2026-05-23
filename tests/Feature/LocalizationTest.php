@@ -80,3 +80,21 @@ it('routes Section::make headings through the labels namespace', function () {
 
     expect($source)->toContain("__('laravel-crm-filament::labels.sections.custom_fields')");
 });
+
+it('actually resolves __(laravel-crm-filament::labels.*) at runtime instead of returning the raw key', function () {
+    // Regression guard: Spatie's Package::shortName() strips `laravel-`,
+    // so $package->hasTranslations() alone registers the namespace as
+    // `crm-filament::*` — every fully-qualified `laravel-crm-filament::*`
+    // lookup would then fall back to the literal key string and render
+    // as e.g. "laravel-crm-filament::labels.fields.id" in the host UI.
+    expect(__('laravel-crm-filament::labels.fields.id'))
+        ->toBe('ID');
+    expect(__('laravel-crm-filament::labels.actions.list_view'))
+        ->toBe('List view');
+    expect(__('laravel-crm-filament::labels.actions.kanban_view'))
+        ->toBe('Kanban view');
+    expect(__('laravel-crm-filament::labels.fields.labels'))
+        ->toBe('Labels');
+    expect(__('laravel-crm-filament::labels.money.amount'))
+        ->toBe('Amount');
+});
