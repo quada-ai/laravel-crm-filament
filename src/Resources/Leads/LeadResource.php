@@ -220,6 +220,9 @@ class LeadResource extends Resource
             ->recordActions([
                 Actions\ViewAction::make(),
                 Actions\EditAction::make(),
+                static::convertAction(),
+                Actions\DeleteAction::make()
+                    ->requiresConfirmation(),
             ])
             ->toolbarActions([
                 static::primaryBulkActionGroup(withPipelineStage: true),
