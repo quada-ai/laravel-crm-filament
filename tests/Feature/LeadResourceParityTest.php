@@ -45,6 +45,7 @@ it('table registers every new column from the parity plan', function () {
     $names = array_values(array_map(fn ($c) => $c->getName(), $columns));
 
     expect($names)->toBe([
+        'created_at',
         'lead_id',
         'title',
         'labels.name',
@@ -54,7 +55,6 @@ it('table registers every new column from the parity plan', function () {
         'pipelineStage.name',
         'leadSource.name',
         'ownerUser.name',
-        'created_at',
     ]);
 });
 

@@ -45,6 +45,7 @@ it('renders the 10 plan columns in the prescribed order', function () {
     $names = array_keys(leadTableColumns());
 
     expect($names)->toBe([
+        'created_at',
         'lead_id',
         'title',
         'labels.name',
@@ -54,15 +55,14 @@ it('renders the 10 plan columns in the prescribed order', function () {
         'pipelineStage.name',
         'leadSource.name',
         'ownerUser.name',
-        'created_at',
     ]);
 });
 
-it('uses created_at relative time and hides it by default', function () {
+it('uses created_at relative time as the lead column, visible by default', function () {
     $cols = leadTableColumns();
     $created = $cols['created_at'];
 
-    expect($created->isToggledHiddenByDefault())->toBeTrue();
+    expect($created->isToggledHiddenByDefault())->toBeFalse();
     expect($created->isToggleable())->toBeTrue();
 
     $source = file_get_contents(__DIR__ . '/../../src/Resources/Leads/LeadResource.php');
@@ -148,7 +148,7 @@ it('uses translation keys for all column labels rather than literal strings', fu
     $source = file_get_contents(__DIR__ . '/../../src/Resources/Leads/LeadResource.php');
 
     foreach ([
-        'labels.fields.id',
+        'labels.fields.number',
         'labels.fields.labels',
         'labels.money.amount',
         'labels.fields.contact',

@@ -133,8 +133,14 @@ class LeadResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created_at'))
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('lead_id')
-                    ->label(__('laravel-crm-filament::labels.fields.id'))
+                    ->label(__('laravel-crm-filament::labels.fields.number'))
                     ->searchable()
                     ->sortable(),
 
@@ -186,12 +192,6 @@ class LeadResource extends Resource
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'))
                     ->toggleable(),
-
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('laravel-crm-filament::labels.fields.created_at'))
-                    ->since()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
