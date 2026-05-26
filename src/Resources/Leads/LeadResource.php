@@ -74,6 +74,21 @@ class LeadResource extends Resource
         return 'external_id';
     }
 
+    /**
+     * Filament v5 only consults getRecordRouteKeyName() for binding RESOLUTION,
+     * not for URL generation. Without this override Laravel's route() helper
+     * substitutes the `record` param via $model->getRouteKey() (the integer PK)
+     * and the resolver then 404s when it looks up `external_id = '<pk>'`.
+     */
+    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?Model $tenant = null, bool $shouldGuessMissingParameters = false, ?string $configuration = null): string
+    {
+        if (($key = static::getRecordRouteKeyName()) && isset($parameters['record']) && $parameters['record'] instanceof Model) {
+            $parameters['record'] = $parameters['record']->getAttribute($key);
+        }
+
+        return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters, $configuration);
+    }
+
     public static function form(Schema $schema): Schema
     {
         $components = [
@@ -134,7 +149,7 @@ class LeadResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('laravel-crm-filament::labels.fields.created_at'))
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
                     ->since()
                     ->sortable()
                     ->toggleable(),
@@ -167,7 +182,7 @@ class LeadResource extends Resource
                     ->limitList(3),
 
                 Tables\Columns\TextColumn::make('amount')
-                    ->label(__('laravel-crm-filament::labels.money.amount'))
+                    ->label(__('laravel-crm-filament::labels.money.value'))
                     ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
                     ->sortable(),
 
@@ -218,10 +233,14 @@ class LeadResource extends Resource
                     ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id')),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
-                static::convertAction(),
+                static::convertAction()
+                    ->button(),
+                Actions\ViewAction::make()
+                    ->button(),
+                Actions\EditAction::make()
+                    ->button(),
                 Actions\DeleteAction::make()
+                    ->button()
                     ->requiresConfirmation(),
             ])
             ->toolbarActions([

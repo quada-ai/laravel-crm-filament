@@ -36,20 +36,20 @@ function leadRecordActions(): array
     return array_values($instance->getTable()->getRecordActions());
 }
 
-it('registers four row actions in the order View, Edit, Convert, Delete', function () {
+it('registers four row actions in the order Convert, View, Edit, Delete', function () {
     $actions = leadRecordActions();
 
     expect($actions)->toHaveCount(4);
-    expect($actions[0])->toBeInstanceOf(ViewAction::class);
-    expect($actions[1])->toBeInstanceOf(EditAction::class);
-    expect($actions[2]->getName())->toBe('convertToDeal');
+    expect($actions[0]->getName())->toBe('convertToDeal');
+    expect($actions[1])->toBeInstanceOf(ViewAction::class);
+    expect($actions[2])->toBeInstanceOf(EditAction::class);
     expect($actions[3])->toBeInstanceOf(DeleteAction::class);
 });
 
 it('hides the Convert row action when the lead is already converted', function () {
     $actions = leadRecordActions();
     /** @var Action $convert */
-    $convert = $actions[2];
+    $convert = $actions[0];
 
     $open = Lead::create([
         'external_id' => (string) Str::uuid(),
@@ -89,7 +89,7 @@ it('runs the Convert row action to create a Deal and stamp converted_at', functi
 
     $actions = leadRecordActions();
     /** @var Action $convert */
-    $convert = $actions[2];
+    $convert = $actions[0];
     $convert->record($lead);
     $convert->call();
 

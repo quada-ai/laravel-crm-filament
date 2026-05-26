@@ -150,13 +150,13 @@ it('uses translation keys for all column labels rather than literal strings', fu
     foreach ([
         'labels.fields.number',
         'labels.fields.labels',
-        'labels.money.amount',
+        'labels.money.value',
         'labels.fields.contact',
         'labels.fields.organization',
         'labels.sales.stage',
         'labels.sales.lead_source',
         'labels.fields.owner',
-        'labels.fields.created_at',
+        'labels.fields.created',
         'labels.misc.unallocated',
     ] as $key) {
         expect($source)->toContain($key);

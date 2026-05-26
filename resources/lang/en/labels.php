@@ -25,6 +25,7 @@ return [
         'owner' => 'Owner',
         'created_by' => 'Created by',
         'created_at' => 'Created at',
+        'created' => 'Created',
         'updated_at' => 'Updated at',
         'assigned_to' => 'Assigned to',
         'assigned' => 'Assigned',
@@ -105,6 +106,7 @@ return [
     // Money / orders / lines
     'money' => [
         'amount' => 'Amount',
+        'value' => 'Value',
         'subtotal' => 'Subtotal',
         'total' => 'Total',
         'tax_rate' => 'Tax rate',

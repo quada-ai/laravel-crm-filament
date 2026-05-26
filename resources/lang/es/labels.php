@@ -24,6 +24,7 @@ return [
         'owner' => 'Propietario',
         'created_by' => 'Creado por',
         'created_at' => 'Creado el',
+        'created' => 'Creado',
         'updated_at' => 'Actualizado el',
         'assigned_to' => 'Asignado a',
         'assigned' => 'Asignado',
@@ -101,6 +102,7 @@ return [
 
     'money' => [
         'amount' => 'Importe',
+        'value' => 'Valor',
         'subtotal' => 'Subtotal',
         'total' => 'Total',
         'tax_rate' => 'Tasa de impuesto',

@@ -158,9 +158,9 @@ it('row actions cover view, edit, convertToDeal, and delete', function () {
     $actions = array_values(livewire(ListLeads::class)->instance()->getTable()->getRecordActions());
 
     expect($actions)->toHaveCount(4);
-    expect($actions[0])->toBeInstanceOf(ViewAction::class);
-    expect($actions[1])->toBeInstanceOf(EditAction::class);
-    expect($actions[2]->getName())->toBe('convertToDeal');
+    expect($actions[0]->getName())->toBe('convertToDeal');
+    expect($actions[1])->toBeInstanceOf(ViewAction::class);
+    expect($actions[2])->toBeInstanceOf(EditAction::class);
     expect($actions[3])->toBeInstanceOf(DeleteAction::class);
 
     // Convert surface also reaches both view + edit page headers (gap area 5).
