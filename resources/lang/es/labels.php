@@ -102,6 +102,10 @@ return [
         'probability_percent' => 'Probabilidad %',
         'expected_close' => 'Cierre estimado',
         'delivery_type' => 'Tipo de entrega',
+        'deliver' => 'Entregar',
+        'collect' => 'Recoger',
+        'delivery_address' => 'Dirección de entrega',
+        'delivery_instructions' => 'Instrucciones de entrega',
         'shipping_address' => 'Dirección de envío',
     ],
 
@@ -211,6 +215,7 @@ return [
         'contact' => 'Contacto',
         'organization' => 'Organización',
         'products' => 'Productos',
+        'delivery_details' => 'Detalles de entrega',
         'custom_fields' => 'Campos personalizados',
         'performance' => 'Rendimiento',
         'column_mapping' => 'Mapeo de columnas',

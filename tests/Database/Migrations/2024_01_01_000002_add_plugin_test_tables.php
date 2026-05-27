@@ -459,6 +459,24 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasTable($prefix . 'purchase_orders') && ! Schema::hasColumn($prefix . 'purchase_orders', 'subtotal')) {
+            Schema::table($prefix . 'purchase_orders', function (Blueprint $table) {
+                $table->bigInteger('subtotal')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'purchase_orders') && ! Schema::hasColumn($prefix . 'purchase_orders', 'delivery_instructions')) {
+            Schema::table($prefix . 'purchase_orders', function (Blueprint $table) {
+                $table->text('delivery_instructions')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'purchase_orders') && ! Schema::hasColumn($prefix . 'purchase_orders', 'adjustments')) {
+            Schema::table($prefix . 'purchase_orders', function (Blueprint $table) {
+                $table->bigInteger('adjustments')->nullable();
+            });
+        }
+
         if (Schema::hasTable($prefix . 'purchase_orders') && ! Schema::hasColumn($prefix . 'purchase_orders', 'sent')) {
             Schema::table($prefix . 'purchase_orders', function (Blueprint $table) {
                 $table->boolean('sent')->default(false);

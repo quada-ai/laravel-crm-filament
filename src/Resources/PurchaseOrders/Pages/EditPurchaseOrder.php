@@ -5,6 +5,8 @@ namespace VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use VentureDrake\LaravelCrm\Models\Organization;
+use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrm\Services\PurchaseOrderService;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResource;
@@ -30,12 +32,16 @@ class EditPurchaseOrder extends EditRecord
         /** @var PurchaseOrder $po */
         $po = $this->record;
 
-        foreach (['sub_total', 'tax', 'total'] as $field) {
+        foreach (['sub_total', 'discount', 'tax', 'total'] as $field) {
             $value = $data[$field] ?? null;
             if ($value !== null) {
                 $data[$field] = $value / 100;
             }
         }
+
+        $data['adjustment'] = isset($data['adjustments']) && $data['adjustments'] !== null
+            ? $data['adjustments'] / 100
+            : null;
 
         $data['products'] = $po->purchaseOrderLines
             ->map(fn ($line) => [
@@ -54,17 +60,40 @@ class EditPurchaseOrder extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        // PurchaseOrderService::update reads $request->purchaseOrderLines for round-trip,
-        // while create reads $request->products. Provide both so the same form key works.
+        // PurchaseOrderService::update reads $request->purchaseOrderLines, create reads $request->products.
         $data['purchaseOrderLines'] = $data['products'] ?? [];
 
         /** @var PurchaseOrder $record */
+        $person = isset($data['person_id'])
+            ? Person::find($data['person_id'])
+            : $record->person;
+        $organization = isset($data['organization_id'])
+            ? Organization::find($data['organization_id'])
+            : $record->organization;
+
         app(PurchaseOrderService::class)->update(
             FormPayload::wrap($data),
             $record,
-            $record->person,
-            $record->organization,
+            $person,
+            $organization,
         );
+
+        // Persist discount + adjustments (the service doesn't write them).
+        $extras = [];
+        if (array_key_exists('discount', $data)) {
+            $extras['discount'] = $data['discount'] !== null
+                ? (int) round(((float) $data['discount']) * 100)
+                : null;
+        }
+        if (array_key_exists('adjustment', $data)) {
+            $extras['adjustments'] = $data['adjustment'] !== null
+                ? (int) round(((float) $data['adjustment']) * 100)
+                : null;
+        }
+        if ($extras !== []) {
+            $record->forceFill($extras)->save();
+        }
+
         PurchaseOrderResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();

@@ -102,6 +102,10 @@ return [
         'probability_percent' => 'Probabilité %',
         'expected_close' => 'Clôture prévue',
         'delivery_type' => 'Type de livraison',
+        'deliver' => 'Livrer',
+        'collect' => 'Retrait',
+        'delivery_address' => 'Adresse de livraison',
+        'delivery_instructions' => 'Instructions de livraison',
         'shipping_address' => 'Adresse de livraison',
     ],
 
@@ -211,6 +215,7 @@ return [
         'contact' => 'Contact',
         'organization' => 'Organisation',
         'products' => 'Produits',
+        'delivery_details' => 'Détails de livraison',
         'custom_fields' => 'Champs personnalisés',
         'performance' => 'Performance',
         'column_mapping' => 'Correspondance des colonnes',

@@ -105,6 +105,10 @@ return [
         'probability_percent' => 'Probability %',
         'expected_close' => 'Expected close',
         'delivery_type' => 'Delivery type',
+        'deliver' => 'Deliver',
+        'collect' => 'Collect',
+        'delivery_address' => 'Delivery address',
+        'delivery_instructions' => 'Delivery instructions',
         'shipping_address' => 'Shipping address',
     ],
 
@@ -255,6 +259,7 @@ return [
         'contact' => 'Contact',
         'organization' => 'Organization',
         'products' => 'Products',
+        'delivery_details' => 'Delivery details',
         'custom_fields' => 'Custom fields',
         'performance' => 'Performance',
         'column_mapping' => 'Column mapping',
