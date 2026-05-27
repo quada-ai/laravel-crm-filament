@@ -5,11 +5,13 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Quotes;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Models\Product;
@@ -158,45 +160,105 @@ class QuoteResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('quote_id')
-                    ->label(__('laravel-crm-filament::labels.fields.id'))
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
                     ->sortable()
-                    ->searchable(),
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('quote_id')
+                    ->label(__('laravel-crm-filament::labels.fields.number'))
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('reference')
+                    ->label(__('laravel-crm-filament::labels.fields.reference'))
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('title')
                     ->sortable()
                     ->limit(50)
-                    ->searchable(),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query
+                            ->where('title', 'like', "%{$search}%")
+                            ->orWhereHas('person', function (Builder $q) use ($search): void {
+                                $q->where('first_name', 'like', "%{$search}%")
+                                    ->orWhere('last_name', 'like', "%{$search}%")
+                                    ->orWhere('middle_name', 'like', "%{$search}%")
+                                    ->orWhere('maiden_name', 'like', "%{$search}%");
+                            })
+                            ->orWhereHas('organization', function (Builder $q) use ($search): void {
+                                $q->where('name', 'like', "%{$search}%");
+                            });
+                    }),
+
+                Tables\Columns\TextColumn::make('labels.name')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->badge()
+                    ->limitList(3),
+
+                Tables\Columns\TextColumn::make('person.name')
+                    ->label(__('laravel-crm-filament::labels.fields.contact'))
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('organization.name')
+                    ->label(__('laravel-crm-filament::labels.fields.organization'))
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('total')
+                    ->label(__('laravel-crm-filament::labels.money.total'))
                     ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('pipelineStage.name')
-                    ->label(__('laravel-crm-filament::labels.sales.stage'))
-                    ->badge()
-                    ->toggleable(),
-
-                Tables\Columns\TextColumn::make('expire_at')
-                    ->label(__('laravel-crm-filament::labels.money.expires'))
+                Tables\Columns\TextColumn::make('issue_at')
+                    ->label(__('laravel-crm-filament::labels.money.issue_date'))
                     ->date()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('expire_at')
+                    ->label(__('laravel-crm-filament::labels.money.expiry_date'))
+                    ->date()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('pipelineStage.name')
+                    ->label(__('laravel-crm-filament::labels.sales.stage'))
+                    ->badge()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('ownerUser.name')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'))
+                    ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                Tables\Filters\SelectFilter::make('user_owner_id')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->multiple()
+                    ->relationship('ownerUser', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('labels')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->multiple()
+                    ->relationship('labels', 'name')
+                    ->preload(),
+
                 Tables\Filters\SelectFilter::make('pipeline_stage_id')
                     ->label(__('laravel-crm-filament::labels.sales.stage'))
                     ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id')),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()
+                    ->button(),
+                Actions\EditAction::make()
+                    ->button(),
+                Actions\DeleteAction::make()
+                    ->button()
+                    ->requiresConfirmation(),
             ])
             ->toolbarActions([
                 static::primaryBulkActionGroup(),
@@ -235,5 +297,107 @@ class QuoteResource extends Resource
             'view' => ViewQuote::route('/{record}'),
             'edit' => EditQuote::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return array<int, Actions\Action>
+     */
+    public static function listKanbanToggleActions(string $current): array
+    {
+        return [
+            Actions\Action::make('view_list')
+                ->label(__('laravel-crm-filament::labels.actions.list_view'))
+                ->icon('heroicon-o-list-bullet')
+                ->color($current === 'list' ? 'primary' : 'gray')
+                ->url(static::getUrl('index')),
+
+            Actions\Action::make('view_kanban')
+                ->label(__('laravel-crm-filament::labels.actions.kanban_view'))
+                ->icon('heroicon-o-view-columns')
+                ->color($current === 'kanban' ? 'primary' : 'gray')
+                ->url(static::getUrl('kanban')),
+        ];
+    }
+
+    public static function acceptAction(): Actions\Action
+    {
+        return Actions\Action::make('accept')
+            ->label(__('laravel-crm-filament::labels.actions.accept'))
+            ->icon('heroicon-o-check-circle')
+            ->color('success')
+            ->requiresConfirmation()
+            ->visible(fn (?Quote $record): bool => $record !== null && $record->accepted_at === null)
+            ->action(function (Quote $record): void {
+                $record->forceFill([
+                    'accepted_at' => now(),
+                    'rejected_at' => null,
+                ])->save();
+
+                Notification::make()
+                    ->title(__('laravel-crm-filament::labels.actions.accept'))
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public static function rejectAction(): Actions\Action
+    {
+        return Actions\Action::make('reject')
+            ->label(__('laravel-crm-filament::labels.actions.reject'))
+            ->icon('heroicon-o-x-circle')
+            ->color('danger')
+            ->requiresConfirmation()
+            ->visible(fn (?Quote $record): bool => $record !== null && $record->rejected_at === null)
+            ->action(function (Quote $record): void {
+                $record->forceFill([
+                    'rejected_at' => now(),
+                    'accepted_at' => null,
+                ])->save();
+
+                Notification::make()
+                    ->title(__('laravel-crm-filament::labels.actions.reject'))
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public static function unacceptAction(): Actions\Action
+    {
+        return Actions\Action::make('unaccept')
+            ->label(__('laravel-crm-filament::labels.actions.unaccept'))
+            ->icon('heroicon-o-arrow-uturn-left')
+            ->color('gray')
+            ->requiresConfirmation()
+            ->visible(fn (?Quote $record): bool => $record !== null && $record->accepted_at !== null)
+            ->action(function (Quote $record): void {
+                $record->forceFill([
+                    'accepted_at' => null,
+                ])->save();
+
+                Notification::make()
+                    ->title(__('laravel-crm-filament::labels.actions.unaccept'))
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public static function unrejectAction(): Actions\Action
+    {
+        return Actions\Action::make('unreject')
+            ->label(__('laravel-crm-filament::labels.actions.unreject'))
+            ->icon('heroicon-o-arrow-uturn-left')
+            ->color('gray')
+            ->requiresConfirmation()
+            ->visible(fn (?Quote $record): bool => $record !== null && $record->rejected_at !== null)
+            ->action(function (Quote $record): void {
+                $record->forceFill([
+                    'rejected_at' => null,
+                ])->save();
+
+                Notification::make()
+                    ->title(__('laravel-crm-filament::labels.actions.unreject'))
+                    ->success()
+                    ->send();
+            });
     }
 }

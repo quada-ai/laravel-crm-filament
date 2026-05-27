@@ -3,6 +3,7 @@
 namespace VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages;
 
 use BackedEnum;
+use Filament\Actions;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Collection;
 use VentureDrake\LaravelCrm\Models\Pipeline;
@@ -21,6 +22,15 @@ class QuoteKanban extends Page
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-view-columns';
 
     public ?int $ownerFilter = null;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            ...QuoteResource::listKanbanToggleActions('kanban'),
+            Actions\CreateAction::make()
+                ->url(QuoteResource::getUrl('create')),
+        ];
+    }
 
     public function getOwners(): Collection
     {

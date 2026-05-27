@@ -1,5 +1,6 @@
 <?php
 
+use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrmFilament\Concerns\DownloadsPdf;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\Concerns\HasInvoiceSendAction;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\ViewInvoice;
@@ -99,4 +100,29 @@ it('registers the expected header actions on each View page', function () {
             expect($names)->toContain($name);
         }
     }
+});
+
+it('gates ConvertToOrder visibility on quote.accepted_at being non-null', function () {
+    $page = new ViewQuote;
+    // ReflectionClass to access the protected trait method without booting a Livewire page.
+    $reflection = new ReflectionMethod(ViewQuote::class, 'quoteConvertToOrderAction');
+    $reflection->setAccessible(true);
+    $action = $reflection->invoke($page);
+
+    $open = new Quote;
+    $open->title = 'Pending';
+    $open->accepted_at = null;
+    // setRelation so $record->orders()->count() does not need a DB connection.
+    $open->setRelation('orders', collect());
+
+    $accepted = new Quote;
+    $accepted->title = 'Accepted';
+    $accepted->accepted_at = now();
+    $accepted->setRelation('orders', collect());
+
+    $action->record($open);
+    expect($action->isVisible())->toBeFalse();
+
+    $action->record($accepted);
+    expect($action->isVisible())->toBeTrue();
 });

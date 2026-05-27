@@ -12,14 +12,20 @@ use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
 class EditQuote extends EditRecord
 {
+    use Concerns\HasQuoteAcceptAction;
     use Concerns\HasQuotePortalAction;
+    use Concerns\HasQuoteRejectAction;
     use Concerns\HasQuoteSendAction;
+    use Concerns\HasQuoteUnacceptAction;
 
     protected static string $resource = QuoteResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            $this->quoteAcceptAction(),
+            $this->quoteRejectAction(),
+            ...$this->quoteUnacceptActions(),
             Actions\ViewAction::make(),
             $this->quoteSendAction(),
             $this->quotePortalAction(),

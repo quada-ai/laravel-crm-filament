@@ -8,15 +8,21 @@ use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 
 class ViewQuote extends ViewRecord
 {
+    use Concerns\HasQuoteAcceptAction;
     use Concerns\HasQuoteConvertToOrderAction;
     use Concerns\HasQuotePortalAction;
+    use Concerns\HasQuoteRejectAction;
     use Concerns\HasQuoteSendAction;
+    use Concerns\HasQuoteUnacceptAction;
 
     protected static string $resource = QuoteResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            $this->quoteAcceptAction(),
+            $this->quoteRejectAction(),
+            ...$this->quoteUnacceptActions(),
             $this->quotePortalAction(),
             Actions\EditAction::make(),
             $this->quoteSendAction(),

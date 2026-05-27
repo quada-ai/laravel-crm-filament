@@ -27,7 +27,7 @@ trait HasQuoteConvertToOrderAction
             ->requiresConfirmation()
             ->modalHeading('Convert quote to order')
             ->modalDescription('Creates a new order with the same line items and marks this quote as accepted.')
-            ->visible(fn (Quote $record): bool => $record->orders()->count() === 0)
+            ->visible(fn (Quote $record): bool => $record->accepted_at !== null && $record->orders()->count() === 0)
             ->action(function (Quote $record, OrderService $orderService): void {
                 $payload = $this->buildOrderPayloadFromQuote($record);
 
