@@ -25,6 +25,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\CreateOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\EditOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\ListOrders;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\ViewOrder;
+use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 
 class OrderResource extends Resource
 {
@@ -171,32 +172,88 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('order_id')
-                    ->label(__('laravel-crm-filament::labels.fields.id'))
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
                     ->sortable()
-                    ->searchable(),
+                    ->toggleable(),
 
-                Tables\Columns\TextColumn::make('total')
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                Tables\Columns\TextColumn::make('order_id')
+                    ->label(__('laravel-crm-filament::labels.fields.number'))
+                    ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('reference')
+                    ->label(__('laravel-crm-filament::labels.fields.reference'))
                     ->searchable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                Tables\Columns\TextColumn::make('quote.quote_id')
+                    ->label(__('laravel-crm-filament::labels.money.quote'))
+                    ->url(fn ($record) => $record->quote
+                        ? QuoteResource::getUrl('view', ['record' => $record->quote])
+                        : null)
+                    ->color('primary')
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('labels.name')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->badge()
+                    ->limitList(3),
+
+                Tables\Columns\TextColumn::make('person.name')
+                    ->label(__('laravel-crm-filament::labels.fields.contact'))
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('organization.name')
+                    ->label(__('laravel-crm-filament::labels.fields.organization'))
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('subtotal')
+                    ->label(__('laravel-crm-filament::labels.money.subtotal'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('tax')
+                    ->label(__('laravel-crm-filament::labels.money.tax'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('total')
+                    ->label(__('laravel-crm-filament::labels.money.total'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('ownerUser.name')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'))
+                    ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
+            ->filters([
+                Tables\Filters\SelectFilter::make('user_owner_id')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->multiple()
+                    ->relationship('ownerUser', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('labels')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->multiple()
+                    ->relationship('labels', 'name')
+                    ->preload(),
+            ])
             ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()
+                    ->button(),
+                Actions\EditAction::make()
+                    ->button(),
+                Actions\DeleteAction::make()
+                    ->button()
+                    ->requiresConfirmation(),
             ])
             ->toolbarActions([
                 static::primaryBulkActionGroup(),

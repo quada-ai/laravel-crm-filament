@@ -108,6 +108,8 @@ return [
         'amount' => 'Amount',
         'value' => 'Value',
         'subtotal' => 'Subtotal',
+        'quote' => 'Quote',
+        'tax' => 'Tax',
         'total' => 'Total',
         'tax_rate' => 'Tax rate',
         'default_tax_rate' => 'Default tax rate',

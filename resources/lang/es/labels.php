@@ -104,6 +104,8 @@ return [
         'amount' => 'Importe',
         'value' => 'Valor',
         'subtotal' => 'Subtotal',
+        'quote' => 'Cotización',
+        'tax' => 'Impuesto',
         'total' => 'Total',
         'tax_rate' => 'Tasa de impuesto',
         'default_tax_rate' => 'Tasa de impuesto por defecto',

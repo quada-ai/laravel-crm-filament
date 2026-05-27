@@ -104,6 +104,8 @@ return [
         'amount' => 'Montant',
         'value' => 'Valeur',
         'subtotal' => 'Sous-total',
+        'quote' => 'Devis',
+        'tax' => 'Taxe',
         'total' => 'Total',
         'tax_rate' => 'Taux de taxe',
         'default_tax_rate' => 'Taux de taxe par défaut',
