@@ -247,6 +247,7 @@ return [
 
     // Sections (top-level grouping headings on forms / infolists)
     'sections' => [
+        'details' => 'Details',
         'custom_fields' => 'Custom fields',
         'performance' => 'Performance',
         'column_mapping' => 'Column mapping',

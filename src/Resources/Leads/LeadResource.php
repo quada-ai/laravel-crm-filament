@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -20,6 +21,7 @@ use VentureDrake\LaravelCrm\Models\LeadStatus;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Services\DealService;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
+use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
@@ -73,21 +75,23 @@ class LeadResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        $components = [
+        $details = [
             Forms\Components\TextInput::make('title')
                 ->required()
                 ->maxLength(255),
 
             Forms\Components\Textarea::make('description')
-                ->rows(3)
+                ->rows(5)
                 ->columnSpanFull(),
 
             Grid::make(2)->schema([
                 Forms\Components\TextInput::make('amount')
+                    ->label(__('laravel-crm-filament::labels.money.value'))
                     ->numeric()
                     ->prefix(fn ($get) => $get('currency') ?: config('laravel-crm.default_currency', 'USD')),
 
                 Forms\Components\TextInput::make('currency')
+                    ->label(__('laravel-crm-filament::labels.fields.currency'))
                     ->maxLength(3)
                     ->default(config('laravel-crm.default_currency', 'USD')),
             ]),
@@ -120,10 +124,23 @@ class LeadResource extends Resource
         ];
 
         if ($customFields = static::crmCustomFieldsSection(Lead::class)) {
-            $components[] = $customFields;
+            $details[] = $customFields;
         }
 
-        return $schema->components($components);
+        return $schema->components([
+            Grid::make(['default' => 1, 'lg' => 2])->schema([
+                Grid::make(1)
+                    ->columnSpan(['lg' => 1])
+                    ->schema([
+                        LeadDealContactSection::contactColumn(),
+                        LeadDealContactSection::organizationColumn(),
+                    ]),
+
+                Section::make(__('laravel-crm-filament::labels.sections.details'))
+                    ->columnSpan(['lg' => 1])
+                    ->schema($details),
+            ]),
+        ]);
     }
 
     public static function table(Table $table): Table

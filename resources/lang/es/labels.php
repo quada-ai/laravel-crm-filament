@@ -203,6 +203,7 @@ return [
     ],
 
     'sections' => [
+        'details' => 'Detalles',
         'custom_fields' => 'Campos personalizados',
         'performance' => 'Rendimiento',
         'column_mapping' => 'Mapeo de columnas',

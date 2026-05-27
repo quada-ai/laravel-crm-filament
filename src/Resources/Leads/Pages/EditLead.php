@@ -6,6 +6,8 @@ use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Lead;
+use VentureDrake\LaravelCrm\Models\Organization;
+use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Services\LeadService;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 use VentureDrake\LaravelCrmFilament\Support\FormPayload;
@@ -31,7 +33,10 @@ class EditLead extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Lead $record */
-        app(LeadService::class)->update(FormPayload::wrap($data), $record);
+        $person = isset($data['person_id']) ? Person::find($data['person_id']) : null;
+        $organization = isset($data['organization_id']) ? Organization::find($data['organization_id']) : null;
+
+        app(LeadService::class)->update(FormPayload::wrap($data), $record, $person, $organization);
         LeadResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();

@@ -203,6 +203,7 @@ return [
     ],
 
     'sections' => [
+        'details' => 'Détails',
         'custom_fields' => 'Champs personnalisés',
         'performance' => 'Performance',
         'column_mapping' => 'Correspondance des colonnes',

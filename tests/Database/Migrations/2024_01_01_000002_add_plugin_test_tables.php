@@ -375,6 +375,42 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasTable($prefix . 'organizations') && ! Schema::hasColumn($prefix . 'organizations', 'total_money_raised')) {
+            Schema::table($prefix . 'organizations', function (Blueprint $table) {
+                $table->bigInteger('total_money_raised')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'organizations') && ! Schema::hasColumn($prefix . 'organizations', 'number_of_employees')) {
+            Schema::table($prefix . 'organizations', function (Blueprint $table) {
+                $table->unsignedInteger('number_of_employees')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'organizations') && ! Schema::hasColumn($prefix . 'organizations', 'organization_type_id')) {
+            Schema::table($prefix . 'organizations', function (Blueprint $table) {
+                $table->unsignedBigInteger('organization_type_id')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'organizations') && ! Schema::hasColumn($prefix . 'organizations', 'timezone_id')) {
+            Schema::table($prefix . 'organizations', function (Blueprint $table) {
+                $table->unsignedBigInteger('timezone_id')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'organizations') && ! Schema::hasColumn($prefix . 'organizations', 'linkedin')) {
+            Schema::table($prefix . 'organizations', function (Blueprint $table) {
+                $table->string('linkedin')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'addresses') && ! Schema::hasColumn($prefix . 'addresses', 'suburb')) {
+            Schema::table($prefix . 'addresses', function (Blueprint $table) {
+                $table->string('suburb')->nullable();
+            });
+        }
+
         if (Schema::hasTable($prefix . 'deliveries') && ! Schema::hasColumn($prefix . 'deliveries', 'delivery_expected')) {
             Schema::table($prefix . 'deliveries', function (Blueprint $table) {
                 $table->date('delivery_expected')->nullable();
