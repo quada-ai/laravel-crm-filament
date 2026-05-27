@@ -248,6 +248,9 @@ return [
     // Sections (top-level grouping headings on forms / infolists)
     'sections' => [
         'details' => 'Details',
+        'contact' => 'Contact',
+        'organization' => 'Organization',
+        'products' => 'Products',
         'custom_fields' => 'Custom fields',
         'performance' => 'Performance',
         'column_mapping' => 'Column mapping',
@@ -268,6 +271,7 @@ return [
     // Actions
     'actions' => [
         'save' => 'Save',
+        'add_line_item' => 'Add line item',
         'save_sync_settings' => 'Save sync settings',
         'cancel' => 'Cancel',
         'close' => 'Close',

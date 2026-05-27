@@ -6,6 +6,8 @@ use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Deal;
+use VentureDrake\LaravelCrm\Models\Organization;
+use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Services\DealService;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\Concerns\HasDealMarkLostAction;
@@ -34,13 +36,33 @@ class EditDeal extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        return DealResource::loadCrmCustomFieldsInto($data, $this->record);
+        $data = DealResource::loadCrmCustomFieldsInto($data, $this->record);
+
+        // Reshape dealProducts into the repeater's expected row shape
+        // (display dollar values; the model setter multiplies by 100 on save).
+        $data['products'] = $this->record->dealProducts()->get()->map(fn ($line) => [
+            'deal_product_id' => $line->id,
+            'id' => $line->product_id,
+            'price' => ($line->price ?? 0) / 100,
+            'quantity' => $line->quantity,
+            'amount' => ($line->amount ?? 0) / 100,
+        ])->toArray();
+
+        // Surface money fields as dollars
+        if (! is_null($data['amount'] ?? null)) {
+            $data['amount'] = $data['amount'] / 100;
+        }
+
+        return $data;
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Deal $record */
-        app(DealService::class)->update(FormPayload::wrap($data), $record);
+        $person = isset($data['person_id']) ? Person::find($data['person_id']) : null;
+        $organization = isset($data['organization_id']) ? Organization::find($data['organization_id']) : null;
+
+        app(DealService::class)->update(FormPayload::wrap($data), $record, $person, $organization);
         DealResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();

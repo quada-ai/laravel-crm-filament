@@ -204,6 +204,9 @@ return [
 
     'sections' => [
         'details' => 'Detalles',
+        'contact' => 'Contacto',
+        'organization' => 'Organización',
+        'products' => 'Productos',
         'custom_fields' => 'Campos personalizados',
         'performance' => 'Rendimiento',
         'column_mapping' => 'Mapeo de columnas',
@@ -223,6 +226,7 @@ return [
 
     'actions' => [
         'save' => 'Guardar',
+        'add_line_item' => 'Añadir línea',
         'save_sync_settings' => 'Guardar ajustes de sincronización',
         'cancel' => 'Cancelar',
         'close' => 'Cerrar',

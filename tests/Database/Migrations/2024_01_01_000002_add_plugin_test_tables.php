@@ -375,6 +375,24 @@ return new class extends Migration
             });
         }
 
+        if (! Schema::hasTable($prefix . 'deal_products')) {
+            Schema::create($prefix . 'deal_products', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('deal_id');
+                $table->unsignedBigInteger('product_id')->nullable();
+                $table->unsignedBigInteger('product_variation_id')->nullable();
+                $table->bigInteger('price')->nullable();
+                $table->integer('quantity')->nullable();
+                $table->decimal('tax_rate')->nullable();
+                $table->bigInteger('tax_amount')->nullable();
+                $table->bigInteger('amount')->nullable();
+                $table->string('currency', 3)->default('USD');
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
         if (Schema::hasTable($prefix . 'organizations') && ! Schema::hasColumn($prefix . 'organizations', 'total_money_raised')) {
             Schema::table($prefix . 'organizations', function (Blueprint $table) {
                 $table->bigInteger('total_money_raised')->nullable();
