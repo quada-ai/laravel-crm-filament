@@ -393,6 +393,12 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasTable($prefix . 'address_types') && ! Schema::hasColumn($prefix . 'address_types', 'deleted_at')) {
+            Schema::table($prefix . 'address_types', function (Blueprint $table) {
+                $table->softDeletes();
+            });
+        }
+
         if (Schema::hasTable($prefix . 'organizations') && ! Schema::hasColumn($prefix . 'organizations', 'total_money_raised')) {
             Schema::table($prefix . 'organizations', function (Blueprint $table) {
                 $table->bigInteger('total_money_raised')->nullable();

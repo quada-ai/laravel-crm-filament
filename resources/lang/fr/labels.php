@@ -78,6 +78,8 @@ return [
         'email_addresses' => 'Adresses e-mail',
         'email' => 'E-mail',
         'addresses' => 'Adresses',
+        'billing' => 'Facturation',
+        'shipping' => 'Livraison',
         'line1' => 'Ligne 1',
         'line2' => 'Ligne 2',
         'line3' => 'Ligne 3',

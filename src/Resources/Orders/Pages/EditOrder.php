@@ -6,7 +6,10 @@ use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Order;
+use VentureDrake\LaravelCrm\Models\Organization;
+use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Services\OrderService;
+use VentureDrake\LaravelCrmFilament\Concerns\Forms\OrderAddressTabs;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
@@ -49,34 +52,28 @@ class EditOrder extends EditRecord
             ])
             ->all();
 
-        $data['addresses'] = $order->addresses
-            ->map(fn ($address) => [
-                'id' => $address->id,
-                'address_type_id' => $address->address_type_id,
-                'name' => $address->name,
-                'line1' => $address->line1,
-                'line2' => $address->line2,
-                'line3' => $address->line3,
-                'city' => $address->city,
-                'state' => $address->state,
-                'code' => $address->code,
-                'country' => $address->country,
-                'contact' => $address->contact,
-                'phone' => $address->phone,
-            ])
-            ->all();
+        $data = array_merge($data, OrderAddressTabs::toFormData($order->addresses));
 
-        return $data;
+        return OrderResource::loadCrmCustomFieldsInto($data, $order);
     }
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Order $record */
+        $person = isset($data['person_id'])
+            ? Person::find($data['person_id'])
+            : $record->person;
+        $organization = isset($data['organization_id'])
+            ? Organization::find($data['organization_id'])
+            : $record->organization;
+
+        $data['addresses'] = OrderAddressTabs::fromFormData($data);
+
         app(OrderService::class)->update(
             FormPayload::wrap($data),
             $record,
-            $record->person,
-            $record->organization,
+            $person,
+            $organization,
             $record->client,
         );
         OrderResource::saveCrmCustomFields($data, $record);

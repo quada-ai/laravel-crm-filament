@@ -80,6 +80,8 @@ return [
         'email_addresses' => 'Email addresses',
         'email' => 'Email',
         'addresses' => 'Addresses',
+        'billing' => 'Billing',
+        'shipping' => 'Shipping',
         'line1' => 'Line 1',
         'line2' => 'Line 2',
         'line3' => 'Line 3',

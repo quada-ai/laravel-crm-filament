@@ -78,6 +78,8 @@ return [
         'email_addresses' => 'Direcciones de correo',
         'email' => 'Correo electrónico',
         'addresses' => 'Direcciones',
+        'billing' => 'Facturación',
+        'shipping' => 'Envío',
         'line1' => 'Línea 1',
         'line2' => 'Línea 2',
         'line3' => 'Línea 3',
