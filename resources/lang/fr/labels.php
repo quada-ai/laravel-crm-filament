@@ -57,6 +57,7 @@ return [
         'last_activity' => 'Dernière activité',
         'fields' => 'Champs',
         'labels' => 'Étiquettes',
+        'sent' => 'Envoyé',
         'timestamp' => 'Horodatage',
         'message' => 'Message',
         'phone_number' => 'Numéro de téléphone',
@@ -102,6 +103,9 @@ return [
 
     'money' => [
         'amount' => 'Montant',
+        'amount_paid' => 'Montant payé',
+        'amount_due' => 'Montant dû',
+        'overdue_by' => 'En retard de',
         'value' => 'Valeur',
         'subtotal' => 'Sous-total',
         'quote' => 'Devis',
@@ -270,6 +274,8 @@ return [
         'unaccept' => 'Annuler l\'acceptation',
         'unreject' => 'Annuler le rejet',
         'mark_won' => 'Marquer gagné',
+        'mark_paid' => 'Marquer comme payé',
+        'record_payment' => 'Enregistrer un paiement',
         'mark_lost' => 'Marquer perdu',
         'resend_to_failed' => 'Renvoyer aux échoués',
     ],

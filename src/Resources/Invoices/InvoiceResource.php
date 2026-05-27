@@ -5,12 +5,16 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Invoices;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
+use Ramsey\Uuid\Uuid;
 use VentureDrake\LaravelCrm\Models\Invoice;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Product;
@@ -20,12 +24,14 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\Models\InvoicePayment;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\CreateInvoice;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\EditInvoice;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\ListInvoices;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\ViewInvoice;
+use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 
 class InvoiceResource extends Resource
 {
@@ -147,39 +153,143 @@ class InvoiceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('invoice_id')
-                    ->label(__('laravel-crm-filament::labels.fields.id'))
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
                     ->sortable()
-                    ->searchable(),
+                    ->toggleable(),
 
-                Tables\Columns\TextColumn::make('total')
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                Tables\Columns\TextColumn::make('invoice_id')
+                    ->label(__('laravel-crm-filament::labels.fields.number'))
+                    ->searchable()
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('reference')
+                    ->label(__('laravel-crm-filament::labels.fields.reference'))
+                    ->searchable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('order.order_id')
+                    ->label(__('laravel-crm-filament::labels.money.order'))
+                    ->url(fn ($record) => $record->order
+                        ? OrderResource::getUrl('view', ['record' => $record->order])
+                        : null)
+                    ->color('primary')
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('person.name')
+                    ->label(__('laravel-crm-filament::labels.fields.contact'))
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('organization.name')
+                    ->label(__('laravel-crm-filament::labels.fields.organization'))
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('issue_date')
+                    ->label(__('laravel-crm-filament::labels.money.issue_date'))
                     ->date()
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('due_date')
-                    ->label(__('laravel-crm-filament::labels.money.due'))
+                    ->label(__('laravel-crm-filament::labels.money.due_date'))
                     ->date()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                Tables\Columns\TextColumn::make('total')
+                    ->label(__('laravel-crm-filament::labels.money.total'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('fully_paid_at')
+                    ->label(__('laravel-crm-filament::labels.xero.fully_paid_at'))
+                    ->date()
+                    ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('amount_paid')
+                    ->label(__('laravel-crm-filament::labels.money.amount_paid'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('amount_due')
+                    ->label(__('laravel-crm-filament::labels.money.amount_due'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('overdue_by')
+                    ->label(__('laravel-crm-filament::labels.money.overdue_by'))
+                    ->state(function (Invoice $record): ?string {
+                        if ($record->fully_paid_at !== null || $record->due_date === null) {
+                            return null;
+                        }
+                        $due = Carbon::parse($record->due_date);
+                        if (! $due->isPast()) {
+                            return null;
+                        }
+
+                        return $due->diffInDays(now()) . 'd';
+                    })
+                    ->color('danger')
+                    ->toggleable(),
+
+                Tables\Columns\IconColumn::make('sent')
+                    ->label(__('laravel-crm-filament::labels.fields.sent'))
+                    ->boolean()
+                    ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
+            ->filters([
+                Tables\Filters\SelectFilter::make('user_owner_id')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->multiple()
+                    ->relationship('ownerUser', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('labels')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->multiple()
+                    ->relationship('labels', 'name')
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('status')
+                    ->label(__('laravel-crm-filament::labels.fields.status'))
+                    ->options([
+                        'paid' => __('laravel-crm-filament::labels.money.amount_paid'),
+                        'unpaid' => __('laravel-crm-filament::labels.money.amount_due'),
+                        'overdue' => __('laravel-crm-filament::labels.money.overdue_by'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+                        if ($value === 'paid') {
+                            return $query->whereNotNull('fully_paid_at');
+                        }
+                        if ($value === 'unpaid') {
+                            return $query->whereNull('fully_paid_at');
+                        }
+                        if ($value === 'overdue') {
+                            return $query->whereNull('fully_paid_at')
+                                ->whereNotNull('due_date')
+                                ->where('due_date', '<', now()->toDateString());
+                        }
+
+                        return $query;
+                    }),
+            ])
             ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()
+                    ->button(),
+                Actions\EditAction::make()
+                    ->button()
+                    ->hidden(fn (Invoice $record): bool => (int) ($record->getAttributes()['amount_paid'] ?? 0) > 0),
+                Actions\DeleteAction::make()
+                    ->button()
+                    ->requiresConfirmation()
+                    ->hidden(fn (Invoice $record): bool => (int) ($record->getAttributes()['amount_paid'] ?? 0) > 0),
             ])
             ->toolbarActions([
                 static::primaryBulkActionGroup(),
@@ -198,6 +308,59 @@ class InvoiceResource extends Resource
                     ),
                 ]),
             ]);
+    }
+
+    public static function markPaidAction(): Actions\Action
+    {
+        return Actions\Action::make('markPaid')
+            ->label(__('laravel-crm-filament::labels.actions.mark_paid'))
+            ->icon('heroicon-o-banknotes')
+            ->color('success')
+            ->modalHeading(__('laravel-crm-filament::labels.actions.record_payment'))
+            ->schema([
+                Forms\Components\TextInput::make('amount')
+                    ->label(__('laravel-crm-filament::labels.money.amount'))
+                    ->numeric()
+                    ->required()
+                    ->minValue(0.01)
+                    ->default(fn (?Invoice $record): float => $record
+                        ? round(((int) ($record->getAttributes()['amount_due'] ?? $record->getAttributes()['total'] ?? 0)) / 100, 2)
+                        : 0.0),
+                Forms\Components\DatePicker::make('paid_at')
+                    ->label(__('laravel-crm-filament::labels.money.due_date'))
+                    ->required()
+                    ->default(now()->toDateString()),
+            ])
+            ->action(function (Invoice $record, array $data): void {
+                $amountDollars = (float) ($data['amount'] ?? 0);
+                $paidAt = $data['paid_at'] ?? now()->toDateString();
+
+                $paymentCents = (int) round($amountDollars * 100);
+                $currentPaidCents = (int) ($record->getAttributes()['amount_paid'] ?? 0);
+                $totalCents = (int) ($record->getAttributes()['total'] ?? 0);
+                $newPaidCents = $currentPaidCents + $paymentCents;
+                $newDueCents = max(0, $totalCents - $newPaidCents);
+                $fullyPaid = $totalCents > 0 && $newPaidCents >= $totalCents;
+
+                InvoicePayment::create([
+                    'external_id' => Uuid::uuid4()->toString(),
+                    'invoice_id' => $record->getKey(),
+                    'amount' => $paymentCents,
+                    'paid_at' => $paidAt,
+                    'user_created_id' => auth()->id(),
+                ]);
+
+                // The model setters multiply by 100, so divide first.
+                $record->amount_paid = $newPaidCents / 100;
+                $record->amount_due = $newDueCents / 100;
+                $record->fully_paid_at = $fullyPaid ? $paidAt : null;
+                $record->save();
+
+                Notification::make()
+                    ->title(__('laravel-crm-filament::labels.actions.mark_paid'))
+                    ->success()
+                    ->send();
+            });
     }
 
     public static function getGloballySearchableAttributes(): array

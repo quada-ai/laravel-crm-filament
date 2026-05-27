@@ -12,6 +12,7 @@ use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
 class EditInvoice extends EditRecord
 {
+    use Concerns\HasInvoiceMarkPaidAction;
     use Concerns\HasInvoicePortalAction;
     use Concerns\HasInvoiceSendAction;
 
@@ -20,8 +21,10 @@ class EditInvoice extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            $this->invoiceMarkPaidAction(),
             Actions\ViewAction::make(),
             $this->invoiceSendAction(),
+            $this->invoiceDownloadPdfAction(),
             $this->invoicePortalAction(),
             Actions\DeleteAction::make(),
         ];

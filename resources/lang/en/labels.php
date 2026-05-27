@@ -58,6 +58,7 @@ return [
         'last_activity' => 'Last activity',
         'fields' => 'Fields',
         'labels' => 'Labels',
+        'sent' => 'Sent',
         'timestamp' => 'Timestamp',
         'message' => 'Message',
         'phone_number' => 'Phone number',
@@ -106,6 +107,9 @@ return [
     // Money / orders / lines
     'money' => [
         'amount' => 'Amount',
+        'amount_paid' => 'Amount paid',
+        'amount_due' => 'Amount due',
+        'overdue_by' => 'Overdue by',
         'value' => 'Value',
         'subtotal' => 'Subtotal',
         'quote' => 'Quote',
@@ -315,6 +319,8 @@ return [
         'unaccept' => 'Unaccept',
         'unreject' => 'Unreject',
         'mark_won' => 'Mark won',
+        'mark_paid' => 'Mark paid',
+        'record_payment' => 'Record payment',
         'mark_lost' => 'Mark lost',
         'resend_to_failed' => 'Resend to failed',
     ],

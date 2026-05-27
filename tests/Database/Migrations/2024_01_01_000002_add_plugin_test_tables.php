@@ -514,6 +514,20 @@ return new class extends Migration
             });
         }
 
+        if (! Schema::hasTable($prefix . 'invoice_payments')) {
+            Schema::create($prefix . 'invoice_payments', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->unsignedBigInteger('invoice_id')->index();
+                $table->integer('amount')->nullable();
+                $table->dateTime('paid_at')->nullable();
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
         if (! Schema::hasTable('sessions')) {
             Schema::create('sessions', function (Blueprint $table) {
                 $table->string('id')->primary();

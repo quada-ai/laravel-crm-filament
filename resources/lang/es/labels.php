@@ -57,6 +57,7 @@ return [
         'last_activity' => 'Última actividad',
         'fields' => 'Campos',
         'labels' => 'Etiquetas',
+        'sent' => 'Enviado',
         'timestamp' => 'Marca de tiempo',
         'message' => 'Mensaje',
         'phone_number' => 'Número de teléfono',
@@ -102,6 +103,9 @@ return [
 
     'money' => [
         'amount' => 'Importe',
+        'amount_paid' => 'Monto pagado',
+        'amount_due' => 'Monto adeudado',
+        'overdue_by' => 'Vencido por',
         'value' => 'Valor',
         'subtotal' => 'Subtotal',
         'quote' => 'Cotización',
@@ -270,6 +274,8 @@ return [
         'unaccept' => 'Desaceptar',
         'unreject' => 'Desrechazar',
         'mark_won' => 'Marcar ganado',
+        'mark_paid' => 'Marcar pagado',
+        'record_payment' => 'Registrar pago',
         'mark_lost' => 'Marcar perdido',
         'resend_to_failed' => 'Reenviar a fallidos',
     ],

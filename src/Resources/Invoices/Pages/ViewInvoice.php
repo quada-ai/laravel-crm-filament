@@ -11,6 +11,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
 
 class ViewInvoice extends ViewRecord
 {
+    use Concerns\HasInvoiceMarkPaidAction;
     use Concerns\HasInvoicePortalAction;
     use Concerns\HasInvoiceSendAction;
     use HasXeroSyncStateInfolist;
@@ -21,6 +22,7 @@ class ViewInvoice extends ViewRecord
     {
         return [
             $this->invoicePortalAction(),
+            $this->invoiceMarkPaidAction(),
             Actions\EditAction::make(),
             $this->invoiceSendAction(),
             $this->invoiceDownloadPdfAction(),
