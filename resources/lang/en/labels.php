@@ -308,6 +308,8 @@ return [
         'change_pipeline_stage' => 'Change pipeline stage',
         'apply_labels' => 'Apply labels',
         'archive' => 'Archive',
+        'mark_won' => 'Mark won',
+        'mark_lost' => 'Mark lost',
         'resend_to_failed' => 'Resend to failed',
     ],
 

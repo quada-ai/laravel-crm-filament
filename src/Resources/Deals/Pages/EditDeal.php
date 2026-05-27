@@ -8,15 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Services\DealService;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\Concerns\HasDealMarkLostAction;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\Concerns\HasDealMarkWonAction;
+use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\Concerns\HasDealReopenAction;
 use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
 class EditDeal extends EditRecord
 {
+    use HasDealMarkLostAction;
+    use HasDealMarkWonAction;
+    use HasDealReopenAction;
+
     protected static string $resource = DealResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            $this->dealMarkWonAction(),
+            $this->dealMarkLostAction(),
+            $this->dealReopenAction(),
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];

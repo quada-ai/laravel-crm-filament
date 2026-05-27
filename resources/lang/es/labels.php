@@ -263,6 +263,8 @@ return [
         'change_pipeline_stage' => 'Cambiar etapa',
         'apply_labels' => 'Aplicar etiquetas',
         'archive' => 'Archivar',
+        'mark_won' => 'Marcar ganado',
+        'mark_lost' => 'Marcar perdido',
         'resend_to_failed' => 'Reenviar a fallidos',
     ],
 

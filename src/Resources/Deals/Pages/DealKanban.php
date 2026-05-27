@@ -3,6 +3,7 @@
 namespace VentureDrake\LaravelCrmFilament\Resources\Deals\Pages;
 
 use BackedEnum;
+use Filament\Actions;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
@@ -22,6 +23,15 @@ class DealKanban extends Page
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-view-columns';
 
     public ?int $ownerFilter = null;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            ...DealResource::listKanbanToggleActions('kanban'),
+            Actions\CreateAction::make()
+                ->url(DealResource::getUrl('create')),
+        ];
+    }
 
     public function getOwners(): Collection
     {
@@ -72,6 +82,7 @@ class DealKanban extends Page
         }
         $deal->forceFill([
             'closed_at' => now(),
+            'closed_status' => $won ? 'won' : 'lost',
         ]);
         if (Schema::hasColumn($deal->getTable(), 'won')) {
             $deal->won = $won;
