@@ -5,6 +5,8 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use VentureDrake\LaravelCrm\Models\Organization;
+use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrm\Services\QuoteService;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
@@ -66,11 +68,18 @@ class EditQuote extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Quote $record */
+        $person = isset($data['person_id'])
+            ? Person::find($data['person_id'])
+            : $record->person;
+        $organization = isset($data['organization_id'])
+            ? Organization::find($data['organization_id'])
+            : $record->organization;
+
         app(QuoteService::class)->update(
             FormPayload::wrap($data),
             $record,
-            $record->person,
-            $record->organization,
+            $person,
+            $organization,
             $record->client,
         );
         QuoteResource::saveCrmCustomFields($data, $record);

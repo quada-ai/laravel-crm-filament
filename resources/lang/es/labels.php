@@ -110,6 +110,8 @@ return [
         'overdue_by' => 'Vencido por',
         'value' => 'Valor',
         'subtotal' => 'Subtotal',
+        'discount' => 'Descuento',
+        'adjustment' => 'Ajuste',
         'quote' => 'Cotización',
         'tax' => 'Impuesto',
         'total' => 'Total',

@@ -114,6 +114,8 @@ return [
         'overdue_by' => 'Overdue by',
         'value' => 'Value',
         'subtotal' => 'Subtotal',
+        'discount' => 'Discount',
+        'adjustment' => 'Adjustment',
         'quote' => 'Quote',
         'tax' => 'Tax',
         'total' => 'Total',

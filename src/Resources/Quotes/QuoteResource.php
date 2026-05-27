@@ -4,18 +4,20 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Quotes;
 
 use BackedEnum;
 use Filament\Actions;
-use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
-use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\Quote;
+use VentureDrake\LaravelCrmFilament\Concerns\Forms\LineItemsRepeater;
+use VentureDrake\LaravelCrmFilament\Concerns\Forms\MoneyTotalsRow;
+use VentureDrake\LaravelCrmFilament\Concerns\Forms\SalesDetailsSection;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
@@ -53,107 +55,35 @@ class QuoteResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        $components = [
-            Forms\Components\TextInput::make('title')
-                ->required()
-                ->maxLength(255),
+        $details = SalesDetailsSection::make([
+            'title' => true,
+            'description' => true,
+            'reference' => true,
+            'currency' => true,
+            'issueDateKey' => 'issue_at',
+            'expiryDateKey' => 'expire_at',
+            'terms' => true,
+            'stage' => true,
+            'owner' => true,
+            'labels' => true,
+            'labelsField' => fn () => static::labelsField(),
+            'customFields' => static::crmCustomFieldsSection(Quote::class),
+        ]);
 
-            Forms\Components\Textarea::make('description')
-                ->rows(2)
-                ->columnSpanFull(),
+        return $schema->components([
+            Grid::make(['default' => 1, 'lg' => 2])->schema([
+                Grid::make(1)
+                    ->columnSpan(['lg' => 1])
+                    ->schema([$details]),
 
-            Grid::make(3)->schema([
-                Forms\Components\TextInput::make('reference')->maxLength(100),
-                Forms\Components\TextInput::make('currency')
-                    ->maxLength(3)
-                    ->default(config('laravel-crm.default_currency', 'USD')),
-                Forms\Components\Select::make('pipeline_stage_id')
-                    ->label(__('laravel-crm-filament::labels.sales.stage'))
-                    ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id'))
-                    ->searchable()
-                    ->preload(),
+                Section::make(__('laravel-crm-filament::labels.sections.products'))
+                    ->columnSpan(['lg' => 1])
+                    ->schema([
+                        LineItemsRepeater::products('quote_product_id', 'unit_price'),
+                        MoneyTotalsRow::make(),
+                    ]),
             ]),
-
-            Grid::make(2)->schema([
-                Forms\Components\DatePicker::make('issue_at')->label(__('laravel-crm-filament::labels.money.issue_date')),
-                Forms\Components\DatePicker::make('expire_at')->label(__('laravel-crm-filament::labels.money.expiry_date')),
-            ]),
-
-            // Line items
-            Forms\Components\Repeater::make('products')
-                ->label(__('laravel-crm-filament::labels.money.line_items'))
-                ->schema([
-                    Forms\Components\Hidden::make('quote_product_id'),
-                    Forms\Components\Select::make('id')
-                        ->label(__('laravel-crm-filament::labels.money.product'))
-                        ->options(fn () => Product::query()->where('active', true)->orderBy('name')->pluck('name', 'id'))
-                        ->searchable()
-                        ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
-                            $product = Product::find($state);
-                            if ($product) {
-                                $price = $product->getDefaultPrice();
-                                $set('unit_price', $price ? $price->price / 100 : 0);
-                            }
-                        }),
-                    Forms\Components\TextInput::make('quantity')
-                        ->numeric()
-                        ->default(1)
-                        ->minValue(0)
-                        ->live()
-                        ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
-                            $set('amount', (float) $state * (float) $get('unit_price'));
-                        }),
-                    Forms\Components\TextInput::make('unit_price')
-                        ->label(__('laravel-crm-filament::labels.money.unit_price'))
-                        ->numeric()
-                        ->live()
-                        ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
-                            $set('amount', (float) $state * (float) $get('quantity'));
-                        }),
-                    Forms\Components\TextInput::make('amount')
-                        ->numeric()
-                        ->readOnly(),
-                    Forms\Components\TextInput::make('comments')
-                        ->maxLength(255),
-                ])
-                ->columns(5)
-                ->addActionLabel('Add line item')
-                ->defaultItems(0)
-                ->reorderable()
-                ->columnSpanFull(),
-
-            // Totals
-            Grid::make(4)->schema([
-                Forms\Components\TextInput::make('sub_total')
-                    ->label(__('laravel-crm-filament::labels.money.subtotal'))
-                    ->numeric(),
-                Forms\Components\TextInput::make('discount')
-                    ->numeric(),
-                Forms\Components\TextInput::make('tax')
-                    ->numeric(),
-                Forms\Components\TextInput::make('total')
-                    ->numeric(),
-            ]),
-
-            Forms\Components\Textarea::make('terms')
-                ->rows(3)
-                ->columnSpanFull(),
-
-            Forms\Components\Select::make('user_owner_id')
-                ->label(__('laravel-crm-filament::labels.fields.owner'))
-                ->relationship('ownerUser', 'name')
-                ->searchable()
-                ->preload(),
-
-            static::labelsField(),
-        ];
-
-        if ($customFields = static::crmCustomFieldsSection(Quote::class)) {
-            $components[] = $customFields;
-        }
-
-        return $schema->components($components);
+        ]);
     }
 
     public static function table(Table $table): Table

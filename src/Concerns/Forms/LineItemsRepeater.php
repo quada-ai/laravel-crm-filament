@@ -9,21 +9,19 @@ use VentureDrake\LaravelCrm\Models\Product;
  * Shared products line-items Repeater used by Deal, Quote, Order, Invoice,
  * and PurchaseOrder create/edit forms.
  *
- * Each entity stores its line items in a sibling table whose foreign-key
- * column name differs (`deal_product_id`, `quote_product_id`,
- * `order_product_id`, `invoice_line_id`, `purchase_order_line_id`). Pass
- * the FK column name as `$fkColumn` so the repeater renders the correct
- * hidden field per row — necessary so Edit hooks can match existing rows
- * back to their primary key.
+ * The hidden foreign-key column name differs per entity (`deal_product_id`,
+ * `quote_product_id`, `order_product_id`, `invoice_line_id`,
+ * `purchase_order_line_id`). The unit-price form field name also differs
+ * across the family — Deal uses `price`; Quote/Order/Invoice/PurchaseOrder
+ * use `unit_price`. Pass both as constructor args so the repeater's row
+ * shape matches the destination service's expected payload.
  *
- * Row shape (matches the *Service::create/update array contract):
- *   id (product_id), price, quantity, amount (read-only)
- *
- * The row also exposes `comments` as an optional fifth field.
+ * Row shape per entity (matches *Service::create/update):
+ *   { $fkColumn (hidden), id (product_id), $priceField, quantity, amount, comments }
  */
 class LineItemsRepeater
 {
-    public static function products(string $fkColumn = 'deal_product_id'): Forms\Components\Repeater
+    public static function products(string $fkColumn = 'deal_product_id', string $priceField = 'price'): Forms\Components\Repeater
     {
         return Forms\Components\Repeater::make('products')
             ->label(__('laravel-crm-filament::labels.money.line_items'))
@@ -34,14 +32,14 @@ class LineItemsRepeater
                     ->options(fn () => Product::query()->where('active', true)->orderBy('name')->pluck('name', 'id'))
                     ->searchable()
                     ->live()
-                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                    ->afterStateUpdated(function ($state, Forms\Set $set) use ($priceField) {
                         $product = Product::find($state);
                         if ($product && method_exists($product, 'getDefaultPrice')) {
                             $price = $product->getDefaultPrice();
-                            $set('price', $price ? $price->price / 100 : 0);
+                            $set($priceField, $price ? $price->price / 100 : 0);
                         }
                     }),
-                Forms\Components\TextInput::make('price')
+                Forms\Components\TextInput::make($priceField)
                     ->label(__('laravel-crm-filament::labels.money.unit_price'))
                     ->numeric()
                     ->live()
@@ -53,8 +51,8 @@ class LineItemsRepeater
                     ->default(1)
                     ->minValue(0)
                     ->live()
-                    ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
-                        $set('amount', (float) $state * (float) $get('price'));
+                    ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) use ($priceField) {
+                        $set('amount', (float) $state * (float) $get($priceField));
                     }),
                 Forms\Components\TextInput::make('amount')
                     ->label(__('laravel-crm-filament::labels.money.amount'))
