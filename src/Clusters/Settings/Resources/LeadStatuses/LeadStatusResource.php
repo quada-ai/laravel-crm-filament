@@ -15,9 +15,12 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadStatuses\Pages\CreateLeadStatus;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadStatuses\Pages\EditLeadStatus;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadStatuses\Pages\ListLeadStatuses;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 
 class LeadStatusResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = LeadStatus::class;
 
     protected static ?string $cluster = Settings::class;
@@ -27,11 +30,6 @@ class LeadStatusResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-flag';
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
-    }
 
     public static function form(Schema $schema): Schema
     {

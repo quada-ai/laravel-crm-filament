@@ -16,9 +16,12 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\Page
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\Pages\EditChatWidget;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\Pages\ListChatWidgets;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\Pages\ViewChatWidget;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 
 class ChatWidgetResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = ChatWidget::class;
 
     protected static ?string $cluster = Settings::class;
@@ -28,11 +31,6 @@ class ChatWidgetResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-window';
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
-    }
 
     public static function form(Schema $schema): Schema
     {

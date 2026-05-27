@@ -23,6 +23,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
@@ -41,6 +42,7 @@ class LeadResource extends Resource
     use HasCrmCustomFields;
     use HasLabels;
     use HasPrimaryBulkActions;
+    use UsesExternalIdRouting;
 
     protected static ?string $model = Lead::class;
 
@@ -67,26 +69,6 @@ class LeadResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         return 'primary';
-    }
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
-    }
-
-    /**
-     * Filament v5 only consults getRecordRouteKeyName() for binding RESOLUTION,
-     * not for URL generation. Without this override Laravel's route() helper
-     * substitutes the `record` param via $model->getRouteKey() (the integer PK)
-     * and the resolver then 404s when it looks up `external_id = '<pk>'`.
-     */
-    public static function getUrl(?string $name = null, array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?Model $tenant = null, bool $shouldGuessMissingParameters = false, ?string $configuration = null): string
-    {
-        if (($key = static::getRecordRouteKeyName()) && isset($parameters['record']) && $parameters['record'] instanceof Model) {
-            $parameters['record'] = $parameters['record']->getAttribute($key);
-        }
-
-        return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters, $configuration);
     }
 
     public static function form(Schema $schema): Schema

@@ -15,9 +15,12 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStageProbabilities\Pages\CreatePipelineStageProbability;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStageProbabilities\Pages\EditPipelineStageProbability;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStageProbabilities\Pages\ListPipelineStageProbabilities;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 
 class PipelineStageProbabilityResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = PipelineStageProbability::class;
 
     protected static ?string $cluster = Settings::class;
@@ -27,11 +30,6 @@ class PipelineStageProbabilityResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chart-pie';
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
-    }
 
     public static function form(Schema $schema): Schema
     {

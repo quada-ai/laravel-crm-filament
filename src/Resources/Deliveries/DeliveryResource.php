@@ -16,6 +16,7 @@ use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\OrderProduct;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
@@ -27,6 +28,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\ViewDelivery;
 class DeliveryResource extends Resource
 {
     use HasLabels;
+    use UsesExternalIdRouting;
 
     protected static ?string $model = Delivery::class;
 
@@ -39,11 +41,6 @@ class DeliveryResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
-    }
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
     }
 
     public static function form(Schema $schema): Schema

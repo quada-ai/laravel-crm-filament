@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Customer;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Customers\Pages\CreateCustomer;
@@ -23,6 +24,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Customers\Pages\ViewCustomer;
 class CustomerResource extends Resource
 {
     use HasEncryptedGlobalSearch;
+    use UsesExternalIdRouting;
 
     protected static ?string $model = Customer::class;
 
@@ -37,11 +39,6 @@ class CustomerResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Contacts';
-    }
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
     }
 
     public static function form(Schema $schema): Schema

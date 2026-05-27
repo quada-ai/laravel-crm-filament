@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
@@ -30,6 +31,7 @@ class OrderResource extends Resource
     use HasCrmCustomFields;
     use HasLabels;
     use HasPrimaryBulkActions;
+    use UsesExternalIdRouting;
 
     protected static ?string $model = Order::class;
 
@@ -44,11 +46,6 @@ class OrderResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
-    }
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
     }
 
     public static function form(Schema $schema): Schema

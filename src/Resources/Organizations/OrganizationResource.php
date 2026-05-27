@@ -20,6 +20,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
@@ -37,6 +38,7 @@ class OrganizationResource extends Resource
     use HasCrmCustomFields;
     use HasEncryptedGlobalSearch;
     use HasLabels;
+    use UsesExternalIdRouting;
 
     protected static ?string $model = Organization::class;
 
@@ -51,11 +53,6 @@ class OrganizationResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Contacts';
-    }
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
     }
 
     public static function form(Schema $schema): Schema
