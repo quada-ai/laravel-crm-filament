@@ -99,6 +99,8 @@ return [
         'probability' => 'Probabilidad',
         'probability_percent' => 'Probabilidad %',
         'expected_close' => 'Cierre estimado',
+        'delivery_type' => 'Tipo de entrega',
+        'shipping_address' => 'Dirección de envío',
     ],
 
     'money' => [

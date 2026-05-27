@@ -375,6 +375,42 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasTable($prefix . 'deliveries') && ! Schema::hasColumn($prefix . 'deliveries', 'delivery_expected')) {
+            Schema::table($prefix . 'deliveries', function (Blueprint $table) {
+                $table->date('delivery_expected')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'deliveries') && ! Schema::hasColumn($prefix . 'deliveries', 'delivered_on')) {
+            Schema::table($prefix . 'deliveries', function (Blueprint $table) {
+                $table->date('delivered_on')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'deliveries') && ! Schema::hasColumn($prefix . 'deliveries', 'user_owner_id')) {
+            Schema::table($prefix . 'deliveries', function (Blueprint $table) {
+                $table->unsignedBigInteger('user_owner_id')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'deliveries') && ! Schema::hasColumn($prefix . 'deliveries', 'reference')) {
+            Schema::table($prefix . 'deliveries', function (Blueprint $table) {
+                $table->string('reference')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'purchase_orders') && ! Schema::hasColumn($prefix . 'purchase_orders', 'sent')) {
+            Schema::table($prefix . 'purchase_orders', function (Blueprint $table) {
+                $table->boolean('sent')->default(false);
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'purchase_orders') && ! Schema::hasColumn($prefix . 'purchase_orders', 'delivery_date')) {
+            Schema::table($prefix . 'purchase_orders', function (Blueprint $table) {
+                $table->date('delivery_date')->nullable();
+            });
+        }
+
         if (! Schema::hasTable($prefix . 'email_campaign_clicks')) {
             Schema::create($prefix . 'email_campaign_clicks', function (Blueprint $table) {
                 $table->bigIncrements('id');

@@ -15,10 +15,12 @@ use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
+use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\CreatePurchaseOrder;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\EditPurchaseOrder;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\ListPurchaseOrders;
@@ -28,6 +30,7 @@ class PurchaseOrderResource extends Resource
 {
     use HasCrmCustomFields;
     use HasLabels;
+    use HasPrimaryBulkActions;
     use UsesExternalIdRouting;
 
     protected static ?string $model = PurchaseOrder::class;
@@ -67,6 +70,7 @@ class PurchaseOrderResource extends Resource
 
             Grid::make(2)->schema([
                 Forms\Components\Select::make('delivery_type')
+                    ->label(__('laravel-crm-filament::labels.sales.delivery_type'))
                     ->options(['collect' => 'Collect', 'deliver' => 'Deliver'])
                     ->live(),
                 Forms\Components\Textarea::make('delivery_instructions')
@@ -151,43 +155,92 @@ class PurchaseOrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('purchase_order_id')
-                    ->label(__('laravel-crm-filament::labels.fields.id'))
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
                     ->sortable()
-                    ->searchable(),
+                    ->toggleable(),
 
-                Tables\Columns\TextColumn::make('total')
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                Tables\Columns\TextColumn::make('purchase_order_id')
+                    ->label(__('laravel-crm-filament::labels.fields.number'))
+                    ->searchable()
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('reference')
+                    ->label(__('laravel-crm-filament::labels.fields.reference'))
+                    ->searchable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('order.order_id')
+                    ->label(__('laravel-crm-filament::labels.fields.order'))
+                    ->url(fn ($record) => $record->order
+                        ? OrderResource::getUrl('view', ['record' => $record->order])
+                        : null)
+                    ->color('primary')
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('person.name')
+                    ->label(__('laravel-crm-filament::labels.fields.contact'))
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('organization.name')
+                    ->label(__('laravel-crm-filament::labels.fields.organization'))
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('issue_date')
+                    ->label(__('laravel-crm-filament::labels.money.issue_date'))
                     ->date()
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('delivery_date')
+                    ->label(__('laravel-crm-filament::labels.money.delivery_date'))
                     ->date()
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                Tables\Columns\TextColumn::make('delivery_type')
+                    ->label(__('laravel-crm-filament::labels.sales.delivery_type'))
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('total')
+                    ->label(__('laravel-crm-filament::labels.money.amount'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->sortable(),
+
+                Tables\Columns\IconColumn::make('sent')
+                    ->label(__('laravel-crm-filament::labels.fields.sent'))
+                    ->boolean()
+                    ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
+            ->filters([
+                Tables\Filters\SelectFilter::make('user_owner_id')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->multiple()
+                    ->relationship('ownerUser', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('labels')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->multiple()
+                    ->relationship('labels', 'name')
+                    ->preload(),
+            ])
             ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()
+                    ->button(),
+                Actions\EditAction::make()
+                    ->button()
+                    ->hidden(fn (?PurchaseOrder $record) => $record !== null && $record->xeroPurchaseOrder()->exists()),
+                Actions\DeleteAction::make()
+                    ->button()
+                    ->requiresConfirmation()
+                    ->hidden(fn (?PurchaseOrder $record) => $record !== null && $record->xeroPurchaseOrder()->exists()),
             ])
             ->toolbarActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
-                ]),
+                static::primaryBulkActionGroup(),
             ]);
     }
 

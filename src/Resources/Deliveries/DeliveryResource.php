@@ -15,7 +15,9 @@ use VentureDrake\LaravelCrm\Models\AddressType;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\OrderProduct;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
@@ -24,10 +26,13 @@ use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\CreateDelivery;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\EditDelivery;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\ListDeliveries;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\ViewDelivery;
+use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 
 class DeliveryResource extends Resource
 {
+    use HasCrmCustomFields;
     use HasLabels;
+    use HasPrimaryBulkActions;
     use UsesExternalIdRouting;
 
     protected static ?string $model = Delivery::class;
@@ -45,7 +50,7 @@ class DeliveryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        $components = [
             Grid::make(3)->schema([
                 Forms\Components\Select::make('order_id')
                     ->label(__('laravel-crm-filament::labels.fields.order'))
@@ -129,20 +134,56 @@ class DeliveryResource extends Resource
                 ->preload(),
 
             static::labelsField(),
-        ]);
+        ];
+
+        if ($customFields = static::crmCustomFieldsSection(Delivery::class)) {
+            $components[] = $customFields;
+        }
+
+        return $schema->components($components);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label(__('laravel-crm-filament::labels.fields.id'))
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('delivery_id')
+                    ->label(__('laravel-crm-filament::labels.fields.number'))
+                    ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('order.reference')
+                    ->label(__('laravel-crm-filament::labels.fields.reference'))
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('order.order_id')
                     ->label(__('laravel-crm-filament::labels.fields.order'))
-                    ->searchable(),
+                    ->url(fn ($record) => $record->order
+                        ? OrderResource::getUrl('view', ['record' => $record->order])
+                        : null)
+                    ->color('primary')
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('order.person.name')
+                    ->label(__('laravel-crm-filament::labels.fields.contact'))
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('order.organization.name')
+                    ->label(__('laravel-crm-filament::labels.fields.organization'))
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('shipping_address')
+                    ->label(__('laravel-crm-filament::labels.sales.shipping_address'))
+                    ->state(fn (Delivery $record) => static::formatShippingAddress($record))
+                    ->limit(60)
+                    ->tooltip(fn (Delivery $record) => static::formatShippingAddress($record))
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('delivery_expected')
                     ->label(__('laravel-crm-filament::labels.money.expected'))
@@ -151,30 +192,74 @@ class DeliveryResource extends Resource
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('delivered_on')
-                    ->label(__('laravel-crm-filament::labels.money.delivered'))
+                    ->label(__('laravel-crm-filament::labels.money.delivered_on'))
                     ->date()
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'))
                     ->toggleable(),
-
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
+            ->filters([
+                Tables\Filters\SelectFilter::make('user_owner_id')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->multiple()
+                    ->relationship('ownerUser', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('labels')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->multiple()
+                    ->relationship('labels', 'name')
+                    ->preload(),
+            ])
             ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()
+                    ->button(),
+                Actions\EditAction::make()
+                    ->button(),
+                Actions\DeleteAction::make()
+                    ->button()
+                    ->requiresConfirmation(),
             ])
             ->toolbarActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make(),
-                ]),
+                static::primaryBulkActionGroup(),
             ]);
+    }
+
+    /**
+     * Render the delivery's shipping address as a single comma-separated line.
+     * Prefers the address tagged with the shipping AddressType (id 6 in core's
+     * seeded fixtures); falls back to the first address attached to the
+     * delivery, then to an empty string when none exists.
+     */
+    protected static function formatShippingAddress(Delivery $record): ?string
+    {
+        $address = method_exists($record, 'getShippingAddress')
+            ? $record->getShippingAddress()
+            : null;
+
+        if (! $address) {
+            $address = $record->addresses()->first();
+        }
+
+        if (! $address) {
+            return null;
+        }
+
+        $parts = array_filter([
+            $address->line1 ?? null,
+            $address->city ?? null,
+            $address->state ?? null,
+            $address->code ?? null,
+            $address->country ?? null,
+        ]);
+
+        return $parts === [] ? null : implode(', ', $parts);
     }
 
     public static function getRelations(): array

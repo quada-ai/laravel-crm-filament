@@ -102,6 +102,8 @@ return [
         'probability' => 'Probability',
         'probability_percent' => 'Probability %',
         'expected_close' => 'Expected close',
+        'delivery_type' => 'Delivery type',
+        'shipping_address' => 'Shipping address',
     ],
 
     // Money / orders / lines
