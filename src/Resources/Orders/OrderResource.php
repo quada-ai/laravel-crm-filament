@@ -69,7 +69,7 @@ class OrderResource extends Resource
         ]);
 
         return $schema->components([
-            Grid::make(['default' => 1, 'lg' => 2])->schema([
+            Grid::make(['default' => 1, 'lg' => 2])->columnSpanFull()->schema([
                 Grid::make(1)
                     ->columnSpan(['lg' => 1])
                     ->schema([
