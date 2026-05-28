@@ -92,9 +92,10 @@ class SalesDetailsSection
                     ->maxLength(100);
             }
             if ($opts['currency']) {
-                $row[] = Forms\Components\TextInput::make('currency')
+                $row[] = Forms\Components\Select::make('currency')
                     ->label(__('laravel-crm-filament::labels.fields.currency'))
-                    ->maxLength(3)
+                    ->options(fn () => \VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\currencies())
+                    ->searchable()
                     ->default(config('laravel-crm.default_currency', 'USD'));
             }
             $components[] = Grid::make(2)->schema($row);
