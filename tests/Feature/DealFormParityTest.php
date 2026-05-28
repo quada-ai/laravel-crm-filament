@@ -2,6 +2,7 @@
 
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Deal;
@@ -61,12 +62,8 @@ it('LineItemsRepeater produces a reorderable Repeater with the expected FK and r
     $reorderProp->setAccessible(true);
     expect($reorderProp->getValue($repeater))->toBeTrue();
 
-    $ref = new ReflectionProperty($repeater, 'childComponents');
-    $ref->setAccessible(true);
-    $childGroup = $ref->getValue($repeater);
-    $rowFields = $childGroup['default'] ?? $childGroup;
-
-    $names = array_map(fn ($c) => $c->getName(), $rowFields);
+    // Walk one level into nested Grids — row 2 is a 3-col Grid for Deal (no tax_amount).
+    $names = dealFormCollectLeafNames($repeater);
     expect($names)->toBe([
         'deal_product_id',
         'id',
@@ -78,13 +75,10 @@ it('LineItemsRepeater produces a reorderable Repeater with the expected FK and r
 });
 
 it('LineItemsRepeater FK column changes with the constructor arg', function () {
-    $repeater = LineItemsRepeater::products('quote_product_id');
-    $ref = new ReflectionProperty($repeater, 'childComponents');
-    $ref->setAccessible(true);
-    $childGroup = $ref->getValue($repeater);
-    $rowFields = $childGroup['default'] ?? $childGroup;
+    $repeater = LineItemsRepeater::products('quote_product_id', 'unit_price');
+    $names = dealFormCollectLeafNames($repeater);
 
-    expect($rowFields[0]->getName())->toBe('quote_product_id');
+    expect($names[0])->toBe('quote_product_id');
 });
 
 it('Contact section is reused from LeadDealContactSection', function () {
@@ -143,3 +137,27 @@ it('CreateDeal resolves person_id and organization_id and persists line items vi
     expect($line->quantity)->toBe(3);
     expect($line->amount)->toBe(300 * 100);
 });
+
+function dealFormCollectLeafNames(Repeater | Section | Grid $component): array
+{
+    $ref = new ReflectionProperty($component, 'childComponents');
+    $ref->setAccessible(true);
+    $group = $ref->getValue($component);
+    $children = $group['default'] ?? $group;
+
+    $names = [];
+    foreach ($children as $child) {
+        if ($child instanceof Grid) {
+            $gref = new ReflectionProperty($child, 'childComponents');
+            $gref->setAccessible(true);
+            $ggroup = $gref->getValue($child);
+            foreach (($ggroup['default'] ?? $ggroup) as $inner) {
+                $names[] = $inner->getName();
+            }
+        } else {
+            $names[] = $child->getName();
+        }
+    }
+
+    return $names;
+}

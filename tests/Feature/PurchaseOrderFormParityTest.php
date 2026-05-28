@@ -2,6 +2,7 @@
 
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Order;
@@ -81,16 +82,15 @@ it('LineItemsRepeater for PurchaseOrder uses purchase_order_line_id + unit_price
     /** @var Repeater $repeater */
     $repeater = LineItemsRepeater::products('purchase_order_line_id', 'unit_price');
 
-    $ref = new ReflectionProperty($repeater, 'childComponents');
-    $ref->setAccessible(true);
-    $rowFields = $ref->getValue($repeater)['default'] ?? [];
+    // Walk one level into the nested row-2 Grid; unit_price variant has tax_amount.
+    $names = poFormCollectLeafNames($repeater);
 
-    $names = array_map(fn ($c) => $c->getName(), $rowFields);
     expect($names)->toBe([
         'purchase_order_line_id',
         'id',
         'unit_price',
         'quantity',
+        'tax_amount',
         'amount',
         'comments',
     ]);
@@ -147,3 +147,27 @@ it('delivery_details + deliver/collect/delivery_address/instructions translation
     app('translator')->setLocale('en');
     expect(trans('laravel-crm-filament::labels.sections.delivery_details'))->toBe('Delivery details');
 });
+
+function poFormCollectLeafNames(Repeater | Section | Grid $component): array
+{
+    $ref = new ReflectionProperty($component, 'childComponents');
+    $ref->setAccessible(true);
+    $group = $ref->getValue($component);
+    $children = $group['default'] ?? $group;
+
+    $names = [];
+    foreach ($children as $child) {
+        if ($child instanceof Grid) {
+            $gref = new ReflectionProperty($child, 'childComponents');
+            $gref->setAccessible(true);
+            $ggroup = $gref->getValue($child);
+            foreach (($ggroup['default'] ?? $ggroup) as $inner) {
+                $names[] = $inner->getName();
+            }
+        } else {
+            $names[] = $child->getName();
+        }
+    }
+
+    return $names;
+}

@@ -57,6 +57,7 @@ class EditQuote extends EditRecord
                 'id' => $line->product_id,
                 'quantity' => $line->quantity,
                 'unit_price' => $line->price !== null ? $line->price / 100 : 0,
+                'tax_amount' => $line->tax_amount !== null ? $line->tax_amount / 100 : 0,
                 'amount' => $line->amount !== null ? $line->amount / 100 : 0,
                 'comments' => $line->comments,
             ])

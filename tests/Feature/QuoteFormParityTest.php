@@ -95,9 +95,19 @@ it('MoneyTotalsRow renders the 5 monetary fields with total read-only', function
     $grid = MoneyTotalsRow::make();
     expect($grid)->toBeInstanceOf(Grid::class);
 
-    $ref = new ReflectionProperty($grid, 'childComponents');
-    $ref->setAccessible(true);
-    $components = $ref->getValue($grid)['default'] ?? [];
+    // Outer Grid is 2-col on md+; the right column holds a 1-col stack of 5
+    // inlineLabel TextInputs. Walk into the right-side inner Grid.
+    $outerRef = new ReflectionProperty($grid, 'childComponents');
+    $outerRef->setAccessible(true);
+    $outer = $outerRef->getValue($grid)['default'] ?? [];
+    expect($outer)->toHaveCount(2);
+
+    $rightGrid = $outer[1];
+    expect($rightGrid)->toBeInstanceOf(Grid::class);
+
+    $innerRef = new ReflectionProperty($rightGrid, 'childComponents');
+    $innerRef->setAccessible(true);
+    $components = $innerRef->getValue($rightGrid)['default'] ?? [];
 
     $names = array_map(fn ($c) => $c->getName(), $components);
     expect($names)->toBe([
@@ -119,16 +129,16 @@ it('LineItemsRepeater for Quote uses unit_price and quote_product_id', function 
     /** @var Repeater $repeater */
     $repeater = LineItemsRepeater::products('quote_product_id', 'unit_price');
 
-    $ref = new ReflectionProperty($repeater, 'childComponents');
-    $ref->setAccessible(true);
-    $rowFields = $ref->getValue($repeater)['default'] ?? [];
+    // Walk one level into the nested row-2 Grid; for $priceField === 'unit_price'
+    // the inner Grid is 4-col and includes a read-only tax_amount field.
+    $names = quoteFormCollectLeafNames($repeater);
 
-    $names = array_map(fn ($c) => $c->getName(), $rowFields);
     expect($names)->toBe([
         'quote_product_id',
         'id',
         'unit_price',
         'quantity',
+        'tax_amount',
         'amount',
         'comments',
     ]);
@@ -188,3 +198,27 @@ it('discount and adjustment translation keys exist in en/fr/es', function () {
     expect(trans('laravel-crm-filament::labels.money.discount'))->toBe('Discount');
     expect(trans('laravel-crm-filament::labels.money.adjustment'))->toBe('Adjustment');
 });
+
+function quoteFormCollectLeafNames(Repeater | Section | Grid $component): array
+{
+    $ref = new ReflectionProperty($component, 'childComponents');
+    $ref->setAccessible(true);
+    $group = $ref->getValue($component);
+    $children = $group['default'] ?? $group;
+
+    $names = [];
+    foreach ($children as $child) {
+        if ($child instanceof Grid) {
+            $gref = new ReflectionProperty($child, 'childComponents');
+            $gref->setAccessible(true);
+            $ggroup = $gref->getValue($child);
+            foreach (($ggroup['default'] ?? $ggroup) as $inner) {
+                $names[] = $inner->getName();
+            }
+        } else {
+            $names[] = $child->getName();
+        }
+    }
+
+    return $names;
+}
