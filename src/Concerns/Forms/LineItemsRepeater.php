@@ -21,6 +21,12 @@ use VentureDrake\LaravelCrm\Models\Product;
  * `purchase_order_line_id`). The unit-price form field name also differs
  * across the family — Deal uses `price`; Quote/Order/Invoice/PurchaseOrder
  * use `unit_price`. tax_amount is only added when $priceField === 'unit_price'.
+ *
+ * Closure callbacks are typed loosely (no Forms\Get / Forms\Set typehints)
+ * because the nested Schemas\Components\Grid causes Filament to pass
+ * Schemas\Components\Utilities\Get / Set instead of the Forms namespace
+ * variants. Filament resolves these by parameter name, so the untyped
+ * shape works for both.
  */
 class LineItemsRepeater
 {
@@ -31,7 +37,7 @@ class LineItemsRepeater
                 ->label(__('laravel-crm-filament::labels.money.unit_price'))
                 ->numeric()
                 ->live()
-                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                ->afterStateUpdated(function ($state, $get, $set) {
                     $qty = (float) $get('quantity');
                     $tax = (float) ($get('tax_amount') ?? 0);
                     $set('amount', ((float) $state * $qty) + $tax);
@@ -41,7 +47,7 @@ class LineItemsRepeater
                 ->default(1)
                 ->minValue(0)
                 ->live()
-                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) use ($priceField) {
+                ->afterStateUpdated(function ($state, $get, $set) use ($priceField) {
                     $tax = (float) ($get('tax_amount') ?? 0);
                     $set('amount', (float) $state * (float) $get($priceField) + $tax);
                 }),
@@ -70,7 +76,7 @@ class LineItemsRepeater
                     ->options(fn () => Product::query()->where('active', true)->orderBy('name')->pluck('name', 'id'))
                     ->searchable()
                     ->live()
-                    ->afterStateUpdated(function ($state, Forms\Set $set) use ($priceField) {
+                    ->afterStateUpdated(function ($state, $set) use ($priceField) {
                         $product = Product::find($state);
                         if ($product && method_exists($product, 'getDefaultPrice')) {
                             $price = $product->getDefaultPrice();
