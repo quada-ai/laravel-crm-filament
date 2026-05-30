@@ -79,7 +79,7 @@ class QuoteResource extends Resource
                 Section::make(__('laravel-crm-filament::labels.sections.products'))
                     ->columnSpan(['lg' => 1])
                     ->schema([
-                        LineItemsRepeater::products('quote_product_id', 'unit_price'),
+                        LineItemsRepeater::products('quote_product_id', 'unit_price')->defaultItems(1),
                         MoneyTotalsRow::make(),
                     ]),
             ]),

@@ -133,7 +133,7 @@ class DealResource extends Resource
 
                         Section::make(__('laravel-crm-filament::labels.sections.products'))
                             ->schema([
-                                LineItemsRepeater::products('deal_product_id'),
+                                LineItemsRepeater::products('deal_product_id')->defaultItems(1),
                             ]),
                     ]),
             ]),
