@@ -80,7 +80,7 @@ class OrderResource extends Resource
                 Section::make(__('laravel-crm-filament::labels.sections.products'))
                     ->columnSpan(['lg' => 1])
                     ->schema([
-                        LineItemsRepeater::products('order_product_id', 'unit_price'),
+                        LineItemsRepeater::products('order_product_id', 'unit_price')->defaultItems(1),
                         MoneyTotalsRow::make(),
                     ]),
             ]),
