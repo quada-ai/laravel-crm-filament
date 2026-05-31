@@ -15,9 +15,9 @@ use Filament\Schemas\Components\Grid;
  * a single column on screens < md.
  *
  * Form keys match the core CRM Livewire form keys:
- *   sub_total  -> service writes `subtotal` column ×100
+ *   sub_total  -> service writes `subtotal` column ×100 (read-only on form)
  *   discount   -> service writes `discount` column ×100
- *   tax        -> service writes `tax` column ×100
+ *   tax        -> service writes `tax` column ×100 (read-only on form)
  *   adjustment -> service writes `adjustments` column ×100
  *   total      -> service writes `total` column ×100 (read-only on form)
  */
@@ -31,7 +31,8 @@ class MoneyTotalsRow
                 Forms\Components\TextInput::make('sub_total')
                     ->label(__('laravel-crm-filament::labels.money.subtotal'))
                     ->numeric()
-                    ->inlineLabel(),
+                    ->inlineLabel()
+                    ->readOnly(),
                 Forms\Components\TextInput::make('discount')
                     ->label(__('laravel-crm-filament::labels.money.discount'))
                     ->numeric()
@@ -39,7 +40,8 @@ class MoneyTotalsRow
                 Forms\Components\TextInput::make('tax')
                     ->label(__('laravel-crm-filament::labels.money.tax'))
                     ->numeric()
-                    ->inlineLabel(),
+                    ->inlineLabel()
+                    ->readOnly(),
                 Forms\Components\TextInput::make('adjustment')
                     ->label(__('laravel-crm-filament::labels.money.adjustment'))
                     ->numeric()

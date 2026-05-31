@@ -118,11 +118,17 @@ it('MoneyTotalsRow renders the 5 monetary fields with total read-only', function
         'total',
     ]);
 
-    /** @var TextInput $totalInput */
-    $totalInput = $components[4];
-    $isReadOnly = new ReflectionProperty($totalInput, 'isReadOnly');
-    $isReadOnly->setAccessible(true);
-    expect($isReadOnly->getValue($totalInput))->toBeTrue();
+    // sub_total (index 0), tax (index 2), and total (index 4) are read-only;
+    // discount (index 1) and adjustment (index 3) remain editable.
+    $readOnlyRef = new ReflectionProperty(TextInput::class, 'isReadOnly');
+    $readOnlyRef->setAccessible(true);
+
+    foreach ([0, 2, 4] as $i) {
+        expect($readOnlyRef->getValue($components[$i]))->toBeTrue();
+    }
+    foreach ([1, 3] as $i) {
+        expect($readOnlyRef->getValue($components[$i]))->toBeFalse();
+    }
 });
 
 it('LineItemsRepeater for Quote uses unit_price and quote_product_id', function () {
