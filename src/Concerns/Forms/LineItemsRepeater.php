@@ -97,6 +97,34 @@ class LineItemsRepeater
     }
 
     /**
+     * Recompute a single row's `amount` (and `tax_amount` when applicable).
+     *
+     * Mirrors the per-row math in core CRM's LiveQuoteItems::calculateAmounts()
+     * (lines 148-150): `amount = unit_price * quantity` — the line subtotal
+     * does NOT include tax. When the price field is `unit_price` (Quote /
+     * Order / Invoice / PurchaseOrder), `tax_amount = amount * rate / 100`
+     * using the resolved rate from resolveTaxRate(). Deal uses `price` and
+     * does not carry a tax_amount column, so the tax branch is skipped.
+     *
+     * Does NOT trigger form-level totals recalculation — that lives on a
+     * subsequent story.
+     */
+    private static function recalcRow($get, $set, string $priceField): void
+    {
+        $unitPrice = (float) $get($priceField);
+        $quantity = (float) $get('quantity');
+
+        $amount = $unitPrice * $quantity;
+        $set('amount', $amount);
+
+        if ($priceField === 'unit_price') {
+            $productId = $get('id');
+            $rate = self::resolveTaxRate($productId !== null ? (int) $productId : null);
+            $set('tax_amount', $amount * ($rate / 100));
+        }
+    }
+
+    /**
      * Resolve the tax rate to apply to a line item, mirroring the fallback
      * chain in core CRM's LiveQuoteItems::calculateAmounts() (lines 133-143):
      *   1. $product->taxRate?->rate   (TaxRate relation on Product)
