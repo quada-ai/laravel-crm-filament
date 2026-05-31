@@ -125,6 +125,37 @@ class LineItemsRepeater
     }
 
     /**
+     * Aggregate sibling rows up to the form-level `sub_total`, `tax`, and
+     * `total` fields. Designed to be called from inside a row field's
+     * reactive `afterStateUpdated` closure, where Filament's relative
+     * paths resolve as follows:
+     *   ../../        → the rows array keyed by row UUID
+     *   ../../../X    → the form-level field X (sub_total / tax / total)
+     *
+     * Mirrors core CRM's LiveQuoteItems::calculateAmounts (lines 155-161)
+     * exactly: sums each row's `amount` into sub_total, each row's
+     * `tax_amount` into tax, and writes total = sub_total + tax.
+     * Discount and adjustment are NOT included — those are applied
+     * server-side at save by the various *Service::create/update methods.
+     */
+    private static function recalcFormTotals($get, $set): void
+    {
+        $rows = $get('../../') ?? [];
+
+        $subTotal = 0.0;
+        $tax = 0.0;
+
+        foreach ($rows as $row) {
+            $subTotal += (float) ($row['amount'] ?? 0);
+            $tax += (float) ($row['tax_amount'] ?? 0);
+        }
+
+        $set('../../../sub_total', $subTotal);
+        $set('../../../tax', $tax);
+        $set('../../../total', $subTotal + $tax);
+    }
+
+    /**
      * Resolve the tax rate to apply to a line item, mirroring the fallback
      * chain in core CRM's LiveQuoteItems::calculateAmounts() (lines 133-143):
      *   1. $product->taxRate?->rate   (TaxRate relation on Product)
