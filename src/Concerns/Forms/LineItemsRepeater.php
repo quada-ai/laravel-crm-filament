@@ -38,10 +38,9 @@ class LineItemsRepeater
                 ->label(__('laravel-crm-filament::labels.money.unit_price'))
                 ->numeric()
                 ->live()
-                ->afterStateUpdated(function ($state, $get, $set) {
-                    $qty = (float) $get('quantity');
-                    $tax = (float) ($get('tax_amount') ?? 0);
-                    $set('amount', ((float) $state * $qty) + $tax);
+                ->afterStateUpdated(function ($state, $get, $set) use ($priceField) {
+                    self::recalcRow($get, $set, $priceField);
+                    self::recalcFormTotals($get, $set);
                 }),
             Forms\Components\TextInput::make('quantity')
                 ->numeric()
@@ -49,8 +48,8 @@ class LineItemsRepeater
                 ->minValue(0)
                 ->live()
                 ->afterStateUpdated(function ($state, $get, $set) use ($priceField) {
-                    $tax = (float) ($get('tax_amount') ?? 0);
-                    $set('amount', (float) $state * (float) $get($priceField) + $tax);
+                    self::recalcRow($get, $set, $priceField);
+                    self::recalcFormTotals($get, $set);
                 }),
         ];
 
