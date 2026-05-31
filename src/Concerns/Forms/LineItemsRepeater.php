@@ -5,6 +5,7 @@ namespace VentureDrake\LaravelCrmFilament\Concerns\Forms;
 use Filament\Forms;
 use Filament\Schemas\Components\Grid;
 use VentureDrake\LaravelCrm\Models\Product;
+use VentureDrake\LaravelCrm\Models\TaxRate;
 
 /**
  * Shared products line-items Repeater used by Deal, Quote, Order, Invoice,
@@ -93,5 +94,39 @@ class LineItemsRepeater
             ->defaultItems(0)
             ->reorderable()
             ->columnSpanFull();
+    }
+
+    /**
+     * Resolve the tax rate to apply to a line item, mirroring the fallback
+     * chain in core CRM's LiveQuoteItems::calculateAmounts() (lines 133-143):
+     *   1. $product->taxRate?->rate   (TaxRate relation on Product)
+     *   2. $product->tax_rate          (legacy scalar column on Product)
+     *   3. TaxRate::where('default', 1)->first()?->rate
+     *   4. app('laravel-crm.settings')->get('tax_rate')?->value
+     *   5. 0.0
+     */
+    private static function resolveTaxRate(?int $productId): float
+    {
+        if ($productId !== null) {
+            $product = Product::find($productId);
+
+            if ($product && $product->taxRate) {
+                return (float) $product->taxRate->rate;
+            }
+
+            if ($product && $product->tax_rate) {
+                return (float) $product->tax_rate;
+            }
+        }
+
+        if ($default = TaxRate::where('default', 1)->first()) {
+            return (float) $default->rate;
+        }
+
+        if ($setting = app('laravel-crm.settings')->get('tax_rate')) {
+            return (float) $setting->value;
+        }
+
+        return 0.0;
     }
 }
