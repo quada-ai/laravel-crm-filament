@@ -77,12 +77,14 @@ class LineItemsRepeater
                     ->options(fn () => Product::query()->where('active', true)->orderBy('name')->pluck('name', 'id'))
                     ->searchable()
                     ->live()
-                    ->afterStateUpdated(function ($state, $set) use ($priceField) {
+                    ->afterStateUpdated(function ($state, $get, $set) use ($priceField) {
                         $product = Product::find($state);
                         if ($product && method_exists($product, 'getDefaultPrice')) {
                             $price = $product->getDefaultPrice();
-                            $set($priceField, $price ? $price->price / 100 : 0);
+                            $set($priceField, $price ? $price->unit_price / 100 : 0);
                         }
+                        self::recalcRow($get, $set, $priceField);
+                        self::recalcFormTotals($get, $set);
                     }),
                 Grid::make($row2Cols)->schema($row2Fields),
                 Forms\Components\Textarea::make('comments')
