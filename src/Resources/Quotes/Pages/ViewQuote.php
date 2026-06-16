@@ -20,14 +20,16 @@ class ViewQuote extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            QuoteResource::backToIndexAction(),
             $this->quoteAcceptAction(),
             $this->quoteRejectAction(),
             ...$this->quoteUnacceptActions(),
-            $this->quotePortalAction(),
-            Actions\EditAction::make(),
-            $this->quoteSendAction(),
-            $this->quoteDownloadPdfAction(),
             $this->quoteConvertToOrderAction(),
+            $this->quoteSendAction(),
+            $this->quotePortalAction(),
+            $this->quoteDownloadPdfAction(),
+            Actions\EditAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 }
