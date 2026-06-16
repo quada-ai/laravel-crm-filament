@@ -13,8 +13,10 @@ class ViewLead extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            LeadResource::backToIndexAction(),
             LeadResource::convertAction(),
             Actions\EditAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 }
