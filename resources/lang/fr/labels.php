@@ -294,6 +294,9 @@ return [
         'record_payment' => 'Enregistrer un paiement',
         'mark_lost' => 'Marquer perdu',
         'resend_to_failed' => 'Renvoyer aux échoués',
+        'back_to_leads' => 'Retour aux pistes',
+        'back_to_quotes' => 'Retour aux devis',
+        'back_to_deals' => 'Retour aux affaires',
     ],
 
     'import' => [

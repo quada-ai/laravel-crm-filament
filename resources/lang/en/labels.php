@@ -339,6 +339,9 @@ return [
         'record_payment' => 'Record payment',
         'mark_lost' => 'Mark lost',
         'resend_to_failed' => 'Resend to failed',
+        'back_to_leads' => 'Back to leads',
+        'back_to_quotes' => 'Back to quotes',
+        'back_to_deals' => 'Back to deals',
     ],
 
     // CSV import
