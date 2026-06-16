@@ -360,4 +360,13 @@ class LeadResource extends Resource
                 ->url(static::getUrl('kanban')),
         ];
     }
+
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_leads'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
+    }
 }
