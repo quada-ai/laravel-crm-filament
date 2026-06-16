@@ -20,10 +20,12 @@ class ViewDeal extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            DealResource::backToIndexAction(),
             $this->dealMarkWonAction(),
             $this->dealMarkLostAction(),
             $this->dealReopenAction(),
             Actions\EditAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 }
