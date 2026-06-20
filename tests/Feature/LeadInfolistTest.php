@@ -229,7 +229,7 @@ it('ViewLead::content produces a top-level Grid with two columns: infolist (lg 2
     $children = $grid->getChildComponents();
 
     expect($children)->toHaveCount(2);
-    expect($children[0]->getColumnSpan())->toBe(['lg' => 2]);
+    expect($children[0]->getColumnSpan())->toBe(['lg' => 1]);
     expect($children[1]->getColumnSpan())->toBe(['lg' => 1]);
 });
 

@@ -25,8 +25,8 @@ class ViewLead extends ViewRecord
     public function content(Schema $schema): Schema
     {
         return $schema->components([
-            Grid::make(['default' => 1, 'lg' => 3])->schema([
-                $this->getInfolistContentComponent()->columnSpan(['lg' => 2]),
+            Grid::make(['default' => 1, 'lg' => 2])->schema([
+                $this->getInfolistContentComponent()->columnSpan(['lg' => 1]),
                 $this->getRelationManagersContentComponent()->columnSpan(['lg' => 1]),
             ]),
         ]);

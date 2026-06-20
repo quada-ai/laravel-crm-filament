@@ -27,7 +27,7 @@ it('content() root component is a Grid with default=1, lg=3 columns', function (
 
     expect($components)->toHaveCount(1);
     expect($components[0])->toBeInstanceOf(Grid::class);
-    expect($components[0]->getColumns())->toBe(['default' => 1, 'lg' => 3]);
+    expect($components[0]->getColumns())->toBe(['default' => 1, 'lg' => 2]);
 });
 
 it('Grid children are infolist (lg=2) and relation managers (lg=1)', function () {
@@ -43,7 +43,7 @@ it('Grid children are infolist (lg=2) and relation managers (lg=1)', function ()
 
     expect($children)->toHaveCount(2);
 
-    expect($children[0]->getColumnSpan())->toBe(['lg' => 2]);
+    expect($children[0]->getColumnSpan())->toBe(['lg' => 1]);
     expect($children[1]->getColumnSpan())->toBe(['lg' => 1]);
 });
 
@@ -63,5 +63,5 @@ it('ViewLead source mirrors ViewInvoice content pattern by calling infolist + re
 
     expect($src)->toContain('getInfolistContentComponent()');
     expect($src)->toContain('getRelationManagersContentComponent()');
-    expect($src)->toContain("Grid::make(['default' => 1, 'lg' => 3])");
+    expect($src)->toContain("Grid::make(['default' => 1, 'lg' => 2])");
 });
