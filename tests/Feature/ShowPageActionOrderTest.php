@@ -62,7 +62,7 @@ it('DealResource::backToIndexAction returns a gray arrow-left Action pointing at
     expect($action->getUrl())->toBe(DealResource::getUrl('index'));
 });
 
-it('ViewLead header actions render in the documented order with Edit at primary color', function () {
+it('ViewLead header actions render in the documented order with Edit at gray color', function () {
     $actions = showActionOrderInvokeHeaderActions(ViewLead::class);
 
     $names = array_map(fn ($a) => $a->getName(), $actions);
@@ -82,7 +82,7 @@ it('ViewLead header actions render in the documented order with Edit at primary 
         }
     }
     expect($edit)->not->toBeNull();
-    expect($edit->getColor())->toBeIn(['primary', null]);
+    expect($edit->getColor())->toBe('gray');
 });
 
 it('ViewQuote header actions render in the documented order with Edit at primary color', function () {

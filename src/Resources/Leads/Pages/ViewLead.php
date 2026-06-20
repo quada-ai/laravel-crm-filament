@@ -17,7 +17,7 @@ class ViewLead extends ViewRecord
         return [
             LeadResource::backToIndexAction(),
             LeadResource::convertAction(),
-            Actions\EditAction::make(),
+            Actions\EditAction::make()->color('gray'),
             Actions\DeleteAction::make(),
         ];
     }
