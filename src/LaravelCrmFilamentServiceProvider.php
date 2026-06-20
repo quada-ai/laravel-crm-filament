@@ -5,6 +5,7 @@ namespace VentureDrake\LaravelCrmFilament;
 use Illuminate\Filesystem\Filesystem;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
+use VentureDrake\LaravelCrm\Models\Activity;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
@@ -89,6 +90,16 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
                 return $model->morphMany(Audit::class, 'auditable');
             });
         }
+
+        // Core CRM declares `activities()` on Lead via HasCrmActivities (a
+        // morphMany on `timelineable_*`). Filament's standard RelationManager
+        // contract is `protected static string $relationship = '...'`, so we
+        // register a parallel `timelineActivities` relation under an
+        // unambiguous name the upcoming ActivitiesRelationManager (US-007)
+        // can bind to. Mirrors the audits/labels precedent above.
+        Lead::resolveRelationUsing('timelineActivities', function ($model) {
+            return $model->morphMany(Activity::class, 'timelineable');
+        });
 
         // Core CRM declares `clicks()` on EmailCampaignRecipient / SmsCampaignRecipient
         // but not on the campaign model itself. The ClicksRelationManager binds
