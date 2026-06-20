@@ -212,6 +212,7 @@ return [
     // Audit / history (owen-it/laravel-auditing)
     'audit' => [
         'history' => 'History',
+        'activity' => 'Activity',
         'event' => 'Event',
         'user' => 'User',
         'changes' => 'Changes',
@@ -256,6 +257,7 @@ return [
     // Sections (top-level grouping headings on forms / infolists)
     'sections' => [
         'details' => 'Details',
+        'lead_qualification' => 'Lead Qualification',
         'contact' => 'Contact',
         'organization' => 'Organization',
         'products' => 'Products',

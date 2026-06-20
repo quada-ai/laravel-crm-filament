@@ -205,6 +205,7 @@ return [
     // Audit / history (owen-it/laravel-auditing)
     'audit' => [
         'history' => 'Historique',
+        'activity' => 'Activité',
         'event' => 'Événement',
         'user' => 'Utilisateur',
         'changes' => 'Modifications',
@@ -212,6 +213,7 @@ return [
 
     'sections' => [
         'details' => 'Détails',
+        'lead_qualification' => 'Qualification du prospect',
         'contact' => 'Contact',
         'organization' => 'Organisation',
         'products' => 'Produits',
