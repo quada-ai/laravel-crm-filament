@@ -400,7 +400,7 @@ class LeadResource extends Resource
                             return trim(($phone->number ?? '') . ($phone->type ? ' (' . $phone->type . ')' : ''));
                         }),
                 ]),
-        ]);
+        ])->columns(1);
     }
 
     public static function doConvertToDeal(Lead $lead): void
