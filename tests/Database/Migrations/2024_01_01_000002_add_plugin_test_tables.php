@@ -17,6 +17,12 @@ return new class extends Migration
     {
         $prefix = config('laravel-crm.db_table_prefix');
 
+        if (Schema::hasTable($prefix . 'field_options') && ! Schema::hasColumn($prefix . 'field_options', 'label')) {
+            Schema::table($prefix . 'field_options', function (Blueprint $table) {
+                $table->string('label')->nullable();
+            });
+        }
+
         if (! Schema::hasTable($prefix . 'industries')) {
             Schema::create($prefix . 'industries', function (Blueprint $table) {
                 $table->bigIncrements('id');
