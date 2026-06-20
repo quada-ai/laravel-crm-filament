@@ -1,7 +1,6 @@
 <?php
 
 use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LunchesRelationManager;
@@ -24,11 +23,10 @@ it('LeadResource::getRelations() preserves the six previously-registered RMs', f
         ->and($relations)->toContain(TasksRelationManager::class)
         ->and($relations)->toContain(CallsRelationManager::class)
         ->and($relations)->toContain(MeetingsRelationManager::class)
-        ->and($relations)->toContain(FilesRelationManager::class)
-        ->and($relations)->toContain(AuditsRelationManager::class);
+        ->and($relations)->toContain(FilesRelationManager::class);
 });
 
-it('LeadResource::getRelations() returns the AC tab order: Activity / Notes / Tasks / Calls / Meetings / Lunches / Files (with Audits trailing)', function () {
+it('LeadResource::getRelations() returns the AC tab order: Activity / Notes / Tasks / Calls / Meetings / Lunches / Files', function () {
     expect(LeadResource::getRelations())->toBe([
         ActivitiesRelationManager::class,
         NotesRelationManager::class,
@@ -37,6 +35,5 @@ it('LeadResource::getRelations() returns the AC tab order: Activity / Notes / Ta
         MeetingsRelationManager::class,
         LunchesRelationManager::class,
         FilesRelationManager::class,
-        AuditsRelationManager::class,
     ]);
 });
