@@ -2,6 +2,7 @@
 
 namespace VentureDrake\LaravelCrmFilament;
 
+use Filament\Actions\EditAction;
 use Illuminate\Filesystem\Filesystem;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -64,6 +65,10 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        // Apply consistent gray styling to every EditAction across the panel,
+        // so Edit pills match the gray Back-to-index pill.
+        EditAction::configureUsing(fn (EditAction $action) => $action->color('gray'));
+
         // Core CRM declares `labels()` on Lead/Deal/Quote/Order/Invoice/PurchaseOrder/Person/Organization/Customer
         // but not on Product or Delivery, even though the same polymorphic
         // `labelables` pivot supports them. Inject the relation via

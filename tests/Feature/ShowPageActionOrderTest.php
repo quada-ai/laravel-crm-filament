@@ -85,7 +85,7 @@ it('ViewLead header actions render in the documented order with Edit at gray col
     expect($edit->getColor())->toBe('gray');
 });
 
-it('ViewQuote header actions render in the documented order with Edit at primary color', function () {
+it('ViewQuote header actions render in the documented order with Edit at gray color', function () {
     $actions = showActionOrderInvokeHeaderActions(ViewQuote::class);
 
     $names = array_map(fn ($a) => $a->getName(), $actions);
@@ -112,10 +112,10 @@ it('ViewQuote header actions render in the documented order with Edit at primary
         }
     }
     expect($edit)->not->toBeNull();
-    expect($edit->getColor())->toBeIn(['primary', null]);
+    expect($edit->getColor())->toBe('gray');
 });
 
-it('ViewDeal header actions render in the documented order with Edit at primary color', function () {
+it('ViewDeal header actions render in the documented order with Edit at gray color', function () {
     $actions = showActionOrderInvokeHeaderActions(ViewDeal::class);
 
     $names = array_map(fn ($a) => $a->getName(), $actions);
@@ -137,7 +137,7 @@ it('ViewDeal header actions render in the documented order with Edit at primary 
         }
     }
     expect($edit)->not->toBeNull();
-    expect($edit->getColor())->toBeIn(['primary', null]);
+    expect($edit->getColor())->toBe('gray');
 });
 
 it('back_to_{leads,quotes,deals} translation keys exist and resolve in en, fr, and es', function () {
