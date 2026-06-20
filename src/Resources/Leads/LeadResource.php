@@ -39,6 +39,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\EditLead;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\LeadKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\ListLeads;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\ViewLead;
+use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
+use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 
 class LeadResource extends Resource
 {
@@ -299,6 +301,102 @@ class LeadResource extends Resource
             'view' => ViewLead::route('/{record}'),
             'edit' => EditLead::route('/{record}/edit'),
         ];
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->schema(fn (?Lead $record) => array_merge([
+                    TextEntry::make('created_at')
+                        ->label(__('laravel-crm-filament::labels.fields.created'))
+                        ->since(),
+
+                    TextEntry::make('lead_id')
+                        ->label(__('laravel-crm-filament::labels.fields.number')),
+
+                    TextEntry::make('amount')
+                        ->label(__('laravel-crm-filament::labels.money.value'))
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+
+                    TextEntry::make('description')
+                        ->label(__('laravel-crm-filament::labels.fields.description'))
+                        ->columnSpanFull(),
+
+                    TextEntry::make('leadSource.name')
+                        ->label(__('laravel-crm-filament::labels.sales.lead_source')),
+
+                    TextEntry::make('labels.name')
+                        ->label(__('laravel-crm-filament::labels.fields.labels'))
+                        ->badge()
+                        ->color(function ($state, $record) {
+                            $label = $record?->labels?->firstWhere('name', $state);
+                            $hex = $label?->hex;
+
+                            if (! $hex) {
+                                return 'gray';
+                            }
+
+                            return '#' . ltrim($hex, '#');
+                        }),
+
+                    TextEntry::make('ownerUser.name')
+                        ->label(__('laravel-crm-filament::labels.fields.owner'))
+                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
+                ], $record ? static::leadCustomFieldEntries($record, false) : [])),
+
+            Section::make(__('laravel-crm-filament::labels.sections.lead_qualification'))
+                ->schema(fn (?Lead $record) => $record ? static::leadCustomFieldEntries($record, true) : [])
+                ->hidden(function ($record): bool {
+                    if (! $record instanceof Lead) {
+                        return true;
+                    }
+
+                    return ! $record->fields()
+                        ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
+                        ->exists();
+                }),
+
+            Section::make(__('laravel-crm-filament::labels.sections.contact'))
+                ->schema([
+                    TextEntry::make('person.name')
+                        ->label(__('laravel-crm-filament::labels.fields.contact'))
+                        ->state(fn ($record) => LeadDealContactSection::personLabel($record?->person))
+                        ->url(fn ($record) => $record?->person
+                            ? PersonResource::getUrl('view', ['record' => $record->person])
+                            : null),
+
+                    TextEntry::make('organization.name')
+                        ->label(__('laravel-crm-filament::labels.fields.organization'))
+                        ->url(fn ($record) => $record?->organization
+                            ? OrganizationResource::getUrl('view', ['record' => $record->organization])
+                            : null),
+
+                    TextEntry::make('person_email')
+                        ->label(__('laravel-crm-filament::labels.fields.email'))
+                        ->state(function ($record) {
+                            $email = $record?->person?->emails()->first();
+
+                            if (! $email) {
+                                return null;
+                            }
+
+                            return trim(($email->address ?? '') . ($email->type ? ' (' . $email->type . ')' : ''));
+                        }),
+
+                    TextEntry::make('person_phone')
+                        ->label(__('laravel-crm-filament::labels.fields.phone'))
+                        ->state(function ($record) {
+                            $phone = $record?->person?->phones()->first();
+
+                            if (! $phone) {
+                                return null;
+                            }
+
+                            return trim(($phone->number ?? '') . ($phone->type ? ' (' . $phone->type . ')' : ''));
+                        }),
+                ]),
+        ]);
     }
 
     public static function doConvertToDeal(Lead $lead): void

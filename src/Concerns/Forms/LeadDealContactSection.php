@@ -24,6 +24,20 @@ use VentureDrake\LaravelCrm\Services\PersonService;
  */
 class LeadDealContactSection
 {
+    /**
+     * Compose a person's display name (first + last), matching the
+     * convention used by the contactColumn() Select's
+     * getOptionLabelFromRecordUsing closure.
+     */
+    public static function personLabel(?Person $person): string
+    {
+        if ($person === null) {
+            return '';
+        }
+
+        return trim(($person->first_name ?? '') . ' ' . ($person->last_name ?? ''));
+    }
+
     public static function contactColumn(): Section
     {
         return Section::make(__('laravel-crm-filament::labels.fields.contact'))
