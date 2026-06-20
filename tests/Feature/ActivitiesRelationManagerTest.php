@@ -47,8 +47,8 @@ it('uses the audit.activity translation key for the tab title', function () {
     expect($src)->toContain("'laravel-crm-filament::labels.audit.activity'");
 });
 
-it('is not yet registered on LeadResource (US-008 wires it)', function () {
+it('is registered on LeadResource (wired by US-008)', function () {
     $relations = LeadResource::getRelations();
 
-    expect($relations)->not->toContain(ActivitiesRelationManager::class);
+    expect($relations)->toContain(ActivitiesRelationManager::class);
 });

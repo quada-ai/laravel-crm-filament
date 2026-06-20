@@ -41,8 +41,8 @@ it('mirrors MeetingsRelationManager title/date/user columns', function () {
     expect($names)->toBe(['name', 'start_at', 'finish_at', 'ownerUser.name']);
 });
 
-it('is not yet registered on LeadResource (US-008 wires it)', function () {
+it('is registered on LeadResource (wired by US-008)', function () {
     $relations = LeadResource::getRelations();
 
-    expect($relations)->not->toContain(LunchesRelationManager::class);
+    expect($relations)->toContain(LunchesRelationManager::class);
 });

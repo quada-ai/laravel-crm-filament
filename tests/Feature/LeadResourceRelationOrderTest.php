@@ -1,0 +1,42 @@
+<?php
+
+use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LunchesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
+use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
+
+it('LeadResource::getRelations() contains both LunchesRelationManager and ActivitiesRelationManager', function () {
+    $relations = LeadResource::getRelations();
+
+    expect($relations)->toContain(LunchesRelationManager::class)
+        ->and($relations)->toContain(ActivitiesRelationManager::class);
+});
+
+it('LeadResource::getRelations() preserves the six previously-registered RMs', function () {
+    $relations = LeadResource::getRelations();
+
+    expect($relations)->toContain(NotesRelationManager::class)
+        ->and($relations)->toContain(TasksRelationManager::class)
+        ->and($relations)->toContain(CallsRelationManager::class)
+        ->and($relations)->toContain(MeetingsRelationManager::class)
+        ->and($relations)->toContain(FilesRelationManager::class)
+        ->and($relations)->toContain(AuditsRelationManager::class);
+});
+
+it('LeadResource::getRelations() returns the AC tab order: Activity / Notes / Tasks / Calls / Meetings / Lunches / Files (with Audits trailing)', function () {
+    expect(LeadResource::getRelations())->toBe([
+        ActivitiesRelationManager::class,
+        NotesRelationManager::class,
+        TasksRelationManager::class,
+        CallsRelationManager::class,
+        MeetingsRelationManager::class,
+        LunchesRelationManager::class,
+        FilesRelationManager::class,
+        AuditsRelationManager::class,
+    ]);
+});

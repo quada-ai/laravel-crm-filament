@@ -28,9 +28,11 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
@@ -268,12 +270,14 @@ class LeadResource extends Resource
     public static function getRelations(): array
     {
         return [
+            ActivitiesRelationManager::class,
             NotesRelationManager::class,
             TasksRelationManager::class,
             CallsRelationManager::class,
             MeetingsRelationManager::class,
-            AuditsRelationManager::class,
+            LunchesRelationManager::class,
             FilesRelationManager::class,
+            AuditsRelationManager::class,
         ];
     }
 
