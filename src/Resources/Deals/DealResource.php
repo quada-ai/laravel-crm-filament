@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Deals;
 
 use BackedEnum;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -292,28 +293,24 @@ class DealResource extends Resource
     }
 
     /**
-     * @return array<int, Actions\Action>
+     * @return array<int, Action>
      */
     public static function listKanbanToggleActions(string $current): array
     {
         return [
-            Actions\Action::make('view_list')
-                ->label(__('laravel-crm-filament::labels.actions.list_view'))
-                ->icon('heroicon-o-list-bullet')
-                ->color($current === 'list' ? 'primary' : 'gray')
-                ->url(static::getUrl('index')),
-
-            Actions\Action::make('view_kanban')
-                ->label(__('laravel-crm-filament::labels.actions.kanban_view'))
-                ->icon('heroicon-o-view-columns')
-                ->color($current === 'kanban' ? 'primary' : 'gray')
-                ->url(static::getUrl('kanban')),
+            Action::make('viewToggle')
+                ->label('')
+                ->view('laravel-crm-filament::components.list-kanban-toggle', [
+                    'current' => $current,
+                    'listUrl' => static::getUrl('index'),
+                    'kanbanUrl' => static::getUrl('kanban'),
+                ]),
         ];
     }
 
-    public static function markWonAction(): Actions\Action
+    public static function markWonAction(): Action
     {
-        return Actions\Action::make('markWon')
+        return Action::make('markWon')
             ->label(__('laravel-crm-filament::labels.actions.mark_won'))
             ->icon('heroicon-o-trophy')
             ->color('success')
@@ -332,9 +329,9 @@ class DealResource extends Resource
             });
     }
 
-    public static function markLostAction(): Actions\Action
+    public static function markLostAction(): Action
     {
-        return Actions\Action::make('markLost')
+        return Action::make('markLost')
             ->label(__('laravel-crm-filament::labels.actions.mark_lost'))
             ->icon('heroicon-o-x-circle')
             ->color('danger')
@@ -353,9 +350,9 @@ class DealResource extends Resource
             });
     }
 
-    public static function reopenAction(): Actions\Action
+    public static function reopenAction(): Action
     {
-        return Actions\Action::make('reopen')
+        return Action::make('reopen')
             ->label(__('laravel-crm-filament::labels.actions.reopen'))
             ->icon('heroicon-o-arrow-uturn-left')
             ->color('gray')
@@ -374,9 +371,9 @@ class DealResource extends Resource
             });
     }
 
-    public static function backToIndexAction(): Actions\Action
+    public static function backToIndexAction(): Action
     {
-        return Actions\Action::make('backToIndex')
+        return Action::make('backToIndex')
             ->label(__('laravel-crm-filament::labels.actions.back_to_deals'))
             ->icon('heroicon-o-arrow-left')
             ->color('gray')

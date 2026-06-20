@@ -110,34 +110,32 @@ it('row actions are buttons in View, Edit, Delete order', function () {
     }
 });
 
-it('listKanbanToggleActions(list) returns view_list primary and view_kanban gray', function () {
+it('listKanbanToggleActions(list) returns a segmented viewToggle action with current=list', function () {
     $actions = DealResource::listKanbanToggleActions('list');
 
-    expect($actions)->toHaveCount(2);
-    expect($actions[0]->getName())->toBe('view_list');
-    expect($actions[0]->getColor())->toBe('primary');
-    expect($actions[0]->getUrl())->toBe(DealResource::getUrl('index'));
-
-    expect($actions[1]->getName())->toBe('view_kanban');
-    expect($actions[1]->getColor())->toBe('gray');
-    expect($actions[1]->getUrl())->toBe(DealResource::getUrl('kanban'));
+    expect($actions)->toHaveCount(1);
+    expect($actions[0]->getName())->toBe('viewToggle');
+    expect($actions[0]->getView())->toBe('laravel-crm-filament::components.list-kanban-toggle');
+    expect($actions[0]->getViewData())->toMatchArray([
+        'current' => 'list',
+        'listUrl' => DealResource::getUrl('index'),
+        'kanbanUrl' => DealResource::getUrl('kanban'),
+    ]);
 });
 
-it('ListDeals and DealKanban headers expose the toggle pair and a Create action', function () {
+it('ListDeals and DealKanban headers expose the viewToggle and a Create action', function () {
     $listActions = dealParityInvokeHeaderActions(ListDeals::class);
-    expect($listActions)->toHaveCount(3);
-    expect($listActions[0]->getName())->toBe('view_list');
-    expect($listActions[0]->getColor())->toBe('primary');
-    expect($listActions[1]->getName())->toBe('view_kanban');
-    expect($listActions[1]->getColor())->toBe('gray');
-    expect($listActions[2])->toBeInstanceOf(CreateAction::class);
+    expect($listActions)->toHaveCount(2);
+    expect($listActions[0]->getName())->toBe('viewToggle');
+    expect($listActions[0]->getViewData()['current'])->toBe('list');
+    expect($listActions[1])->toBeInstanceOf(CreateAction::class);
 
     $kanbanActions = dealParityInvokeHeaderActions(DealKanban::class);
-    expect($kanbanActions)->toHaveCount(3);
-    expect($kanbanActions[0]->getColor())->toBe('gray');
-    expect($kanbanActions[1]->getColor())->toBe('primary');
-    expect($kanbanActions[2])->toBeInstanceOf(CreateAction::class);
-    expect($kanbanActions[2]->getUrl())->toBe(DealResource::getUrl('create'));
+    expect($kanbanActions)->toHaveCount(2);
+    expect($kanbanActions[0]->getName())->toBe('viewToggle');
+    expect($kanbanActions[0]->getViewData()['current'])->toBe('kanban');
+    expect($kanbanActions[1])->toBeInstanceOf(CreateAction::class);
+    expect($kanbanActions[1]->getUrl())->toBe(DealResource::getUrl('create'));
 });
 
 it('ListDeals no longer exposes getTabs entries', function () {

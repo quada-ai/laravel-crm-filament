@@ -110,48 +110,43 @@ it('convertAction visibility closure flips between open and converted leads', fu
     expect($action->isVisible())->toBeFalse();
 });
 
-it('listKanbanToggleActions(list) returns view_list primary and view_kanban gray', function () {
+it('listKanbanToggleActions(list) returns a segmented viewToggle action with current=list', function () {
     $actions = LeadResource::listKanbanToggleActions('list');
 
-    expect($actions)->toHaveCount(2);
-    expect($actions[0]->getName())->toBe('view_list');
-    expect($actions[0]->getColor())->toBe('primary');
-    expect($actions[0]->getUrl())->toBe(LeadResource::getUrl('index'));
-
-    expect($actions[1]->getName())->toBe('view_kanban');
-    expect($actions[1]->getColor())->toBe('gray');
-    expect($actions[1]->getUrl())->toBe(LeadResource::getUrl('kanban'));
+    expect($actions)->toHaveCount(1);
+    expect($actions[0]->getName())->toBe('viewToggle');
+    expect($actions[0]->getView())->toBe('laravel-crm-filament::components.list-kanban-toggle');
+    expect($actions[0]->getViewData())->toMatchArray([
+        'current' => 'list',
+        'listUrl' => LeadResource::getUrl('index'),
+        'kanbanUrl' => LeadResource::getUrl('kanban'),
+    ]);
 });
 
-it('listKanbanToggleActions(kanban) returns view_list gray and view_kanban primary', function () {
+it('listKanbanToggleActions(kanban) flips current to kanban', function () {
     $actions = LeadResource::listKanbanToggleActions('kanban');
 
-    expect($actions)->toHaveCount(2);
-    expect($actions[0]->getColor())->toBe('gray');
-    expect($actions[1]->getColor())->toBe('primary');
+    expect($actions)->toHaveCount(1);
+    expect($actions[0]->getViewData()['current'])->toBe('kanban');
 });
 
-it('ListLeads::getHeaderActions exposes the toggle pair plus Create', function () {
+it('ListLeads::getHeaderActions exposes the viewToggle plus Create', function () {
     $actions = parityInvokeHeaderActions(ListLeads::class);
 
-    expect($actions)->toHaveCount(3);
-    expect($actions[0]->getName())->toBe('view_list');
-    expect($actions[0]->getColor())->toBe('primary');
-    expect($actions[1]->getName())->toBe('view_kanban');
-    expect($actions[1]->getColor())->toBe('gray');
-    expect($actions[2])->toBeInstanceOf(CreateAction::class);
+    expect($actions)->toHaveCount(2);
+    expect($actions[0]->getName())->toBe('viewToggle');
+    expect($actions[0]->getViewData()['current'])->toBe('list');
+    expect($actions[1])->toBeInstanceOf(CreateAction::class);
 });
 
-it('LeadKanban::getHeaderActions exposes the toggle pair plus Create pointing at the create route', function () {
+it('LeadKanban::getHeaderActions exposes the viewToggle plus Create pointing at the create route', function () {
     $actions = parityInvokeHeaderActions(LeadKanban::class);
 
-    expect($actions)->toHaveCount(3);
-    expect($actions[0]->getName())->toBe('view_list');
-    expect($actions[0]->getColor())->toBe('gray');
-    expect($actions[1]->getName())->toBe('view_kanban');
-    expect($actions[1]->getColor())->toBe('primary');
-    expect($actions[2])->toBeInstanceOf(CreateAction::class);
-    expect($actions[2]->getUrl())->toBe(LeadResource::getUrl('create'));
+    expect($actions)->toHaveCount(2);
+    expect($actions[0]->getName())->toBe('viewToggle');
+    expect($actions[0]->getViewData()['current'])->toBe('kanban');
+    expect($actions[1])->toBeInstanceOf(CreateAction::class);
+    expect($actions[1]->getUrl())->toBe(LeadResource::getUrl('create'));
 });
 
 it('row actions cover view, edit, convertToDeal, and delete', function () {

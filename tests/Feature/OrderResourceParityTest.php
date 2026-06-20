@@ -150,7 +150,7 @@ it('ListOrders header exposes only a Create action (no kanban)', function () {
     expect($actions[0])->toBeInstanceOf(CreateAction::class);
 
     $names = array_map(fn ($a) => $a->getName(), $actions);
-    expect($names)->not->toContain('view_kanban');
+    expect($names)->not->toContain('viewToggle');
 });
 
 it('OrderResource no longer registers a kanban page', function () {

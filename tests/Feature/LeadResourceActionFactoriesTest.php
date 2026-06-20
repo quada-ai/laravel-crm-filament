@@ -63,40 +63,39 @@ it('convertAction execution calls doConvertToDeal and wires up a success notific
     expect($src)->toContain('->success()');
 });
 
-it('listKanbanToggleActions returns two actions named view_list and view_kanban', function () {
+it('listKanbanToggleActions returns a single segmented viewToggle action', function () {
     $actions = LeadResource::listKanbanToggleActions('list');
 
-    expect($actions)->toBeArray()->toHaveCount(2);
+    expect($actions)->toBeArray()->toHaveCount(1);
     expect($actions[0])->toBeInstanceOf(Action::class);
-    expect($actions[1])->toBeInstanceOf(Action::class);
-    expect($actions[0]->getName())->toBe('view_list');
-    expect($actions[1]->getName())->toBe('view_kanban');
+    expect($actions[0]->getName())->toBe('viewToggle');
 });
 
-it('listKanbanToggleActions uses the expected heroicons', function () {
+it('viewToggle uses the segmented control Blade view', function () {
     $actions = LeadResource::listKanbanToggleActions('list');
 
-    expect($actions[0]->getIcon())->toBe('heroicon-o-list-bullet');
-    expect($actions[1]->getIcon())->toBe('heroicon-o-view-columns');
+    expect($actions[0]->getView())->toBe('laravel-crm-filament::components.list-kanban-toggle');
 });
 
-it('listKanbanToggleActions("list") makes view_list primary and view_kanban gray', function () {
+it('viewToggle carries current=list when called with "list"', function () {
     $actions = LeadResource::listKanbanToggleActions('list');
 
-    expect($actions[0]->getColor())->toBe('primary');
-    expect($actions[1]->getColor())->toBe('gray');
+    expect($actions[0]->getViewData())->toMatchArray([
+        'current' => 'list',
+        'listUrl' => LeadResource::getUrl('index'),
+        'kanbanUrl' => LeadResource::getUrl('kanban'),
+    ]);
 });
 
-it('listKanbanToggleActions("kanban") flips the coloring', function () {
+it('viewToggle carries current=kanban when called with "kanban"', function () {
     $actions = LeadResource::listKanbanToggleActions('kanban');
 
-    expect($actions[0]->getColor())->toBe('gray');
-    expect($actions[1]->getColor())->toBe('primary');
+    expect($actions[0]->getViewData()['current'])->toBe('kanban');
 });
 
-it('listKanbanToggleActions URLs resolve to the index and kanban routes', function () {
+it('viewToggle URLs resolve to the index and kanban routes', function () {
     $actions = LeadResource::listKanbanToggleActions('list');
 
-    expect($actions[0]->getUrl())->toBe(LeadResource::getUrl('index'));
-    expect($actions[1]->getUrl())->toBe(LeadResource::getUrl('kanban'));
+    expect($actions[0]->getViewData()['listUrl'])->toBe(LeadResource::getUrl('index'));
+    expect($actions[0]->getViewData()['kanbanUrl'])->toBe(LeadResource::getUrl('kanban'));
 });

@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Leads;
 
 use BackedEnum;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
@@ -426,9 +427,9 @@ class LeadResource extends Resource
         $lead->forceFill(['converted_at' => now()])->save();
     }
 
-    public static function convertAction(): Actions\Action
+    public static function convertAction(): Action
     {
-        return Actions\Action::make('convertToDeal')
+        return Action::make('convertToDeal')
             ->label(__('laravel-crm-filament::labels.actions.convert_to_deal'))
             ->icon('heroicon-o-arrow-right-circle')
             ->color('success')
@@ -445,28 +446,24 @@ class LeadResource extends Resource
     }
 
     /**
-     * @return array<int, Actions\Action>
+     * @return array<int, Action>
      */
     public static function listKanbanToggleActions(string $current): array
     {
         return [
-            Actions\Action::make('view_list')
-                ->label(__('laravel-crm-filament::labels.actions.list_view'))
-                ->icon('heroicon-o-list-bullet')
-                ->color($current === 'list' ? 'primary' : 'gray')
-                ->url(static::getUrl('index')),
-
-            Actions\Action::make('view_kanban')
-                ->label(__('laravel-crm-filament::labels.actions.kanban_view'))
-                ->icon('heroicon-o-view-columns')
-                ->color($current === 'kanban' ? 'primary' : 'gray')
-                ->url(static::getUrl('kanban')),
+            Action::make('viewToggle')
+                ->label('')
+                ->view('laravel-crm-filament::components.list-kanban-toggle', [
+                    'current' => $current,
+                    'listUrl' => static::getUrl('index'),
+                    'kanbanUrl' => static::getUrl('kanban'),
+                ]),
         ];
     }
 
-    public static function backToIndexAction(): Actions\Action
+    public static function backToIndexAction(): Action
     {
-        return Actions\Action::make('backToIndex')
+        return Action::make('backToIndex')
             ->label(__('laravel-crm-filament::labels.actions.back_to_leads'))
             ->icon('heroicon-o-arrow-left')
             ->color('gray')

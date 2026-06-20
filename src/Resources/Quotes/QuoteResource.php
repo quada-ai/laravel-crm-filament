@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Quotes;
 
 use BackedEnum;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -230,28 +231,24 @@ class QuoteResource extends Resource
     }
 
     /**
-     * @return array<int, Actions\Action>
+     * @return array<int, Action>
      */
     public static function listKanbanToggleActions(string $current): array
     {
         return [
-            Actions\Action::make('view_list')
-                ->label(__('laravel-crm-filament::labels.actions.list_view'))
-                ->icon('heroicon-o-list-bullet')
-                ->color($current === 'list' ? 'primary' : 'gray')
-                ->url(static::getUrl('index')),
-
-            Actions\Action::make('view_kanban')
-                ->label(__('laravel-crm-filament::labels.actions.kanban_view'))
-                ->icon('heroicon-o-view-columns')
-                ->color($current === 'kanban' ? 'primary' : 'gray')
-                ->url(static::getUrl('kanban')),
+            Action::make('viewToggle')
+                ->label('')
+                ->view('laravel-crm-filament::components.list-kanban-toggle', [
+                    'current' => $current,
+                    'listUrl' => static::getUrl('index'),
+                    'kanbanUrl' => static::getUrl('kanban'),
+                ]),
         ];
     }
 
-    public static function acceptAction(): Actions\Action
+    public static function acceptAction(): Action
     {
-        return Actions\Action::make('accept')
+        return Action::make('accept')
             ->label(__('laravel-crm-filament::labels.actions.accept'))
             ->icon('heroicon-o-check-circle')
             ->color('success')
@@ -270,9 +267,9 @@ class QuoteResource extends Resource
             });
     }
 
-    public static function rejectAction(): Actions\Action
+    public static function rejectAction(): Action
     {
-        return Actions\Action::make('reject')
+        return Action::make('reject')
             ->label(__('laravel-crm-filament::labels.actions.reject'))
             ->icon('heroicon-o-x-circle')
             ->color('danger')
@@ -291,9 +288,9 @@ class QuoteResource extends Resource
             });
     }
 
-    public static function unacceptAction(): Actions\Action
+    public static function unacceptAction(): Action
     {
-        return Actions\Action::make('unaccept')
+        return Action::make('unaccept')
             ->label(__('laravel-crm-filament::labels.actions.unaccept'))
             ->icon('heroicon-o-arrow-uturn-left')
             ->color('gray')
@@ -311,9 +308,9 @@ class QuoteResource extends Resource
             });
     }
 
-    public static function unrejectAction(): Actions\Action
+    public static function unrejectAction(): Action
     {
-        return Actions\Action::make('unreject')
+        return Action::make('unreject')
             ->label(__('laravel-crm-filament::labels.actions.unreject'))
             ->icon('heroicon-o-arrow-uturn-left')
             ->color('gray')
@@ -331,9 +328,9 @@ class QuoteResource extends Resource
             });
     }
 
-    public static function backToIndexAction(): Actions\Action
+    public static function backToIndexAction(): Action
     {
-        return Actions\Action::make('backToIndex')
+        return Action::make('backToIndex')
             ->label(__('laravel-crm-filament::labels.actions.back_to_quotes'))
             ->icon('heroicon-o-arrow-left')
             ->color('gray')
