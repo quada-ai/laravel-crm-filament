@@ -29,8 +29,10 @@ class ViewQuote extends ViewRecord
             $this->quoteRejectAction(),
             ...$this->quoteUnacceptActions(),
             $this->quoteConvertToOrderAction(),
-            $this->quotePortalAction(),
-            $this->quoteDownloadPdfAction(),
+            $this->quotePortalAction()
+                ->hiddenLabel(),
+            $this->quoteDownloadPdfAction()
+                ->hiddenLabel(),
             Actions\EditAction::make()
                 ->button()
                 ->hiddenLabel()
