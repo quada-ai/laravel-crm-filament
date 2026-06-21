@@ -1,5 +1,5 @@
-<div class="crm-lead-notes" data-testid="crm-lead-notes">
-    @include('laravel-crm-filament::partials.lead-card-styles')
+<div class="crm-card-area-notes" data-testid="crm-card-area-notes">
+    @include('laravel-crm-filament::partials.crm-card-styles')
 
     @php
         $noteRows = $this->getOwnerRecord()->notes()->orderBy('created_at', 'desc')->get();

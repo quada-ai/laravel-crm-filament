@@ -1,11 +1,11 @@
 <?php
 
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadFilesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadLunchesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadMeetingsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmFilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
 /**
@@ -17,7 +17,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
  *   (b) Each subclass declares a LOCAL $view property pointing at
  *       'laravel-crm-filament::lead-{x}'.
  *   (c) Each Blade view file exists and @includes the shared
- *       'laravel-crm-filament::partials.lead-card-styles' partial.
+ *       'laravel-crm-filament::partials.crm-card-styles' partial.
  *   (d) Dark-mode CSS markers (--crm-card-bg, var(--color-gray-900)) exist in the
  *       shared partial.
  *   (e) Each view contains the expected structural markers (heading, add card,
@@ -27,12 +27,12 @@ function leadShowPageRmMatrix(): array
 {
     return [
         // [class, slug, blade-filename, section-translation-key, add-card-testid, wrapper-class]
-        'Notes' => [LeadNotesRelationManager::class, 'lead-notes', 'lead-notes.blade.php', 'sections.add_note', 'crm-lead-note-add-card', 'crm-lead-notes'],
-        'Tasks' => [LeadTasksRelationManager::class, 'lead-tasks', 'lead-tasks.blade.php', 'sections.add_task', 'crm-lead-task-add-card', 'crm-lead-tasks'],
-        'Calls' => [LeadCallsRelationManager::class, 'lead-calls', 'lead-calls.blade.php', 'sections.add_call', 'crm-lead-call-add-card', 'crm-lead-calls'],
-        'Meetings' => [LeadMeetingsRelationManager::class, 'lead-meetings', 'lead-meetings.blade.php', 'sections.add_meeting', 'crm-lead-meeting-add-card', 'crm-lead-meetings'],
-        'Lunches' => [LeadLunchesRelationManager::class, 'lead-lunches', 'lead-lunches.blade.php', 'sections.add_lunch', 'crm-lead-lunch-add-card', 'crm-lead-lunches'],
-        'Files' => [LeadFilesRelationManager::class, 'lead-files', 'lead-files.blade.php', 'sections.add_file', 'crm-lead-file-add-card', 'crm-lead-files'],
+        'Notes' => [CrmNotesRelationManager::class, 'crm-notes', 'crm-notes.blade.php', 'sections.add_note', 'crm-lead-note-add-card', 'crm-card-area-notes'],
+        'Tasks' => [CrmTasksRelationManager::class, 'crm-tasks', 'crm-tasks.blade.php', 'sections.add_task', 'crm-lead-task-add-card', 'crm-card-area-tasks'],
+        'Calls' => [CrmCallsRelationManager::class, 'crm-calls', 'crm-calls.blade.php', 'sections.add_call', 'crm-lead-call-add-card', 'crm-card-area-calls'],
+        'Meetings' => [CrmMeetingsRelationManager::class, 'crm-meetings', 'crm-meetings.blade.php', 'sections.add_meeting', 'crm-lead-meeting-add-card', 'crm-card-area-meetings'],
+        'Lunches' => [CrmLunchesRelationManager::class, 'crm-lunches', 'crm-lunches.blade.php', 'sections.add_lunch', 'crm-lead-lunch-add-card', 'crm-card-area-lunches'],
+        'Files' => [CrmFilesRelationManager::class, 'crm-files', 'crm-files.blade.php', 'sections.add_file', 'crm-lead-file-add-card', 'crm-card-area-files'],
     ];
 }
 
@@ -46,12 +46,12 @@ it('AC(a): registers all 6 Lead-prefixed RM classes in LeadResource::getRelation
 
     // The six Lead-prefixed RMs land at indices 1..6 (index 0 is ActivitiesRelationManager
     // per the v0.x US-008 lead show-page series wiring; index 7+ does not exist).
-    expect($relations[1])->toBe(LeadNotesRelationManager::class)
-        ->and($relations[2])->toBe(LeadTasksRelationManager::class)
-        ->and($relations[3])->toBe(LeadCallsRelationManager::class)
-        ->and($relations[4])->toBe(LeadMeetingsRelationManager::class)
-        ->and($relations[5])->toBe(LeadLunchesRelationManager::class)
-        ->and($relations[6])->toBe(LeadFilesRelationManager::class);
+    expect($relations[1])->toBe(CrmNotesRelationManager::class)
+        ->and($relations[2])->toBe(CrmTasksRelationManager::class)
+        ->and($relations[3])->toBe(CrmCallsRelationManager::class)
+        ->and($relations[4])->toBe(CrmMeetingsRelationManager::class)
+        ->and($relations[5])->toBe(CrmLunchesRelationManager::class)
+        ->and($relations[6])->toBe(CrmFilesRelationManager::class);
 });
 
 it('AC(b): each Lead-prefixed RM subclass declares a LOCAL $view property pointing at the expected blade key', function (string $class, string $slug) {
@@ -69,12 +69,12 @@ it('AC(b): each Lead-prefixed RM subclass declares a LOCAL $view property pointi
     $property->setAccessible(true);
     expect($property->getValue($instance))->toBe('laravel-crm-filament::' . $slug);
 })->with([
-    'Notes' => [LeadNotesRelationManager::class, 'lead-notes'],
-    'Tasks' => [LeadTasksRelationManager::class, 'lead-tasks'],
-    'Calls' => [LeadCallsRelationManager::class, 'lead-calls'],
-    'Meetings' => [LeadMeetingsRelationManager::class, 'lead-meetings'],
-    'Lunches' => [LeadLunchesRelationManager::class, 'lead-lunches'],
-    'Files' => [LeadFilesRelationManager::class, 'lead-files'],
+    'Notes' => [CrmNotesRelationManager::class, 'crm-notes'],
+    'Tasks' => [CrmTasksRelationManager::class, 'crm-tasks'],
+    'Calls' => [CrmCallsRelationManager::class, 'crm-calls'],
+    'Meetings' => [CrmMeetingsRelationManager::class, 'crm-meetings'],
+    'Lunches' => [CrmLunchesRelationManager::class, 'crm-lunches'],
+    'Files' => [CrmFilesRelationManager::class, 'crm-files'],
 ]);
 
 it('AC(c): each Lead-prefixed blade view file exists and @includes the shared lead-card-styles partial', function (string $bladeFile) {
@@ -83,18 +83,18 @@ it('AC(c): each Lead-prefixed blade view file exists and @includes the shared le
     expect(file_exists($path))->toBeTrue();
 
     $source = file_get_contents($path);
-    expect($source)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
+    expect($source)->toContain("@include('laravel-crm-filament::partials.crm-card-styles')");
 })->with([
-    'lead-notes.blade.php',
-    'lead-tasks.blade.php',
-    'lead-calls.blade.php',
-    'lead-meetings.blade.php',
-    'lead-lunches.blade.php',
-    'lead-files.blade.php',
+    'crm-notes.blade.php',
+    'crm-tasks.blade.php',
+    'crm-calls.blade.php',
+    'crm-meetings.blade.php',
+    'crm-lunches.blade.php',
+    'crm-files.blade.php',
 ]);
 
 it('AC(d): shared lead-card-styles partial declares dark-mode CSS markers (--crm-card-bg, var(--color-gray-900))', function () {
-    $path = leadShowPageBladeRoot() . '/partials/lead-card-styles.blade.php';
+    $path = leadShowPageBladeRoot() . '/partials/crm-card-styles.blade.php';
 
     expect(file_exists($path))->toBeTrue();
 
@@ -113,7 +113,7 @@ it('AC(d): shared lead-card-styles partial declares dark-mode CSS markers (--crm
         ->and($source)->toContain('</style>');
 
     // Each of the six wrapper classes is targeted by both light-mode and dark-mode rules.
-    foreach (['crm-lead-notes', 'crm-lead-tasks', 'crm-lead-calls', 'crm-lead-meetings', 'crm-lead-lunches', 'crm-lead-files'] as $wrapper) {
+    foreach (['crm-card-area-notes', 'crm-card-area-tasks', 'crm-card-area-calls', 'crm-card-area-meetings', 'crm-card-area-lunches', 'crm-card-area-files'] as $wrapper) {
         expect($source)->toContain('.' . $wrapper)
             ->and($source)->toContain('html.dark .' . $wrapper);
     }
@@ -148,10 +148,10 @@ it('AC(e): each Lead-prefixed blade view contains the expected structural marker
         ->and($source)->toContain('crm-card-dropdown-btn')
         ->and($source)->toContain('crm-card-dropdown-menu');
 })->with([
-    'Notes' => ['lead-notes.blade.php', 'sections.add_note', 'crm-lead-note-add-card', 'crm-lead-notes'],
-    'Tasks' => ['lead-tasks.blade.php', 'sections.add_task', 'crm-lead-task-add-card', 'crm-lead-tasks'],
-    'Calls' => ['lead-calls.blade.php', 'sections.add_call', 'crm-lead-call-add-card', 'crm-lead-calls'],
-    'Meetings' => ['lead-meetings.blade.php', 'sections.add_meeting', 'crm-lead-meeting-add-card', 'crm-lead-meetings'],
-    'Lunches' => ['lead-lunches.blade.php', 'sections.add_lunch', 'crm-lead-lunch-add-card', 'crm-lead-lunches'],
-    'Files' => ['lead-files.blade.php', 'sections.add_file', 'crm-lead-file-add-card', 'crm-lead-files'],
+    'Notes' => ['crm-notes.blade.php', 'sections.add_note', 'crm-lead-note-add-card', 'crm-card-area-notes'],
+    'Tasks' => ['crm-tasks.blade.php', 'sections.add_task', 'crm-lead-task-add-card', 'crm-card-area-tasks'],
+    'Calls' => ['crm-calls.blade.php', 'sections.add_call', 'crm-lead-call-add-card', 'crm-card-area-calls'],
+    'Meetings' => ['crm-meetings.blade.php', 'sections.add_meeting', 'crm-lead-meeting-add-card', 'crm-card-area-meetings'],
+    'Lunches' => ['crm-lunches.blade.php', 'sections.add_lunch', 'crm-lead-lunch-add-card', 'crm-card-area-lunches'],
+    'Files' => ['crm-files.blade.php', 'sections.add_file', 'crm-lead-file-add-card', 'crm-card-area-files'],
 ]);

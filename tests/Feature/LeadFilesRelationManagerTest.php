@@ -8,20 +8,20 @@ use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Activity;
 use VentureDrake\LaravelCrm\Models\File;
 use VentureDrake\LaravelCrm\Models\Lead;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmFilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadFilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
 
 /**
  * Hot-patch subclass that bypasses $this->form->fill() / getState() (which require
  * a real Filament panel mount) and operates on $this->data directly. Mirrors the
- * pattern locked-in by LeadNotesRelationManagerTest / LeadTasksRelationManagerTest /
- * LeadCallsRelationManagerTest. Re-implements the lifecycle bodies without form
+ * pattern locked-in by CrmNotesRelationManagerTest / CrmTasksRelationManagerTest /
+ * CrmCallsRelationManagerTest. Re-implements the lifecycle bodies without form
  * validation so the round-trip can be exercised headless.
  */
-function leadFilesFocusedRm(): LeadFilesRelationManager
+function leadFilesFocusedRm(): CrmFilesRelationManager
 {
-    return new class extends LeadFilesRelationManager
+    return new class extends CrmFilesRelationManager
     {
         public function createFile(): void
         {
@@ -80,26 +80,26 @@ function leadFilesFocusedRm(): LeadFilesRelationManager
 // AC (1) Inheritance.
 
 it('extends FilesRelationManager', function () {
-    expect(is_subclass_of(LeadFilesRelationManager::class, FilesRelationManager::class))->toBeTrue();
+    expect(is_subclass_of(CrmFilesRelationManager::class, FilesRelationManager::class))->toBeTrue();
 });
 
 // AC (2) $view points at the lead-files template.
 
 it('overrides the $view property to point at the lead-files Blade template', function () {
-    $ref = new ReflectionClass(LeadFilesRelationManager::class);
+    $ref = new ReflectionClass(CrmFilesRelationManager::class);
     $prop = $ref->getProperty('view');
     $prop->setAccessible(true);
 
-    expect($prop->getDeclaringClass()->getName())->toBe(LeadFilesRelationManager::class);
+    expect($prop->getDeclaringClass()->getName())->toBe(CrmFilesRelationManager::class);
 
     $rm = $ref->newInstanceWithoutConstructor();
-    expect($prop->getValue($rm))->toBe('laravel-crm-filament::lead-files');
+    expect($prop->getValue($rm))->toBe('laravel-crm-filament::crm-files');
 });
 
 // AC (3) form() returns a single FileUpload field with no label and no title field.
 
 it('returns a 1-field form schema with FileUpload only, no label and no title', function () {
-    $rm = (new ReflectionClass(LeadFilesRelationManager::class))->newInstanceWithoutConstructor();
+    $rm = (new ReflectionClass(CrmFilesRelationManager::class))->newInstanceWithoutConstructor();
     $schema = $rm->form(Schema::make($rm));
 
     $components = $schema->getComponents();
@@ -115,7 +115,7 @@ it('returns a 1-field form schema with FileUpload only, no label and no title', 
 });
 
 it('inherits the parent table configuration', function () {
-    $ref = new ReflectionClass(LeadFilesRelationManager::class);
+    $ref = new ReflectionClass(CrmFilesRelationManager::class);
 
     expect($ref->hasMethod('table'))->toBeTrue();
     expect($ref->getMethod('table')->getDeclaringClass()->getName())
@@ -123,7 +123,7 @@ it('inherits the parent table configuration', function () {
 });
 
 it('inherits the parent relationship binding to files morphMany', function () {
-    $ref = new ReflectionClass(LeadFilesRelationManager::class);
+    $ref = new ReflectionClass(CrmFilesRelationManager::class);
     $prop = $ref->getProperty('relationship');
     $prop->setAccessible(true);
 
@@ -131,19 +131,19 @@ it('inherits the parent relationship binding to files morphMany', function () {
 });
 
 it('declares createFile/downloadFile/deleteFile lifecycle methods (no edit/update/cancelEdit)', function () {
-    $ref = new ReflectionClass(LeadFilesRelationManager::class);
+    $ref = new ReflectionClass(CrmFilesRelationManager::class);
 
     expect($ref->hasMethod('createFile'))->toBeTrue();
     expect($ref->getMethod('createFile')->getDeclaringClass()->getName())
-        ->toBe(LeadFilesRelationManager::class);
+        ->toBe(CrmFilesRelationManager::class);
 
     expect($ref->hasMethod('downloadFile'))->toBeTrue();
     expect($ref->getMethod('downloadFile')->getDeclaringClass()->getName())
-        ->toBe(LeadFilesRelationManager::class);
+        ->toBe(CrmFilesRelationManager::class);
 
     expect($ref->hasMethod('deleteFile'))->toBeTrue();
     expect($ref->getMethod('deleteFile')->getDeclaringClass()->getName())
-        ->toBe(LeadFilesRelationManager::class);
+        ->toBe(CrmFilesRelationManager::class);
 
     // AC: no edit mode — these methods MUST NOT be declared.
     expect($ref->hasMethod('editFile'))->toBeFalse();
@@ -224,7 +224,7 @@ it('downloadFile() returns a URL resolved from Storage::disk($file->disk) with f
         'disk' => 'local',
     ]);
 
-    $rm = new LeadFilesRelationManager;
+    $rm = new CrmFilesRelationManager;
     $rm->ownerRecord = $lead->fresh();
 
     $url = $rm->downloadFile((int) $file->id);
@@ -250,7 +250,7 @@ it('downloadFile() returns null for a record that does not belong to the owner l
         'disk' => 'local',
     ]);
 
-    $rm = new LeadFilesRelationManager;
+    $rm = new CrmFilesRelationManager;
     $rm->ownerRecord = $leadA->fresh();
 
     expect($rm->downloadFile((int) $foreignFile->id))->toBeNull();
@@ -289,7 +289,7 @@ it('deleteFile() soft-deletes the file via the owner relation', function () {
 // AC (5) Blade source assertions.
 
 it('the lead-files Blade view contains the expected structural markers', function () {
-    $bladePath = dirname(__DIR__, 2) . '/resources/views/lead-files.blade.php';
+    $bladePath = dirname(__DIR__, 2) . '/resources/views/crm-files.blade.php';
     expect(file_exists($bladePath))->toBeTrue();
 
     $blade = file_get_contents($bladePath);
@@ -323,15 +323,15 @@ it('the lead-files Blade view contains the expected structural markers', functio
     expect($blade)->not->toContain('wire:click="cancelEdit');
 
     // Shared partial is included; no inline @once <style>.
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-styles')");
     expect($blade)->not->toContain('@once');
 
     // Empty state copy.
     expect($blade)->toContain('No files yet.');
 
-    // Partial declares the new .crm-lead-files selector.
-    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/lead-card-styles.blade.php';
+    // Partial declares the new .crm-card-area-files selector.
+    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/crm-card-styles.blade.php';
     $partial = file_get_contents($partialPath);
-    expect($partial)->toContain('.crm-lead-files');
-    expect($partial)->toContain('html.dark .crm-lead-files');
+    expect($partial)->toContain('.crm-card-area-files');
+    expect($partial)->toContain('html.dark .crm-card-area-files');
 });

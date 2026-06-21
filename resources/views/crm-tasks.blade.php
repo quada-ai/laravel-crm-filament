@@ -1,5 +1,5 @@
-<div class="crm-lead-tasks" data-testid="crm-lead-tasks">
-    @include('laravel-crm-filament::partials.lead-card-styles')
+<div class="crm-card-area-tasks" data-testid="crm-card-area-tasks">
+    @include('laravel-crm-filament::partials.crm-card-styles')
 
     @php
         $taskRows = $this->getOwnerRecord()->tasks()->orderBy('created_at', 'desc')->get();

@@ -8,21 +8,21 @@ use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Activity;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Lunch;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadLunchesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
 
 /**
  * Hot-patch subclass that bypasses $this->form->fill() / getState() (which require
  * a real Filament panel mount) and operates on $this->data directly. Mirrors the
- * pattern locked-in by LeadNotesRelationManagerTest + LeadTasksRelationManagerTest +
- * LeadCallsRelationManagerTest + LeadMeetingsRelationManagerTest. Re-implements
+ * pattern locked-in by CrmNotesRelationManagerTest + CrmTasksRelationManagerTest +
+ * CrmCallsRelationManagerTest + CrmMeetingsRelationManagerTest. Re-implements
  * the CRUD bodies without form validation so the round-trip can be exercised
  * headless.
  */
-function leadLunchesFocusedRm(): LeadLunchesRelationManager
+function leadLunchesFocusedRm(): CrmLunchesRelationManager
 {
-    return new class extends LeadLunchesRelationManager
+    return new class extends CrmLunchesRelationManager
     {
         public function createLunch(): void
         {
@@ -133,11 +133,11 @@ function leadLunchesFocusedRm(): LeadLunchesRelationManager
 // AC (1) Inheritance from LunchesRelationManager + isReadOnly() flipped to false.
 
 it('extends LunchesRelationManager', function () {
-    expect(is_subclass_of(LeadLunchesRelationManager::class, LunchesRelationManager::class))->toBeTrue();
+    expect(is_subclass_of(CrmLunchesRelationManager::class, LunchesRelationManager::class))->toBeTrue();
 });
 
 it('overrides isReadOnly() to return false (flipping the parent read-only contract)', function () {
-    $rm = (new ReflectionClass(LeadLunchesRelationManager::class))->newInstanceWithoutConstructor();
+    $rm = (new ReflectionClass(CrmLunchesRelationManager::class))->newInstanceWithoutConstructor();
     expect($rm->isReadOnly())->toBeFalse();
 
     // Standalone LunchesRelationManager remains read-only (parent untouched).
@@ -148,20 +148,20 @@ it('overrides isReadOnly() to return false (flipping the parent read-only contra
 // AC (2) $view points at the lead-lunches template.
 
 it('overrides the $view property to point at the lead-lunches Blade template', function () {
-    $ref = new ReflectionClass(LeadLunchesRelationManager::class);
+    $ref = new ReflectionClass(CrmLunchesRelationManager::class);
     $prop = $ref->getProperty('view');
     $prop->setAccessible(true);
 
-    expect($prop->getDeclaringClass()->getName())->toBe(LeadLunchesRelationManager::class);
+    expect($prop->getDeclaringClass()->getName())->toBe(CrmLunchesRelationManager::class);
 
     $rm = $ref->newInstanceWithoutConstructor();
-    expect($prop->getValue($rm))->toBe('laravel-crm-filament::lead-lunches');
+    expect($prop->getValue($rm))->toBe('laravel-crm-filament::crm-lunches');
 });
 
 // AC (3) form() returns name/description/start_at/finish_at + location + owner/assigned grid.
 
 it('returns the expected form schema with name, description, start/finish times, location, owner, assigned', function () {
-    $rm = (new ReflectionClass(LeadLunchesRelationManager::class))->newInstanceWithoutConstructor();
+    $rm = (new ReflectionClass(CrmLunchesRelationManager::class))->newInstanceWithoutConstructor();
     $schema = $rm->form(Schema::make($rm));
 
     expect($schema->getStatePath())->toBe('data');
@@ -189,7 +189,7 @@ it('returns the expected form schema with name, description, start/finish times,
 });
 
 it('inherits the parent table configuration (columns and actions)', function () {
-    $ref = new ReflectionClass(LeadLunchesRelationManager::class);
+    $ref = new ReflectionClass(CrmLunchesRelationManager::class);
 
     expect($ref->hasMethod('table'))->toBeTrue();
     expect($ref->getMethod('table')->getDeclaringClass()->getName())
@@ -197,7 +197,7 @@ it('inherits the parent table configuration (columns and actions)', function () 
 });
 
 it('inherits the parent relationship binding', function () {
-    $ref = new ReflectionClass(LeadLunchesRelationManager::class);
+    $ref = new ReflectionClass(CrmLunchesRelationManager::class);
     $prop = $ref->getProperty('relationship');
     $prop->setAccessible(true);
 
@@ -337,7 +337,7 @@ it('deleteLunch() soft-deletes the lunch via the owner relation', function () {
 // AC (5) Blade source assertions.
 
 it('the lead-lunches Blade view contains the expected structural markers', function () {
-    $bladePath = dirname(__DIR__, 2) . '/resources/views/lead-lunches.blade.php';
+    $bladePath = dirname(__DIR__, 2) . '/resources/views/crm-lunches.blade.php';
     expect(file_exists($bladePath))->toBeTrue();
 
     $blade = file_get_contents($bladePath);
@@ -383,17 +383,17 @@ it('the lead-lunches Blade view contains the expected structural markers', funct
     expect($blade)->toContain('crm-card-guests');
 
     // Shared lead-card-styles partial.
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-styles')");
     expect($blade)->not->toContain('@once');
 
     // Empty state.
     expect($blade)->toContain('No lunches yet');
 
-    // Partial extension confirms the shared selector covers crm-lead-lunches.
-    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/lead-card-styles.blade.php';
+    // Partial extension confirms the shared selector covers crm-card-area-lunches.
+    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/crm-card-styles.blade.php';
     expect(file_exists($partialPath))->toBeTrue();
 
     $partial = file_get_contents($partialPath);
-    expect($partial)->toContain('.crm-lead-lunches');
-    expect($partial)->toContain('html.dark .crm-lead-lunches');
+    expect($partial)->toContain('.crm-card-area-lunches');
+    expect($partial)->toContain('html.dark .crm-card-area-lunches');
 });

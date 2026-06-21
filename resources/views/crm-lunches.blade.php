@@ -1,15 +1,15 @@
-<div class="crm-lead-meetings" data-testid="crm-lead-meetings">
-    @include('laravel-crm-filament::partials.lead-card-styles')
+<div class="crm-card-area-lunches" data-testid="crm-card-area-lunches">
+    @include('laravel-crm-filament::partials.crm-card-styles')
 
     @php
-        $meetingRows = $this->getOwnerRecord()->meetings()->orderBy('created_at', 'desc')->get();
+        $lunchRows = $this->getOwnerRecord()->lunches()->orderBy('created_at', 'desc')->get();
     @endphp
 
     @if ($editingId === null)
-        <div class="crm-card-card crm-card-card--add" data-testid="crm-lead-meeting-add-card">
-            <h3 class="crm-card-section-heading">{{ __('laravel-crm-filament::labels.sections.add_meeting') }}</h3>
+        <div class="crm-card-card crm-card-card--add" data-testid="crm-lead-lunch-add-card">
+            <h3 class="crm-card-section-heading">{{ __('laravel-crm-filament::labels.sections.add_lunch') }}</h3>
             <hr class="crm-card-section-divider" />
-            <form wire:submit="createMeeting" class="crm-card-form">
+            <form wire:submit="createLunch" class="crm-card-form">
                 {{ $this->form }}
                 <hr class="crm-card-section-divider crm-card-section-divider--footer" />
                 <div class="crm-card-form-actions">
@@ -23,10 +23,10 @@
         </div>
     @endif
 
-    @forelse ($meetingRows as $meeting)
-        <div class="crm-card-card" data-meeting-id="{{ $meeting->id }}" data-testid="crm-lead-meeting-card">
-            @if ($editingId === $meeting->id)
-                <form wire:submit="updateMeeting" class="crm-card-form" data-testid="crm-lead-meeting-edit-form">
+    @forelse ($lunchRows as $lunch)
+        <div class="crm-card-card" data-lunch-id="{{ $lunch->id }}" data-testid="crm-lead-lunch-card">
+            @if ($editingId === $lunch->id)
+                <form wire:submit="updateLunch" class="crm-card-form" data-testid="crm-lead-lunch-edit-form">
                     {{ $this->form }}
                     <div class="crm-card-form-actions">
                         <button
@@ -43,7 +43,7 @@
                 </form>
             @else
                 <div class="crm-card-card-head">
-                    <div class="crm-card-card-title">{{ $meeting->name }}</div>
+                    <div class="crm-card-card-title">{{ $lunch->name }}</div>
                     <div
                         x-data="{ open: false }"
                         @click.outside="open = false"
@@ -65,15 +65,15 @@
                         >
                             <button
                                 type="button"
-                                wire:click="editMeeting({{ $meeting->id }})"
+                                wire:click="editLunch({{ $lunch->id }})"
                                 @click="open = false"
                                 class="crm-card-dropdown-item"
                                 role="menuitem"
                             >{{ __('laravel-crm-filament::labels.actions.edit') }}</button>
                             <button
                                 type="button"
-                                wire:click="deleteMeeting({{ $meeting->id }})"
-                                wire:confirm="Delete this meeting?"
+                                wire:click="deleteLunch({{ $lunch->id }})"
+                                wire:confirm="Delete this lunch?"
                                 @click="open = false"
                                 class="crm-card-dropdown-item crm-card-dropdown-item--danger"
                                 role="menuitem"
@@ -82,18 +82,18 @@
                     </div>
                 </div>
                 <div class="crm-card-badges">
-                    @if ($meeting->start_at)
-                        <span class="crm-card-pill">{{ __('laravel-crm-filament::labels.money.start_at') }} {{ $meeting->start_at->format('h:i A') }} on {{ $meeting->start_at->format('M d, Y') }}</span>
+                    @if ($lunch->start_at)
+                        <span class="crm-card-pill">{{ __('laravel-crm-filament::labels.money.start_at') }} {{ $lunch->start_at->format('h:i A') }} on {{ $lunch->start_at->format('M d, Y') }}</span>
                     @endif
-                    @if ($meeting->finish_at)
-                        <span class="crm-card-pill">{{ __('laravel-crm-filament::labels.money.finish_at') }} {{ $meeting->finish_at->format('h:i A') }} on {{ $meeting->finish_at->format('M d, Y') }}</span>
+                    @if ($lunch->finish_at)
+                        <span class="crm-card-pill">{{ __('laravel-crm-filament::labels.money.finish_at') }} {{ $lunch->finish_at->format('h:i A') }} on {{ $lunch->finish_at->format('M d, Y') }}</span>
                     @endif
                 </div>
 
                 <hr class="crm-card-section-divider crm-card-section-divider--inset" />
                 <h4 class="crm-card-section-title">{{ __('laravel-crm-filament::labels.fields.guests') }}</h4>
                 @php
-                    $guestContacts = $meeting->contacts->filter(fn ($c) => $c->entityable !== null);
+                    $guestContacts = $lunch->contacts->filter(fn ($c) => $c->entityable !== null);
                 @endphp
                 @if ($guestContacts->count() > 0)
                     <div class="crm-card-guests">
@@ -110,18 +110,18 @@
 
                 <hr class="crm-card-section-divider crm-card-section-divider--inset" />
                 <h4 class="crm-card-section-title">{{ __('laravel-crm-filament::labels.fields.location') }}</h4>
-                @if ($meeting->location)
-                    <div class="crm-card-section-content">{{ $meeting->location }}</div>
+                @if ($lunch->location)
+                    <div class="crm-card-section-content">{{ $lunch->location }}</div>
                 @endif
 
                 <hr class="crm-card-section-divider crm-card-section-divider--inset" />
                 <h4 class="crm-card-section-title">{{ __('laravel-crm-filament::labels.fields.description') }}</h4>
-                @if ($meeting->description)
-                    <div class="crm-card-section-content">{{ $meeting->description }}</div>
+                @if ($lunch->description)
+                    <div class="crm-card-section-content">{{ $lunch->description }}</div>
                 @endif
             @endif
         </div>
     @empty
-        <div class="crm-card-empty">No meetings yet.</div>
+        <div class="crm-card-empty">No lunches yet.</div>
     @endforelse
 </div>

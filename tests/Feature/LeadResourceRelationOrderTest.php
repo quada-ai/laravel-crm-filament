@@ -1,39 +1,39 @@
 <?php
 
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadActivitiesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadFilesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadLunchesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadMeetingsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmFilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
-it('LeadResource::getRelations() contains both LeadLunchesRelationManager and ActivitiesRelationManager', function () {
+it('LeadResource::getRelations() contains both CrmLunchesRelationManager and ActivitiesRelationManager', function () {
     $relations = LeadResource::getRelations();
 
-    expect($relations)->toContain(LeadLunchesRelationManager::class)
-        ->and($relations)->toContain(LeadActivitiesRelationManager::class);
+    expect($relations)->toContain(CrmLunchesRelationManager::class)
+        ->and($relations)->toContain(CrmActivitiesRelationManager::class);
 });
 
 it('LeadResource::getRelations() preserves the six previously-registered RMs', function () {
     $relations = LeadResource::getRelations();
 
-    expect($relations)->toContain(LeadNotesRelationManager::class)
-        ->and($relations)->toContain(LeadTasksRelationManager::class)
-        ->and($relations)->toContain(LeadCallsRelationManager::class)
-        ->and($relations)->toContain(LeadMeetingsRelationManager::class)
-        ->and($relations)->toContain(LeadFilesRelationManager::class);
+    expect($relations)->toContain(CrmNotesRelationManager::class)
+        ->and($relations)->toContain(CrmTasksRelationManager::class)
+        ->and($relations)->toContain(CrmCallsRelationManager::class)
+        ->and($relations)->toContain(CrmMeetingsRelationManager::class)
+        ->and($relations)->toContain(CrmFilesRelationManager::class);
 });
 
 it('LeadResource::getRelations() returns the AC tab order: Activity / Notes / Tasks / Calls / Meetings / Lunches / Files', function () {
     expect(LeadResource::getRelations())->toBe([
-        LeadActivitiesRelationManager::class,
-        LeadNotesRelationManager::class,
-        LeadTasksRelationManager::class,
-        LeadCallsRelationManager::class,
-        LeadMeetingsRelationManager::class,
-        LeadLunchesRelationManager::class,
-        LeadFilesRelationManager::class,
+        CrmActivitiesRelationManager::class,
+        CrmNotesRelationManager::class,
+        CrmTasksRelationManager::class,
+        CrmCallsRelationManager::class,
+        CrmMeetingsRelationManager::class,
+        CrmLunchesRelationManager::class,
+        CrmFilesRelationManager::class,
     ]);
 });

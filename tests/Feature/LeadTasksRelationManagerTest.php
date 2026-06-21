@@ -8,19 +8,19 @@ use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Activity;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Task;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
 
 /**
  * Hot-patch subclass that bypasses $this->form->fill() / getState() (which require
  * a real Filament panel mount) and operates on $this->data directly. Mirrors the
- * pattern locked-in by LeadNotesRelationManagerTest. Re-implements the four CRUD
+ * pattern locked-in by CrmNotesRelationManagerTest. Re-implements the four CRUD
  * bodies without form validation so the round-trip can be exercised headless.
  */
-function leadTasksFocusedRm(): LeadTasksRelationManager
+function leadTasksFocusedRm(): CrmTasksRelationManager
 {
-    return new class extends LeadTasksRelationManager
+    return new class extends CrmTasksRelationManager
     {
         public function createTask(): void
         {
@@ -121,26 +121,26 @@ function leadTasksFocusedRm(): LeadTasksRelationManager
 // AC (1) Inheritance.
 
 it('extends TasksRelationManager', function () {
-    expect(is_subclass_of(LeadTasksRelationManager::class, TasksRelationManager::class))->toBeTrue();
+    expect(is_subclass_of(CrmTasksRelationManager::class, TasksRelationManager::class))->toBeTrue();
 });
 
 // AC (2) $view points at the lead-tasks template.
 
 it('overrides the $view property to point at the lead-tasks Blade template', function () {
-    $ref = new ReflectionClass(LeadTasksRelationManager::class);
+    $ref = new ReflectionClass(CrmTasksRelationManager::class);
     $prop = $ref->getProperty('view');
     $prop->setAccessible(true);
 
-    expect($prop->getDeclaringClass()->getName())->toBe(LeadTasksRelationManager::class);
+    expect($prop->getDeclaringClass()->getName())->toBe(CrmTasksRelationManager::class);
 
     $rm = $ref->newInstanceWithoutConstructor();
-    expect($prop->getValue($rm))->toBe('laravel-crm-filament::lead-tasks');
+    expect($prop->getValue($rm))->toBe('laravel-crm-filament::crm-tasks');
 });
 
 // AC (3) form() returns name/description/due_at + owner/assigned grid.
 
 it('returns the expected form schema with name, description, due_at, owner, assigned', function () {
-    $rm = (new ReflectionClass(LeadTasksRelationManager::class))->newInstanceWithoutConstructor();
+    $rm = (new ReflectionClass(CrmTasksRelationManager::class))->newInstanceWithoutConstructor();
     $schema = $rm->form(Schema::make($rm));
 
     expect($schema->getStatePath())->toBe('data');
@@ -165,7 +165,7 @@ it('returns the expected form schema with name, description, due_at, owner, assi
 });
 
 it('inherits the parent table configuration (columns and actions)', function () {
-    $ref = new ReflectionClass(LeadTasksRelationManager::class);
+    $ref = new ReflectionClass(CrmTasksRelationManager::class);
 
     expect($ref->hasMethod('table'))->toBeTrue();
     expect($ref->getMethod('table')->getDeclaringClass()->getName())
@@ -173,7 +173,7 @@ it('inherits the parent table configuration (columns and actions)', function () 
 });
 
 it('inherits the parent relationship binding', function () {
-    $ref = new ReflectionClass(LeadTasksRelationManager::class);
+    $ref = new ReflectionClass(CrmTasksRelationManager::class);
     $prop = $ref->getProperty('relationship');
     $prop->setAccessible(true);
 
@@ -305,7 +305,7 @@ it('deleteTask() soft-deletes the task via the owner relation', function () {
 // AC (5) Blade source assertions.
 
 it('the lead-tasks Blade view contains the expected structural markers', function () {
-    $bladePath = dirname(__DIR__, 2) . '/resources/views/lead-tasks.blade.php';
+    $bladePath = dirname(__DIR__, 2) . '/resources/views/crm-tasks.blade.php';
     expect(file_exists($bladePath))->toBeTrue();
 
     $blade = file_get_contents($bladePath);
@@ -338,17 +338,17 @@ it('the lead-tasks Blade view contains the expected structural markers', functio
     expect($blade)->toContain('wire:click="cancelEdit"');
 
     // Shared lead-card-styles partial.
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-styles')");
     expect($blade)->not->toContain('@once');
 
     // Empty state.
     expect($blade)->toContain('No tasks yet');
 
-    // Partial extension confirms the shared selector covers crm-lead-tasks.
-    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/lead-card-styles.blade.php';
+    // Partial extension confirms the shared selector covers crm-card-area-tasks.
+    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/crm-card-styles.blade.php';
     expect(file_exists($partialPath))->toBeTrue();
 
     $partial = file_get_contents($partialPath);
-    expect($partial)->toContain('.crm-lead-tasks');
-    expect($partial)->toContain('html.dark .crm-lead-tasks');
+    expect($partial)->toContain('.crm-card-area-tasks');
+    expect($partial)->toContain('html.dark .crm-card-area-tasks');
 });

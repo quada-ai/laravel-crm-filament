@@ -4,7 +4,7 @@ use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Note;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
 
 /**
@@ -12,9 +12,9 @@ use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
  * Filament panel mount) and operates on $this->data directly. Mirrors the
  * pattern locked-in by LeadNotesCreateNoteTest and LeadNotesEditLifecycleTest.
  */
-function leadNotesDeleteRm(): LeadNotesRelationManager
+function leadNotesDeleteRm(): CrmNotesRelationManager
 {
-    return new class extends LeadNotesRelationManager
+    return new class extends CrmNotesRelationManager
     {
         public function deleteNote(int $id): void
         {
@@ -43,13 +43,13 @@ function leadNotesDeleteRm(): LeadNotesRelationManager
 }
 
 it('declares a public deleteNote(int): void method locally', function () {
-    $ref = new ReflectionClass(LeadNotesRelationManager::class);
+    $ref = new ReflectionClass(CrmNotesRelationManager::class);
 
     expect($ref->hasMethod('deleteNote'))->toBeTrue();
 
     $method = $ref->getMethod('deleteNote');
     expect($method->isPublic())->toBeTrue();
-    expect($method->getDeclaringClass()->getName())->toBe(LeadNotesRelationManager::class);
+    expect($method->getDeclaringClass()->getName())->toBe(CrmNotesRelationManager::class);
     expect($method->getReturnType()?->getName())->toBe('void');
     expect($method->getNumberOfRequiredParameters())->toBe(1);
 
@@ -188,7 +188,7 @@ it('deleteNote() clears edit state when deleting the currently-editing note', fu
 
 it('the real deleteNote() method routes through the owner relation, calls delete(), and notifies', function () {
     $src = file_get_contents(
-        dirname(__DIR__, 2) . '/src/RelationManagers/LeadNotesRelationManager.php'
+        dirname(__DIR__, 2) . '/src/RelationManagers/CrmNotesRelationManager.php'
     );
 
     // Resolves the target via the owner relation (scoping enforced)

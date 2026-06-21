@@ -9,19 +9,19 @@ use VentureDrake\LaravelCrm\Models\Activity;
 use VentureDrake\LaravelCrm\Models\Call;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmCallsRelationManager;
 use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
 
 /**
  * Hot-patch subclass that bypasses $this->form->fill() / getState() (which require
  * a real Filament panel mount) and operates on $this->data directly. Mirrors the
- * pattern locked-in by LeadNotesRelationManagerTest + LeadTasksRelationManagerTest.
+ * pattern locked-in by CrmNotesRelationManagerTest + CrmTasksRelationManagerTest.
  * Re-implements the four CRUD bodies without form validation so the round-trip can
  * be exercised headless.
  */
-function leadCallsFocusedRm(): LeadCallsRelationManager
+function leadCallsFocusedRm(): CrmCallsRelationManager
 {
-    return new class extends LeadCallsRelationManager
+    return new class extends CrmCallsRelationManager
     {
         public function createCall(): void
         {
@@ -127,26 +127,26 @@ function leadCallsFocusedRm(): LeadCallsRelationManager
 // AC (1) Inheritance.
 
 it('extends CallsRelationManager', function () {
-    expect(is_subclass_of(LeadCallsRelationManager::class, CallsRelationManager::class))->toBeTrue();
+    expect(is_subclass_of(CrmCallsRelationManager::class, CallsRelationManager::class))->toBeTrue();
 });
 
 // AC (2) $view points at the lead-calls template.
 
 it('overrides the $view property to point at the lead-calls Blade template', function () {
-    $ref = new ReflectionClass(LeadCallsRelationManager::class);
+    $ref = new ReflectionClass(CrmCallsRelationManager::class);
     $prop = $ref->getProperty('view');
     $prop->setAccessible(true);
 
-    expect($prop->getDeclaringClass()->getName())->toBe(LeadCallsRelationManager::class);
+    expect($prop->getDeclaringClass()->getName())->toBe(CrmCallsRelationManager::class);
 
     $rm = $ref->newInstanceWithoutConstructor();
-    expect($prop->getValue($rm))->toBe('laravel-crm-filament::lead-calls');
+    expect($prop->getValue($rm))->toBe('laravel-crm-filament::crm-calls');
 });
 
 // AC (3) form() returns subject/start_at/finish_at/guests/location/description matching core CRM CallRelated parity.
 
 it('returns the expected form schema with subject/start/finish/guests/location/description', function () {
-    $rm = (new ReflectionClass(LeadCallsRelationManager::class))->newInstanceWithoutConstructor();
+    $rm = (new ReflectionClass(CrmCallsRelationManager::class))->newInstanceWithoutConstructor();
     $schema = $rm->form(Schema::make($rm));
 
     expect($schema->getStatePath())->toBe('data');
@@ -176,7 +176,7 @@ it('returns the expected form schema with subject/start/finish/guests/location/d
 });
 
 it('inherits the parent table configuration (columns and actions)', function () {
-    $ref = new ReflectionClass(LeadCallsRelationManager::class);
+    $ref = new ReflectionClass(CrmCallsRelationManager::class);
 
     expect($ref->hasMethod('table'))->toBeTrue();
     expect($ref->getMethod('table')->getDeclaringClass()->getName())
@@ -184,7 +184,7 @@ it('inherits the parent table configuration (columns and actions)', function () 
 });
 
 it('inherits the parent relationship binding', function () {
-    $ref = new ReflectionClass(LeadCallsRelationManager::class);
+    $ref = new ReflectionClass(CrmCallsRelationManager::class);
     $prop = $ref->getProperty('relationship');
     $prop->setAccessible(true);
 
@@ -319,7 +319,7 @@ it('deleteCall() soft-deletes the call via the owner relation', function () {
 // AC (5) Blade source assertions.
 
 it('the lead-calls Blade view contains the expected structural markers', function () {
-    $bladePath = dirname(__DIR__, 2) . '/resources/views/lead-calls.blade.php';
+    $bladePath = dirname(__DIR__, 2) . '/resources/views/crm-calls.blade.php';
     expect(file_exists($bladePath))->toBeTrue();
 
     $blade = file_get_contents($bladePath);
@@ -364,17 +364,17 @@ it('the lead-calls Blade view contains the expected structural markers', functio
     expect($blade)->toContain('$call->location');
 
     // Shared lead-card-styles partial.
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-styles')");
     expect($blade)->not->toContain('@once');
 
     // Empty state.
     expect($blade)->toContain('No calls yet');
 
-    // Partial extension confirms the shared selector covers crm-lead-calls.
-    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/lead-card-styles.blade.php';
+    // Partial extension confirms the shared selector covers crm-card-area-calls.
+    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/crm-card-styles.blade.php';
     expect(file_exists($partialPath))->toBeTrue();
 
     $partial = file_get_contents($partialPath);
-    expect($partial)->toContain('.crm-lead-calls');
-    expect($partial)->toContain('html.dark .crm-lead-calls');
+    expect($partial)->toContain('.crm-card-area-calls');
+    expect($partial)->toContain('html.dark .crm-card-area-calls');
 });

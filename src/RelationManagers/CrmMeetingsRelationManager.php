@@ -8,9 +8,9 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use VentureDrake\LaravelCrm\Models\Person;
 
-class LeadMeetingsRelationManager extends MeetingsRelationManager
+class CrmMeetingsRelationManager extends MeetingsRelationManager
 {
-    protected string $view = 'laravel-crm-filament::lead-meetings';
+    protected string $view = 'laravel-crm-filament::crm-meetings';
 
     /**
      * @var array<string, mixed>|null

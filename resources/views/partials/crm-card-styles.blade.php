@@ -1,12 +1,12 @@
 @once
     <style>
-        .crm-lead-notes,
-        .crm-lead-tasks,
-        .crm-lead-calls,
-        .crm-lead-meetings,
-        .crm-lead-lunches,
-        .crm-lead-files,
-        .crm-lead-activity {
+        .crm-card-area-notes,
+        .crm-card-area-tasks,
+        .crm-card-area-calls,
+        .crm-card-area-meetings,
+        .crm-card-area-lunches,
+        .crm-card-area-files,
+        .crm-card-area-activity {
             --crm-card-bg: #ffffff;
             --crm-card-border: rgba(0, 0, 0, 0.06);
             --crm-card-text: #111827;
@@ -25,13 +25,13 @@
             flex-direction: column;
             gap: 0.75rem;
         }
-        html.dark .crm-lead-notes,
-        html.dark .crm-lead-tasks,
-        html.dark .crm-lead-calls,
-        html.dark .crm-lead-meetings,
-        html.dark .crm-lead-lunches,
-        html.dark .crm-lead-files,
-        html.dark .crm-lead-activity {
+        html.dark .crm-card-area-notes,
+        html.dark .crm-card-area-tasks,
+        html.dark .crm-card-area-calls,
+        html.dark .crm-card-area-meetings,
+        html.dark .crm-card-area-lunches,
+        html.dark .crm-card-area-files,
+        html.dark .crm-card-area-activity {
             --crm-card-bg: var(--color-gray-900, rgb(17, 24, 39));
             --crm-card-border: rgba(255, 255, 255, 0.1);
             --crm-card-text: #ffffff;

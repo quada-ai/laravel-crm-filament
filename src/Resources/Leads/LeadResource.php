@@ -29,13 +29,13 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadActivitiesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadFilesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadLunchesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadMeetingsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmFilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\CreateLead;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\EditLead;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\LeadKanban;
@@ -270,13 +270,13 @@ class LeadResource extends Resource
     public static function getRelations(): array
     {
         return [
-            LeadActivitiesRelationManager::class,
-            LeadNotesRelationManager::class,
-            LeadTasksRelationManager::class,
-            LeadCallsRelationManager::class,
-            LeadMeetingsRelationManager::class,
-            LeadLunchesRelationManager::class,
-            LeadFilesRelationManager::class,
+            CrmActivitiesRelationManager::class,
+            CrmNotesRelationManager::class,
+            CrmTasksRelationManager::class,
+            CrmCallsRelationManager::class,
+            CrmMeetingsRelationManager::class,
+            CrmLunchesRelationManager::class,
+            CrmFilesRelationManager::class,
         ];
     }
 

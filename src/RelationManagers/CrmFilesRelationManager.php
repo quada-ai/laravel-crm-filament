@@ -8,9 +8,9 @@ use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Storage;
 use VentureDrake\LaravelCrm\Models\File;
 
-class LeadFilesRelationManager extends FilesRelationManager
+class CrmFilesRelationManager extends FilesRelationManager
 {
-    protected string $view = 'laravel-crm-filament::lead-files';
+    protected string $view = 'laravel-crm-filament::crm-files';
 
     /**
      * @var array<string, mixed>|null

@@ -9,8 +9,8 @@ use VentureDrake\LaravelCrm\Models\Lunch;
 use VentureDrake\LaravelCrm\Models\Meeting;
 use VentureDrake\LaravelCrm\Models\Note;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmFilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadFilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\ActivityResource;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\Pages\ListActivities;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\Pages\ViewActivity;
@@ -80,9 +80,9 @@ it('attaches FilesRelationManager to every parent resource that owns files', fun
     expect($resource::getRelations())->toContain(FilesRelationManager::class);
 })->with('filesRelationManagerParents');
 
-it('attaches the Lead-specific LeadFilesRelationManager (subclass) to LeadResource', function (): void {
+it('attaches the Lead-specific CrmFilesRelationManager (subclass) to LeadResource', function (): void {
     $relations = LeadResource::getRelations();
-    expect($relations)->toContain(LeadFilesRelationManager::class);
+    expect($relations)->toContain(CrmFilesRelationManager::class);
     expect($relations)->not->toContain(FilesRelationManager::class);
 });
 

@@ -1,11 +1,11 @@
 <?php
 
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadLunchesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadMeetingsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
@@ -33,17 +33,17 @@ it('attaches Notes/Tasks/Calls/Meetings RMs to all contact-activity parents', fu
     expect($relations)->toContain(MeetingsRelationManager::class);
 })->with('contactActivityParents');
 
-it('attaches LeadNotesRelationManager + LeadTasksRelationManager + LeadCallsRelationManager (subclasses of Notes/Tasks/Calls RMs) plus Meetings RM to LeadResource', function () {
+it('attaches CrmNotesRelationManager + CrmTasksRelationManager + CrmCallsRelationManager (subclasses of Notes/Tasks/Calls RMs) plus Meetings RM to LeadResource', function () {
     $relations = LeadResource::getRelations();
-    expect($relations)->toContain(LeadNotesRelationManager::class);
+    expect($relations)->toContain(CrmNotesRelationManager::class);
     expect($relations)->not->toContain(NotesRelationManager::class);
-    expect($relations)->toContain(LeadTasksRelationManager::class);
+    expect($relations)->toContain(CrmTasksRelationManager::class);
     expect($relations)->not->toContain(TasksRelationManager::class);
-    expect($relations)->toContain(LeadCallsRelationManager::class);
+    expect($relations)->toContain(CrmCallsRelationManager::class);
     expect($relations)->not->toContain(CallsRelationManager::class);
-    expect($relations)->toContain(LeadMeetingsRelationManager::class);
+    expect($relations)->toContain(CrmMeetingsRelationManager::class);
     expect($relations)->not->toContain(MeetingsRelationManager::class);
-    expect($relations)->toContain(LeadLunchesRelationManager::class);
+    expect($relations)->toContain(CrmLunchesRelationManager::class);
     expect($relations)->not->toContain(LunchesRelationManager::class);
 });
 

@@ -7,10 +7,13 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use VentureDrake\LaravelCrm\Models\Person;
+use VentureDrake\LaravelCrmFilament\Concerns\LogsCrmActivity;
 
-class LeadCallsRelationManager extends CallsRelationManager
+class CrmLunchesRelationManager extends LunchesRelationManager
 {
-    protected string $view = 'laravel-crm-filament::lead-calls';
+    use LogsCrmActivity;
+
+    protected string $view = 'laravel-crm-filament::crm-lunches';
 
     /**
      * @var array<string, mixed>|null
@@ -18,6 +21,11 @@ class LeadCallsRelationManager extends CallsRelationManager
     public ?array $data = [];
 
     public ?int $editingId = null;
+
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
 
     public function mount(): void
     {
@@ -61,11 +69,11 @@ class LeadCallsRelationManager extends CallsRelationManager
             ]);
     }
 
-    public function createCall(): void
+    public function createLunch(): void
     {
         $data = $this->form->getState();
 
-        $call = $this->getOwnerRecord()->calls()->create([
+        $lunch = $this->getOwnerRecord()->lunches()->create([
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
             'start_at' => $data['start_at'] ?? null,
@@ -75,35 +83,35 @@ class LeadCallsRelationManager extends CallsRelationManager
             'user_created_id' => auth()->id(),
         ]);
 
-        $this->syncGuests($call, $data['guests'] ?? []);
+        $this->syncGuests($lunch, $data['guests'] ?? []);
 
-        static::logCrmActivity($this->getOwnerRecord(), $call);
+        static::logCrmActivity($this->getOwnerRecord(), $lunch);
 
         $this->form->fill($this->defaultFormData());
 
         Notification::make()
-            ->title('Call added')
+            ->title('Lunch added')
             ->success()
             ->send();
     }
 
-    public function editCall(int $id): void
+    public function editLunch(int $id): void
     {
-        $call = $this->getOwnerRecord()->calls()->whereKey($id)->first();
+        $lunch = $this->getOwnerRecord()->lunches()->whereKey($id)->first();
 
-        if ($call === null) {
+        if ($lunch === null) {
             return;
         }
 
-        $this->editingId = (int) $call->id;
+        $this->editingId = (int) $lunch->id;
 
         $this->form->fill([
-            'name' => $call->name,
-            'description' => $call->description,
-            'start_at' => $call->start_at,
-            'finish_at' => $call->finish_at,
-            'location' => $call->location ?? null,
-            'guests' => $call->contacts()
+            'name' => $lunch->name,
+            'description' => $lunch->description,
+            'start_at' => $lunch->start_at,
+            'finish_at' => $lunch->finish_at,
+            'location' => $lunch->location ?? null,
+            'guests' => $lunch->contacts()
                 ->where('entityable_type', Person::class)
                 ->pluck('entityable_id')
                 ->map(fn ($id) => (int) $id)
@@ -118,7 +126,7 @@ class LeadCallsRelationManager extends CallsRelationManager
         $this->form->fill($this->defaultFormData());
     }
 
-    public function updateCall(): void
+    public function updateLunch(): void
     {
         if ($this->editingId === null) {
             return;
@@ -126,15 +134,15 @@ class LeadCallsRelationManager extends CallsRelationManager
 
         $data = $this->form->getState();
 
-        $call = $this->getOwnerRecord()->calls()->whereKey($this->editingId)->first();
+        $lunch = $this->getOwnerRecord()->lunches()->whereKey($this->editingId)->first();
 
-        if ($call === null) {
+        if ($lunch === null) {
             $this->cancelEdit();
 
             return;
         }
 
-        $call->update([
+        $lunch->update([
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
             'start_at' => $data['start_at'] ?? null,
@@ -143,29 +151,29 @@ class LeadCallsRelationManager extends CallsRelationManager
             'user_updated_id' => auth()->id(),
         ]);
 
-        $this->syncGuests($call, $data['guests'] ?? []);
+        $this->syncGuests($lunch, $data['guests'] ?? []);
 
-        static::logCrmActivity($this->getOwnerRecord(), $call);
+        static::logCrmActivity($this->getOwnerRecord(), $lunch);
 
         $this->editingId = null;
 
         $this->form->fill($this->defaultFormData());
 
         Notification::make()
-            ->title('Call updated')
+            ->title('Lunch updated')
             ->success()
             ->send();
     }
 
-    public function deleteCall(int $id): void
+    public function deleteLunch(int $id): void
     {
-        $call = $this->getOwnerRecord()->calls()->whereKey($id)->first();
+        $lunch = $this->getOwnerRecord()->lunches()->whereKey($id)->first();
 
-        if ($call === null) {
+        if ($lunch === null) {
             return;
         }
 
-        $call->delete();
+        $lunch->delete();
 
         if ($this->editingId === (int) $id) {
             $this->editingId = null;
@@ -173,7 +181,7 @@ class LeadCallsRelationManager extends CallsRelationManager
         }
 
         Notification::make()
-            ->title('Call deleted')
+            ->title('Lunch deleted')
             ->success()
             ->send();
     }
@@ -194,16 +202,15 @@ class LeadCallsRelationManager extends CallsRelationManager
     }
 
     /**
-     * Sync the Call's guest contacts to match the supplied Person ids.
+     * Sync the Lunch's guest contacts to match the supplied Person ids.
      *
      * @param  array<int|string>  $personIds
      */
-    protected function syncGuests($call, array $personIds): void
+    protected function syncGuests($lunch, array $personIds): void
     {
         $personIds = array_values(array_filter(array_map('intval', $personIds)));
 
-        // Wipe existing Person-guest contacts on this call, then re-create.
-        $call->contacts()
+        $lunch->contacts()
             ->where('entityable_type', Person::class)
             ->delete();
 
@@ -212,7 +219,7 @@ class LeadCallsRelationManager extends CallsRelationManager
             if ($person === null) {
                 continue;
             }
-            $call->contacts()->create([
+            $lunch->contacts()->create([
                 'entityable_type' => $person->getMorphClass(),
                 'entityable_id' => $person->id,
                 'user_created_id' => auth()->id(),

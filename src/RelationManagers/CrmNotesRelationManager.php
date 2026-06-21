@@ -6,9 +6,9 @@ use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Schema;
 
-class LeadNotesRelationManager extends NotesRelationManager
+class CrmNotesRelationManager extends NotesRelationManager
 {
-    protected string $view = 'laravel-crm-filament::lead-notes';
+    protected string $view = 'laravel-crm-filament::crm-notes';
 
     /**
      * @var array<string, mixed>|null

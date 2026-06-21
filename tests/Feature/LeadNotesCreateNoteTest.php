@@ -6,47 +6,47 @@ use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Activity;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Note;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
 
-it('declares a public createNote() method on LeadNotesRelationManager', function () {
-    $ref = new ReflectionClass(LeadNotesRelationManager::class);
+it('declares a public createNote() method on CrmNotesRelationManager', function () {
+    $ref = new ReflectionClass(CrmNotesRelationManager::class);
 
     expect($ref->hasMethod('createNote'))->toBeTrue();
 
     $method = $ref->getMethod('createNote');
     expect($method->isPublic())->toBeTrue();
-    expect($method->getDeclaringClass()->getName())->toBe(LeadNotesRelationManager::class);
+    expect($method->getDeclaringClass()->getName())->toBe(CrmNotesRelationManager::class);
     expect($method->getReturnType()?->getName())->toBe('void');
     expect($method->getNumberOfRequiredParameters())->toBe(0);
 });
 
 it('declares a public $data property for the inline form state', function () {
-    $ref = new ReflectionClass(LeadNotesRelationManager::class);
+    $ref = new ReflectionClass(CrmNotesRelationManager::class);
 
     expect($ref->hasProperty('data'))->toBeTrue();
 
     $prop = $ref->getProperty('data');
     expect($prop->isPublic())->toBeTrue();
-    expect($prop->getDeclaringClass()->getName())->toBe(LeadNotesRelationManager::class);
+    expect($prop->getDeclaringClass()->getName())->toBe(CrmNotesRelationManager::class);
 });
 
 it('sets statePath(data) on the inline form schema', function () {
-    $rm = (new ReflectionClass(LeadNotesRelationManager::class))->newInstanceWithoutConstructor();
+    $rm = (new ReflectionClass(CrmNotesRelationManager::class))->newInstanceWithoutConstructor();
     $schema = $rm->form(Schema::make($rm));
 
     expect($schema->getStatePath())->toBe('data');
 });
 
 it('declares mount() locally and calls parent::mount() plus form->fill()', function () {
-    $ref = new ReflectionClass(LeadNotesRelationManager::class);
+    $ref = new ReflectionClass(CrmNotesRelationManager::class);
 
     expect($ref->hasMethod('mount'))->toBeTrue();
     expect($ref->getMethod('mount')->getDeclaringClass()->getName())
-        ->toBe(LeadNotesRelationManager::class);
+        ->toBe(CrmNotesRelationManager::class);
 
     $src = file_get_contents(
-        dirname(__DIR__, 2) . '/src/RelationManagers/LeadNotesRelationManager.php'
+        dirname(__DIR__, 2) . '/src/RelationManagers/CrmNotesRelationManager.php'
     );
 
     expect($src)->toContain('parent::mount();');
@@ -57,7 +57,7 @@ it('createNote() persists a Note via the owner relation with user_created_id, lo
     // Hot-patch subclass that bypasses $this->form->getState() (which requires
     // a real Filament panel mount) and reads $this->data directly. Mirrors
     // the pattern locked-in by ClickSendIntegrationPageTest.
-    $rm = new class extends LeadNotesRelationManager
+    $rm = new class extends CrmNotesRelationManager
     {
         public bool $resetCalled = false;
 
@@ -140,7 +140,7 @@ it('createNote() persists a Note via the owner relation with user_created_id, lo
 
 it('the real createNote() method routes through form->getState() and Notification::make()->success()', function () {
     $src = file_get_contents(
-        dirname(__DIR__, 2) . '/src/RelationManagers/LeadNotesRelationManager.php'
+        dirname(__DIR__, 2) . '/src/RelationManagers/CrmNotesRelationManager.php'
     );
 
     // Validates via form->getState()

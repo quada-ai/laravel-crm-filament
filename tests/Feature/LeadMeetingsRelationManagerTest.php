@@ -8,20 +8,20 @@ use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Activity;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Meeting;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadMeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
 
 /**
  * Hot-patch subclass that bypasses $this->form->fill() / getState() (which require
  * a real Filament panel mount) and operates on $this->data directly. Mirrors the
- * pattern locked-in by LeadNotesRelationManagerTest + LeadTasksRelationManagerTest +
- * LeadCallsRelationManagerTest. Re-implements the CRUD bodies without form
+ * pattern locked-in by CrmNotesRelationManagerTest + CrmTasksRelationManagerTest +
+ * CrmCallsRelationManagerTest. Re-implements the CRUD bodies without form
  * validation so the round-trip can be exercised headless.
  */
-function leadMeetingsFocusedRm(): LeadMeetingsRelationManager
+function leadMeetingsFocusedRm(): CrmMeetingsRelationManager
 {
-    return new class extends LeadMeetingsRelationManager
+    return new class extends CrmMeetingsRelationManager
     {
         public function createMeeting(): void
         {
@@ -132,26 +132,26 @@ function leadMeetingsFocusedRm(): LeadMeetingsRelationManager
 // AC (1) Inheritance.
 
 it('extends MeetingsRelationManager', function () {
-    expect(is_subclass_of(LeadMeetingsRelationManager::class, MeetingsRelationManager::class))->toBeTrue();
+    expect(is_subclass_of(CrmMeetingsRelationManager::class, MeetingsRelationManager::class))->toBeTrue();
 });
 
 // AC (2) $view points at the lead-meetings template.
 
 it('overrides the $view property to point at the lead-meetings Blade template', function () {
-    $ref = new ReflectionClass(LeadMeetingsRelationManager::class);
+    $ref = new ReflectionClass(CrmMeetingsRelationManager::class);
     $prop = $ref->getProperty('view');
     $prop->setAccessible(true);
 
-    expect($prop->getDeclaringClass()->getName())->toBe(LeadMeetingsRelationManager::class);
+    expect($prop->getDeclaringClass()->getName())->toBe(CrmMeetingsRelationManager::class);
 
     $rm = $ref->newInstanceWithoutConstructor();
-    expect($prop->getValue($rm))->toBe('laravel-crm-filament::lead-meetings');
+    expect($prop->getValue($rm))->toBe('laravel-crm-filament::crm-meetings');
 });
 
 // AC (3) form() returns name/description/start_at/finish_at + location + owner/assigned grid.
 
 it('returns the expected form schema with name, description, start/finish times, location, owner, assigned', function () {
-    $rm = (new ReflectionClass(LeadMeetingsRelationManager::class))->newInstanceWithoutConstructor();
+    $rm = (new ReflectionClass(CrmMeetingsRelationManager::class))->newInstanceWithoutConstructor();
     $schema = $rm->form(Schema::make($rm));
 
     expect($schema->getStatePath())->toBe('data');
@@ -179,7 +179,7 @@ it('returns the expected form schema with name, description, start/finish times,
 });
 
 it('inherits the parent table configuration (columns and actions)', function () {
-    $ref = new ReflectionClass(LeadMeetingsRelationManager::class);
+    $ref = new ReflectionClass(CrmMeetingsRelationManager::class);
 
     expect($ref->hasMethod('table'))->toBeTrue();
     expect($ref->getMethod('table')->getDeclaringClass()->getName())
@@ -187,7 +187,7 @@ it('inherits the parent table configuration (columns and actions)', function () 
 });
 
 it('inherits the parent relationship binding', function () {
-    $ref = new ReflectionClass(LeadMeetingsRelationManager::class);
+    $ref = new ReflectionClass(CrmMeetingsRelationManager::class);
     $prop = $ref->getProperty('relationship');
     $prop->setAccessible(true);
 
@@ -327,7 +327,7 @@ it('deleteMeeting() soft-deletes the meeting via the owner relation', function (
 // AC (5) Blade source assertions.
 
 it('the lead-meetings Blade view contains the expected structural markers', function () {
-    $bladePath = dirname(__DIR__, 2) . '/resources/views/lead-meetings.blade.php';
+    $bladePath = dirname(__DIR__, 2) . '/resources/views/crm-meetings.blade.php';
     expect(file_exists($bladePath))->toBeTrue();
 
     $blade = file_get_contents($bladePath);
@@ -373,17 +373,17 @@ it('the lead-meetings Blade view contains the expected structural markers', func
     expect($blade)->toContain('crm-card-guests');
 
     // Shared lead-card-styles partial.
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-styles')");
     expect($blade)->not->toContain('@once');
 
     // Empty state.
     expect($blade)->toContain('No meetings yet');
 
-    // Partial extension confirms the shared selector covers crm-lead-meetings.
-    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/lead-card-styles.blade.php';
+    // Partial extension confirms the shared selector covers crm-card-area-meetings.
+    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/crm-card-styles.blade.php';
     expect(file_exists($partialPath))->toBeTrue();
 
     $partial = file_get_contents($partialPath);
-    expect($partial)->toContain('.crm-lead-meetings');
-    expect($partial)->toContain('html.dark .crm-lead-meetings');
+    expect($partial)->toContain('.crm-card-area-meetings');
+    expect($partial)->toContain('html.dark .crm-card-area-meetings');
 });

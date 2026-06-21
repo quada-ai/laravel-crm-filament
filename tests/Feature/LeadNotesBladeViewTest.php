@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 beforeEach(function () {
-    $this->bladePath = __DIR__ . '/../../resources/views/lead-notes.blade.php';
-    $this->partialPath = __DIR__ . '/../../resources/views/partials/lead-card-styles.blade.php';
+    $this->bladePath = __DIR__ . '/../../resources/views/crm-notes.blade.php';
+    $this->partialPath = __DIR__ . '/../../resources/views/partials/crm-card-styles.blade.php';
 });
 
 it('renders the lead-notes blade file at the expected path', function () {
@@ -14,7 +14,7 @@ it('renders the lead-notes blade file at the expected path', function () {
 it('includes the shared lead-card-styles partial in place of an inline style block', function () {
     $blade = file_get_contents($this->bladePath);
 
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-styles')");
 
     // Inline @once <style> block must no longer live on this view.
     expect($blade)->not->toContain('@once');
@@ -34,7 +34,7 @@ it('the shared lead-card-styles partial declares CSS custom properties for dark 
     expect($partial)->toContain('--crm-card-bg:');
     expect($partial)->toContain('--crm-card-text:');
     expect($partial)->toContain('--crm-card-pill-bg:');
-    expect($partial)->toContain('html.dark .crm-lead-notes');
+    expect($partial)->toContain('html.dark .crm-card-area-notes');
 
     // Old --crm-note-* property names are gone from the partial.
     expect($partial)->not->toContain('--crm-note-');

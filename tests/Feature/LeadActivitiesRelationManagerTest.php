@@ -1,36 +1,36 @@
 <?php
 
 use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadActivitiesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
 
 it('extends ActivitiesRelationManager', function () {
-    expect(is_subclass_of(LeadActivitiesRelationManager::class, ActivitiesRelationManager::class))->toBeTrue();
+    expect(is_subclass_of(CrmActivitiesRelationManager::class, ActivitiesRelationManager::class))->toBeTrue();
 });
 
 it('overrides the $view property to point at the lead-activity Blade template', function () {
-    $ref = new ReflectionClass(LeadActivitiesRelationManager::class);
+    $ref = new ReflectionClass(CrmActivitiesRelationManager::class);
     $prop = $ref->getProperty('view');
     $prop->setAccessible(true);
 
-    expect($prop->getDeclaringClass()->getName())->toBe(LeadActivitiesRelationManager::class);
+    expect($prop->getDeclaringClass()->getName())->toBe(CrmActivitiesRelationManager::class);
 
     $rm = $ref->newInstanceWithoutConstructor();
-    expect($prop->getValue($rm))->toBe('laravel-crm-filament::lead-activity');
+    expect($prop->getValue($rm))->toBe('laravel-crm-filament::crm-activity');
 });
 
 it('inherits read-only contract from ActivitiesRelationManager', function () {
-    $rm = (new ReflectionClass(LeadActivitiesRelationManager::class))->newInstanceWithoutConstructor();
+    $rm = (new ReflectionClass(CrmActivitiesRelationManager::class))->newInstanceWithoutConstructor();
     expect($rm->isReadOnly())->toBeTrue();
 });
 
 it('the lead-activity Blade view contains the expected timeline markers', function () {
-    $bladePath = dirname(__DIR__, 2) . '/resources/views/lead-activity.blade.php';
+    $bladePath = dirname(__DIR__, 2) . '/resources/views/crm-activity.blade.php';
     expect(file_exists($bladePath))->toBeTrue();
 
     $blade = file_get_contents($bladePath);
 
     // Wrapper class scopes the shared CSS custom properties.
-    expect($blade)->toContain('class="crm-lead-activity"');
+    expect($blade)->toContain('class="crm-card-area-activity"');
 
     // Loop over the owner's timelineActivities, newest first.
     expect($blade)->toContain('$this->getOwnerRecord()');
@@ -49,19 +49,19 @@ it('the lead-activity Blade view contains the expected timeline markers', functi
     expect($blade)->toContain('crm-timeline-subtitle');
 
     // Shared partial @include + no inline @once block (regression guard).
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-styles')");
     expect($blade)->not->toContain('@once');
 
     // Empty state.
     expect($blade)->toContain('No activity yet');
 });
 
-it('the shared lead-card-styles partial declares timeline + .crm-lead-activity scoping', function () {
-    $partial = file_get_contents(dirname(__DIR__, 2) . '/resources/views/partials/lead-card-styles.blade.php');
+it('the shared lead-card-styles partial declares timeline + .crm-card-area-activity scoping', function () {
+    $partial = file_get_contents(dirname(__DIR__, 2) . '/resources/views/partials/crm-card-styles.blade.php');
 
     // Wrapper class participates in the existing CSS custom-property scope.
-    expect($partial)->toContain('.crm-lead-activity');
-    expect($partial)->toContain('html.dark .crm-lead-activity');
+    expect($partial)->toContain('.crm-card-area-activity');
+    expect($partial)->toContain('html.dark .crm-card-area-activity');
 
     // Timeline-specific selectors.
     expect($partial)->toContain('.crm-timeline-item');
@@ -74,16 +74,16 @@ it('the shared lead-card-styles partial declares timeline + .crm-lead-activity s
 });
 
 it('the timeline view embeds the per-entity card partials inside each recordable', function () {
-    $bladePath = dirname(__DIR__, 2) . '/resources/views/lead-activity.blade.php';
+    $bladePath = dirname(__DIR__, 2) . '/resources/views/crm-activity.blade.php';
     $blade = file_get_contents($bladePath);
 
     // The @switch over entityType routes each recordable to the matching partial.
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-note'");
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-task'");
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-call'");
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-meeting'");
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-lunch'");
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-file'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-note'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-task'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-call'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-meeting'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-lunch'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-file'");
 });
 
 it('each lead-card-{entity} partial file exists and renders the expected markers', function (string $partial, string $marker) {
@@ -97,10 +97,10 @@ it('each lead-card-{entity} partial file exists and renders the expected markers
     // Per-entity marker locked in for grep safety.
     expect($body)->toContain($marker);
 })->with([
-    'note' => ['lead-card-note.blade.php', '$record->content'],
-    'task' => ['lead-card-task.blade.php', '$record->name'],
-    'call' => ['lead-card-call.blade.php', '$record->name'],
-    'meeting' => ['lead-card-meeting.blade.php', '$record->name'],
-    'lunch' => ['lead-card-lunch.blade.php', '$record->name'],
-    'file' => ['lead-card-file.blade.php', '$record->file'],
+    'note' => ['crm-card-note.blade.php', '$record->content'],
+    'task' => ['crm-card-task.blade.php', '$record->name'],
+    'call' => ['crm-card-call.blade.php', '$record->name'],
+    'meeting' => ['crm-card-meeting.blade.php', '$record->name'],
+    'lunch' => ['crm-card-lunch.blade.php', '$record->name'],
+    'file' => ['crm-card-file.blade.php', '$record->file'],
 ]);

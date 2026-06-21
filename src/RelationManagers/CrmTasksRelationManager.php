@@ -7,9 +7,9 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 
-class LeadTasksRelationManager extends TasksRelationManager
+class CrmTasksRelationManager extends TasksRelationManager
 {
-    protected string $view = 'laravel-crm-filament::lead-tasks';
+    protected string $view = 'laravel-crm-filament::crm-tasks';
 
     /**
      * @var array<string, mixed>|null

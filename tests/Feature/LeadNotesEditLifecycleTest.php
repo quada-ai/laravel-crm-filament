@@ -5,7 +5,7 @@ use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Activity;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Note;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
 
 /**
@@ -13,9 +13,9 @@ use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
  * a real Filament panel mount) and operates on $this->data directly. Mirrors the
  * pattern locked-in by LeadNotesCreateNoteTest.
  */
-function leadNotesEditLifecycleRm(): LeadNotesRelationManager
+function leadNotesEditLifecycleRm(): CrmNotesRelationManager
 {
-    return new class extends LeadNotesRelationManager
+    return new class extends CrmNotesRelationManager
     {
         public function editNote(int $id): void
         {
@@ -82,26 +82,26 @@ function leadNotesEditLifecycleRm(): LeadNotesRelationManager
 }
 
 it('declares a public ?int $editingId property defaulting to null', function () {
-    $ref = new ReflectionClass(LeadNotesRelationManager::class);
+    $ref = new ReflectionClass(CrmNotesRelationManager::class);
 
     expect($ref->hasProperty('editingId'))->toBeTrue();
 
     $prop = $ref->getProperty('editingId');
     expect($prop->isPublic())->toBeTrue();
-    expect($prop->getDeclaringClass()->getName())->toBe(LeadNotesRelationManager::class);
+    expect($prop->getDeclaringClass()->getName())->toBe(CrmNotesRelationManager::class);
 
     $rm = $ref->newInstanceWithoutConstructor();
     expect($rm->editingId)->toBeNull();
 });
 
 it('declares public editNote(int), cancelEdit(), and updateNote() methods locally', function () {
-    $ref = new ReflectionClass(LeadNotesRelationManager::class);
+    $ref = new ReflectionClass(CrmNotesRelationManager::class);
 
     foreach (['editNote', 'cancelEdit', 'updateNote'] as $methodName) {
         expect($ref->hasMethod($methodName))->toBeTrue();
         $method = $ref->getMethod($methodName);
         expect($method->isPublic())->toBeTrue();
-        expect($method->getDeclaringClass()->getName())->toBe(LeadNotesRelationManager::class);
+        expect($method->getDeclaringClass()->getName())->toBe(CrmNotesRelationManager::class);
         expect($method->getReturnType()?->getName())->toBe('void');
     }
 
@@ -295,7 +295,7 @@ it('updateNote() is a no-op when editingId is null', function () {
 
 it('the real updateNote() method routes through form->getState(), owner relation, logCrmActivity, and Notification', function () {
     $src = file_get_contents(
-        dirname(__DIR__, 2) . '/src/RelationManagers/LeadNotesRelationManager.php'
+        dirname(__DIR__, 2) . '/src/RelationManagers/CrmNotesRelationManager.php'
     );
 
     // editingId guard
@@ -325,7 +325,7 @@ it('the real updateNote() method routes through form->getState(), owner relation
 
 it('editNote() and cancelEdit() source bodies route through the form and owner relation', function () {
     $src = file_get_contents(
-        dirname(__DIR__, 2) . '/src/RelationManagers/LeadNotesRelationManager.php'
+        dirname(__DIR__, 2) . '/src/RelationManagers/CrmNotesRelationManager.php'
     );
 
     // editNote looks up via the owner relation

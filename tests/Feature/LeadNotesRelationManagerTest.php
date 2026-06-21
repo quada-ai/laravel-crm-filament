@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Activity;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Note;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
 
@@ -18,9 +18,9 @@ use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
  * LeadNotesDeleteNoteTest. Re-implements the four CRUD bodies without form
  * validation so the round-trip can be exercised headless.
  */
-function leadNotesFocusedRm(): LeadNotesRelationManager
+function leadNotesFocusedRm(): CrmNotesRelationManager
 {
-    return new class extends LeadNotesRelationManager
+    return new class extends CrmNotesRelationManager
     {
         public function createNote(): void
         {
@@ -100,26 +100,26 @@ function leadNotesFocusedRm(): LeadNotesRelationManager
 // AC (1) Inheritance.
 
 it('extends NotesRelationManager', function () {
-    expect(is_subclass_of(LeadNotesRelationManager::class, NotesRelationManager::class))->toBeTrue();
+    expect(is_subclass_of(CrmNotesRelationManager::class, NotesRelationManager::class))->toBeTrue();
 });
 
 // AC (2) $view points at the lead-notes template.
 
 it('overrides the $view property to point at the lead-notes Blade template', function () {
-    $ref = new ReflectionClass(LeadNotesRelationManager::class);
+    $ref = new ReflectionClass(CrmNotesRelationManager::class);
     $prop = $ref->getProperty('view');
     $prop->setAccessible(true);
 
-    expect($prop->getDeclaringClass()->getName())->toBe(LeadNotesRelationManager::class);
+    expect($prop->getDeclaringClass()->getName())->toBe(CrmNotesRelationManager::class);
 
     $rm = $ref->newInstanceWithoutConstructor();
-    expect($prop->getValue($rm))->toBe('laravel-crm-filament::lead-notes');
+    expect($prop->getValue($rm))->toBe('laravel-crm-filament::crm-notes');
 });
 
 // AC (3) form() returns only Note + Noted-at, no pinned.
 
 it('returns a 2-field form schema with Note + Noted-at and no pinned field', function () {
-    $rm = (new ReflectionClass(LeadNotesRelationManager::class))->newInstanceWithoutConstructor();
+    $rm = (new ReflectionClass(CrmNotesRelationManager::class))->newInstanceWithoutConstructor();
     $schema = $rm->form(Schema::make($rm));
 
     $components = $schema->getComponents();
@@ -133,7 +133,7 @@ it('returns a 2-field form schema with Note + Noted-at and no pinned field', fun
 });
 
 it('inherits the parent table configuration (columns and actions)', function () {
-    $ref = new ReflectionClass(LeadNotesRelationManager::class);
+    $ref = new ReflectionClass(CrmNotesRelationManager::class);
 
     expect($ref->hasMethod('table'))->toBeTrue();
     expect($ref->getMethod('table')->getDeclaringClass()->getName())
@@ -141,7 +141,7 @@ it('inherits the parent table configuration (columns and actions)', function () 
 });
 
 it('inherits the parent relationship binding', function () {
-    $ref = new ReflectionClass(LeadNotesRelationManager::class);
+    $ref = new ReflectionClass(CrmNotesRelationManager::class);
     $prop = $ref->getProperty('relationship');
     $prop->setAccessible(true);
 
@@ -264,7 +264,7 @@ it('deleteNote() soft-deletes the note via the owner relation', function () {
 // AC (5) Blade source assertions.
 
 it('the lead-notes Blade view contains the expected structural markers', function () {
-    $bladePath = dirname(__DIR__, 2) . '/resources/views/lead-notes.blade.php';
+    $bladePath = dirname(__DIR__, 2) . '/resources/views/crm-notes.blade.php';
     expect(file_exists($bladePath))->toBeTrue();
 
     $blade = file_get_contents($bladePath);
@@ -288,11 +288,11 @@ it('the lead-notes Blade view contains the expected structural markers', functio
     expect($blade)->toContain('wire:click="deleteNote({{ $note->id }})"');
 
     // Dark-mode styles now live in the shared lead-card-styles partial.
-    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.crm-card-styles')");
     expect($blade)->not->toContain('@once');
     expect($blade)->not->toContain('--crm-note-bg:');
 
-    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/lead-card-styles.blade.php';
+    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/crm-card-styles.blade.php';
     expect(file_exists($partialPath))->toBeTrue();
 
     $partial = file_get_contents($partialPath);
@@ -300,5 +300,5 @@ it('the lead-notes Blade view contains the expected structural markers', functio
     expect($partial)->toContain('<style>');
     expect($partial)->toContain('@endonce');
     expect($partial)->toContain('--crm-card-bg:');
-    expect($partial)->toContain('html.dark .crm-lead-notes');
+    expect($partial)->toContain('html.dark .crm-card-area-notes');
 });

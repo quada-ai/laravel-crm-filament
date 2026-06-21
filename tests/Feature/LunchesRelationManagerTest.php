@@ -2,7 +2,7 @@
 
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LeadLunchesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
@@ -42,9 +42,9 @@ it('mirrors MeetingsRelationManager title/date/user columns', function () {
     expect($names)->toBe(['name', 'start_at', 'finish_at', 'ownerUser.name']);
 });
 
-it('LeadResource registers LeadLunchesRelationManager (swapped in by the lead lunches UI story)', function () {
+it('LeadResource registers CrmLunchesRelationManager (swapped in by the lead lunches UI story)', function () {
     $relations = LeadResource::getRelations();
 
-    expect($relations)->toContain(LeadLunchesRelationManager::class);
+    expect($relations)->toContain(CrmLunchesRelationManager::class);
     expect($relations)->not->toContain(LunchesRelationManager::class);
 });

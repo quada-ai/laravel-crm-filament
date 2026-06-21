@@ -1,5 +1,5 @@
-<div class="crm-lead-files" data-testid="crm-lead-files">
-    @include('laravel-crm-filament::partials.lead-card-styles')
+<div class="crm-card-area-files" data-testid="crm-card-area-files">
+    @include('laravel-crm-filament::partials.crm-card-styles')
 
     @php
         $fileRows = $this->getOwnerRecord()->files()->orderBy('created_at', 'desc')->get();
