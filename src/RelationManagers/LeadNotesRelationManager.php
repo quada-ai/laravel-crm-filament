@@ -125,4 +125,28 @@ class LeadNotesRelationManager extends NotesRelationManager
             ->success()
             ->send();
     }
+
+    public function deleteNote(int $id): void
+    {
+        $note = $this->getOwnerRecord()->notes()->whereKey($id)->first();
+
+        if ($note === null) {
+            return;
+        }
+
+        $note->delete();
+
+        if ($this->editingId === (int) $id) {
+            $this->editingId = null;
+            $this->form->fill([
+                'content' => null,
+                'noted_at' => now(),
+            ]);
+        }
+
+        Notification::make()
+            ->title('Note deleted')
+            ->success()
+            ->send();
+    }
 }
