@@ -21,16 +21,16 @@
                 gap: 0.75rem;
             }
             html.dark .crm-lead-notes {
-                --crm-note-bg: rgb(31, 41, 55);
-                --crm-note-border: rgba(255, 255, 255, 0.08);
-                --crm-note-text: #f3f4f6;
+                --crm-note-bg: rgb(17, 24, 39);
+                --crm-note-border: rgba(255, 255, 255, 0.1);
+                --crm-note-text: #ffffff;
                 --crm-note-muted: #9ca3af;
                 --crm-note-subtle: #6b7280;
-                --crm-note-pill-bg: rgba(255, 255, 255, 0.08);
+                --crm-note-pill-bg: rgba(255, 255, 255, 0.05);
                 --crm-note-pill-color: #d1d5db;
-                --crm-note-input-bg: rgb(17, 24, 39);
-                --crm-note-input-border: rgba(255, 255, 255, 0.12);
-                --crm-note-input-color: #f3f4f6;
+                --crm-note-input-bg: rgba(255, 255, 255, 0.05);
+                --crm-note-input-border: rgba(255, 255, 255, 0.1);
+                --crm-note-input-color: #ffffff;
                 --crm-note-primary: #2dd4bf;
                 --crm-note-primary-hover: #0d9488;
                 --crm-note-danger: #f87171;
