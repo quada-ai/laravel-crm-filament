@@ -21,7 +21,13 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmFilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\CreateDelivery;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\EditDelivery;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\ListDeliveries;
@@ -265,8 +271,14 @@ class DeliveryResource extends Resource
     public static function getRelations(): array
     {
         return [
+            CrmActivitiesRelationManager::class,
+            CrmNotesRelationManager::class,
+            CrmTasksRelationManager::class,
+            CrmCallsRelationManager::class,
+            CrmMeetingsRelationManager::class,
+            CrmLunchesRelationManager::class,
+            CrmFilesRelationManager::class,
             AuditsRelationManager::class,
-            FilesRelationManager::class,
         ];
     }
 

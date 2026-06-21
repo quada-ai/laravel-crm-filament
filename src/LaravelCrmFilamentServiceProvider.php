@@ -96,15 +96,18 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             });
         }
 
-        // Core CRM declares `activities()` on Lead via HasCrmActivities (a
-        // morphMany on `timelineable_*`). Filament's standard RelationManager
-        // contract is `protected static string $relationship = '...'`, so we
-        // register a parallel `timelineActivities` relation under an
-        // unambiguous name the upcoming ActivitiesRelationManager (US-007)
-        // can bind to. Mirrors the audits/labels precedent above.
-        Lead::resolveRelationUsing('timelineActivities', function ($model) {
-            return $model->morphMany(Activity::class, 'timelineable');
-        });
+        // Core CRM declares `activities()` on each primary model via
+        // HasCrmActivities (a morphMany on `timelineable_*`). Filament's
+        // RelationManager contract uses `protected static string $relationship`,
+        // so we register a parallel `timelineActivities` relation under an
+        // unambiguous name the Crm activities RelationManager can bind to.
+        // Mirrors the audits/labels precedent above; extended to every primary
+        // model so the Crm* RM family attaches uniformly.
+        foreach (static::timelineActivityModels() as $timelineModel) {
+            $timelineModel::resolveRelationUsing('timelineActivities', function ($model) {
+                return $model->morphMany(Activity::class, 'timelineable');
+            });
+        }
 
         // Core CRM declares `clicks()` on EmailCampaignRecipient / SmsCampaignRecipient
         // but not on the campaign model itself. The ClicksRelationManager binds
@@ -163,6 +166,24 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             Person::class,
             Organization::class,
             Product::class,
+        ];
+    }
+
+    /**
+     * @return array<class-string>
+     */
+    public static function timelineActivityModels(): array
+    {
+        return [
+            Lead::class,
+            Deal::class,
+            Quote::class,
+            Order::class,
+            Invoice::class,
+            PurchaseOrder::class,
+            Delivery::class,
+            Person::class,
+            Organization::class,
         ];
     }
 

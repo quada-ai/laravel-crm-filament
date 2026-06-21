@@ -28,7 +28,13 @@ use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Models\InvoicePayment;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmFilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\CreateInvoice;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\EditInvoice;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\ListInvoices;
@@ -323,8 +329,14 @@ class InvoiceResource extends Resource
     public static function getRelations(): array
     {
         return [
+            CrmActivitiesRelationManager::class,
+            CrmNotesRelationManager::class,
+            CrmTasksRelationManager::class,
+            CrmCallsRelationManager::class,
+            CrmMeetingsRelationManager::class,
+            CrmLunchesRelationManager::class,
+            CrmFilesRelationManager::class,
             AuditsRelationManager::class,
-            FilesRelationManager::class,
         ];
     }
 

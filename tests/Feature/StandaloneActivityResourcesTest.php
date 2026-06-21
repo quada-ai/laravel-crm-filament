@@ -65,7 +65,8 @@ it('uses external_id for record routing', function (string $resource): void {
     expect($resource::getRecordRouteKeyName())->toBe('external_id');
 })->with('standaloneActivityResources');
 
-dataset('filesRelationManagerParents', [
+dataset('crmFilesRmParents', [
+    'Lead' => [LeadResource::class],
     'Deal' => [DealResource::class],
     'Person' => [PersonResource::class],
     'Organization' => [OrganizationResource::class],
@@ -76,15 +77,11 @@ dataset('filesRelationManagerParents', [
     'Delivery' => [DeliveryResource::class],
 ]);
 
-it('attaches FilesRelationManager to every parent resource that owns files', function (string $resource): void {
-    expect($resource::getRelations())->toContain(FilesRelationManager::class);
-})->with('filesRelationManagerParents');
-
-it('attaches the Lead-specific CrmFilesRelationManager (subclass) to LeadResource', function (): void {
-    $relations = LeadResource::getRelations();
+it('attaches CrmFilesRelationManager (subclass of FilesRelationManager) to every primary parent resource', function (string $resource): void {
+    $relations = $resource::getRelations();
     expect($relations)->toContain(CrmFilesRelationManager::class);
     expect($relations)->not->toContain(FilesRelationManager::class);
-});
+})->with('crmFilesRmParents');
 
 it('uses the polymorphic files relationship name from HasCrmActivities', function (): void {
     $rm = new ReflectionClass(FilesRelationManager::class);
