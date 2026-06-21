@@ -21,7 +21,10 @@ class ViewInvoice extends ViewRecord
         return [
             $this->invoicePortalAction(),
             $this->invoiceMarkPaidAction(),
-            Actions\EditAction::make(),
+            Actions\EditAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
             $this->invoiceSendAction(),
             $this->invoiceDownloadPdfAction(),
         ];

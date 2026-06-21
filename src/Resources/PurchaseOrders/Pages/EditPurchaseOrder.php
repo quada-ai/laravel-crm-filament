@@ -21,9 +21,15 @@ class EditPurchaseOrder extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
+            Actions\ViewAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-eye'),
             $this->purchaseOrderSendAction(),
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 

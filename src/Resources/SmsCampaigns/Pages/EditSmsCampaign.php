@@ -16,8 +16,14 @@ class EditSmsCampaign extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
+            Actions\ViewAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-eye'),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 

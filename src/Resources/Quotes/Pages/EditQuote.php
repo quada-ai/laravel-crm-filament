@@ -28,10 +28,16 @@ class EditQuote extends EditRecord
             $this->quoteAcceptAction(),
             $this->quoteRejectAction(),
             ...$this->quoteUnacceptActions(),
-            Actions\ViewAction::make(),
+            Actions\ViewAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-eye'),
             $this->quoteSendAction(),
             $this->quotePortalAction(),
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 

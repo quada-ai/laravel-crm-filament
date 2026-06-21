@@ -112,7 +112,9 @@ class ChatConversationResource extends Resource
                     ->options(self::STATUSES),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
                 Actions\Action::make('markReplied')
                     ->label(__('laravel-crm-filament::labels.actions.mark_replied'))
                     ->icon('heroicon-o-check')

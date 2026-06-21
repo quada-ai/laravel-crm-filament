@@ -102,7 +102,9 @@ class NoteResource extends Resource
                     }),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
                 static::openParentAction('noteable_type', 'noteable_id'),
             ]);
     }

@@ -84,8 +84,12 @@ class CustomerResource extends Resource
                 )
             )
             ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
+                Actions\EditAction::make()
+                    ->button()
+                    ->hiddenLabel(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([

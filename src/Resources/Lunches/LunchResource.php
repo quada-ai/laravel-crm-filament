@@ -87,7 +87,9 @@ class LunchResource extends Resource
                     }),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
                 static::openParentAction('lunchable_type', 'lunchable_id'),
             ]);
     }

@@ -180,12 +180,15 @@ class OrderResource extends Resource
             ])
             ->recordActions([
                 Actions\ViewAction::make()
-                    ->button(),
+                    ->button()
+                    ->hiddenLabel(),
                 Actions\EditAction::make()
-                    ->button(),
+                    ->button()
+                    ->hiddenLabel(),
                 Actions\DeleteAction::make()
                     ->button()
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->hiddenLabel(),
             ])
             ->toolbarActions([
                 static::primaryBulkActionGroup(),

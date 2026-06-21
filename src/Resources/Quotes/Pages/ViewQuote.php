@@ -30,8 +30,14 @@ class ViewQuote extends ViewRecord
             $this->quoteSendAction(),
             $this->quotePortalAction(),
             $this->quoteDownloadPdfAction(),
-            Actions\EditAction::make(),
-            Actions\DeleteAction::make(),
+            Actions\EditAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 

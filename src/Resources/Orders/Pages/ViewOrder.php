@@ -21,7 +21,10 @@ class ViewOrder extends ViewRecord
     {
         return [
             $this->orderPortalAction(),
-            Actions\EditAction::make(),
+            Actions\EditAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
             $this->orderConvertToInvoiceAction(),
             $this->orderConvertToDeliveryAction(),
             $this->orderConvertToPurchaseOrderAction(),

@@ -97,7 +97,9 @@ class XeroContactResource extends Resource
             ])
             ->defaultSort('updated_at', 'desc')
             ->recordActions([
-                Actions\ViewAction::make(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
             ]);
     }
 

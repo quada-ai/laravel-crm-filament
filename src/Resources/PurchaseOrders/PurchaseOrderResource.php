@@ -179,14 +179,17 @@ class PurchaseOrderResource extends Resource
             ])
             ->recordActions([
                 Actions\ViewAction::make()
-                    ->button(),
+                    ->button()
+                    ->hiddenLabel(),
                 Actions\EditAction::make()
                     ->button()
-                    ->hidden(fn (?PurchaseOrder $record) => $record !== null && $record->xeroPurchaseOrder()->exists()),
+                    ->hidden(fn (?PurchaseOrder $record) => $record !== null && $record->xeroPurchaseOrder()->exists())
+                    ->hiddenLabel(),
                 Actions\DeleteAction::make()
                     ->button()
                     ->requiresConfirmation()
-                    ->hidden(fn (?PurchaseOrder $record) => $record !== null && $record->xeroPurchaseOrder()->exists()),
+                    ->hidden(fn (?PurchaseOrder $record) => $record !== null && $record->xeroPurchaseOrder()->exists())
+                    ->hiddenLabel(),
             ])
             ->toolbarActions([
                 static::primaryBulkActionGroup(),

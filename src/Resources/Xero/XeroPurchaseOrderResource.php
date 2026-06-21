@@ -130,7 +130,9 @@ class XeroPurchaseOrderResource extends Resource
                     ->options(fn () => XeroPurchaseOrder::query()->select('status')->distinct()->whereNotNull('status')->pluck('status', 'status')->all()),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
             ]);
     }
 

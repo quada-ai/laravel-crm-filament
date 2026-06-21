@@ -155,8 +155,12 @@ class SmsCampaignResource extends Resource
                     ]),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make()->visible(fn ($record) => $record->isEditable()),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
+                Actions\EditAction::make()->visible(fn ($record) => $record->isEditable())
+                    ->button()
+                    ->hiddenLabel(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),

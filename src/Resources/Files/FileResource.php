@@ -90,7 +90,9 @@ class FileResource extends Resource
                     }),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
                 Actions\Action::make('download')
                     ->label(__('laravel-crm-filament::labels.actions.download'))
                     ->icon('heroicon-o-arrow-down-tray')

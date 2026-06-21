@@ -24,11 +24,17 @@ class EditInvoice extends EditRecord
     {
         return [
             $this->invoiceMarkPaidAction(),
-            Actions\ViewAction::make(),
+            Actions\ViewAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-eye'),
             $this->invoiceSendAction(),
             $this->invoiceDownloadPdfAction(),
             $this->invoicePortalAction(),
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 

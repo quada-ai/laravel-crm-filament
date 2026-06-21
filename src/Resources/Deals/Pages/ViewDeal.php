@@ -26,8 +26,14 @@ class ViewDeal extends ViewRecord
             $this->dealMarkWonAction(),
             $this->dealMarkLostAction(),
             $this->dealReopenAction(),
-            Actions\EditAction::make(),
-            Actions\DeleteAction::make(),
+            Actions\EditAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 

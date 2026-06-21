@@ -19,7 +19,10 @@ class ViewPurchaseOrder extends ViewRecord
     {
         return [
             $this->purchaseOrderPortalAction(),
-            Actions\EditAction::make(),
+            Actions\EditAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
             $this->purchaseOrderSendAction(),
             $this->purchaseOrderDownloadPdfAction(),
         ];

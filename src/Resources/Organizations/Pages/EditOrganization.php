@@ -16,7 +16,10 @@ class EditOrganization extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [Actions\ViewAction::make(), Actions\DeleteAction::make()];
+        return [Actions\ViewAction::make()
+            ->button()
+            ->hiddenLabel()
+            ->icon('heroicon-m-eye'), Actions\DeleteAction::make()];
     }
 
     protected function mutateFormDataBeforeFill(array $data): array

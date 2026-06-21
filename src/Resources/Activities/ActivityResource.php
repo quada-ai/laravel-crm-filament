@@ -103,7 +103,9 @@ class ActivityResource extends Resource
                     }),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
                 static::openParentAction('timelineable_type', 'timelineable_id'),
             ]);
     }

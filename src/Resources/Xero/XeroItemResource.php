@@ -118,7 +118,9 @@ class XeroItemResource extends Resource
             ])
             ->defaultSort('updated_date', 'desc')
             ->recordActions([
-                Actions\ViewAction::make(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
             ]);
     }
 

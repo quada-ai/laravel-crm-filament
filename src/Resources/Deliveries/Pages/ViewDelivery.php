@@ -18,7 +18,10 @@ class ViewDelivery extends ViewRecord
     {
         return [
             $this->deliveryPortalAction(),
-            Actions\EditAction::make(),
+            Actions\EditAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
         ];
     }
 

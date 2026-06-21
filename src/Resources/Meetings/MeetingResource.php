@@ -87,7 +87,9 @@ class MeetingResource extends Resource
                     }),
             ])
             ->recordActions([
-                Actions\ViewAction::make(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel(),
                 static::openParentAction('meetingable_type', 'meetingable_id'),
             ]);
     }

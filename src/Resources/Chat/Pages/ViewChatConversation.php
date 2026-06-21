@@ -259,7 +259,10 @@ class ViewChatConversation extends ViewRecord
 
                     Notification::make()->title('Converted to lead')->success()->send();
                 }),
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 }

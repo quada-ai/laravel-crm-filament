@@ -25,7 +25,10 @@ class ViewSmsCampaign extends ViewRecord
     {
         return [
             Actions\EditAction::make()
-                ->visible(fn (SmsCampaign $record) => $record->isEditable()),
+                ->visible(fn (SmsCampaign $record) => $record->isEditable())
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
             Actions\Action::make('preview')
                 ->label(__('laravel-crm-filament::labels.actions.preview'))
                 ->icon('heroicon-o-eye')

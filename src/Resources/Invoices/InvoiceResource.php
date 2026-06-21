@@ -237,7 +237,8 @@ class InvoiceResource extends Resource
             ])
             ->recordActions([
                 Actions\ViewAction::make()
-                    ->button(),
+                    ->button()
+                    ->hiddenLabel(),
                 Actions\EditAction::make()
                     ->button()
                     ->hidden(fn (Invoice $record): bool => (int) ($record->getAttributes()['amount_paid'] ?? 0) > 0),
