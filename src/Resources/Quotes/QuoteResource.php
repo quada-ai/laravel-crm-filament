@@ -204,7 +204,8 @@ class QuoteResource extends Resource
             ])
             ->recordActions([
                 static::sendActionFactory()
-                    ->button(),
+                    ->button()
+                    ->color('gray'),
                 static::acceptAction()
                     ->button(),
                 static::rejectAction()
