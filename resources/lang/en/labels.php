@@ -377,6 +377,8 @@ return [
         'back_to_quotes' => 'Back to quotes',
         'back_to_deals' => 'Back to deals',
         'back_to_orders' => 'Back to orders',
+        'pay' => 'Pay',
+        'back_to_invoices' => 'Back to invoices',
         'purchase_order' => 'Purchase Order',
         'delivery' => 'Delivery',
         'upload' => 'Upload',

@@ -15,7 +15,6 @@ use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
 class ViewInvoice extends ViewRecord
 {
     use Concerns\HasInvoiceMarkPaidAction;
-    use Concerns\HasInvoicePortalAction;
     use Concerns\HasInvoiceSendAction;
 
     protected static string $resource = InvoiceResource::class;
@@ -23,16 +22,27 @@ class ViewInvoice extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->invoicePortalAction()
+            InvoiceResource::backToIndexAction(),
+            $this->invoiceSendAction()
                 ->button()
-                ->hiddenLabel(),
-            $this->invoiceMarkPaidAction(),
+                ->label(__('laravel-crm-filament::labels.actions.send'))
+                ->color('gray'),
+            $this->invoiceMarkPaidAction()
+                ->button()
+                ->label(__('laravel-crm-filament::labels.actions.pay'))
+                ->color('gray'),
+            $this->invoiceDownloadPdfAction()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-arrow-down-tray'),
             Actions\EditAction::make()
                 ->button()
                 ->hiddenLabel()
                 ->icon('heroicon-m-pencil-square'),
-            $this->invoiceSendAction(),
-            $this->invoiceDownloadPdfAction(),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 

@@ -332,6 +332,8 @@ return [
         'back_to_quotes' => 'Retour aux devis',
         'back_to_deals' => 'Retour aux affaires',
         'back_to_orders' => 'Retour aux commandes',
+        'pay' => 'Payer',
+        'back_to_invoices' => 'Retour aux factures',
         'purchase_order' => 'Bon de commande',
         'delivery' => 'Livraison',
         'upload' => 'Téléverser',
