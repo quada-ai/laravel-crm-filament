@@ -5,6 +5,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Invoices;
 use BackedEnum;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Textarea;
@@ -295,9 +296,9 @@ class InvoiceResource extends Resource
             ]);
     }
 
-    public static function markPaidAction(): Actions\Action
+    public static function markPaidAction(): Action
     {
-        return Actions\Action::make('markPaid')
+        return Action::make('markPaid')
             ->label(__('laravel-crm-filament::labels.actions.mark_paid'))
             ->icon('heroicon-o-banknotes')
             ->color('success')
@@ -583,9 +584,9 @@ class InvoiceResource extends Resource
         return $pdfRelative;
     }
 
-    public static function backToIndexAction(): Actions\Action
+    public static function backToIndexAction(): Action
     {
-        return Actions\Action::make('backToIndex')
+        return Action::make('backToIndex')
             ->label(__('laravel-crm-filament::labels.actions.back_to_invoices'))
             ->color('gray')
             ->icon('heroicon-o-arrow-left')
