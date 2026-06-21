@@ -76,6 +76,7 @@ return [
     'contact' => [
         'phone_numbers' => 'Numéros de téléphone',
         'phone' => 'Téléphone',
+        'location' => 'Lieu',
         'number' => 'Numéro',
         'email_addresses' => 'Adresses e-mail',
         'email' => 'E-mail',
@@ -217,6 +218,7 @@ return [
         'add_note' => 'Ajouter une note',
         'add_task' => 'Ajouter une tâche',
         'add_call' => 'Ajouter un appel',
+        'add_meeting' => 'Ajouter une réunion',
         'details' => 'Détails',
         'lead_qualification' => 'Qualification du prospect',
         'contact' => 'Contact',

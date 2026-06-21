@@ -2,6 +2,7 @@
 
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
@@ -38,7 +39,8 @@ it('attaches LeadNotesRelationManager + LeadTasksRelationManager + LeadCallsRela
     expect($relations)->not->toContain(TasksRelationManager::class);
     expect($relations)->toContain(LeadCallsRelationManager::class);
     expect($relations)->not->toContain(CallsRelationManager::class);
-    expect($relations)->toContain(MeetingsRelationManager::class);
+    expect($relations)->toContain(LeadMeetingsRelationManager::class);
+    expect($relations)->not->toContain(MeetingsRelationManager::class);
 });
 
 it('uses the polymorphic relationship names that match HasCrmActivities', function () {
