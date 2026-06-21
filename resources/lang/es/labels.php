@@ -78,6 +78,7 @@ return [
         'current_password' => 'Contraseña actual',
         'new_password' => 'Contraseña nueva',
         'confirm_password' => 'Confirmar contraseña',
+        'requested_by' => 'Solicitado por',
     ],
 
     'contact' => [
@@ -369,4 +370,8 @@ return [
         'error' => 'Error de sincronización',
     ],
 
+    'status' => [
+        'complete' => 'Completada',
+        'pending' => 'Pendiente',
+    ],
 ];

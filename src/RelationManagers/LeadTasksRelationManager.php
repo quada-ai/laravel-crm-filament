@@ -166,6 +166,27 @@ class LeadTasksRelationManager extends TasksRelationManager
             ->send();
     }
 
+    public function completeTask(int $id): void
+    {
+        $task = $this->getOwnerRecord()->tasks()->whereKey($id)->first();
+
+        if ($task === null) {
+            return;
+        }
+
+        $task->update([
+            'completed_at' => now(),
+            'user_updated_id' => auth()->id(),
+        ]);
+
+        static::logCrmActivity($this->getOwnerRecord(), $task);
+
+        Notification::make()
+            ->title('Task completed')
+            ->success()
+            ->send();
+    }
+
     public function deleteTask(int $id): void
     {
         $task = $this->getOwnerRecord()->tasks()->whereKey($id)->first();

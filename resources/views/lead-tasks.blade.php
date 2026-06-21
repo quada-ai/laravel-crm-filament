@@ -146,9 +146,7 @@
                 </form>
             @else
                 <div class="crm-card-card-head">
-                    <div class="crm-card-card-meta">
-                        {{ $task->created_at?->diffForHumans() }} - {{ $task->createdByUser?->name }}
-                    </div>
+                    <div class="crm-card-card-title">{{ $task->name }}</div>
                     <div
                         x-data="{ open: false }"
                         @click.outside="open = false"
@@ -174,7 +172,16 @@
                                 @click="open = false"
                                 class="crm-card-dropdown-item"
                                 role="menuitem"
-                            >Edit</button>
+                            >{{ __('laravel-crm-filament::labels.actions.edit') }}</button>
+                            @if ($task->completed_at === null)
+                                <button
+                                    type="button"
+                                    wire:click="completeTask({{ $task->id }})"
+                                    @click="open = false"
+                                    class="crm-card-dropdown-item"
+                                    role="menuitem"
+                                >{{ __('laravel-crm-filament::labels.status.complete') }}</button>
+                            @endif
                             <button
                                 type="button"
                                 wire:click="deleteTask({{ $task->id }})"
@@ -182,19 +189,34 @@
                                 @click="open = false"
                                 class="crm-card-dropdown-item crm-card-dropdown-item--danger"
                                 role="menuitem"
-                            >Delete</button>
+                            >{{ __('laravel-crm-filament::labels.actions.delete') }}</button>
                         </div>
                     </div>
                 </div>
-                <div class="crm-card-card-body">
-                    <strong>{{ $task->name }}</strong>
-                    @if ($task->description)
-                        <div>{{ $task->description }}</div>
+                <div class="crm-card-badges">
+                    @if ($task->completed_at)
+                        <span class="crm-card-badge crm-card-badge--success">{{ __('laravel-crm-filament::labels.status.complete') }}</span>
+                    @else
+                        <span class="crm-card-badge crm-card-badge--primary">{{ __('laravel-crm-filament::labels.status.pending') }}</span>
+                    @endif
+                    @if ($task->due_at)
+                        <span class="crm-card-pill">{{ __('laravel-crm-filament::labels.money.due') }} {{ $task->due_at->format('h:i A') }} on {{ $task->due_at->format('M d, Y') }}</span>
                     @endif
                 </div>
-                @if ($task->due_at)
-                    <div class="crm-card-card-footer">
-                        <span class="crm-card-pill">Due at {{ $task->due_at->format('h:i A') }} on {{ $task->due_at->format('M d, Y') }}</span>
+                @if ($task->description)
+                    <div class="crm-card-card-body">{{ $task->description }}</div>
+                @endif
+                @if ($task->ownerUser || $task->assignedToUser)
+                    <div class="crm-card-card-footer crm-card-card-attribution">
+                        @if ($task->ownerUser)
+                            <small>{{ __('laravel-crm-filament::labels.fields.requested_by') }} <span class="crm-card-attribution-name">{{ $task->ownerUser->name }}</span></small>
+                        @endif
+                        @if ($task->ownerUser && $task->assignedToUser)
+                            <small class="crm-card-attribution-sep">|</small>
+                        @endif
+                        @if ($task->assignedToUser)
+                            <small>{{ __('laravel-crm-filament::labels.fields.assigned_to') }} <span class="crm-card-attribution-name">{{ $task->assignedToUser->name }}</span></small>
+                        @endif
                     </div>
                 @endif
             @endif

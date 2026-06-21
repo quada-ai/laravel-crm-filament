@@ -79,6 +79,7 @@ return [
         'current_password' => 'Current password',
         'new_password' => 'New password',
         'confirm_password' => 'Confirm password',
+        'requested_by' => 'Requested by',
     ],
 
     // Contact / address fields
@@ -379,5 +380,9 @@ return [
         'hours_before' => 'Hours before',
         'attribute' => 'Attribute',
         'diff_from_gmt' => 'Diff from GMT',
+    ],
+    'status' => [
+        'complete' => 'Complete',
+        'pending' => 'Pending',
     ],
 ];
