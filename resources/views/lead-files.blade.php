@@ -22,10 +22,30 @@
     </div>
 
     @forelse ($fileRows as $file)
+        @php
+            $downloadUrl = $this->downloadFile($file->id);
+            $size = (int) ($file->filesize ?? 0);
+            if ($size >= 1024 * 1024) {
+                $formattedSize = round($size / (1024 * 1024), 2) . ' MB';
+            } elseif ($size >= 1024) {
+                $formattedSize = round($size / 1024, 2) . ' KB';
+            } else {
+                $formattedSize = $size . ' B';
+            }
+        @endphp
         <div class="crm-card-card" data-file-id="{{ $file->id }}" data-testid="crm-lead-file-card">
             <div class="crm-card-card-head">
-                <div class="crm-card-card-meta">
-                    {{ $file->created_at?->diffForHumans() }} - {{ $file->createdByUser?->name }}
+                <div class="crm-card-card-title">
+                    @if ($downloadUrl)
+                        <a
+                            href="{{ $downloadUrl }}"
+                            target="_blank"
+                            rel="noopener"
+                            class="crm-card-card-title-link"
+                        >{{ $file->name ?? $file->file }}</a>
+                    @else
+                        {{ $file->name ?? $file->file }}
+                    @endif
                 </div>
                 <div
                     x-data="{ open: false }"
@@ -46,9 +66,6 @@
                         class="crm-card-dropdown-menu"
                         role="menu"
                     >
-                        @php
-                            $downloadUrl = $this->downloadFile($file->id);
-                        @endphp
                         @if ($downloadUrl)
                             <a
                                 href="{{ $downloadUrl }}"
@@ -66,28 +83,24 @@
                             @click="open = false"
                             class="crm-card-dropdown-item crm-card-dropdown-item--danger"
                             role="menuitem"
-                        >Delete</button>
+                        >{{ __('laravel-crm-filament::labels.actions.delete') }}</button>
                     </div>
                 </div>
             </div>
-            <div class="crm-card-card-body">
-                <strong>{{ $file->name ?? $file->file }}</strong>
-                @if ($file->title)
-                    <div>{{ $file->title }}</div>
+            <div class="crm-card-badges">
+                @if ($file->mime)
+                    <span class="crm-card-pill">{{ $file->mime }}</span>
+                @endif
+                @if ($file->filesize)
+                    <span class="crm-card-pill">{{ $formattedSize }}</span>
                 @endif
             </div>
-            <div class="crm-card-card-footer">
-                <span class="crm-card-pill">
-                    @if ($file->filesize)
-                        {{ $file->filesize }} bytes
+            <div class="crm-card-card-attribution">
+                <small>{{ $file->created_at?->diffForHumans() }}
+                    @if ($file->createdByUser)
+                        &mdash; {{ $file->createdByUser->name }}
                     @endif
-                    @if ($file->filesize && $file->mime)
-                        ·
-                    @endif
-                    @if ($file->mime)
-                        {{ $file->mime }}
-                    @endif
-                </span>
+                </small>
             </div>
         </div>
     @empty

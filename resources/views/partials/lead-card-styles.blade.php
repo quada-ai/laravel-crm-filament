@@ -306,5 +306,11 @@
             color: var(--crm-card-primary);
             font-weight: 500;
         }
+        .crm-card-card-title-link {
+            color: var(--crm-card-primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+        .crm-card-card-title-link:hover { text-decoration: underline; }
     </style>
 @endonce
