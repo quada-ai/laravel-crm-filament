@@ -4,23 +4,40 @@ declare(strict_types=1);
 
 beforeEach(function () {
     $this->bladePath = __DIR__ . '/../../resources/views/lead-notes.blade.php';
+    $this->partialPath = __DIR__ . '/../../resources/views/partials/lead-card-styles.blade.php';
 });
 
 it('renders the lead-notes blade file at the expected path', function () {
     expect(file_exists($this->bladePath))->toBeTrue();
 });
 
-it('declares the @once <style> block with CSS custom properties for dark mode', function () {
+it('includes the shared lead-card-styles partial in place of an inline style block', function () {
     $blade = file_get_contents($this->bladePath);
 
-    expect($blade)->toContain('@once');
-    expect($blade)->toContain('<style>');
-    expect($blade)->toContain('@endonce');
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
 
-    expect($blade)->toContain('--crm-note-bg:');
-    expect($blade)->toContain('--crm-note-text:');
-    expect($blade)->toContain('--crm-note-pill-bg:');
-    expect($blade)->toContain('html.dark .crm-lead-notes');
+    // Inline @once <style> block must no longer live on this view.
+    expect($blade)->not->toContain('@once');
+    expect($blade)->not->toContain('<style>');
+    expect($blade)->not->toContain('@endonce');
+});
+
+it('the shared lead-card-styles partial declares CSS custom properties for dark mode', function () {
+    expect(file_exists($this->partialPath))->toBeTrue();
+
+    $partial = file_get_contents($this->partialPath);
+
+    expect($partial)->toContain('@once');
+    expect($partial)->toContain('<style>');
+    expect($partial)->toContain('@endonce');
+
+    expect($partial)->toContain('--crm-card-bg:');
+    expect($partial)->toContain('--crm-card-text:');
+    expect($partial)->toContain('--crm-card-pill-bg:');
+    expect($partial)->toContain('html.dark .crm-lead-notes');
+
+    // Old --crm-note-* property names are gone from the partial.
+    expect($partial)->not->toContain('--crm-note-');
 });
 
 it('exposes the add-note form wired to createNote with content + noted_at bindings', function () {
@@ -63,13 +80,13 @@ it('renders the Noted-at footer pill in the prescribed format', function () {
     expect($blade)->toContain('Noted at');
     expect($blade)->toContain("\$note->noted_at->format('h:i A')");
     expect($blade)->toContain("\$note->noted_at->format('M d, Y')");
-    expect($blade)->toContain('crm-note-pill');
+    expect($blade)->toContain('crm-card-pill');
 });
 
 it('exposes a three-dot dropdown with Edit and Delete wired to editNote / deleteNote', function () {
     $blade = file_get_contents($this->bladePath);
 
-    expect($blade)->toContain('crm-note-dropdown');
+    expect($blade)->toContain('crm-card-dropdown');
     expect($blade)->toContain('x-data="{ open: false }"');
     expect($blade)->toContain('wire:click="editNote({{ $note->id }})"');
     expect($blade)->toContain('wire:click="deleteNote({{ $note->id }})"');
@@ -98,4 +115,15 @@ it('renders an empty-state message when the lead has no notes', function () {
 
     expect($blade)->toContain('@empty');
     expect($blade)->toContain('No notes yet');
+});
+
+it('the lead-notes blade no longer carries any crm-note-* class references', function () {
+    $blade = file_get_contents($this->bladePath);
+
+    // The rename is exhaustive: no class attribute on this view should still
+    // reference the old crm-note-* prefix. (data-testid="crm-lead-note-*"
+    // and id="crm-lead-note-*" use a "crm-lead-note-" prefix and are NOT
+    // class references — those stay.)
+    expect($blade)->not->toContain('class="crm-note-');
+    expect($blade)->not->toContain(' crm-note-');
 });

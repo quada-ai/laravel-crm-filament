@@ -283,14 +283,22 @@ it('the lead-notes Blade view contains the expected structural markers', functio
 
     // Three-dot dropdown wired to editNote / deleteNote per row.
     expect($blade)->toContain('x-data="{ open: false }"');
-    expect($blade)->toContain('crm-note-dropdown');
+    expect($blade)->toContain('crm-card-dropdown');
     expect($blade)->toContain('wire:click="editNote({{ $note->id }})"');
     expect($blade)->toContain('wire:click="deleteNote({{ $note->id }})"');
 
-    // Dark-mode @once <style> block with CSS custom properties.
-    expect($blade)->toContain('@once');
-    expect($blade)->toContain('<style>');
-    expect($blade)->toContain('@endonce');
-    expect($blade)->toContain('--crm-note-bg:');
-    expect($blade)->toContain('html.dark .crm-lead-notes');
+    // Dark-mode styles now live in the shared lead-card-styles partial.
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
+    expect($blade)->not->toContain('@once');
+    expect($blade)->not->toContain('--crm-note-bg:');
+
+    $partialPath = dirname(__DIR__, 2) . '/resources/views/partials/lead-card-styles.blade.php';
+    expect(file_exists($partialPath))->toBeTrue();
+
+    $partial = file_get_contents($partialPath);
+    expect($partial)->toContain('@once');
+    expect($partial)->toContain('<style>');
+    expect($partial)->toContain('@endonce');
+    expect($partial)->toContain('--crm-card-bg:');
+    expect($partial)->toContain('html.dark .crm-lead-notes');
 });
