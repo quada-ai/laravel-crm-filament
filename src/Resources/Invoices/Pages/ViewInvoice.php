@@ -19,7 +19,9 @@ class ViewInvoice extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->invoicePortalAction(),
+            $this->invoicePortalAction()
+                ->button()
+                ->hiddenLabel(),
             $this->invoiceMarkPaidAction(),
             Actions\EditAction::make()
                 ->button()

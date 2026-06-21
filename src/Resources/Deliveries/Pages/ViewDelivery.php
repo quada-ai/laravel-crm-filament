@@ -17,7 +17,9 @@ class ViewDelivery extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->deliveryPortalAction(),
+            $this->deliveryPortalAction()
+                ->button()
+                ->hiddenLabel(),
             Actions\EditAction::make()
                 ->button()
                 ->hiddenLabel()

@@ -20,7 +20,9 @@ class ViewOrder extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->orderPortalAction(),
+            $this->orderPortalAction()
+                ->button()
+                ->hiddenLabel(),
             Actions\EditAction::make()
                 ->button()
                 ->hiddenLabel()

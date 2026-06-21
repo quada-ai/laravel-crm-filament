@@ -18,7 +18,9 @@ class ViewPurchaseOrder extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            $this->purchaseOrderPortalAction(),
+            $this->purchaseOrderPortalAction()
+                ->button()
+                ->hiddenLabel(),
             Actions\EditAction::make()
                 ->button()
                 ->hiddenLabel()
