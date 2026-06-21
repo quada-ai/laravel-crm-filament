@@ -3,9 +3,11 @@
 namespace VentureDrake\LaravelCrmFilament\Resources\Orders;
 
 use BackedEnum;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -13,7 +15,12 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 use VentureDrake\LaravelCrm\Models\Order;
+use VentureDrake\LaravelCrm\Models\Product;
+use VentureDrake\LaravelCrm\Services\DeliveryService;
+use VentureDrake\LaravelCrm\Services\PurchaseOrderService;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LineItemsRepeater;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\MoneyTotalsRow;
@@ -33,13 +40,16 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
+use VentureDrake\LaravelCrmFilament\Resources\Deliveries\DeliveryResource;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\CreateOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\EditOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\ListOrders;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\ViewOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
+use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
+use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
 class OrderResource extends Resource
 {
@@ -180,6 +190,16 @@ class OrderResource extends Resource
                     ->preload(),
             ])
             ->recordActions([
+                static::convertToDeliveryActionFactory()
+                    ->label(__('laravel-crm-filament::labels.actions.delivery'))
+                    ->button(),
+                static::convertToPurchaseOrderActionFactory()
+                    ->label(__('laravel-crm-filament::labels.actions.purchase_order'))
+                    ->button(),
+                static::downloadOrderPdfActionFactory()
+                    ->button()
+                    ->hiddenLabel()
+                    ->icon('heroicon-m-arrow-down-tray'),
                 Actions\ViewAction::make()
                     ->button()
                     ->hiddenLabel(),
@@ -314,6 +334,187 @@ class OrderResource extends Resource
             'view' => ViewOrder::route('/{record}'),
             'edit' => EditOrder::route('/{record}/edit'),
         ];
+    }
+
+    public static function convertToDeliveryActionFactory(): Action
+    {
+        return Action::make('convertToDelivery')
+            ->label(__('laravel-crm-filament::labels.actions.convert_to_delivery'))
+            ->icon('heroicon-o-truck')
+            ->color('success')
+            ->requiresConfirmation()
+            ->modalHeading('Create delivery from order')
+            ->modalDescription('Pre-fills the full ordered quantity for every line item.')
+            ->action(function (Order $record, DeliveryService $deliveryService): void {
+                $payload = static::buildDeliveryPayloadFromOrderStatic($record);
+
+                $delivery = $deliveryService->create(
+                    FormPayload::wrap($payload),
+                    $record->person,
+                    $record->organization,
+                );
+
+                $url = DeliveryResource::getUrl('view', ['record' => $delivery]);
+
+                Notification::make()
+                    ->title('Delivery ' . $delivery->delivery_id . ' created')
+                    ->body('Order converted to delivery.')
+                    ->success()
+                    ->actions([
+                        \Filament\Notifications\Actions\Action::make('open')
+                            ->label(__('laravel-crm-filament::labels.actions.open_delivery'))
+                            ->url($url),
+                    ])
+                    ->send();
+            });
+    }
+
+    public static function convertToPurchaseOrderActionFactory(): Action
+    {
+        return Action::make('convertToPurchaseOrder')
+            ->label(__('laravel-crm-filament::labels.actions.convert_to_purchase_order'))
+            ->icon('heroicon-o-clipboard-document-list')
+            ->color('success')
+            ->requiresConfirmation()
+            ->modalHeading('Create purchase order from order')
+            ->modalDescription("Copies line items using each product's supplier price (or unit price as fallback).")
+            ->action(function (Order $record, PurchaseOrderService $purchaseOrderService): void {
+                $payload = static::buildPurchaseOrderPayloadFromOrderStatic($record);
+
+                $purchaseOrder = $purchaseOrderService->create(
+                    FormPayload::wrap($payload),
+                    $record->person,
+                    $record->organization,
+                );
+
+                $url = PurchaseOrderResource::getUrl('view', ['record' => $purchaseOrder]);
+
+                Notification::make()
+                    ->title('Purchase order ' . $purchaseOrder->purchase_order_id . ' created')
+                    ->body('Order converted to purchase order.')
+                    ->success()
+                    ->actions([
+                        \Filament\Notifications\Actions\Action::make('open')
+                            ->label(__('laravel-crm-filament::labels.actions.open_purchase_order'))
+                            ->url($url),
+                    ])
+                    ->send();
+            });
+    }
+
+    public static function downloadOrderPdfActionFactory(): Action
+    {
+        return Action::make('downloadPdf')
+            ->label(__('laravel-crm-filament::labels.actions.download_pdf'))
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('gray')
+            ->action(function (Order $record) {
+                $relative = static::renderOrderPdfToDisk($record);
+
+                return Response::download(
+                    storage_path($relative),
+                    'order-' . strtolower((string) ($record->order_id ?? $record->external_id)) . '.pdf',
+                );
+            });
+    }
+
+    protected static function buildDeliveryPayloadFromOrderStatic(Order $record): array
+    {
+        $products = [];
+
+        foreach ($record->orderProducts as $orderProduct) {
+            $products[] = [
+                'order_product_id' => $orderProduct->id,
+                'quantity' => $orderProduct->quantity,
+            ];
+        }
+
+        return [
+            'order_id' => $record->id,
+            'delivery_expected' => now(),
+            'delivered_on' => null,
+            'user_owner_id' => $record->user_owner_id,
+            'products' => $products,
+            'addresses' => [],
+        ];
+    }
+
+    protected static function buildPurchaseOrderPayloadFromOrderStatic(Order $record): array
+    {
+        $products = [];
+
+        foreach ($record->orderProducts as $orderProduct) {
+            $unitPrice = static::resolveSupplierUnitPriceStatic($orderProduct->product_id, $orderProduct->price);
+            $quantity = (float) $orderProduct->quantity;
+            $amount = $unitPrice * $quantity;
+
+            $products[] = [
+                'id' => $orderProduct->product_id,
+                'order_product_id' => $orderProduct->id,
+                'quantity' => $orderProduct->quantity,
+                'unit_price' => $unitPrice,
+                'amount' => $amount,
+                'comments' => $orderProduct->comments,
+            ];
+        }
+
+        return [
+            'order_id' => $record->id,
+            'reference' => $record->reference,
+            'issue_date' => now(),
+            'delivery_date' => now()->addDays(14),
+            'currency' => $record->currency,
+            'delivery_type' => 'collect',
+            'delivery_instructions' => null,
+            'terms' => null,
+            'user_owner_id' => $record->user_owner_id,
+            'products' => $products,
+        ];
+    }
+
+    protected static function resolveSupplierUnitPriceStatic(?int $productId, ?int $orderProductPriceCents): float
+    {
+        if ($productId && $product = Product::find($productId)) {
+            $price = $product->getDefaultPrice();
+
+            if ($price && $price->cost_per_unit) {
+                return $price->cost_per_unit / 100;
+            }
+
+            if ($price && $price->unit_price) {
+                return $price->unit_price / 100;
+            }
+        }
+
+        return $orderProductPriceCents !== null ? $orderProductPriceCents / 100 : 0;
+    }
+
+    protected static function renderOrderPdfToDisk(Order $record): string
+    {
+        $settings = app('laravel-crm.settings');
+
+        $data = [
+            'order' => $record,
+            'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
+            'email' => optional($record->person)->getPrimaryEmail(),
+            'phone' => optional($record->person)->getPrimaryPhone(),
+            'address' => optional($record->person)->getPrimaryAddress(),
+            'organization_address' => optional($record->organization)->getPrimaryAddress(),
+            'fromName' => $settings->get('organization_name'),
+            'logo' => $settings->get('logo_file'),
+        ];
+
+        $relativeDir = 'laravel-crm/order/' . $record->id;
+        Storage::makeDirectory($relativeDir);
+
+        $filename = 'order-' . strtolower((string) ($record->order_id ?? $record->external_id)) . '.pdf';
+        $pdfRelative = 'app/' . $relativeDir . '/' . $filename;
+
+        Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
+            ->loadView('laravel-crm::orders.pdf', $data)
+            ->save(storage_path($pdfRelative));
+
+        return $pdfRelative;
     }
 
     public static function backToIndexAction(): Action
