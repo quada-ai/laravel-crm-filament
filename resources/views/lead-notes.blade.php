@@ -10,7 +10,7 @@
                 --crm-note-pill-bg: rgba(0, 0, 0, 0.05);
                 --crm-note-pill-color: #374151;
                 --crm-note-input-bg: #ffffff;
-                --crm-note-input-border: rgba(0, 0, 0, 0.12);
+                --crm-note-input-border: rgba(15, 23, 42, 0.1);
                 --crm-note-input-color: #111827;
                 --crm-note-primary: #05b3a9;
                 --crm-note-primary-hover: #047d75;
@@ -29,7 +29,7 @@
                 --crm-note-pill-bg: rgba(255, 255, 255, 0.05);
                 --crm-note-pill-color: #d1d5db;
                 --crm-note-input-bg: rgba(255, 255, 255, 0.05);
-                --crm-note-input-border: rgba(255, 255, 255, 0.1);
+                --crm-note-input-border: rgba(255, 255, 255, 0.2);
                 --crm-note-input-color: #ffffff;
                 --crm-note-primary: #2dd4bf;
                 --crm-note-primary-hover: #0d9488;
@@ -44,7 +44,6 @@
                 color: var(--crm-note-text);
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
             }
-            .crm-note-card--add { border-style: dashed; }
             .crm-note-card-head {
                 display: flex;
                 justify-content: space-between;
@@ -80,22 +79,38 @@
             .crm-note-textarea {
                 width: 100%;
                 min-height: 90px;
-                padding: 0.5rem 0.75rem;
+                padding: 0.375rem 0.75rem;
                 border-radius: 0.5rem;
                 border: 1px solid var(--crm-note-input-border);
                 background: var(--crm-note-input-bg);
                 color: var(--crm-note-input-color);
                 font-size: 0.875rem;
-                line-height: 1.4;
+                line-height: 1.5;
                 resize: vertical;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                transition: box-shadow 75ms, border-color 75ms;
             }
+            .crm-note-textarea:focus {
+                outline: none;
+                border-color: var(--crm-note-primary);
+                box-shadow: 0 0 0 1px var(--crm-note-primary);
+            }
+            .crm-note-textarea::placeholder { color: var(--crm-note-subtle); }
             .crm-note-noted-at {
-                padding: 0.5rem 0.75rem;
+                padding: 0.375rem 0.75rem;
                 border-radius: 0.5rem;
                 border: 1px solid var(--crm-note-input-border);
                 background: var(--crm-note-input-bg);
                 color: var(--crm-note-input-color);
                 font-size: 0.875rem;
+                line-height: 1.5;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                transition: box-shadow 75ms, border-color 75ms;
+            }
+            .crm-note-noted-at:focus {
+                outline: none;
+                border-color: var(--crm-note-primary);
+                box-shadow: 0 0 0 1px var(--crm-note-primary);
             }
             .crm-note-form-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
             .crm-note-btn {
