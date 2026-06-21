@@ -1,6 +1,7 @@
 <?php
 
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\NotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\TasksRelationManager;
@@ -14,7 +15,6 @@ use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\RelationManagers\Reci
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 
 dataset('contactActivityParents', [
-    'Lead' => [LeadResource::class],
     'Deal' => [DealResource::class],
     'Person' => [PersonResource::class],
     'Organization' => [OrganizationResource::class],
@@ -27,6 +27,15 @@ it('attaches Notes/Tasks/Calls/Meetings RMs to all contact-activity parents', fu
     expect($relations)->toContain(CallsRelationManager::class);
     expect($relations)->toContain(MeetingsRelationManager::class);
 })->with('contactActivityParents');
+
+it('attaches LeadNotesRelationManager (subclass of NotesRelationManager) plus Tasks/Calls/Meetings RMs to LeadResource', function () {
+    $relations = LeadResource::getRelations();
+    expect($relations)->toContain(LeadNotesRelationManager::class);
+    expect($relations)->not->toContain(NotesRelationManager::class);
+    expect($relations)->toContain(TasksRelationManager::class);
+    expect($relations)->toContain(CallsRelationManager::class);
+    expect($relations)->toContain(MeetingsRelationManager::class);
+});
 
 it('uses the polymorphic relationship names that match HasCrmActivities', function () {
     $rm = new ReflectionClass(NotesRelationManager::class);
