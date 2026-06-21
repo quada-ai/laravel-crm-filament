@@ -23,10 +23,12 @@ class ViewLead extends ViewRecord
                 ->label(__('laravel-crm-filament::labels.actions.convert')),
             Actions\EditAction::make()
                 ->button()
-                ->hiddenLabel(),
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
             Actions\DeleteAction::make()
                 ->button()
-                ->hiddenLabel(),
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 
