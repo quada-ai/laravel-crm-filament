@@ -244,11 +244,14 @@ class LeadResource extends Resource
                     ->button()
                     ->label(__('laravel-crm-filament::labels.actions.convert')),
                 Actions\ViewAction::make()
-                    ->iconButton(),
+                    ->button()
+                    ->hiddenLabel(),
                 Actions\EditAction::make()
-                    ->iconButton(),
+                    ->button()
+                    ->hiddenLabel(),
                 Actions\DeleteAction::make()
-                    ->iconButton()
+                    ->button()
+                    ->hiddenLabel()
                     ->requiresConfirmation(),
             ])
             ->toolbarActions([
