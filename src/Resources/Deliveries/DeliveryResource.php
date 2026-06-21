@@ -5,8 +5,10 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Deliveries;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -15,6 +17,7 @@ use VentureDrake\LaravelCrm\Models\AddressType;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\OrderProduct;
+use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
@@ -33,6 +36,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\EditDelivery;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\ListDeliveries;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\ViewDelivery;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
+use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
+use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 
 class DeliveryResource extends Resource
 {
@@ -280,6 +285,71 @@ class DeliveryResource extends Resource
             CrmFilesRelationManager::class,
             AuditsRelationManager::class,
         ];
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->schema([
+                    TextEntry::make('created_at')
+                        ->label(__('laravel-crm-filament::labels.fields.created'))
+                        ->since(),
+
+                    TextEntry::make('delivery_id')
+                        ->label(__('laravel-crm-filament::labels.fields.number')),
+
+                    TextEntry::make('order.order_id')
+                        ->label(__('laravel-crm-filament::labels.fields.order'))
+                        ->url(fn ($record) => $record?->order
+                            ? OrderResource::getUrl('view', ['record' => $record->order])
+                            : null),
+
+                    TextEntry::make('order.reference')
+                        ->label(__('laravel-crm-filament::labels.fields.reference')),
+
+                    TextEntry::make('delivery_expected')
+                        ->label(__('laravel-crm-filament::labels.money.expected'))
+                        ->date(),
+
+                    TextEntry::make('delivered_on')
+                        ->label(__('laravel-crm-filament::labels.money.delivered_on'))
+                        ->date(),
+
+                    TextEntry::make('shipping_address')
+                        ->label(__('laravel-crm-filament::labels.sales.shipping_address'))
+                        ->state(fn ($record) => $record instanceof Delivery ? static::formatShippingAddress($record) : null)
+                        ->columnSpanFull(),
+
+                    TextEntry::make('labels.name')
+                        ->label(__('laravel-crm-filament::labels.fields.labels'))
+                        ->badge(),
+
+                    TextEntry::make('ownerUser.name')
+                        ->label(__('laravel-crm-filament::labels.fields.owner'))
+                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
+                ]),
+
+            Section::make(__('laravel-crm-filament::labels.sections.contact'))
+                ->schema([
+                    TextEntry::make('order.person.name')
+                        ->label(__('laravel-crm-filament::labels.fields.contact'))
+                        ->state(fn ($record) => LeadDealContactSection::personLabel($record?->order?->person))
+                        ->url(fn ($record) => $record?->order?->person
+                            ? PersonResource::getUrl('view', ['record' => $record->order->person])
+                            : null),
+
+                    TextEntry::make('order.organization.name')
+                        ->label(__('laravel-crm-filament::labels.fields.organization'))
+                        ->url(fn ($record) => $record?->order?->organization
+                            ? OrganizationResource::getUrl('view', ['record' => $record->order->organization])
+                            : null),
+                ]),
+
+            Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
+                ->schema(fn (?Delivery $record) => [])
+                ->hidden(fn (): bool => true),
+        ])->columns(1);
     }
 
     public static function getPages(): array

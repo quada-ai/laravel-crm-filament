@@ -4,9 +4,8 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
-use VentureDrake\LaravelCrm\Models\Invoice;
-use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
 
 class ViewInvoice extends ViewRecord
@@ -14,7 +13,6 @@ class ViewInvoice extends ViewRecord
     use Concerns\HasInvoiceMarkPaidAction;
     use Concerns\HasInvoicePortalAction;
     use Concerns\HasInvoiceSendAction;
-    use HasXeroSyncStateInfolist;
 
     protected static string $resource = InvoiceResource::class;
 
@@ -29,19 +27,13 @@ class ViewInvoice extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema
-    {
-        return $schema->components([
-            static::xeroSyncStateSection(fn (Invoice $invoice) => $invoice->xeroInvoice),
-        ]);
-    }
-
     public function content(Schema $schema): Schema
     {
         return $schema->components([
-            $this->getFormContentComponent(),
-            $this->getInfolistContentComponent(),
-            $this->getRelationManagersContentComponent(),
+            Grid::make(['default' => 1, 'lg' => 2])->schema([
+                $this->getInfolistContentComponent()->columnSpan(['lg' => 1]),
+                $this->getRelationManagersContentComponent()->columnSpan(['lg' => 1]),
+            ]),
         ]);
     }
 }
