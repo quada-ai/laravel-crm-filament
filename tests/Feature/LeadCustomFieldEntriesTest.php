@@ -12,10 +12,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
 function leadCustomFieldEntries(Lead $record, bool $grouped): array
 {
-    $ref = new ReflectionMethod(LeadResource::class, 'leadCustomFieldEntries');
-    $ref->setAccessible(true);
-
-    return $ref->invoke(null, $record, $grouped);
+    return LeadResource::crmCustomFieldEntries($record, $grouped);
 }
 
 function makeField(string $name, string $type, ?int $groupId = null): Field
@@ -40,11 +37,12 @@ function makeFieldValue(Lead $lead, Field $field, ?string $value): FieldValue
     ]);
 }
 
-it('leadCustomFieldEntries has the expected static signature', function () {
-    $reflection = new ReflectionMethod(LeadResource::class, 'leadCustomFieldEntries');
-    expect($reflection->isProtected())->toBeTrue();
+it('crmCustomFieldEntries has the expected static signature on LeadResource', function () {
+    $reflection = new ReflectionMethod(LeadResource::class, 'crmCustomFieldEntries');
+    expect($reflection->isPublic())->toBeTrue();
     expect($reflection->isStatic())->toBeTrue();
-    expect($reflection->getNumberOfRequiredParameters())->toBe(2);
+    expect($reflection->getNumberOfRequiredParameters())->toBe(1);
+    expect($reflection->getNumberOfParameters())->toBe(2);
     expect($reflection->getReturnType()?->getName())->toBe('array');
 });
 

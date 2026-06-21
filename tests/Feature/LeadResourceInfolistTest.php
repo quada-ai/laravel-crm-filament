@@ -62,7 +62,7 @@ it('Details section wires the AC-required TextEntries with money/badge/color/pla
     expect($src)->toContain("TextEntry::make('ownerUser.name')");
     expect($src)->toContain("'laravel-crm-filament::labels.misc.unallocated'");
 
-    expect($src)->toContain('static::leadCustomFieldEntries($record, false)');
+    expect($src)->toContain('static::crmCustomFieldEntries($record, false)');
 });
 
 it('Lead Qualification section uses grouped entries and hidden gate keyed off grouped FieldValues', function () {
@@ -70,7 +70,7 @@ it('Lead Qualification section uses grouped entries and hidden gate keyed off gr
         (new ReflectionClass(LeadResource::class))->getFileName(),
     );
 
-    expect($src)->toContain('static::leadCustomFieldEntries($record, true)');
+    expect($src)->toContain('static::crmCustomFieldEntries($record, true)');
     expect($src)->toContain('->hidden(function ($record): bool');
     expect($src)->toContain('whereNotNull(\'field_group_id\')');
 });

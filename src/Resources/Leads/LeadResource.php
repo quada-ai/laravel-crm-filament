@@ -24,6 +24,7 @@ use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Services\DealService;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
@@ -46,6 +47,7 @@ use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 
 class LeadResource extends Resource
 {
+    use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use HasLabels;
     use HasPrimaryBulkActions;
@@ -346,10 +348,10 @@ class LeadResource extends Resource
                     TextEntry::make('ownerUser.name')
                         ->label(__('laravel-crm-filament::labels.fields.owner'))
                         ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
-                ], $record ? static::leadCustomFieldEntries($record, false) : [])),
+                ], $record ? static::crmCustomFieldEntries($record, false) : [])),
 
             Section::make(__('laravel-crm-filament::labels.sections.lead_qualification'))
-                ->schema(fn (?Lead $record) => $record ? static::leadCustomFieldEntries($record, true) : [])
+                ->schema(fn (?Lead $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
                 ->hidden(function ($record): bool {
                     if (! $record instanceof Lead) {
                         return true;
@@ -466,90 +468,5 @@ class LeadResource extends Resource
             ->icon('heroicon-o-arrow-left')
             ->color('gray')
             ->url(static::getUrl('index'));
-    }
-
-    /**
-     * Build TextEntry components for a Lead's custom FieldValues.
-     *
-     * When `$grouped` is false, returns a flat list of TextEntry components for
-     * FieldValues whose underlying Field has no field_group_id.
-     *
-     * When `$grouped` is true, returns one Section per distinct FieldGroup
-     * containing the grouped TextEntries for that group.
-     *
-     * Per-type display formatting mirrors `resources/views/components/custom-field-values/_row.blade.php`:
-     * - checkbox: Yes/No
-     * - select / radio: looked-up option label
-     * - checkbox_multiple: JSON-decoded list joined with ", "
-     * - anything else: raw value
-     *
-     * @return array<int, TextEntry|Section>
-     */
-    protected static function leadCustomFieldEntries(Lead $record, bool $grouped): array
-    {
-        $fieldValues = $record->fields()
-            ->with(['field.fieldGroup', 'field.fieldOptions'])
-            ->get()
-            ->filter(fn ($fv) => $fv->field !== null);
-
-        if (! $grouped) {
-            return $fieldValues
-                ->filter(fn ($fv) => $fv->field->field_group_id === null)
-                ->values()
-                ->map(fn ($fv) => static::buildLeadCustomFieldTextEntry($fv))
-                ->all();
-        }
-
-        $groupedValues = $fieldValues->filter(fn ($fv) => $fv->field->field_group_id !== null);
-
-        return $groupedValues
-            ->groupBy(fn ($fv) => $fv->field->field_group_id)
-            ->map(function ($groupFieldValues) {
-                $group = $groupFieldValues->first()->field->fieldGroup;
-                $entries = $groupFieldValues
-                    ->map(fn ($fv) => static::buildLeadCustomFieldTextEntry($fv))
-                    ->all();
-
-                return Section::make($group->name)->schema($entries);
-            })
-            ->values()
-            ->all();
-    }
-
-    protected static function buildLeadCustomFieldTextEntry($fieldValue): TextEntry
-    {
-        $field = $fieldValue->field;
-        $fieldName = $field->name;
-        $raw = $fieldValue->value;
-        $type = $field->type;
-
-        return TextEntry::make("custom.{$fieldName}")
-            ->label(ucfirst($fieldName))
-            ->state(function () use ($field, $raw, $type) {
-                switch ($type) {
-                    case 'checkbox':
-                        return ((bool) $raw)
-                            ? ucfirst(__('laravel-crm::lang.yes'))
-                            : ucfirst(__('laravel-crm::lang.no'));
-
-                    case 'select':
-                    case 'radio':
-                        $option = $field->fieldOptions->firstWhere('id', $raw);
-
-                        return $option?->label;
-
-                    case 'checkbox_multiple':
-                        $values = is_string($raw) ? json_decode($raw, true) : $raw;
-                        $values = is_array($values) ? $values : [];
-
-                        return $field->fieldOptions
-                            ->whereIn('id', $values)
-                            ->pluck('label')
-                            ->implode(', ');
-
-                    default:
-                        return $raw;
-                }
-            });
     }
 }
