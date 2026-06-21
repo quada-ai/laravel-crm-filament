@@ -215,6 +215,7 @@ return [
 
     'sections' => [
         'add_note' => 'Añadir nota',
+        'add_task' => 'Añadir tarea',
         'details' => 'Detalles',
         'lead_qualification' => 'Calificación del cliente potencial',
         'contact' => 'Contacto',

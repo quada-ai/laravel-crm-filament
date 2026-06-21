@@ -259,6 +259,7 @@ return [
     // Sections (top-level grouping headings on forms / infolists)
     'sections' => [
         'add_note' => 'Add note',
+        'add_task' => 'Add task',
         'details' => 'Details',
         'lead_qualification' => 'Lead Qualification',
         'contact' => 'Contact',

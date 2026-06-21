@@ -1,0 +1,192 @@
+<?php
+
+namespace VentureDrake\LaravelCrmFilament\RelationManagers;
+
+use Filament\Forms;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
+
+class LeadTasksRelationManager extends TasksRelationManager
+{
+    protected string $view = 'laravel-crm-filament::lead-tasks';
+
+    /**
+     * @var array<string, mixed>|null
+     */
+    public ?array $data = [];
+
+    public ?int $editingId = null;
+
+    public function mount(): void
+    {
+        parent::mount();
+
+        $this->form->fill([
+            'name' => null,
+            'description' => null,
+            'due_at' => now(),
+            'user_owner_id' => auth()->id(),
+            'user_assigned_id' => null,
+        ]);
+    }
+
+    public function form(Schema $schema): Schema
+    {
+        return $schema
+            ->statePath('data')
+            ->components([
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255)
+                    ->columnSpanFull(),
+                Forms\Components\Textarea::make('description')
+                    ->rows(3)
+                    ->columnSpanFull(),
+                Forms\Components\DateTimePicker::make('due_at'),
+                Grid::make(2)->schema([
+                    Forms\Components\Select::make('user_owner_id')
+                        ->label(__('laravel-crm-filament::labels.fields.owner'))
+                        ->relationship('ownerUser', 'name')
+                        ->searchable()
+                        ->preload(),
+                    Forms\Components\Select::make('user_assigned_id')
+                        ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
+                        ->relationship('assignedToUser', 'name')
+                        ->searchable()
+                        ->preload(),
+                ]),
+            ]);
+    }
+
+    public function createTask(): void
+    {
+        $data = $this->form->getState();
+
+        $task = $this->getOwnerRecord()->tasks()->create([
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'due_at' => $data['due_at'] ?? null,
+            'user_owner_id' => $data['user_owner_id'] ?? auth()->id(),
+            'user_assigned_id' => $data['user_assigned_id'] ?? null,
+            'user_created_id' => auth()->id(),
+        ]);
+
+        static::logCrmActivity($this->getOwnerRecord(), $task);
+
+        $this->form->fill([
+            'name' => null,
+            'description' => null,
+            'due_at' => now(),
+            'user_owner_id' => auth()->id(),
+            'user_assigned_id' => null,
+        ]);
+
+        Notification::make()
+            ->title('Task added')
+            ->success()
+            ->send();
+    }
+
+    public function editTask(int $id): void
+    {
+        $task = $this->getOwnerRecord()->tasks()->whereKey($id)->first();
+
+        if ($task === null) {
+            return;
+        }
+
+        $this->editingId = (int) $task->id;
+
+        $this->form->fill([
+            'name' => $task->name,
+            'description' => $task->description,
+            'due_at' => $task->due_at,
+            'user_owner_id' => $task->user_owner_id,
+            'user_assigned_id' => $task->user_assigned_id,
+        ]);
+    }
+
+    public function cancelEdit(): void
+    {
+        $this->editingId = null;
+
+        $this->form->fill([
+            'name' => null,
+            'description' => null,
+            'due_at' => now(),
+            'user_owner_id' => auth()->id(),
+            'user_assigned_id' => null,
+        ]);
+    }
+
+    public function updateTask(): void
+    {
+        if ($this->editingId === null) {
+            return;
+        }
+
+        $data = $this->form->getState();
+
+        $task = $this->getOwnerRecord()->tasks()->whereKey($this->editingId)->first();
+
+        if ($task === null) {
+            $this->cancelEdit();
+
+            return;
+        }
+
+        $task->update([
+            'name' => $data['name'],
+            'description' => $data['description'] ?? null,
+            'due_at' => $data['due_at'] ?? null,
+            'user_owner_id' => $data['user_owner_id'] ?? null,
+            'user_assigned_id' => $data['user_assigned_id'] ?? null,
+            'user_updated_id' => auth()->id(),
+        ]);
+
+        static::logCrmActivity($this->getOwnerRecord(), $task);
+
+        $this->editingId = null;
+
+        $this->form->fill([
+            'name' => null,
+            'description' => null,
+            'due_at' => now(),
+            'user_owner_id' => auth()->id(),
+            'user_assigned_id' => null,
+        ]);
+
+        Notification::make()
+            ->title('Task updated')
+            ->success()
+            ->send();
+    }
+
+    public function deleteTask(int $id): void
+    {
+        $task = $this->getOwnerRecord()->tasks()->whereKey($id)->first();
+
+        if ($task === null) {
+            return;
+        }
+
+        $task->delete();
+
+        if ($this->editingId === (int) $id) {
+            $this->editingId = null;
+            $this->form->fill([
+                'name' => null,
+                'description' => null,
+                'due_at' => now(),
+                'user_owner_id' => auth()->id(),
+                'user_assigned_id' => null,
+            ]);
+        }
+
+        Notification::make()
+            ->title('Task deleted')
+            ->success()
+            ->send();
+    }
+}
