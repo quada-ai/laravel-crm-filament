@@ -1,6 +1,7 @@
 <?php
 
 use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MeetingsRelationManager;
@@ -29,13 +30,14 @@ it('attaches Notes/Tasks/Calls/Meetings RMs to all contact-activity parents', fu
     expect($relations)->toContain(MeetingsRelationManager::class);
 })->with('contactActivityParents');
 
-it('attaches LeadNotesRelationManager + LeadTasksRelationManager (subclasses of Notes/Tasks RMs) plus Calls/Meetings RMs to LeadResource', function () {
+it('attaches LeadNotesRelationManager + LeadTasksRelationManager + LeadCallsRelationManager (subclasses of Notes/Tasks/Calls RMs) plus Meetings RM to LeadResource', function () {
     $relations = LeadResource::getRelations();
     expect($relations)->toContain(LeadNotesRelationManager::class);
     expect($relations)->not->toContain(NotesRelationManager::class);
     expect($relations)->toContain(LeadTasksRelationManager::class);
     expect($relations)->not->toContain(TasksRelationManager::class);
-    expect($relations)->toContain(CallsRelationManager::class);
+    expect($relations)->toContain(LeadCallsRelationManager::class);
+    expect($relations)->not->toContain(CallsRelationManager::class);
     expect($relations)->toContain(MeetingsRelationManager::class);
 });
 

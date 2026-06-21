@@ -12,8 +12,8 @@ use VentureDrake\LaravelCrm\Models\FieldGroup;
 use VentureDrake\LaravelCrm\Models\FieldValue;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LunchesRelationManager;
@@ -246,7 +246,7 @@ it('LeadResource::getRelations contains both new RMs plus the existing six', fun
     // The existing six (US-013 v0.x baseline + earlier stories)
     expect($relations)->toContain(LeadNotesRelationManager::class);
     expect($relations)->toContain(LeadTasksRelationManager::class);
-    expect($relations)->toContain(CallsRelationManager::class);
+    expect($relations)->toContain(LeadCallsRelationManager::class);
     expect($relations)->toContain(MeetingsRelationManager::class);
     expect($relations)->toContain(FilesRelationManager::class);
 

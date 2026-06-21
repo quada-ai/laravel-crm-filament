@@ -260,6 +260,7 @@ return [
     'sections' => [
         'add_note' => 'Add note',
         'add_task' => 'Add task',
+        'add_call' => 'Add call',
         'details' => 'Details',
         'lead_qualification' => 'Lead Qualification',
         'contact' => 'Contact',

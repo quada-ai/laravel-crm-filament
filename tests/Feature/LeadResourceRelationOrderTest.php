@@ -1,8 +1,8 @@
 <?php
 
 use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\CallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LunchesRelationManager;
@@ -21,7 +21,7 @@ it('LeadResource::getRelations() preserves the six previously-registered RMs', f
 
     expect($relations)->toContain(LeadNotesRelationManager::class)
         ->and($relations)->toContain(LeadTasksRelationManager::class)
-        ->and($relations)->toContain(CallsRelationManager::class)
+        ->and($relations)->toContain(LeadCallsRelationManager::class)
         ->and($relations)->toContain(MeetingsRelationManager::class)
         ->and($relations)->toContain(FilesRelationManager::class);
 });
@@ -31,7 +31,7 @@ it('LeadResource::getRelations() returns the AC tab order: Activity / Notes / Ta
         ActivitiesRelationManager::class,
         LeadNotesRelationManager::class,
         LeadTasksRelationManager::class,
-        CallsRelationManager::class,
+        LeadCallsRelationManager::class,
         MeetingsRelationManager::class,
         LunchesRelationManager::class,
         FilesRelationManager::class,

@@ -216,6 +216,7 @@ return [
     'sections' => [
         'add_note' => 'Ajouter une note',
         'add_task' => 'Ajouter une tâche',
+        'add_call' => 'Ajouter un appel',
         'details' => 'Détails',
         'lead_qualification' => 'Qualification du prospect',
         'contact' => 'Contact',

@@ -123,6 +123,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('user_assigned_id')->nullable();
                 $table->unsignedBigInteger('user_created_id')->nullable();
                 $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('user_deleted_id')->nullable();
                 $table->unsignedBigInteger('team_id')->nullable();
                 $table->timestamps();
                 $table->softDeletes();

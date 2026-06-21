@@ -1,7 +1,8 @@
 @once
     <style>
         .crm-lead-notes,
-        .crm-lead-tasks {
+        .crm-lead-tasks,
+        .crm-lead-calls {
             --crm-card-bg: #ffffff;
             --crm-card-border: rgba(0, 0, 0, 0.06);
             --crm-card-text: #111827;
@@ -21,7 +22,8 @@
             gap: 0.75rem;
         }
         html.dark .crm-lead-notes,
-        html.dark .crm-lead-tasks {
+        html.dark .crm-lead-tasks,
+        html.dark .crm-lead-calls {
             --crm-card-bg: var(--color-gray-900, rgb(17, 24, 39));
             --crm-card-border: rgba(255, 255, 255, 0.1);
             --crm-card-text: #ffffff;
