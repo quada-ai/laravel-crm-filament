@@ -35,7 +35,8 @@ class ViewQuote extends ViewRecord
             $this->quotePortalAction()
                 ->button()
                 ->hiddenLabel()
-                ->icon('heroicon-m-arrow-top-right-on-square'),
+                ->icon('heroicon-m-arrow-top-right-on-square')
+                ->color('gray'),
             $this->quoteDownloadPdfAction()
                 ->hiddenLabel(),
             Actions\EditAction::make()
