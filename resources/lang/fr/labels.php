@@ -331,6 +331,9 @@ return [
         'back_to_leads' => 'Retour aux pistes',
         'back_to_quotes' => 'Retour aux devis',
         'back_to_deals' => 'Retour aux affaires',
+        'back_to_orders' => 'Retour aux commandes',
+        'purchase_order' => 'Bon de commande',
+        'delivery' => 'Livraison',
         'upload' => 'Téléverser',
     ],
 

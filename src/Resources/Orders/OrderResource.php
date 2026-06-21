@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Orders;
 
 use BackedEnum;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -313,5 +314,14 @@ class OrderResource extends Resource
             'view' => ViewOrder::route('/{record}'),
             'edit' => EditOrder::route('/{record}/edit'),
         ];
+    }
+
+    public static function backToIndexAction(): Action
+    {
+        return Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_orders'))
+            ->color('gray')
+            ->icon('heroicon-o-arrow-left')
+            ->url(static::getUrl('index'));
     }
 }

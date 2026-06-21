@@ -6,30 +6,44 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use VentureDrake\LaravelCrm\Models\Order;
+use VentureDrake\LaravelCrmFilament\Concerns\DownloadsPdf;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 
 class ViewOrder extends ViewRecord
 {
     use Concerns\HasOrderConvertToDeliveryAction;
-    use Concerns\HasOrderConvertToInvoiceAction;
     use Concerns\HasOrderConvertToPurchaseOrderAction;
-    use Concerns\HasOrderPortalAction;
+    use DownloadsPdf;
 
     protected static string $resource = OrderResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            $this->orderPortalAction()
+            OrderResource::backToIndexAction(),
+            $this->orderConvertToDeliveryAction()
+                ->label(__('laravel-crm-filament::labels.actions.delivery')),
+            $this->orderConvertToPurchaseOrderAction()
+                ->label(__('laravel-crm-filament::labels.actions.purchase_order')),
+            $this->downloadPdfAction(fn (Order $record) => $this->streamPdfDownload(
+                $record,
+                'order',
+                'order',
+                'laravel-crm::orders.pdf',
+                $this->orderPdfViewData($record),
+            ))
                 ->button()
-                ->hiddenLabel(),
+                ->hiddenLabel()
+                ->icon('heroicon-m-arrow-down-tray'),
             Actions\EditAction::make()
                 ->button()
                 ->hiddenLabel()
                 ->icon('heroicon-m-pencil-square'),
-            $this->orderConvertToInvoiceAction(),
-            $this->orderConvertToDeliveryAction(),
-            $this->orderConvertToPurchaseOrderAction(),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 
@@ -41,5 +55,21 @@ class ViewOrder extends ViewRecord
                 $this->getRelationManagersContentComponent()->columnSpan(['lg' => 1]),
             ]),
         ]);
+    }
+
+    protected function orderPdfViewData(Order $record): array
+    {
+        $settings = app('laravel-crm.settings');
+
+        return [
+            'order' => $record,
+            'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
+            'email' => optional($record->person)->getPrimaryEmail(),
+            'phone' => optional($record->person)->getPrimaryPhone(),
+            'address' => optional($record->person)->getPrimaryAddress(),
+            'organization_address' => optional($record->organization)->getPrimaryAddress(),
+            'fromName' => $settings->get('organization_name'),
+            'logo' => $settings->get('logo_file'),
+        ];
     }
 }

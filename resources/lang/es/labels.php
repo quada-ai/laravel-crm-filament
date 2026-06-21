@@ -331,6 +331,9 @@ return [
         'back_to_leads' => 'Volver a clientes potenciales',
         'back_to_quotes' => 'Volver a presupuestos',
         'back_to_deals' => 'Volver a negocios',
+        'back_to_orders' => 'Volver a pedidos',
+        'purchase_order' => 'Orden de compra',
+        'delivery' => 'Entrega',
         'upload' => 'Subir',
     ],
 
