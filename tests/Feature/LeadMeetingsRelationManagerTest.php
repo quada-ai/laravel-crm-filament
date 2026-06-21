@@ -159,27 +159,23 @@ it('returns the expected form schema with name, description, start/finish times,
     $components = $schema->getComponents();
     expect($components[0])->toBeInstanceOf(Forms\Components\TextInput::class);
     expect($components[0]->getName())->toBe('name');
-    expect($components[1])->toBeInstanceOf(Forms\Components\Textarea::class);
-    expect($components[1]->getName())->toBe('description');
-    expect($components[2])->toBeInstanceOf(Grid::class);
+    expect($components[1])->toBeInstanceOf(Grid::class);
+    expect($components[2])->toBeInstanceOf(Forms\Components\Select::class);
+    expect($components[2]->getName())->toBe('guests');
+    expect($components[2]->isMultiple())->toBeTrue();
     expect($components[3])->toBeInstanceOf(Forms\Components\TextInput::class);
     expect($components[3]->getName())->toBe('location');
-    expect($components[4])->toBeInstanceOf(Grid::class);
+    expect($components[4])->toBeInstanceOf(Forms\Components\Textarea::class);
+    expect($components[4]->getName())->toBe('description');
 
-    // Walk the first Grid (start_at + finish_at).
+    // Walk the start_at + finish_at Grid.
     $gridProp = new ReflectionProperty(Grid::class, 'childComponents');
     $gridProp->setAccessible(true);
 
-    $timeGridChildren = $gridProp->getValue($components[2]);
+    $timeGridChildren = $gridProp->getValue($components[1]);
     $timeChildren = $timeGridChildren['default'] ?? $timeGridChildren;
     expect(array_values(array_map(fn ($c) => $c->getName(), $timeChildren)))
         ->toBe(['start_at', 'finish_at']);
-
-    // Walk the second Grid (user_owner_id + user_assigned_id).
-    $userGridChildren = $gridProp->getValue($components[4]);
-    $userChildren = $userGridChildren['default'] ?? $userGridChildren;
-    expect(array_values(array_map(fn ($c) => $c->getName(), $userChildren)))
-        ->toBe(['user_owner_id', 'user_assigned_id']);
 });
 
 it('inherits the parent table configuration (columns and actions)', function () {
@@ -339,11 +335,7 @@ it('the lead-meetings Blade view contains the expected structural markers', func
     // Add-meeting form wired to createMeeting with the inline state bindings.
     expect($blade)->toContain('@if ($editingId === null)');
     expect($blade)->toContain('wire:submit="createMeeting"');
-    expect($blade)->toContain('wire:model="data.name"');
-    expect($blade)->toContain('wire:model="data.description"');
-    expect($blade)->toContain('wire:model="data.start_at"');
-    expect($blade)->toContain('wire:model="data.finish_at"');
-    expect($blade)->toContain('wire:model="data.location"');
+    expect($blade)->toContain('{{ $this->form }}');
 
     // Section heading uses the new translation key.
     expect($blade)->toContain('laravel-crm-filament::labels.sections.add_meeting');
@@ -369,11 +361,16 @@ it('the lead-meetings Blade view contains the expected structural markers', func
     expect($blade)->toContain('$meeting->location');
     expect($blade)->toContain('laravel-crm-filament::labels.fields.location');
 
-    // Footer pill showing start_at..finish_at.
+    // Pills row with separate Start at + Finish at badges plus section headers
+    // for Guests / Location / Description (parity with core CRM call-item).
     expect($blade)->toContain('crm-card-pill');
     expect($blade)->toContain('$meeting->start_at->format');
     expect($blade)->toContain('$meeting->finish_at->format');
-    expect($blade)->toContain('..');
+    expect($blade)->toContain('labels.money.start_at');
+    expect($blade)->toContain('labels.money.finish_at');
+    expect($blade)->toContain('crm-card-section-title');
+    expect($blade)->toContain('labels.fields.guests');
+    expect($blade)->toContain('crm-card-guests');
 
     // Shared lead-card-styles partial.
     expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");
