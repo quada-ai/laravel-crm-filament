@@ -37,21 +37,24 @@ class LeadTasksRelationManager extends TasksRelationManager
             ->statePath('data')
             ->components([
                 Forms\Components\TextInput::make('name')
+                    ->label(__('laravel-crm-filament::labels.fields.task'))
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
                 Forms\Components\Textarea::make('description')
+                    ->label(__('laravel-crm-filament::labels.fields.further_details'))
                     ->rows(3)
                     ->columnSpanFull(),
-                Forms\Components\DateTimePicker::make('due_at'),
+                Forms\Components\DateTimePicker::make('due_at')
+                    ->label(__('laravel-crm-filament::labels.fields.whens_it_due')),
                 Grid::make(2)->schema([
                     Forms\Components\Select::make('user_owner_id')
-                        ->label(__('laravel-crm-filament::labels.fields.owner'))
+                        ->label(__('laravel-crm-filament::labels.fields.who_requested_the_task'))
                         ->relationship('ownerUser', 'name')
                         ->searchable()
                         ->preload(),
                     Forms\Components\Select::make('user_assigned_id')
-                        ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
+                        ->label(__('laravel-crm-filament::labels.fields.who_is_responsible'))
                         ->relationship('assignedToUser', 'name')
                         ->searchable()
                         ->preload(),

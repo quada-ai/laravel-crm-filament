@@ -3,6 +3,7 @@
 
     @php
         $taskRows = $this->getOwnerRecord()->tasks()->orderBy('created_at', 'desc')->get();
+        $userOptions = \VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\users(false);
     @endphp
 
     @if ($editingId === null)
@@ -11,7 +12,7 @@
             <hr class="crm-card-section-divider" />
             <form wire:submit="createTask" class="crm-card-form">
                 <div class="crm-card-field">
-                    <label class="crm-card-field-label" for="crm-lead-task-add-name">{{ __('laravel-crm-filament::labels.fields.name') }}</label>
+                    <label class="crm-card-field-label" for="crm-lead-task-add-name">{{ __('laravel-crm-filament::labels.fields.task') }}</label>
                     <input
                         id="crm-lead-task-add-name"
                         class="crm-card-noted-at"
@@ -20,7 +21,16 @@
                     />
                 </div>
                 <div class="crm-card-field">
-                    <label class="crm-card-field-label" for="crm-lead-task-add-description">{{ __('laravel-crm-filament::labels.fields.description') }}</label>
+                    <label class="crm-card-field-label" for="crm-lead-task-add-due-at">{{ __('laravel-crm-filament::labels.fields.whens_it_due') }}</label>
+                    <input
+                        id="crm-lead-task-add-due-at"
+                        class="crm-card-noted-at"
+                        type="datetime-local"
+                        wire:model="data.due_at"
+                    />
+                </div>
+                <div class="crm-card-field">
+                    <label class="crm-card-field-label" for="crm-lead-task-add-description">{{ __('laravel-crm-filament::labels.fields.further_details') }}</label>
                     <textarea
                         id="crm-lead-task-add-description"
                         class="crm-card-textarea"
@@ -29,13 +39,30 @@
                     ></textarea>
                 </div>
                 <div class="crm-card-field">
-                    <label class="crm-card-field-label" for="crm-lead-task-add-due-at">{{ __('laravel-crm-filament::labels.money.due') }}</label>
-                    <input
-                        id="crm-lead-task-add-due-at"
+                    <label class="crm-card-field-label" for="crm-lead-task-add-user-owner-id">{{ __('laravel-crm-filament::labels.fields.who_requested_the_task') }}</label>
+                    <select
+                        id="crm-lead-task-add-user-owner-id"
                         class="crm-card-noted-at"
-                        type="datetime-local"
-                        wire:model="data.due_at"
-                    />
+                        wire:model="data.user_owner_id"
+                    >
+                        <option value=""></option>
+                        @foreach ($userOptions as $id => $name)
+                            <option value="{{ $id }}">{{ $name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="crm-card-field">
+                    <label class="crm-card-field-label" for="crm-lead-task-add-user-assigned-id">{{ __('laravel-crm-filament::labels.fields.who_is_responsible') }}</label>
+                    <select
+                        id="crm-lead-task-add-user-assigned-id"
+                        class="crm-card-noted-at"
+                        wire:model="data.user_assigned_id"
+                    >
+                        <option value=""></option>
+                        @foreach ($userOptions as $id => $name)
+                            <option value="{{ $id }}">{{ $name }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 @error('data.name')
                     <div class="crm-card-empty" style="text-align:left;color:var(--crm-card-danger);">{{ $message }}</div>
@@ -56,21 +83,54 @@
         <div class="crm-card-card" data-task-id="{{ $task->id }}" data-testid="crm-lead-task-card">
             @if ($editingId === $task->id)
                 <form wire:submit="updateTask" class="crm-card-form" data-testid="crm-lead-task-edit-form">
-                    <input
-                        class="crm-card-noted-at"
-                        type="text"
-                        wire:model="data.name"
-                    />
-                    <textarea
-                        class="crm-card-textarea"
-                        wire:model="data.description"
-                        rows="3"
-                    ></textarea>
-                    <input
-                        class="crm-card-noted-at"
-                        type="datetime-local"
-                        wire:model="data.due_at"
-                    />
+                    <div class="crm-card-field">
+                        <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.fields.task') }}</label>
+                        <input
+                            class="crm-card-noted-at"
+                            type="text"
+                            wire:model="data.name"
+                        />
+                    </div>
+                    <div class="crm-card-field">
+                        <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.fields.whens_it_due') }}</label>
+                        <input
+                            class="crm-card-noted-at"
+                            type="datetime-local"
+                            wire:model="data.due_at"
+                        />
+                    </div>
+                    <div class="crm-card-field">
+                        <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.fields.further_details') }}</label>
+                        <textarea
+                            class="crm-card-textarea"
+                            wire:model="data.description"
+                            rows="3"
+                        ></textarea>
+                    </div>
+                    <div class="crm-card-field">
+                        <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.fields.who_requested_the_task') }}</label>
+                        <select
+                            class="crm-card-noted-at"
+                            wire:model="data.user_owner_id"
+                        >
+                            <option value=""></option>
+                            @foreach ($userOptions as $id => $name)
+                                <option value="{{ $id }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="crm-card-field">
+                        <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.fields.who_is_responsible') }}</label>
+                        <select
+                            class="crm-card-noted-at"
+                            wire:model="data.user_assigned_id"
+                        >
+                            <option value=""></option>
+                            @foreach ($userOptions as $id => $name)
+                                <option value="{{ $id }}">{{ $name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="crm-card-form-actions">
                         <button
                             type="submit"
