@@ -21,7 +21,7 @@
                 gap: 0.75rem;
             }
             html.dark .crm-lead-notes {
-                --crm-note-bg: rgb(17, 24, 39);
+                --crm-note-bg: transparent;
                 --crm-note-border: rgba(255, 255, 255, 0.1);
                 --crm-note-text: #ffffff;
                 --crm-note-muted: #9ca3af;
