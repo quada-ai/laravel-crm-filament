@@ -352,11 +352,19 @@ it('the lead-calls Blade view contains the expected structural markers', functio
     expect($blade)->toContain('wire:submit="updateCall"');
     expect($blade)->toContain('wire:click="cancelEdit"');
 
-    // Footer pill showing start_at..finish_at.
+    // Pills row with separate Start at + Finish at badges, plus section headers
+    // for Guests, Location, and Description matching core CRM call-item parity.
     expect($blade)->toContain('crm-card-pill');
     expect($blade)->toContain('$call->start_at->format');
     expect($blade)->toContain('$call->finish_at->format');
-    expect($blade)->toContain('..');
+    expect($blade)->toContain('labels.money.start_at');
+    expect($blade)->toContain('labels.money.finish_at');
+    expect($blade)->toContain('crm-card-section-title');
+    expect($blade)->toContain('labels.fields.guests');
+    expect($blade)->toContain('labels.fields.location');
+    expect($blade)->toContain('labels.fields.description');
+    expect($blade)->toContain('crm-card-guests');
+    expect($blade)->toContain('$call->location');
 
     // Shared lead-card-styles partial.
     expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-styles')");

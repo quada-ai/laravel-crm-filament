@@ -266,5 +266,45 @@
         @media (min-width: 640px) {
             .crm-card-row-2 { grid-template-columns: 1fr 1fr; }
         }
+        .crm-card-section-divider--inset {
+            margin: 0.75rem -1rem;
+        }
+        .crm-card-section-title {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--crm-card-text);
+            margin: 0 0 0.5rem;
+        }
+        .crm-card-section-content {
+            font-size: 0.875rem;
+            color: var(--crm-card-text);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .crm-card-guests {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 0.75rem 1rem;
+            align-items: center;
+        }
+        .crm-card-guest-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.875rem;
+        }
+        .crm-card-guest-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--crm-card-subtle);
+        }
+        .crm-card-guest-link {
+            color: var(--crm-card-primary);
+            font-weight: 500;
+        }
     </style>
 @endonce
