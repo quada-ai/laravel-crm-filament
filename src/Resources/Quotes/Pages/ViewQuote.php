@@ -27,7 +27,7 @@ class ViewQuote extends ViewRecord
             QuoteResource::backToIndexAction(),
             $this->quoteSendAction()
                 ->button()
-                ->hiddenLabel(),
+                ->label(__('laravel-crm-filament::labels.actions.send')),
             $this->quoteAcceptAction(),
             $this->quoteRejectAction(),
             ...$this->quoteUnacceptActions(),
