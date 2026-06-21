@@ -334,6 +334,7 @@ return [
         'convert_to_delivery' => 'Convert to delivery',
         'convert_to_purchase_order' => 'Convert to purchase order',
         'convert_to_deal' => 'Convert to deal',
+        'convert' => 'Convert',
         'open_invoice' => 'Open invoice',
         'open_order' => 'Open order',
         'open_delivery' => 'Open delivery',

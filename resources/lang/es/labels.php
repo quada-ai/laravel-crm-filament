@@ -289,6 +289,7 @@ return [
         'convert_to_delivery' => 'Convertir en entrega',
         'convert_to_purchase_order' => 'Convertir en orden de compra',
         'convert_to_deal' => 'Convertir en negocio',
+        'convert' => 'Convertir',
         'open_invoice' => 'Abrir factura',
         'open_order' => 'Abrir pedido',
         'open_delivery' => 'Abrir entrega',
