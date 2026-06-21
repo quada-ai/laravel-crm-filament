@@ -3,8 +3,12 @@
 namespace VentureDrake\LaravelCrmFilament\Resources\Invoices;
 
 use BackedEnum;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -16,7 +20,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Ramsey\Uuid\Uuid;
+use VentureDrake\LaravelCrm\Mail\SendInvoice;
 use VentureDrake\LaravelCrm\Models\Invoice;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
@@ -238,6 +247,24 @@ class InvoiceResource extends Resource
                     }),
             ])
             ->recordActions([
+                static::sendInvoiceActionFactory()
+                    ->button()
+                    ->label(__('laravel-crm-filament::labels.actions.send'))
+                    ->color('gray'),
+                static::markPaidAction()
+                    ->button()
+                    ->label(__('laravel-crm-filament::labels.actions.pay'))
+                    ->color('gray')
+                    ->hidden(fn (Invoice $record): bool => (int) ($record->getAttributes()['amount_paid'] ?? 0) > 0),
+                static::invoicePortalActionFactory()
+                    ->button()
+                    ->hiddenLabel()
+                    ->icon('heroicon-m-arrow-top-right-on-square')
+                    ->color('gray'),
+                static::downloadInvoicePdfActionFactory()
+                    ->button()
+                    ->hiddenLabel()
+                    ->icon('heroicon-m-arrow-down-tray'),
                 Actions\ViewAction::make()
                     ->button()
                     ->hiddenLabel(),
@@ -278,7 +305,7 @@ class InvoiceResource extends Resource
             ->color('success')
             ->modalHeading(__('laravel-crm-filament::labels.actions.record_payment'))
             ->schema([
-                Forms\Components\TextInput::make('amount')
+                TextInput::make('amount')
                     ->label(__('laravel-crm-filament::labels.money.amount'))
                     ->numeric()
                     ->required()
@@ -449,6 +476,113 @@ class InvoiceResource extends Resource
             'view' => ViewInvoice::route('/{record}'),
             'edit' => EditInvoice::route('/{record}/edit'),
         ];
+    }
+
+    public static function sendInvoiceActionFactory(): Action
+    {
+        return Action::make('send')
+            ->label(__('laravel-crm-filament::labels.actions.send'))
+            ->icon('heroicon-o-paper-airplane')
+            ->color('success')
+            ->modalHeading('Send invoice')
+            ->modalSubmitActionLabel('Send')
+            ->schema(fn (Invoice $record): array => [
+                TextInput::make('to')
+                    ->label(__('laravel-crm-filament::labels.campaign.to'))
+                    ->email()
+                    ->required()
+                    ->default(fn () => optional($record->person)->getPrimaryEmail()?->address),
+                TextInput::make('subject')
+                    ->required()
+                    ->default(fn () => 'Invoice ' . $record->invoice_id),
+                Textarea::make('message')
+                    ->rows(8)
+                    ->default("Hi,\n\nPlease find your invoice here: [Online Invoice Link]\n\nThanks."),
+                Checkbox::make('cc')
+                    ->label(__('laravel-crm-filament::labels.campaign.send_me_a_copy')),
+            ])
+            ->action(function (array $data, Invoice $record): void {
+                static::dispatchInvoiceSend($record, $data);
+
+                Notification::make()
+                    ->title('Invoice sent')
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public static function invoicePortalActionFactory(): Action
+    {
+        return Action::make('previewPortal')
+            ->label(__('laravel-crm-filament::labels.actions.preview_portal'))
+            ->icon('heroicon-o-arrow-top-right-on-square')
+            ->color('primary')
+            ->url(fn (Invoice $record): string => url('p/invoices/' . $record->external_id))
+            ->openUrlInNewTab();
+    }
+
+    public static function downloadInvoicePdfActionFactory(): Action
+    {
+        return Action::make('downloadPdf')
+            ->label(__('laravel-crm-filament::labels.actions.download_pdf'))
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('gray')
+            ->action(function (Invoice $record) {
+                $relative = static::renderInvoicePdfToDisk($record);
+
+                return Response::download(
+                    storage_path($relative),
+                    'invoice-' . strtolower((string) ($record->invoice_id ?? $record->external_id)) . '.pdf',
+                );
+            });
+    }
+
+    protected static function dispatchInvoiceSend(Invoice $record, array $data): void
+    {
+        $signedUrl = URL::temporarySignedRoute(
+            'laravel-crm.portal.invoices.show',
+            now()->addDays(14),
+            ['invoice' => $record],
+        );
+
+        $pdfPath = static::renderInvoicePdfToDisk($record);
+
+        Mail::send(new SendInvoice([
+            'to' => $data['to'],
+            'subject' => $data['subject'],
+            'message' => $data['message'],
+            'cc' => ! empty($data['cc']) ? 1 : 0,
+            'onlineInvoiceLink' => $signedUrl,
+            'pdf' => $pdfPath,
+        ]));
+    }
+
+    protected static function renderInvoicePdfToDisk(Invoice $record): string
+    {
+        $settings = app('laravel-crm.settings');
+
+        $data = [
+            'invoice' => $record,
+            'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
+            'email' => optional($record->person)->getPrimaryEmail(),
+            'phone' => optional($record->person)->getPrimaryPhone(),
+            'address' => optional($record->person)->getPrimaryAddress(),
+            'organization_address' => optional($record->organization)->getPrimaryAddress(),
+            'fromName' => $settings->get('organization_name'),
+            'logo' => $settings->get('logo_file'),
+        ];
+
+        $relativeDir = 'laravel-crm/invoice/' . $record->id;
+        Storage::makeDirectory($relativeDir);
+
+        $filename = 'invoice-' . strtolower((string) ($record->invoice_id ?? $record->external_id)) . '.pdf';
+        $pdfRelative = 'app/' . $relativeDir . '/' . $filename;
+
+        Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
+            ->loadView('laravel-crm::invoices.pdf', $data)
+            ->save(storage_path($pdfRelative));
+
+        return $pdfRelative;
     }
 
     public static function backToIndexAction(): Actions\Action
