@@ -6,6 +6,8 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
 class ViewLead extends ViewRecord
@@ -30,5 +32,20 @@ class ViewLead extends ViewRecord
                 $this->getRelationManagersContentComponent()->columnSpan(['lg' => 1]),
             ]),
         ]);
+    }
+
+    public function getSubheading(): string | Htmlable | null
+    {
+        $stage = $this->record?->pipelineStage?->name;
+
+        if (! $stage) {
+            return null;
+        }
+
+        return new HtmlString(
+            '<span class="inline-flex items-center rounded-md bg-gray-900 px-3 py-1 text-sm font-medium text-white dark:bg-gray-100 dark:text-gray-900">'
+            . e($stage)
+            . '</span>'
+        );
     }
 }
