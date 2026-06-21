@@ -10,6 +10,7 @@ use VentureDrake\LaravelCrm\Models\Meeting;
 use VentureDrake\LaravelCrm\Models\Note;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadFilesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\ActivityResource;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\Pages\ListActivities;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\Pages\ViewActivity;
@@ -65,7 +66,6 @@ it('uses external_id for record routing', function (string $resource): void {
 })->with('standaloneActivityResources');
 
 dataset('filesRelationManagerParents', [
-    'Lead' => [LeadResource::class],
     'Deal' => [DealResource::class],
     'Person' => [PersonResource::class],
     'Organization' => [OrganizationResource::class],
@@ -79,6 +79,12 @@ dataset('filesRelationManagerParents', [
 it('attaches FilesRelationManager to every parent resource that owns files', function (string $resource): void {
     expect($resource::getRelations())->toContain(FilesRelationManager::class);
 })->with('filesRelationManagerParents');
+
+it('attaches the Lead-specific LeadFilesRelationManager (subclass) to LeadResource', function (): void {
+    $relations = LeadResource::getRelations();
+    expect($relations)->toContain(LeadFilesRelationManager::class);
+    expect($relations)->not->toContain(FilesRelationManager::class);
+});
 
 it('uses the polymorphic files relationship name from HasCrmActivities', function (): void {
     $rm = new ReflectionClass(FilesRelationManager::class);

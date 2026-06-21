@@ -267,19 +267,19 @@ return new class extends Migration
             Schema::create($prefix . 'files', function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
                 $table->morphs('fileable');
-                $table->string('filename');
-                $table->string('original_filename')->nullable();
-                $table->string('disk')->nullable();
-                $table->string('mime')->nullable();
-                $table->string('file_type')->nullable();
-                $table->string('format')->nullable();
-                $table->unsignedBigInteger('filesize')->nullable();
+                $table->string('file');
+                $table->string('name')->nullable();
                 $table->string('title')->nullable();
-                $table->text('description')->nullable();
+                $table->string('format')->nullable();
+                $table->string('filesize')->nullable();
+                $table->string('mime')->nullable();
+                $table->string('disk')->default('local');
                 $table->unsignedBigInteger('user_created_id')->nullable();
                 $table->unsignedBigInteger('user_updated_id')->nullable();
-                $table->unsignedBigInteger('team_id')->nullable();
+                $table->unsignedBigInteger('user_deleted_id')->nullable();
+                $table->unsignedBigInteger('user_restored_id')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
             });
