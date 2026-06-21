@@ -82,6 +82,12 @@ return [
         'subject' => 'Asunto',
         'guests' => 'Invitados',
         'location' => 'Ubicación',
+        'first_name' => 'Nombre',
+        'last_name' => 'Apellido',
+        'middle_name' => 'Segundo nombre',
+        'email' => 'Correo electrónico',
+        'phone' => 'Teléfono',
+        'addresses' => 'Direcciones',
     ],
 
     'contact' => [
@@ -166,6 +172,7 @@ return [
         'delivery_addresses' => 'Direcciones de entrega',
         'start_at' => 'Inicia el',
         'finish_at' => 'Finaliza el',
+        'revenue' => 'Ingresos',
     ],
 
     'campaign' => [
@@ -255,6 +262,7 @@ return [
         'update_password' => 'Actualizar contraseña',
         'two_factor_authentication' => 'Autenticación de dos factores',
         'browser_sessions' => 'Sesiones del navegador',
+        'identity' => 'Identidad',
     ],
 
     'actions' => [

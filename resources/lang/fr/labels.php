@@ -82,6 +82,12 @@ return [
         'subject' => 'Sujet',
         'guests' => 'Invités',
         'location' => 'Lieu',
+        'first_name' => 'Prénom',
+        'last_name' => 'Nom',
+        'middle_name' => 'Deuxième prénom',
+        'email' => 'E-mail',
+        'phone' => 'Téléphone',
+        'addresses' => 'Adresses',
     ],
 
     'contact' => [
@@ -166,6 +172,7 @@ return [
         'delivery_addresses' => 'Adresses de livraison',
         'start_at' => 'Début',
         'finish_at' => 'Fin',
+        'revenue' => 'Chiffre d\'affaires',
     ],
 
     'campaign' => [
@@ -255,6 +262,7 @@ return [
         'update_password' => 'Mettre à jour le mot de passe',
         'two_factor_authentication' => 'Authentification à deux facteurs',
         'browser_sessions' => 'Sessions de navigateur',
+        'identity' => 'Identité',
     ],
 
     'actions' => [

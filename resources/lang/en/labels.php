@@ -83,6 +83,12 @@ return [
         'subject' => 'Subject',
         'guests' => 'Guests',
         'location' => 'Location',
+        'first_name' => 'First name',
+        'last_name' => 'Last name',
+        'middle_name' => 'Middle name',
+        'email' => 'Email',
+        'phone' => 'Phone',
+        'addresses' => 'Addresses',
     ],
 
     // Contact / address fields
@@ -170,6 +176,7 @@ return [
         'delivery_addresses' => 'Delivery addresses',
         'start_at' => 'Start at',
         'finish_at' => 'Finish at',
+        'revenue' => 'Revenue',
     ],
 
     // Campaigns / messaging
@@ -299,6 +306,7 @@ return [
         'update_password' => 'Update password',
         'two_factor_authentication' => 'Two-factor authentication',
         'browser_sessions' => 'Browser sessions',
+        'identity' => 'Identity',
     ],
 
     // Actions

@@ -5,8 +5,10 @@ namespace VentureDrake\LaravelCrmFilament\Resources\People;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
@@ -28,6 +31,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
+use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ListPeople;
@@ -35,6 +39,7 @@ use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ViewPerson;
 
 class PersonResource extends Resource
 {
+    use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use HasEncryptedGlobalSearch;
     use HasLabels;
@@ -155,6 +160,96 @@ class PersonResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make(__('laravel-crm-filament::labels.sections.identity'))
+                ->schema(fn (?Person $record) => array_merge([
+                    TextEntry::make('first_name')
+                        ->label(__('laravel-crm-filament::labels.fields.first_name')),
+
+                    TextEntry::make('last_name')
+                        ->label(__('laravel-crm-filament::labels.fields.last_name')),
+
+                    TextEntry::make('middle_name')
+                        ->label(__('laravel-crm-filament::labels.fields.middle_name')),
+
+                    TextEntry::make('email')
+                        ->label(__('laravel-crm-filament::labels.fields.email'))
+                        ->state(function ($record) {
+                            $email = $record?->emails()->first();
+
+                            if (! $email) {
+                                return null;
+                            }
+
+                            return trim(($email->address ?? '') . ($email->type ? ' (' . $email->type . ')' : ''));
+                        }),
+
+                    TextEntry::make('phone')
+                        ->label(__('laravel-crm-filament::labels.fields.phone'))
+                        ->state(function ($record) {
+                            $phone = $record?->phones()->first();
+
+                            if (! $phone) {
+                                return null;
+                            }
+
+                            return trim(($phone->number ?? '') . ($phone->type ? ' (' . $phone->type . ')' : ''));
+                        }),
+                ], $record ? static::crmCustomFieldEntries($record, false) : [])),
+
+            Section::make(__('laravel-crm-filament::labels.sections.contact'))
+                ->schema([
+                    TextEntry::make('organization.name')
+                        ->label(__('laravel-crm-filament::labels.fields.organization'))
+                        ->url(fn ($record) => $record?->organization
+                            ? OrganizationResource::getUrl('view', ['record' => $record->organization])
+                            : null),
+
+                    TextEntry::make('addresses')
+                        ->label(__('laravel-crm-filament::labels.fields.addresses'))
+                        ->state(fn ($record) => $record instanceof Person ? static::formatAddresses($record) : null)
+                        ->columnSpanFull(),
+                ]),
+
+            Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
+                ->schema(fn (?Person $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
+                ->hidden(function ($record): bool {
+                    if (! $record instanceof Person) {
+                        return true;
+                    }
+
+                    return ! $record->fields()
+                        ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
+                        ->exists();
+                }),
+        ])->columns(1);
+    }
+
+    protected static function formatAddresses(Person $record): ?string
+    {
+        $addresses = $record->addresses()->get();
+
+        if ($addresses->isEmpty()) {
+            return null;
+        }
+
+        $lines = $addresses->map(function ($address) {
+            $parts = array_filter([
+                $address->line1 ?? null,
+                $address->city ?? null,
+                $address->state ?? null,
+                $address->code ?? null,
+                $address->country ?? null,
+            ]);
+
+            return $parts === [] ? null : implode(', ', $parts);
+        })->filter()->values();
+
+        return $lines->isEmpty() ? null : $lines->implode("\n");
     }
 
     public static function getRelations(): array

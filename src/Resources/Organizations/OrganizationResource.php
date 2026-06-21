@@ -6,8 +6,10 @@ use App\Models\User;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,6 +18,7 @@ use VentureDrake\LaravelCrm\Models\Industry;
 use VentureDrake\LaravelCrm\Models\Organization;
 use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
@@ -37,6 +40,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\ViewOrganizati
 
 class OrganizationResource extends Resource
 {
+    use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use HasEncryptedGlobalSearch;
     use HasLabels;
@@ -159,6 +163,70 @@ class OrganizationResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make(__('laravel-crm-filament::labels.sections.identity'))
+                ->schema(fn (?Organization $record) => array_merge([
+                    TextEntry::make('name')
+                        ->label(__('laravel-crm-filament::labels.fields.name')),
+
+                    TextEntry::make('industry.name')
+                        ->label(__('laravel-crm-filament::labels.money.industry')),
+
+                    TextEntry::make('number_of_employees')
+                        ->label(__('laravel-crm-filament::labels.money.employees')),
+
+                    TextEntry::make('annual_revenue')
+                        ->label(__('laravel-crm-filament::labels.money.revenue'))
+                        ->money(fn ($record) => config('laravel-crm.default_currency', 'USD')),
+                ], $record ? static::crmCustomFieldEntries($record, false) : [])),
+
+            Section::make(__('laravel-crm-filament::labels.sections.contact'))
+                ->schema([
+                    TextEntry::make('addresses')
+                        ->label(__('laravel-crm-filament::labels.fields.addresses'))
+                        ->state(fn ($record) => $record instanceof Organization ? static::formatAddresses($record) : null)
+                        ->columnSpanFull(),
+                ]),
+
+            Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
+                ->schema(fn (?Organization $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
+                ->hidden(function ($record): bool {
+                    if (! $record instanceof Organization) {
+                        return true;
+                    }
+
+                    return ! $record->fields()
+                        ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
+                        ->exists();
+                }),
+        ])->columns(1);
+    }
+
+    protected static function formatAddresses(Organization $record): ?string
+    {
+        $addresses = $record->addresses()->get();
+
+        if ($addresses->isEmpty()) {
+            return null;
+        }
+
+        $lines = $addresses->map(function ($address) {
+            $parts = array_filter([
+                $address->line1 ?? null,
+                $address->city ?? null,
+                $address->state ?? null,
+                $address->code ?? null,
+                $address->country ?? null,
+            ]);
+
+            return $parts === [] ? null : implode(', ', $parts);
+        })->filter()->values();
+
+        return $lines->isEmpty() ? null : $lines->implode("\n");
     }
 
     public static function getRelations(): array
