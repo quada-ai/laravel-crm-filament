@@ -46,13 +46,13 @@ class ViewInvoice extends ViewRecord
         ]);
     }
 
-    public function getTitle(): string | Htmlable
+    public function getHeading(): string | Htmlable
     {
         /** @var Invoice|null $record */
         $record = $this->record;
 
         if ($record === null) {
-            return parent::getTitle();
+            return parent::getHeading();
         }
 
         $badges = '';
