@@ -72,3 +72,35 @@ it('the shared lead-card-styles partial declares timeline + .crm-lead-activity s
     expect($partial)->toContain('.crm-timeline-title');
     expect($partial)->toContain('.crm-timeline-subtitle');
 });
+
+it('the timeline view embeds the per-entity card partials inside each recordable', function () {
+    $bladePath = dirname(__DIR__, 2) . '/resources/views/lead-activity.blade.php';
+    $blade = file_get_contents($bladePath);
+
+    // The @switch over entityType routes each recordable to the matching partial.
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-note'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-task'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-call'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-meeting'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-lunch'");
+    expect($blade)->toContain("@include('laravel-crm-filament::partials.lead-card-file'");
+});
+
+it('each lead-card-{entity} partial file exists and renders the expected markers', function (string $partial, string $marker) {
+    $path = dirname(__DIR__, 2) . '/resources/views/partials/' . $partial;
+    expect(file_exists($path))->toBeTrue();
+
+    $body = file_get_contents($path);
+    // Every partial wraps the content in the .crm-card-card class and reads from $record.
+    expect($body)->toContain('class="crm-card-card"');
+    expect($body)->toContain('$record');
+    // Per-entity marker locked in for grep safety.
+    expect($body)->toContain($marker);
+})->with([
+    'note' => ['lead-card-note.blade.php', '$record->content'],
+    'task' => ['lead-card-task.blade.php', '$record->name'],
+    'call' => ['lead-card-call.blade.php', '$record->name'],
+    'meeting' => ['lead-card-meeting.blade.php', '$record->name'],
+    'lunch' => ['lead-card-lunch.blade.php', '$record->name'],
+    'file' => ['lead-card-file.blade.php', '$record->file'],
+]);

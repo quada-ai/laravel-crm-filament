@@ -35,23 +35,22 @@
                     <div class="crm-timeline-recordable">
                         @switch($entityType)
                             @case('note')
-                                @if (! empty($recordable->content))
-                                    <div class="crm-timeline-recordable-body">{{ $recordable->content }}</div>
-                                @endif
+                                @include('laravel-crm-filament::partials.lead-card-note', ['record' => $recordable])
                                 @break
                             @case('task')
+                                @include('laravel-crm-filament::partials.lead-card-task', ['record' => $recordable])
+                                @break
                             @case('call')
+                                @include('laravel-crm-filament::partials.lead-card-call', ['record' => $recordable])
+                                @break
                             @case('meeting')
+                                @include('laravel-crm-filament::partials.lead-card-meeting', ['record' => $recordable])
+                                @break
                             @case('lunch')
-                                @if (! empty($recordable->name))
-                                    <div class="crm-timeline-recordable-title">{{ $recordable->name }}</div>
-                                @endif
-                                @if (! empty($recordable->description))
-                                    <div class="crm-timeline-recordable-body">{{ $recordable->description }}</div>
-                                @endif
+                                @include('laravel-crm-filament::partials.lead-card-lunch', ['record' => $recordable])
                                 @break
                             @case('file')
-                                <div class="crm-timeline-recordable-title">{{ $recordable->name ?? $recordable->file }}</div>
+                                @include('laravel-crm-filament::partials.lead-card-file', ['record' => $recordable])
                                 @break
                         @endswitch
                     </div>

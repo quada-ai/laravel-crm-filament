@@ -364,10 +364,6 @@
         }
         .crm-timeline-recordable {
             margin-top: 0.5rem;
-            padding: 0.625rem 0.75rem;
-            border: 1px solid var(--crm-card-border);
-            border-radius: 0.5rem;
-            background: var(--crm-card-bg);
         }
         .crm-timeline-recordable-title {
             font-weight: 600;
