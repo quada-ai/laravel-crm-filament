@@ -3,6 +3,7 @@
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadActivitiesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
 it('declares timelineActivities as the bound relationship', function () {
@@ -47,8 +48,11 @@ it('uses the audit.activity translation key for the tab title', function () {
     expect($src)->toContain("'laravel-crm-filament::labels.audit.activity'");
 });
 
-it('is registered on LeadResource (wired by US-008)', function () {
+it('is registered on LeadResource via the LeadActivitiesRelationManager subclass', function () {
     $relations = LeadResource::getRelations();
 
-    expect($relations)->toContain(ActivitiesRelationManager::class);
+    // LeadActivitiesRelationManager extends ActivitiesRelationManager. The Lead
+    // show page uses the subclass to swap in a custom timeline-style $view.
+    expect($relations)->toContain(LeadActivitiesRelationManager::class);
+    expect($relations)->not->toContain(ActivitiesRelationManager::class);
 });

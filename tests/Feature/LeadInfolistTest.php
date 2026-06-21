@@ -11,7 +11,7 @@ use VentureDrake\LaravelCrm\Models\Field;
 use VentureDrake\LaravelCrm\Models\FieldGroup;
 use VentureDrake\LaravelCrm\Models\FieldValue;
 use VentureDrake\LaravelCrm\Models\Lead;
-use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadActivitiesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadFilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadLunchesRelationManager;
@@ -242,7 +242,7 @@ it('LeadResource::getRelations contains both new RMs plus the existing six', fun
 
     // Two new RMs from US-005 / US-007 (LeadLunches subclassed in lead-lunches-UI series)
     expect($relations)->toContain(LeadLunchesRelationManager::class);
-    expect($relations)->toContain(ActivitiesRelationManager::class);
+    expect($relations)->toContain(LeadActivitiesRelationManager::class);
 
     // The existing six (US-013 v0.x baseline + earlier stories)
     expect($relations)->toContain(LeadNotesRelationManager::class);
@@ -270,7 +270,7 @@ it('LunchesRelationManager is read-only with empty header/record/toolbar action 
 });
 
 it('ActivitiesRelationManager is read-only with empty header/record/toolbar action arrays', function () {
-    $rm = (new ReflectionClass(ActivitiesRelationManager::class))->newInstanceWithoutConstructor();
+    $rm = (new ReflectionClass(LeadActivitiesRelationManager::class))->newInstanceWithoutConstructor();
     expect($rm)->toBeInstanceOf(RelationManager::class);
     expect($rm->isReadOnly())->toBeTrue();
 

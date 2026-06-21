@@ -5,7 +5,8 @@
         .crm-lead-calls,
         .crm-lead-meetings,
         .crm-lead-lunches,
-        .crm-lead-files {
+        .crm-lead-files,
+        .crm-lead-activity {
             --crm-card-bg: #ffffff;
             --crm-card-border: rgba(0, 0, 0, 0.06);
             --crm-card-text: #111827;
@@ -29,7 +30,8 @@
         html.dark .crm-lead-calls,
         html.dark .crm-lead-meetings,
         html.dark .crm-lead-lunches,
-        html.dark .crm-lead-files {
+        html.dark .crm-lead-files,
+        html.dark .crm-lead-activity {
             --crm-card-bg: var(--color-gray-900, rgb(17, 24, 39));
             --crm-card-border: rgba(255, 255, 255, 0.1);
             --crm-card-text: #ffffff;
@@ -312,5 +314,72 @@
             font-weight: 700;
         }
         .crm-card-card-title-link:hover { text-decoration: underline; }
+        .crm-timeline-item {
+            display: flex;
+            flex-direction: row;
+            gap: 0.75rem;
+            position: relative;
+        }
+        .crm-timeline-rail {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 1rem;
+            flex-shrink: 0;
+            padding-top: 0.25rem;
+        }
+        .crm-timeline-bullet {
+            display: block;
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 9999px;
+            background: var(--crm-card-primary);
+            flex-shrink: 0;
+        }
+        .crm-timeline-connector {
+            display: block;
+            width: 2px;
+            flex: 1;
+            background: var(--crm-card-border);
+            margin-top: 0.25rem;
+            min-height: 1.5rem;
+        }
+        .crm-timeline-body {
+            flex: 1;
+            padding-bottom: 1.25rem;
+        }
+        .crm-timeline-item--last .crm-timeline-body {
+            padding-bottom: 0;
+        }
+        .crm-timeline-title {
+            font-weight: 600;
+            color: var(--crm-card-text);
+            font-size: 0.9375rem;
+        }
+        .crm-timeline-subtitle {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--crm-card-muted);
+            margin-top: 0.125rem;
+        }
+        .crm-timeline-recordable {
+            margin-top: 0.5rem;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid var(--crm-card-border);
+            border-radius: 0.5rem;
+            background: var(--crm-card-bg);
+        }
+        .crm-timeline-recordable-title {
+            font-weight: 600;
+            color: var(--crm-card-text);
+            font-size: 0.875rem;
+        }
+        .crm-timeline-recordable-body {
+            font-size: 0.875rem;
+            color: var(--crm-card-text);
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin-top: 0.25rem;
+        }
     </style>
 @endonce
