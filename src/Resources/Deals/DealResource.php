@@ -6,6 +6,7 @@ use BackedEnum;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
@@ -20,6 +21,7 @@ use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LineItemsRepeater;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
@@ -38,9 +40,12 @@ use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\DealKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\EditDeal;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\ListDeals;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\ViewDeal;
+use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
+use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 
 class DealResource extends Resource
 {
+    use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use HasLabels;
     use HasPrimaryBulkActions;
@@ -373,6 +378,76 @@ class DealResource extends Resource
                     ->success()
                     ->send();
             });
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->schema(fn (?Deal $record) => array_merge([
+                    TextEntry::make('created_at')
+                        ->label(__('laravel-crm-filament::labels.fields.created'))
+                        ->since(),
+
+                    TextEntry::make('deal_id')
+                        ->label(__('laravel-crm-filament::labels.fields.number')),
+
+                    TextEntry::make('title')
+                        ->label(__('laravel-crm-filament::labels.fields.title')),
+
+                    TextEntry::make('description')
+                        ->label(__('laravel-crm-filament::labels.fields.description'))
+                        ->columnSpanFull(),
+
+                    TextEntry::make('amount')
+                        ->label(__('laravel-crm-filament::labels.money.value'))
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+
+                    TextEntry::make('expected_close')
+                        ->label(__('laravel-crm-filament::labels.sales.expected_close'))
+                        ->date(),
+
+                    TextEntry::make('pipelineStage.name')
+                        ->label(__('laravel-crm-filament::labels.sales.stage'))
+                        ->badge(),
+
+                    TextEntry::make('labels.name')
+                        ->label(__('laravel-crm-filament::labels.fields.labels'))
+                        ->badge(),
+
+                    TextEntry::make('ownerUser.name')
+                        ->label(__('laravel-crm-filament::labels.fields.owner'))
+                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
+                ], $record ? static::crmCustomFieldEntries($record, false) : [])),
+
+            Section::make(__('laravel-crm-filament::labels.sections.contact'))
+                ->schema([
+                    TextEntry::make('person.name')
+                        ->label(__('laravel-crm-filament::labels.fields.contact'))
+                        ->state(fn ($record) => LeadDealContactSection::personLabel($record?->person))
+                        ->url(fn ($record) => $record?->person
+                            ? PersonResource::getUrl('view', ['record' => $record->person])
+                            : null),
+
+                    TextEntry::make('organization.name')
+                        ->label(__('laravel-crm-filament::labels.fields.organization'))
+                        ->url(fn ($record) => $record?->organization
+                            ? OrganizationResource::getUrl('view', ['record' => $record->organization])
+                            : null),
+                ]),
+
+            Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
+                ->schema(fn (?Deal $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
+                ->hidden(function ($record): bool {
+                    if (! $record instanceof Deal) {
+                        return true;
+                    }
+
+                    return ! $record->fields()
+                        ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
+                        ->exists();
+                }),
+        ])->columns(1);
     }
 
     public static function backToIndexAction(): Action

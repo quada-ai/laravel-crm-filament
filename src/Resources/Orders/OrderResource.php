@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Orders;
 
 use BackedEnum;
 use Filament\Actions;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -12,13 +13,16 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Order;
+use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LineItemsRepeater;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\MoneyTotalsRow;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\OrderAddressTabs;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\SalesDetailsSection;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
@@ -33,13 +37,17 @@ use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\CreateOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\EditOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\ListOrders;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\ViewOrder;
+use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
+use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 
 class OrderResource extends Resource
 {
+    use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use HasLabels;
     use HasPrimaryBulkActions;
+    use HasXeroSyncStateInfolist;
     use UsesExternalIdRouting;
 
     protected static ?string $model = Order::class;
@@ -212,6 +220,88 @@ class OrderResource extends Resource
             CrmFilesRelationManager::class,
             AuditsRelationManager::class,
         ];
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->schema(fn (?Order $record) => array_merge([
+                    TextEntry::make('created_at')
+                        ->label(__('laravel-crm-filament::labels.fields.created'))
+                        ->since(),
+
+                    TextEntry::make('order_id')
+                        ->label(__('laravel-crm-filament::labels.fields.number')),
+
+                    TextEntry::make('reference')
+                        ->label(__('laravel-crm-filament::labels.fields.reference')),
+
+                    TextEntry::make('description')
+                        ->label(__('laravel-crm-filament::labels.fields.description'))
+                        ->columnSpanFull(),
+
+                    TextEntry::make('quote.quote_id')
+                        ->label(__('laravel-crm-filament::labels.money.quote'))
+                        ->url(fn ($record) => $record?->quote
+                            ? QuoteResource::getUrl('view', ['record' => $record->quote])
+                            : null),
+
+                    TextEntry::make('subtotal')
+                        ->label(__('laravel-crm-filament::labels.money.subtotal'))
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+
+                    TextEntry::make('tax')
+                        ->label(__('laravel-crm-filament::labels.money.tax'))
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+
+                    TextEntry::make('total')
+                        ->label(__('laravel-crm-filament::labels.money.total'))
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+
+                    TextEntry::make('labels.name')
+                        ->label(__('laravel-crm-filament::labels.fields.labels'))
+                        ->badge(),
+
+                    TextEntry::make('ownerUser.name')
+                        ->label(__('laravel-crm-filament::labels.fields.owner'))
+                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
+                ], $record ? static::crmCustomFieldEntries($record, false) : [])),
+
+            Section::make(__('laravel-crm-filament::labels.sections.contact'))
+                ->schema([
+                    TextEntry::make('person.name')
+                        ->label(__('laravel-crm-filament::labels.fields.contact'))
+                        ->state(fn ($record) => LeadDealContactSection::personLabel($record?->person))
+                        ->url(fn ($record) => $record?->person
+                            ? PersonResource::getUrl('view', ['record' => $record->person])
+                            : null),
+
+                    TextEntry::make('organization.name')
+                        ->label(__('laravel-crm-filament::labels.fields.organization'))
+                        ->url(fn ($record) => $record?->organization
+                            ? OrganizationResource::getUrl('view', ['record' => $record->organization])
+                            : null),
+                ]),
+
+            Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
+                ->schema(fn (?Order $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
+                ->hidden(function ($record): bool {
+                    if (! $record instanceof Order) {
+                        return true;
+                    }
+
+                    return ! $record->fields()
+                        ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
+                        ->exists();
+                }),
+
+            static::xeroSyncStateSection(function (Order $order) {
+                $invoice = $order->invoices()->latest()->first();
+
+                return $invoice?->xeroInvoice;
+            }),
+        ])->columns(1);
     }
 
     public static function getPages(): array

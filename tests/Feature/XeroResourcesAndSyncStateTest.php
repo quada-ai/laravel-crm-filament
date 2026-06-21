@@ -11,7 +11,7 @@ use VentureDrake\LaravelCrm\Models\XeroPurchaseOrder;
 use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\ViewInvoice;
-use VentureDrake\LaravelCrmFilament\Resources\Orders\Pages\ViewOrder;
+use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\ViewPurchaseOrder;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\Pages\ListXeroContacts;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\Pages\ListXeroInvoices;
@@ -88,9 +88,12 @@ it('omits all four Xero resources when the Xero module is disabled', function ()
 });
 
 dataset('viewPagesWithXeroSection', [
-    'ViewOrder' => [ViewOrder::class],
     'ViewInvoice' => [ViewInvoice::class],
     'ViewPurchaseOrder' => [ViewPurchaseOrder::class],
+]);
+
+dataset('resourcesWithXeroSection', [
+    'OrderResource' => [OrderResource::class],
 ]);
 
 it('uses the HasXeroSyncStateInfolist trait on every primary view page', function (string $page): void {
@@ -185,7 +188,7 @@ it('reads the linked Xero mirror status when one exists', function (): void {
 });
 
 it('walks Order to the linked invoice mirror for the Xero state resolver', function (): void {
-    $src = file_get_contents((new ReflectionClass(ViewOrder::class))->getFileName());
+    $src = file_get_contents((new ReflectionClass(OrderResource::class))->getFileName());
     expect($src)->toContain('invoices()');
     expect($src)->toContain('xeroInvoice');
 });
@@ -199,3 +202,15 @@ it('uses the direct xeroPurchaseOrder relation on ViewPurchaseOrder', function (
     $src = file_get_contents((new ReflectionClass(ViewPurchaseOrder::class))->getFileName());
     expect($src)->toContain('xeroPurchaseOrder');
 });
+
+it('uses the HasXeroSyncStateInfolist trait on OrderResource', function (string $resource): void {
+    expect(in_array(HasXeroSyncStateInfolist::class, class_uses_recursive($resource), true))->toBeTrue();
+})->with('resourcesWithXeroSection');
+
+it('declares infolist() on OrderResource with a Xero sync state section', function (string $resource): void {
+    $declaringClass = (new ReflectionMethod($resource, 'infolist'))->getDeclaringClass()->getName();
+    expect($declaringClass)->toBe($resource);
+
+    $src = file_get_contents((new ReflectionClass($resource))->getFileName());
+    expect($src)->toContain('xeroSyncStateSection(');
+})->with('resourcesWithXeroSection');
