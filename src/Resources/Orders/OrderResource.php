@@ -25,7 +25,6 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
-use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmCallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmFilesRelationManager;
@@ -218,7 +217,6 @@ class OrderResource extends Resource
             CrmMeetingsRelationManager::class,
             CrmLunchesRelationManager::class,
             CrmFilesRelationManager::class,
-            AuditsRelationManager::class,
         ];
     }
 

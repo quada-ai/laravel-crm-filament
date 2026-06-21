@@ -23,7 +23,6 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
-use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmCallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmFilesRelationManager;
@@ -283,7 +282,6 @@ class DeliveryResource extends Resource
             CrmMeetingsRelationManager::class,
             CrmLunchesRelationManager::class,
             CrmFilesRelationManager::class,
-            AuditsRelationManager::class,
         ];
     }
 

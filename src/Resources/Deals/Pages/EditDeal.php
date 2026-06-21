@@ -67,4 +67,9 @@ class EditDeal extends EditRecord
 
         return $record->refresh();
     }
+
+    protected function getAllRelationManagers(): array
+    {
+        return [];
+    }
 }

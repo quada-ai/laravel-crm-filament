@@ -16,7 +16,6 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
-use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\ProductVariationsRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\CreateProduct;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\EditProduct;
@@ -152,7 +151,6 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            AuditsRelationManager::class,
             ProductVariationsRelationManager::class,
         ];
     }
