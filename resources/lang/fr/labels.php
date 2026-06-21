@@ -88,6 +88,7 @@ return [
         'email' => 'E-mail',
         'phone' => 'Téléphone',
         'addresses' => 'Adresses',
+        'terms' => 'Conditions',
     ],
 
     'contact' => [

@@ -89,6 +89,7 @@ return [
         'email' => 'Email',
         'phone' => 'Phone',
         'addresses' => 'Addresses',
+        'terms' => 'Terms',
     ],
 
     // Contact / address fields
