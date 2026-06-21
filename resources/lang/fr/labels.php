@@ -81,6 +81,7 @@ return [
         'requested_by' => 'Demandée par',
         'subject' => 'Sujet',
         'guests' => 'Invités',
+        'location' => 'Lieu',
     ],
 
     'contact' => [

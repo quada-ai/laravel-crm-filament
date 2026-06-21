@@ -82,6 +82,7 @@ return [
         'requested_by' => 'Requested by',
         'subject' => 'Subject',
         'guests' => 'Guests',
+        'location' => 'Location',
     ],
 
     // Contact / address fields
