@@ -667,6 +667,18 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasTable($prefix . 'lunches') && ! Schema::hasColumn($prefix . 'lunches', 'user_owner_id')) {
+            Schema::table($prefix . 'lunches', function (Blueprint $table) {
+                $table->unsignedBigInteger('user_owner_id')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'lunches') && ! Schema::hasColumn($prefix . 'lunches', 'user_deleted_id')) {
+            Schema::table($prefix . 'lunches', function (Blueprint $table) {
+                $table->unsignedBigInteger('user_deleted_id')->nullable();
+            });
+        }
+
         if (! Schema::hasTable('sessions')) {
             Schema::create('sessions', function (Blueprint $table) {
                 $table->string('id')->primary();

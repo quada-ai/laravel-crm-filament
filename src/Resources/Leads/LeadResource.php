@@ -32,10 +32,10 @@ use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\CreateLead;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\EditLead;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\LeadKanban;
@@ -275,7 +275,7 @@ class LeadResource extends Resource
             LeadTasksRelationManager::class,
             LeadCallsRelationManager::class,
             LeadMeetingsRelationManager::class,
-            LunchesRelationManager::class,
+            LeadLunchesRelationManager::class,
             FilesRelationManager::class,
         ];
     }

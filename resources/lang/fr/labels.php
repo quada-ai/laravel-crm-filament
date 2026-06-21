@@ -219,6 +219,7 @@ return [
         'add_task' => 'Ajouter une tâche',
         'add_call' => 'Ajouter un appel',
         'add_meeting' => 'Ajouter une réunion',
+        'add_lunch' => 'Ajouter un déjeuner',
         'details' => 'Détails',
         'lead_qualification' => 'Qualification du prospect',
         'contact' => 'Contact',

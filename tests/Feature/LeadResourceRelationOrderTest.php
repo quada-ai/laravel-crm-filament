@@ -3,16 +3,16 @@
 use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\LunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
-it('LeadResource::getRelations() contains both LunchesRelationManager and ActivitiesRelationManager', function () {
+it('LeadResource::getRelations() contains both LeadLunchesRelationManager and ActivitiesRelationManager', function () {
     $relations = LeadResource::getRelations();
 
-    expect($relations)->toContain(LunchesRelationManager::class)
+    expect($relations)->toContain(LeadLunchesRelationManager::class)
         ->and($relations)->toContain(ActivitiesRelationManager::class);
 });
 
@@ -33,7 +33,7 @@ it('LeadResource::getRelations() returns the AC tab order: Activity / Notes / Ta
         LeadTasksRelationManager::class,
         LeadCallsRelationManager::class,
         LeadMeetingsRelationManager::class,
-        LunchesRelationManager::class,
+        LeadLunchesRelationManager::class,
         FilesRelationManager::class,
     ]);
 });

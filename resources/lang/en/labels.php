@@ -263,6 +263,7 @@ return [
         'add_task' => 'Add task',
         'add_call' => 'Add call',
         'add_meeting' => 'Add meeting',
+        'add_lunch' => 'Add lunch',
         'details' => 'Details',
         'lead_qualification' => 'Lead Qualification',
         'contact' => 'Contact',

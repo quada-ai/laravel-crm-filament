@@ -14,6 +14,7 @@ use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrmFilament\RelationManagers\ActivitiesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\FilesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadCallsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\LeadLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\LeadTasksRelationManager;
@@ -239,8 +240,8 @@ it('ViewLead::content produces a top-level Grid with two columns: infolist (lg 2
 it('LeadResource::getRelations contains both new RMs plus the existing six', function () {
     $relations = LeadResource::getRelations();
 
-    // Two new RMs from US-005 / US-007
-    expect($relations)->toContain(LunchesRelationManager::class);
+    // Two new RMs from US-005 / US-007 (LeadLunches subclassed in lead-lunches-UI series)
+    expect($relations)->toContain(LeadLunchesRelationManager::class);
     expect($relations)->toContain(ActivitiesRelationManager::class);
 
     // The existing six (US-013 v0.x baseline + earlier stories)
