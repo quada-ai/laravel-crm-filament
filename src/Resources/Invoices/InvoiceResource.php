@@ -200,11 +200,9 @@ class InvoiceResource extends Resource
                     ->color('danger')
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('sent')
+                Tables\Columns\IconColumn::make('sent')
                     ->label(__('laravel-crm-filament::labels.fields.sent'))
-                    ->state(fn (Invoice $record): ?string => $record->sent ? 'Sent' : null)
-                    ->badge()
-                    ->color('success')
+                    ->boolean()
                     ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
