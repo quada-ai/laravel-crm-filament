@@ -165,13 +165,13 @@ class InvoiceResource extends Resource
 
                 Tables\Columns\TextColumn::make('amount_paid')
                     ->label(__('laravel-crm-filament::labels.money.amount_paid'))
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100)
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('amount_due')
                     ->label(__('laravel-crm-filament::labels.money.amount_due'))
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100)
                     ->sortable()
                     ->toggleable(),
 
@@ -186,14 +186,16 @@ class InvoiceResource extends Resource
                             return null;
                         }
 
-                        return $due->diffInDays(now()) . 'd';
+                        return $due->diffForHumans(null, true) . ' ago';
                     })
                     ->color('danger')
                     ->toggleable(),
 
-                Tables\Columns\IconColumn::make('sent')
+                Tables\Columns\TextColumn::make('sent')
                     ->label(__('laravel-crm-filament::labels.fields.sent'))
-                    ->boolean()
+                    ->badge()
+                    ->color('success')
+                    ->formatStateUsing(fn ($state): ?string => $state ? 'Sent' : null)
                     ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
