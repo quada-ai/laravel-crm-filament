@@ -3,8 +3,12 @@
 namespace VentureDrake\LaravelCrmFilament\Resources\Quotes;
 
 use BackedEnum;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -15,6 +19,11 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
+use VentureDrake\LaravelCrm\Mail\SendQuote;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
@@ -194,6 +203,21 @@ class QuoteResource extends Resource
                     ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id')),
             ])
             ->recordActions([
+                static::sendActionFactory()
+                    ->button(),
+                static::acceptAction()
+                    ->button(),
+                static::rejectAction()
+                    ->button(),
+                static::portalActionFactory()
+                    ->button()
+                    ->hiddenLabel()
+                    ->icon('heroicon-m-arrow-top-right-on-square')
+                    ->color('gray'),
+                static::downloadPdfActionFactory()
+                    ->button()
+                    ->hiddenLabel()
+                    ->icon('heroicon-m-arrow-down-tray'),
                 Actions\ViewAction::make()
                     ->button()
                     ->hiddenLabel(),
@@ -263,6 +287,113 @@ class QuoteResource extends Resource
                     'kanbanUrl' => static::getUrl('kanban'),
                 ]),
         ];
+    }
+
+    public static function sendActionFactory(): Action
+    {
+        return Action::make('send')
+            ->label(__('laravel-crm-filament::labels.actions.send'))
+            ->icon('heroicon-o-paper-airplane')
+            ->color('success')
+            ->modalHeading('Send quote')
+            ->modalSubmitActionLabel('Send')
+            ->schema(fn (Quote $record): array => [
+                TextInput::make('to')
+                    ->label(__('laravel-crm-filament::labels.campaign.to'))
+                    ->email()
+                    ->required()
+                    ->default(fn () => optional($record->person)->getPrimaryEmail()?->address),
+                TextInput::make('subject')
+                    ->required()
+                    ->default(fn () => 'Quote ' . $record->quote_id),
+                Textarea::make('message')
+                    ->rows(8)
+                    ->default("Hi,\n\nPlease find your quote here: [Online Quote Link]\n\nThanks."),
+                Checkbox::make('cc')
+                    ->label(__('laravel-crm-filament::labels.campaign.send_me_a_copy')),
+            ])
+            ->action(function (array $data, Quote $record): void {
+                static::dispatchQuoteSend($record, $data);
+
+                Notification::make()
+                    ->title('Quote sent')
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public static function portalActionFactory(): Action
+    {
+        return Action::make('previewPortal')
+            ->label(__('laravel-crm-filament::labels.actions.preview_portal'))
+            ->icon('heroicon-o-arrow-top-right-on-square')
+            ->color('primary')
+            ->url(fn (Quote $record): string => url('p/quotes/' . $record->external_id))
+            ->openUrlInNewTab();
+    }
+
+    public static function downloadPdfActionFactory(): Action
+    {
+        return Action::make('downloadPdf')
+            ->label(__('laravel-crm-filament::labels.actions.download_pdf'))
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('gray')
+            ->action(function (Quote $record) {
+                $relative = static::renderQuotePdfToDisk($record);
+
+                return Response::download(
+                    storage_path($relative),
+                    'quote-' . strtolower((string) ($record->quote_id ?? $record->external_id)) . '.pdf',
+                );
+            });
+    }
+
+    protected static function dispatchQuoteSend(Quote $record, array $data): void
+    {
+        $signedUrl = URL::temporarySignedRoute(
+            'laravel-crm.portal.quotes.show',
+            now()->addDays(14),
+            ['quote' => $record],
+        );
+
+        $pdfPath = static::renderQuotePdfToDisk($record);
+
+        Mail::send(new SendQuote([
+            'to' => $data['to'],
+            'subject' => $data['subject'],
+            'message' => $data['message'],
+            'cc' => ! empty($data['cc']) ? 1 : 0,
+            'onlineQuoteLink' => $signedUrl,
+            'pdf' => $pdfPath,
+        ]));
+    }
+
+    protected static function renderQuotePdfToDisk(Quote $record): string
+    {
+        $settings = app('laravel-crm.settings');
+
+        $data = [
+            'quote' => $record,
+            'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
+            'email' => optional($record->person)->getPrimaryEmail(),
+            'phone' => optional($record->person)->getPrimaryPhone(),
+            'address' => optional($record->person)->getPrimaryAddress(),
+            'organization_address' => optional($record->organization)->getPrimaryAddress(),
+            'fromName' => $settings->get('organization_name'),
+            'logo' => $settings->get('logo_file'),
+        ];
+
+        $relativeDir = 'laravel-crm/quote/' . $record->id;
+        Storage::makeDirectory($relativeDir);
+
+        $filename = 'quote-' . strtolower((string) ($record->quote_id ?? $record->external_id)) . '.pdf';
+        $pdfRelative = 'app/' . $relativeDir . '/' . $filename;
+
+        Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
+            ->loadView('laravel-crm::quotes.pdf', $data)
+            ->save(storage_path($pdfRelative));
+
+        return $pdfRelative;
     }
 
     public static function acceptAction(): Action
