@@ -366,6 +366,7 @@ return [
         'back_to_leads' => 'Back to leads',
         'back_to_quotes' => 'Back to quotes',
         'back_to_deals' => 'Back to deals',
+        'upload' => 'Upload',
     ],
 
     // CSV import

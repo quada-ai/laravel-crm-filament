@@ -23,7 +23,6 @@ class LeadFilesRelationManager extends FilesRelationManager
 
         $this->form->fill([
             'file' => null,
-            'title' => null,
         ]);
     }
 
@@ -35,15 +34,12 @@ class LeadFilesRelationManager extends FilesRelationManager
             ->statePath('data')
             ->components([
                 Forms\Components\FileUpload::make('file')
-                    ->label(__('laravel-crm-filament::labels.fields.file'))
+                    ->hiddenLabel()
                     ->disk($disk)
                     ->directory(fn (): string => 'laravel-crm/lead/' . $this->getOwnerRecord()->id . '/files')
                     ->required()
                     ->preserveFilenames()
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('title')
-                    ->label(__('laravel-crm-filament::labels.fields.title'))
-                    ->maxLength(255),
             ]);
     }
 
@@ -73,7 +69,6 @@ class LeadFilesRelationManager extends FilesRelationManager
         $file = $this->getOwnerRecord()->files()->create([
             'file' => $path,
             'name' => $name,
-            'title' => $data['title'] ?? null,
             'format' => $format,
             'filesize' => $filesize,
             'mime' => $mime,
@@ -85,7 +80,6 @@ class LeadFilesRelationManager extends FilesRelationManager
 
         $this->form->fill([
             'file' => null,
-            'title' => null,
         ]);
 
         Notification::make()

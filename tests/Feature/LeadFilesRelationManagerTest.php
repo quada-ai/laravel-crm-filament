@@ -48,7 +48,6 @@ function leadFilesFocusedRm(): LeadFilesRelationManager
             $file = $this->getOwnerRecord()->files()->create([
                 'file' => $path,
                 'name' => $name,
-                'title' => $data['title'] ?? null,
                 'format' => $format,
                 'filesize' => $filesize,
                 'mime' => $mime,
@@ -58,7 +57,7 @@ function leadFilesFocusedRm(): LeadFilesRelationManager
 
             self::logCrmActivity($this->getOwnerRecord(), $file);
 
-            $this->data = ['file' => null, 'title' => null];
+            $this->data = ['file' => null];
 
             Notification::make()->title('File added')->success()->send();
         }
@@ -97,18 +96,20 @@ it('overrides the $view property to point at the lead-files Blade template', fun
     expect($prop->getValue($rm))->toBe('laravel-crm-filament::lead-files');
 });
 
-// AC (3) form() returns FileUpload + optional title (no edit mode means no other fields).
+// AC (3) form() returns a single FileUpload field with no label and no title field.
 
-it('returns a 2-field form schema with FileUpload and TextInput title, no edit mode', function () {
+it('returns a 1-field form schema with FileUpload only, no label and no title', function () {
     $rm = (new ReflectionClass(LeadFilesRelationManager::class))->newInstanceWithoutConstructor();
     $schema = $rm->form(Schema::make($rm));
 
     $components = $schema->getComponents();
     $names = array_values(array_map(fn ($c) => $c->getName(), $components));
 
-    expect($names)->toBe(['file', 'title']);
+    expect($names)->toBe(['file']);
     expect($components[0])->toBeInstanceOf(Forms\Components\FileUpload::class);
-    expect($components[1])->toBeInstanceOf(Forms\Components\TextInput::class);
+
+    // Label hidden via ->hiddenLabel() — Filament's public getter is isLabelHidden().
+    expect($components[0]->isLabelHidden())->toBeTrue();
 
     expect($schema->getStatePath())->toBe('data');
 });
@@ -174,7 +175,6 @@ it('createFile() persists a File row via the morphMany with name/mime/filesize/d
     $rm->ownerRecord = $lead->fresh();
     $rm->data = [
         'file' => 'leads/example.pdf',
-        'title' => 'Q3 contract',
     ];
 
     $rm->createFile();
@@ -184,7 +184,6 @@ it('createFile() persists a File row via the morphMany with name/mime/filesize/d
     expect($file->fileable_type)->toBe($lead->getMorphClass());
     expect((int) $file->fileable_id)->toBe($lead->id);
     expect($file->name)->toBe('example.pdf');
-    expect($file->title)->toBe('Q3 contract');
     expect((int) $file->filesize)->toBe(strlen('binary-payload'));
     expect($file->mime)->not->toBeNull();
     expect($file->disk)->toBe('local');
@@ -200,7 +199,6 @@ it('createFile() persists a File row via the morphMany with name/mime/filesize/d
 
     // Form state reset.
     expect($rm->data['file'])->toBeNull();
-    expect($rm->data['title'])->toBeNull();
 });
 
 it('downloadFile() returns a URL resolved from Storage::disk($file->disk) with fallback', function () {

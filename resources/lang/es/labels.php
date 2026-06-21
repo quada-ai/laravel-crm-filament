@@ -321,6 +321,7 @@ return [
         'back_to_leads' => 'Volver a clientes potenciales',
         'back_to_quotes' => 'Volver a presupuestos',
         'back_to_deals' => 'Volver a negocios',
+        'upload' => 'Subir',
     ],
 
     'import' => [

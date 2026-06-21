@@ -9,17 +9,14 @@
         <h3 class="crm-card-section-heading">{{ __('laravel-crm-filament::labels.sections.add_file') }}</h3>
         <hr class="crm-card-section-divider" />
         <form wire:submit="createFile" class="crm-card-form">
-            <div class="crm-card-field">
-                <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.fields.file') }}</label>
-                {{ $this->form }}
-            </div>
+            {{ $this->form }}
             <hr class="crm-card-section-divider crm-card-section-divider--footer" />
             <div class="crm-card-form-actions">
                 <button
                     type="submit"
                     class="crm-card-btn crm-card-btn--primary"
                     wire:loading.attr="disabled"
-                >{{ __('laravel-crm-filament::labels.actions.save') }}</button>
+                >{{ __('laravel-crm-filament::labels.actions.upload') }}</button>
             </div>
         </form>
     </div>

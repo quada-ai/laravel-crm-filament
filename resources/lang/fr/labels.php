@@ -321,6 +321,7 @@ return [
         'back_to_leads' => 'Retour aux pistes',
         'back_to_quotes' => 'Retour aux devis',
         'back_to_deals' => 'Retour aux affaires',
+        'upload' => 'Téléverser',
     ],
 
     'import' => [
