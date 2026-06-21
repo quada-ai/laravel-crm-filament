@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use VentureDrake\LaravelCrm\Models\Person;
 
 class LeadCallsRelationManager extends CallsRelationManager
 {
@@ -22,14 +23,7 @@ class LeadCallsRelationManager extends CallsRelationManager
     {
         parent::mount();
 
-        $this->form->fill([
-            'name' => null,
-            'description' => null,
-            'start_at' => now(),
-            'finish_at' => null,
-            'user_owner_id' => auth()->id(),
-            'user_assigned_id' => null,
-        ]);
+        $this->form->fill($this->defaultFormData());
     }
 
     public function form(Schema $schema): Schema
@@ -38,30 +32,30 @@ class LeadCallsRelationManager extends CallsRelationManager
             ->statePath('data')
             ->components([
                 Forms\Components\TextInput::make('name')
+                    ->label(__('laravel-crm-filament::labels.fields.subject'))
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('description')
-                    ->rows(3)
-                    ->columnSpanFull(),
                 Grid::make(2)->schema([
                     Forms\Components\DateTimePicker::make('start_at')
-                        ->label(__('laravel-crm-filament::labels.money.start')),
+                        ->label(__('laravel-crm-filament::labels.money.start_at')),
                     Forms\Components\DateTimePicker::make('finish_at')
-                        ->label(__('laravel-crm-filament::labels.money.finish')),
+                        ->label(__('laravel-crm-filament::labels.money.finish_at')),
                 ]),
-                Grid::make(2)->schema([
-                    Forms\Components\Select::make('user_owner_id')
-                        ->label(__('laravel-crm-filament::labels.fields.owner'))
-                        ->relationship('ownerUser', 'name')
-                        ->searchable()
-                        ->preload(),
-                    Forms\Components\Select::make('user_assigned_id')
-                        ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
-                        ->relationship('assignedToUser', 'name')
-                        ->searchable()
-                        ->preload(),
-                ]),
+                Forms\Components\Select::make('guests')
+                    ->label(__('laravel-crm-filament::labels.fields.guests'))
+                    ->multiple()
+                    ->searchable()
+                    ->options(fn () => Person::query()->orderBy('first_name')->get()->pluck('name', 'id')->all())
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('location')
+                    ->label(__('laravel-crm-filament::labels.fields.location'))
+                    ->maxLength(255)
+                    ->columnSpanFull(),
+                Forms\Components\Textarea::make('description')
+                    ->label(__('laravel-crm-filament::labels.fields.description'))
+                    ->rows(3)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -74,21 +68,16 @@ class LeadCallsRelationManager extends CallsRelationManager
             'description' => $data['description'] ?? null,
             'start_at' => $data['start_at'] ?? null,
             'finish_at' => $data['finish_at'] ?? null,
-            'user_owner_id' => $data['user_owner_id'] ?? auth()->id(),
-            'user_assigned_id' => $data['user_assigned_id'] ?? null,
+            'location' => $data['location'] ?? null,
+            'user_owner_id' => auth()->id(),
             'user_created_id' => auth()->id(),
         ]);
 
+        $this->syncGuests($call, $data['guests'] ?? []);
+
         static::logCrmActivity($this->getOwnerRecord(), $call);
 
-        $this->form->fill([
-            'name' => null,
-            'description' => null,
-            'start_at' => now(),
-            'finish_at' => null,
-            'user_owner_id' => auth()->id(),
-            'user_assigned_id' => null,
-        ]);
+        $this->form->fill($this->defaultFormData());
 
         Notification::make()
             ->title('Call added')
@@ -111,8 +100,12 @@ class LeadCallsRelationManager extends CallsRelationManager
             'description' => $call->description,
             'start_at' => $call->start_at,
             'finish_at' => $call->finish_at,
-            'user_owner_id' => $call->user_owner_id,
-            'user_assigned_id' => $call->user_assigned_id,
+            'location' => $call->location ?? null,
+            'guests' => $call->contacts()
+                ->where('entityable_type', Person::class)
+                ->pluck('entityable_id')
+                ->map(fn ($id) => (int) $id)
+                ->all(),
         ]);
     }
 
@@ -120,14 +113,7 @@ class LeadCallsRelationManager extends CallsRelationManager
     {
         $this->editingId = null;
 
-        $this->form->fill([
-            'name' => null,
-            'description' => null,
-            'start_at' => now(),
-            'finish_at' => null,
-            'user_owner_id' => auth()->id(),
-            'user_assigned_id' => null,
-        ]);
+        $this->form->fill($this->defaultFormData());
     }
 
     public function updateCall(): void
@@ -151,23 +137,17 @@ class LeadCallsRelationManager extends CallsRelationManager
             'description' => $data['description'] ?? null,
             'start_at' => $data['start_at'] ?? null,
             'finish_at' => $data['finish_at'] ?? null,
-            'user_owner_id' => $data['user_owner_id'] ?? null,
-            'user_assigned_id' => $data['user_assigned_id'] ?? null,
+            'location' => $data['location'] ?? null,
             'user_updated_id' => auth()->id(),
         ]);
+
+        $this->syncGuests($call, $data['guests'] ?? []);
 
         static::logCrmActivity($this->getOwnerRecord(), $call);
 
         $this->editingId = null;
 
-        $this->form->fill([
-            'name' => null,
-            'description' => null,
-            'start_at' => now(),
-            'finish_at' => null,
-            'user_owner_id' => auth()->id(),
-            'user_assigned_id' => null,
-        ]);
+        $this->form->fill($this->defaultFormData());
 
         Notification::make()
             ->title('Call updated')
@@ -187,19 +167,54 @@ class LeadCallsRelationManager extends CallsRelationManager
 
         if ($this->editingId === (int) $id) {
             $this->editingId = null;
-            $this->form->fill([
-                'name' => null,
-                'description' => null,
-                'start_at' => now(),
-                'finish_at' => null,
-                'user_owner_id' => auth()->id(),
-                'user_assigned_id' => null,
-            ]);
+            $this->form->fill($this->defaultFormData());
         }
 
         Notification::make()
             ->title('Call deleted')
             ->success()
             ->send();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function defaultFormData(): array
+    {
+        return [
+            'name' => null,
+            'description' => null,
+            'start_at' => now(),
+            'finish_at' => null,
+            'guests' => [],
+            'location' => null,
+        ];
+    }
+
+    /**
+     * Sync the Call's guest contacts to match the supplied Person ids.
+     *
+     * @param  array<int|string>  $personIds
+     */
+    protected function syncGuests($call, array $personIds): void
+    {
+        $personIds = array_values(array_filter(array_map('intval', $personIds)));
+
+        // Wipe existing Person-guest contacts on this call, then re-create.
+        $call->contacts()
+            ->where('entityable_type', Person::class)
+            ->delete();
+
+        foreach ($personIds as $pid) {
+            $person = Person::find($pid);
+            if ($person === null) {
+                continue;
+            }
+            $call->contacts()->create([
+                'entityable_type' => $person->getMorphClass(),
+                'entityable_id' => $person->id,
+                'user_created_id' => auth()->id(),
+            ]);
+        }
     }
 }

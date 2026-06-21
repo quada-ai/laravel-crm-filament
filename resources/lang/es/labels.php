@@ -79,6 +79,8 @@ return [
         'new_password' => 'Contraseña nueva',
         'confirm_password' => 'Confirmar contraseña',
         'requested_by' => 'Solicitado por',
+        'subject' => 'Asunto',
+        'guests' => 'Invitados',
     ],
 
     'contact' => [
@@ -161,6 +163,8 @@ return [
         'delivered_on' => 'Entregado el',
         'delivery_date' => 'Fecha de entrega',
         'delivery_addresses' => 'Direcciones de entrega',
+        'start_at' => 'Inicia el',
+        'finish_at' => 'Finaliza el',
     ],
 
     'campaign' => [

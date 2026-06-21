@@ -258,5 +258,13 @@
         .crm-card-attribution-sep {
             color: var(--crm-card-muted);
         }
+        .crm-card-row-2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        @media (min-width: 640px) {
+            .crm-card-row-2 { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 @endonce

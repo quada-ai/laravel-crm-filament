@@ -80,6 +80,8 @@ return [
         'new_password' => 'New password',
         'confirm_password' => 'Confirm password',
         'requested_by' => 'Requested by',
+        'subject' => 'Subject',
+        'guests' => 'Guests',
     ],
 
     // Contact / address fields
@@ -165,6 +167,8 @@ return [
         'delivered_on' => 'Delivered on',
         'delivery_date' => 'Delivery date',
         'delivery_addresses' => 'Delivery addresses',
+        'start_at' => 'Start at',
+        'finish_at' => 'Finish at',
     ],
 
     // Campaigns / messaging

@@ -689,6 +689,28 @@ return new class extends Migration
                 $table->integer('last_activity')->index();
             });
         }
+
+        if (Schema::hasTable($prefix . 'calls') && ! Schema::hasColumn($prefix . 'calls', 'location')) {
+            Schema::table($prefix . 'calls', function (Blueprint $table) {
+                $table->string('location')->nullable();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'contacts')) {
+            Schema::create($prefix . 'contacts', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable();
+                $table->morphs('contactable');
+                $table->morphs('entityable');
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('user_deleted_id')->nullable();
+                $table->unsignedBigInteger('user_restored_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
     }
 
     public function down(): void

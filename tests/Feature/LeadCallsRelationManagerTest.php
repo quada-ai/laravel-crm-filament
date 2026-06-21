@@ -143,9 +143,9 @@ it('overrides the $view property to point at the lead-calls Blade template', fun
     expect($prop->getValue($rm))->toBe('laravel-crm-filament::lead-calls');
 });
 
-// AC (3) form() returns name/description/start_at/finish_at + owner/assigned grid.
+// AC (3) form() returns subject/start_at/finish_at/guests/location/description matching core CRM CallRelated parity.
 
-it('returns the expected form schema with name, description, start/finish times, owner, assigned', function () {
+it('returns the expected form schema with subject/start/finish/guests/location/description', function () {
     $rm = (new ReflectionClass(LeadCallsRelationManager::class))->newInstanceWithoutConstructor();
     $schema = $rm->form(Schema::make($rm));
 
@@ -154,25 +154,25 @@ it('returns the expected form schema with name, description, start/finish times,
     $components = $schema->getComponents();
     expect($components[0])->toBeInstanceOf(Forms\Components\TextInput::class);
     expect($components[0]->getName())->toBe('name');
-    expect($components[1])->toBeInstanceOf(Forms\Components\Textarea::class);
-    expect($components[1]->getName())->toBe('description');
-    expect($components[2])->toBeInstanceOf(Grid::class);
-    expect($components[3])->toBeInstanceOf(Grid::class);
+    expect($components[1])->toBeInstanceOf(Grid::class);
+    expect($components[2])->toBeInstanceOf(Forms\Components\Select::class);
+    expect($components[2]->getName())->toBe('guests');
+    expect($components[3])->toBeInstanceOf(Forms\Components\TextInput::class);
+    expect($components[3]->getName())->toBe('location');
+    expect($components[4])->toBeInstanceOf(Forms\Components\Textarea::class);
+    expect($components[4]->getName())->toBe('description');
 
-    // Walk the first Grid (start_at + finish_at).
+    // Walk the start_at + finish_at Grid.
     $gridProp = new ReflectionProperty(Grid::class, 'childComponents');
     $gridProp->setAccessible(true);
 
-    $timeGridChildren = $gridProp->getValue($components[2]);
+    $timeGridChildren = $gridProp->getValue($components[1]);
     $timeChildren = $timeGridChildren['default'] ?? $timeGridChildren;
     expect(array_values(array_map(fn ($c) => $c->getName(), $timeChildren)))
         ->toBe(['start_at', 'finish_at']);
 
-    // Walk the second Grid (user_owner_id + user_assigned_id).
-    $userGridChildren = $gridProp->getValue($components[3]);
-    $userChildren = $userGridChildren['default'] ?? $userGridChildren;
-    expect(array_values(array_map(fn ($c) => $c->getName(), $userChildren)))
-        ->toBe(['user_owner_id', 'user_assigned_id']);
+    // Guests is a multi-select.
+    expect($components[2]->isMultiple())->toBeTrue();
 });
 
 it('inherits the parent table configuration (columns and actions)', function () {
