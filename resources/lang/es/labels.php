@@ -18,6 +18,8 @@ return [
         'currency' => 'Moneda',
         'name' => 'Nombre',
         'description' => 'Descripción',
+        'note' => 'Nota',
+        'noted_at' => 'Anotado en',
         'type' => 'Tipo',
         'status' => 'Estado',
         'category' => 'Categoría',
@@ -212,6 +214,7 @@ return [
     ],
 
     'sections' => [
+        'add_note' => 'Añadir nota',
         'details' => 'Detalles',
         'lead_qualification' => 'Calificación del cliente potencial',
         'contact' => 'Contacto',

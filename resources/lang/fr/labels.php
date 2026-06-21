@@ -18,6 +18,8 @@ return [
         'currency' => 'Devise',
         'name' => 'Nom',
         'description' => 'Description',
+        'note' => 'Note',
+        'noted_at' => 'Noté le',
         'type' => 'Type',
         'status' => 'Statut',
         'category' => 'Catégorie',
@@ -212,6 +214,7 @@ return [
     ],
 
     'sections' => [
+        'add_note' => 'Ajouter une note',
         'details' => 'Détails',
         'lead_qualification' => 'Qualification du prospect',
         'contact' => 'Contact',

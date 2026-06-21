@@ -112,7 +112,32 @@
                 border-color: var(--crm-note-primary);
                 box-shadow: 0 0 0 1px var(--crm-note-primary);
             }
-            .crm-note-form-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+            .crm-note-form-actions {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+            .crm-note-section-heading {
+                font-size: 1rem;
+                font-weight: 600;
+                color: var(--crm-note-text);
+                margin: 0 0 0.75rem;
+            }
+            .crm-note-section-divider {
+                border: 0;
+                border-top: 1px solid var(--crm-note-border);
+                margin: 0 -1rem 0.75rem;
+            }
+            .crm-note-section-divider--footer {
+                margin: 0.75rem -1rem 0.75rem;
+            }
+            .crm-note-field { display: flex; flex-direction: column; gap: 0.25rem; }
+            .crm-note-field-label {
+                font-size: 0.8125rem;
+                font-weight: 500;
+                color: var(--crm-note-text);
+            }
             .crm-note-btn {
                 padding: 0.4375rem 0.875rem;
                 border-radius: 0.5rem;
@@ -177,17 +202,31 @@
 
     @if ($editingId === null)
         <div class="crm-note-card crm-note-card--add" data-testid="crm-lead-note-add-card">
+            <h3 class="crm-note-section-heading">{{ __('laravel-crm-filament::labels.sections.add_note') }}</h3>
+            <hr class="crm-note-section-divider" />
             <form wire:submit="createNote" class="crm-note-form">
-                <textarea
-                    class="crm-note-textarea"
-                    wire:model="data.content"
-                    rows="4"
-                ></textarea>
-                <input
-                    class="crm-note-noted-at"
-                    type="datetime-local"
-                    wire:model="data.noted_at"
-                />
+                <div class="crm-note-field">
+                    <label class="crm-note-field-label" for="crm-lead-note-add-content">{{ __('laravel-crm-filament::labels.fields.note') }}</label>
+                    <textarea
+                        id="crm-lead-note-add-content"
+                        class="crm-note-textarea"
+                        wire:model="data.content"
+                        rows="4"
+                    ></textarea>
+                </div>
+                <div class="crm-note-field">
+                    <label class="crm-note-field-label" for="crm-lead-note-add-noted-at">{{ __('laravel-crm-filament::labels.fields.noted_at') }}</label>
+                    <input
+                        id="crm-lead-note-add-noted-at"
+                        class="crm-note-noted-at"
+                        type="datetime-local"
+                        wire:model="data.noted_at"
+                    />
+                </div>
+                @error('data.content')
+                    <div class="crm-note-empty" style="text-align:left;color:var(--crm-note-danger);">{{ $message }}</div>
+                @enderror
+                <hr class="crm-note-section-divider crm-note-section-divider--footer" />
                 <div class="crm-note-form-actions">
                     <button
                         type="submit"
@@ -195,9 +234,6 @@
                         wire:loading.attr="disabled"
                     >{{ __('laravel-crm-filament::labels.actions.save') }}</button>
                 </div>
-                @error('data.content')
-                    <div class="crm-note-empty" style="text-align:left;color:var(--crm-note-danger);">{{ $message }}</div>
-                @enderror
             </form>
         </div>
     @endif

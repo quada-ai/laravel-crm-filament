@@ -19,6 +19,8 @@ return [
         'currency' => 'Currency',
         'name' => 'Name',
         'description' => 'Description',
+        'note' => 'Note',
+        'noted_at' => 'Noted at',
         'type' => 'Type',
         'status' => 'Status',
         'category' => 'Category',
@@ -256,6 +258,7 @@ return [
 
     // Sections (top-level grouping headings on forms / infolists)
     'sections' => [
+        'add_note' => 'Add note',
         'details' => 'Details',
         'lead_qualification' => 'Lead Qualification',
         'contact' => 'Contact',
