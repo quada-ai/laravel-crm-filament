@@ -17,10 +17,16 @@ class ViewLead extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            LeadResource::backToIndexAction(),
-            LeadResource::convertAction(),
-            Actions\EditAction::make(),
-            Actions\DeleteAction::make(),
+            LeadResource::backToIndexAction()
+                ->hiddenLabel(),
+            LeadResource::convertAction()
+                ->label(__('laravel-crm-filament::labels.actions.convert')),
+            Actions\EditAction::make()
+                ->button()
+                ->hiddenLabel(),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel(),
         ];
     }
 
