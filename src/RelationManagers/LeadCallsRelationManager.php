@@ -46,6 +46,8 @@ class LeadCallsRelationManager extends CallsRelationManager
                     ->label(__('laravel-crm-filament::labels.fields.guests'))
                     ->multiple()
                     ->searchable()
+                    ->preload()
+                    ->placeholder('Search ...')
                     ->options(fn () => Person::query()->orderBy('first_name')->get()->pluck('name', 'id')->all())
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('location')

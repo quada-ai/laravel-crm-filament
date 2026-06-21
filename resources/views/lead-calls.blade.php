@@ -3,7 +3,6 @@
 
     @php
         $callRows = $this->getOwnerRecord()->calls()->orderBy('created_at', 'desc')->get();
-        $personOptions = \VentureDrake\LaravelCrm\Models\Person::query()->orderBy('first_name')->get()->pluck('name', 'id');
     @endphp
 
     @if ($editingId === null)
@@ -11,70 +10,7 @@
             <h3 class="crm-card-section-heading">{{ __('laravel-crm-filament::labels.sections.add_call') }}</h3>
             <hr class="crm-card-section-divider" />
             <form wire:submit="createCall" class="crm-card-form">
-                <div class="crm-card-field">
-                    <label class="crm-card-field-label" for="crm-lead-call-add-name">{{ __('laravel-crm-filament::labels.fields.subject') }}</label>
-                    <input
-                        id="crm-lead-call-add-name"
-                        class="crm-card-noted-at"
-                        type="text"
-                        wire:model="data.name"
-                    />
-                </div>
-                <div class="crm-card-row-2">
-                    <div class="crm-card-field">
-                        <label class="crm-card-field-label" for="crm-lead-call-add-start-at">{{ __('laravel-crm-filament::labels.money.start_at') }}</label>
-                        <input
-                            id="crm-lead-call-add-start-at"
-                            class="crm-card-noted-at"
-                            type="datetime-local"
-                            wire:model="data.start_at"
-                        />
-                    </div>
-                    <div class="crm-card-field">
-                        <label class="crm-card-field-label" for="crm-lead-call-add-finish-at">{{ __('laravel-crm-filament::labels.money.finish_at') }}</label>
-                        <input
-                            id="crm-lead-call-add-finish-at"
-                            class="crm-card-noted-at"
-                            type="datetime-local"
-                            wire:model="data.finish_at"
-                        />
-                    </div>
-                </div>
-                <div class="crm-card-field">
-                    <label class="crm-card-field-label" for="crm-lead-call-add-guests">{{ __('laravel-crm-filament::labels.fields.guests') }}</label>
-                    <select
-                        id="crm-lead-call-add-guests"
-                        class="crm-card-noted-at"
-                        wire:model="data.guests"
-                        multiple
-                        size="3"
-                    >
-                        @foreach ($personOptions as $id => $name)
-                            <option value="{{ $id }}">{{ $name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="crm-card-field">
-                    <label class="crm-card-field-label" for="crm-lead-call-add-location">{{ __('laravel-crm-filament::labels.fields.location') }}</label>
-                    <input
-                        id="crm-lead-call-add-location"
-                        class="crm-card-noted-at"
-                        type="text"
-                        wire:model="data.location"
-                    />
-                </div>
-                <div class="crm-card-field">
-                    <label class="crm-card-field-label" for="crm-lead-call-add-description">{{ __('laravel-crm-filament::labels.fields.description') }}</label>
-                    <textarea
-                        id="crm-lead-call-add-description"
-                        class="crm-card-textarea"
-                        wire:model="data.description"
-                        rows="3"
-                    ></textarea>
-                </div>
-                @error('data.name')
-                    <div class="crm-card-empty" style="text-align:left;color:var(--crm-card-danger);">{{ $message }}</div>
-                @enderror
+                {{ $this->form }}
                 <hr class="crm-card-section-divider crm-card-section-divider--footer" />
                 <div class="crm-card-form-actions">
                     <button
@@ -91,61 +27,7 @@
         <div class="crm-card-card" data-call-id="{{ $call->id }}" data-testid="crm-lead-call-card">
             @if ($editingId === $call->id)
                 <form wire:submit="updateCall" class="crm-card-form" data-testid="crm-lead-call-edit-form">
-                    <div class="crm-card-field">
-                        <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.fields.subject') }}</label>
-                        <input
-                            class="crm-card-noted-at"
-                            type="text"
-                            wire:model="data.name"
-                        />
-                    </div>
-                    <div class="crm-card-row-2">
-                        <div class="crm-card-field">
-                            <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.money.start_at') }}</label>
-                            <input
-                                class="crm-card-noted-at"
-                                type="datetime-local"
-                                wire:model="data.start_at"
-                            />
-                        </div>
-                        <div class="crm-card-field">
-                            <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.money.finish_at') }}</label>
-                            <input
-                                class="crm-card-noted-at"
-                                type="datetime-local"
-                                wire:model="data.finish_at"
-                            />
-                        </div>
-                    </div>
-                    <div class="crm-card-field">
-                        <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.fields.guests') }}</label>
-                        <select
-                            class="crm-card-noted-at"
-                            wire:model="data.guests"
-                            multiple
-                            size="3"
-                        >
-                            @foreach ($personOptions as $id => $name)
-                                <option value="{{ $id }}">{{ $name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="crm-card-field">
-                        <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.fields.location') }}</label>
-                        <input
-                            class="crm-card-noted-at"
-                            type="text"
-                            wire:model="data.location"
-                        />
-                    </div>
-                    <div class="crm-card-field">
-                        <label class="crm-card-field-label">{{ __('laravel-crm-filament::labels.fields.description') }}</label>
-                        <textarea
-                            class="crm-card-textarea"
-                            wire:model="data.description"
-                            rows="3"
-                        ></textarea>
-                    </div>
+                    {{ $this->form }}
                     <div class="crm-card-form-actions">
                         <button
                             type="submit"

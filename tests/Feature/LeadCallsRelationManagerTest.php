@@ -324,13 +324,12 @@ it('the lead-calls Blade view contains the expected structural markers', functio
 
     $blade = file_get_contents($bladePath);
 
-    // Add-call form wired to createCall with the inline state bindings.
+    // Add-call form wired to createCall, rendering the Filament form schema
+    // via {{ $this->form }} so Guests is a native Filament multi-select and
+    // labels resolve through the form schema's translation chain.
     expect($blade)->toContain('@if ($editingId === null)');
     expect($blade)->toContain('wire:submit="createCall"');
-    expect($blade)->toContain('wire:model="data.name"');
-    expect($blade)->toContain('wire:model="data.description"');
-    expect($blade)->toContain('wire:model="data.start_at"');
-    expect($blade)->toContain('wire:model="data.finish_at"');
+    expect($blade)->toContain('{{ $this->form }}');
 
     // Section heading uses the new translation key.
     expect($blade)->toContain('laravel-crm-filament::labels.sections.add_call');
@@ -357,8 +356,6 @@ it('the lead-calls Blade view contains the expected structural markers', functio
     expect($blade)->toContain('crm-card-pill');
     expect($blade)->toContain('$call->start_at->format');
     expect($blade)->toContain('$call->finish_at->format');
-    expect($blade)->toContain('labels.money.start_at');
-    expect($blade)->toContain('labels.money.finish_at');
     expect($blade)->toContain('crm-card-section-title');
     expect($blade)->toContain('labels.fields.guests');
     expect($blade)->toContain('labels.fields.location');
