@@ -58,6 +58,7 @@ class RelatedOrganizationsRelationManager extends RelationManager
                 Actions\CreateAction::make()
                     ->authorize(fn (): bool => true)
                     ->icon('heroicon-m-plus')
+                    ->color('gray')
                     ->hiddenLabel()
                     ->tooltip(__('laravel-crm-filament::labels.actions.add_organization'))
                     ->modalHeading(__('laravel-crm-filament::labels.actions.add_organization'))

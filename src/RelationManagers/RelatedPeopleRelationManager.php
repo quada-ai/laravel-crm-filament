@@ -74,6 +74,7 @@ class RelatedPeopleRelationManager extends RelationManager
                 Actions\CreateAction::make()
                     ->authorize(fn (): bool => true)
                     ->icon('heroicon-m-plus')
+                    ->color('gray')
                     ->hiddenLabel()
                     ->tooltip(__('laravel-crm-filament::labels.actions.add_person'))
                     ->modalHeading(__('laravel-crm-filament::labels.actions.add_person'))
