@@ -31,6 +31,8 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FeatureCommentsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FeatureVotersRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\CreateFeature;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\EditFeature;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\ListFeatures;
@@ -247,6 +249,8 @@ class FeatureResource extends Resource
             CrmMeetingsRelationManager::class,
             CrmLunchesRelationManager::class,
             CrmFilesRelationManager::class,
+            FeatureVotersRelationManager::class,
+            FeatureCommentsRelationManager::class,
             AuditsRelationManager::class,
         ];
     }

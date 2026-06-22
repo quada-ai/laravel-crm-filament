@@ -114,6 +114,8 @@ return [
         'comments' => 'Commentaires',
         'views' => 'Vues',
         'submitted_by' => 'Soumis par',
+        'admin_reply' => 'Réponse admin',
+        'voted_at' => 'Voté le',
     ],
 
     'contact' => [

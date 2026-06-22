@@ -115,6 +115,8 @@ return [
         'comments' => 'Comments',
         'views' => 'Views',
         'submitted_by' => 'Submitted by',
+        'admin_reply' => 'Admin reply',
+        'voted_at' => 'Voted at',
     ],
 
     // Contact / address fields

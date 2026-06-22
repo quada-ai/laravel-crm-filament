@@ -16,6 +16,8 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FeatureCommentsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\FeatureVotersRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Features\FeatureResource;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\CreateFeature;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\EditFeature;
@@ -124,7 +126,7 @@ it('registers View, Edit, Delete record actions with Delete requiring confirmati
     expect($source)->toMatch('/recordActions\\(\\[(?:\\s|\\S)*?Actions\\\\ViewAction::make\\(\\)(?:\\s|\\S)*?Actions\\\\EditAction::make\\(\\)(?:\\s|\\S)*?Actions\\\\DeleteAction::make\\(\\)(?:\\s|\\S)*?->requiresConfirmation\\(\\)/');
 });
 
-it('returns the 8 AC-named relation managers in getRelations()', function () {
+it('returns the 10 AC-named relation managers in getRelations()', function () {
     expect(FeatureResource::getRelations())->toEqual([
         CrmActivitiesRelationManager::class,
         CrmNotesRelationManager::class,
@@ -133,6 +135,8 @@ it('returns the 8 AC-named relation managers in getRelations()', function () {
         CrmMeetingsRelationManager::class,
         CrmLunchesRelationManager::class,
         CrmFilesRelationManager::class,
+        FeatureVotersRelationManager::class,
+        FeatureCommentsRelationManager::class,
         AuditsRelationManager::class,
     ]);
 });
