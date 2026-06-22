@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
@@ -112,34 +113,84 @@ class PersonResource extends Resource
 
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('first_name')
-                    ->sortable(! $encrypted)
-                    ->searchable(! $encrypted)
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('laravel-crm-filament::labels.fields.name'))
                     ->limit(40),
 
-                Tables\Columns\TextColumn::make('last_name')
-                    ->sortable(! $encrypted)
-                    ->searchable(! $encrypted)
-                    ->limit(40),
+                Tables\Columns\TextColumn::make('labels.name')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->badge()
+                    ->color(function ($state, $record) {
+                        $label = $record?->labels?->firstWhere('name', $state);
+                        $hex = $label?->hex;
+
+                        if (! $hex) {
+                            return 'gray';
+                        }
+
+                        return '#' . ltrim($hex, '#');
+                    })
+                    ->limitList(3),
+
+                Tables\Columns\TextColumn::make('email')
+                    ->label(__('laravel-crm-filament::labels.fields.email'))
+                    ->state(fn ($record) => $record?->getPrimaryEmail()?->address),
+
+                Tables\Columns\TextColumn::make('phone')
+                    ->label(__('laravel-crm-filament::labels.fields.phone'))
+                    ->state(fn ($record) => $record?->getPrimaryPhone()?->number),
+
+                Tables\Columns\TextColumn::make('open_deals_count')
+                    ->label(__('laravel-crm-filament::labels.fields.open_deals'))
+                    ->numeric()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('lost_deals_count')
+                    ->label(__('laravel-crm-filament::labels.fields.lost_deals'))
+                    ->numeric()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('won_deals_count')
+                    ->label(__('laravel-crm-filament::labels.fields.won_deals'))
+                    ->numeric()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('next_activity')
+                    ->label(__('laravel-crm-filament::labels.fields.next_activity'))
+                    ->state(fn ($record) => $record?->tasks()
+                        ->whereNull('completed_at')
+                        ->where('due_at', '>=', now())
+                        ->orderBy('due_at')
+                        ->first()?->due_at)
+                    ->dateTime(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
+                    ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
-            ->when(
-                $encrypted,
-                fn (Table $t) => $t->modifyQueryUsing(
-                    HasEncryptedSearch::modifyQuery(
+            ->modifyQueryUsing(function (Builder $query) use ($encrypted) {
+                $query->withCount([
+                    'deals as open_deals_count' => fn ($q) => $q->whereNull('closed_at'),
+                    'deals as lost_deals_count' => fn ($q) => $q->where('closed_status', 'lost'),
+                    'deals as won_deals_count' => fn ($q) => $q->where('closed_status', 'won'),
+                ]);
+
+                if ($encrypted) {
+                    $accessor = HasEncryptedSearch::modifyQuery(
                         fn ($r) => trim(($r->first_name ?? '') . ' ' . ($r->last_name ?? ''))
-                    )
-                )
-            )
+                    );
+                    $accessor($query);
+                }
+
+                return $query;
+            })
             ->recordActions([
                 Actions\ViewAction::make()
                     ->button()
