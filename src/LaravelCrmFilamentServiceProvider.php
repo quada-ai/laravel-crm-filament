@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use VentureDrake\LaravelCrm\Models\Activity;
+use VentureDrake\LaravelCrm\Models\Address;
 use VentureDrake\LaravelCrm\Models\Contact;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Delivery;
@@ -20,6 +21,7 @@ use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Organization;
 use VentureDrake\LaravelCrm\Models\Person;
+use VentureDrake\LaravelCrm\Models\Phone;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrm\Models\Quote;
@@ -149,6 +151,34 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             return $model->morphMany(Contact::class, 'contactable')
                 ->where('entityable_type', 'like', '%Organization%');
         });
+
+        // Polyfill phones / addresses / crmTeams on the host's configured
+        // User model so the Filament User form can hydrate them as
+        // polymorphic morphMany relations the same way Person/Organization
+        // do. Skips registration when the User model has already declared
+        // them (e.g. when the host uses HasCrmTeams trait).
+        $userModelClass = config('auth.providers.users.model');
+        if (is_string($userModelClass) && class_exists($userModelClass)) {
+            $userInstance = new $userModelClass;
+
+            if (! method_exists($userInstance, 'phones')) {
+                $userModelClass::resolveRelationUsing('phones', function ($model) {
+                    return $model->morphMany(Phone::class, 'phoneable');
+                });
+            }
+
+            if (! method_exists($userInstance, 'addresses')) {
+                $userModelClass::resolveRelationUsing('addresses', function ($model) {
+                    return $model->morphMany(Address::class, 'addressable');
+                });
+            }
+
+            if (! method_exists($userInstance, 'crmTeams')) {
+                $userModelClass::resolveRelationUsing('crmTeams', function ($model) {
+                    return $model->belongsToMany(Team::class, 'crm_team_user', 'user_id', 'crm_team_id');
+                });
+            }
+        }
 
         // Core CRM declares `clicks()` on EmailCampaignRecipient / SmsCampaignRecipient
         // but not on the campaign model itself. The ClicksRelationManager binds

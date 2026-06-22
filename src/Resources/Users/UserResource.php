@@ -14,7 +14,11 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Ramsey\Uuid\Uuid;
 use Spatie\Permission\Models\Role;
+use VentureDrake\LaravelCrm\Models\Team;
+use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\CreateUser;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\EditUser;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\ListUsers;
@@ -75,6 +79,18 @@ class UserResource extends Resource
                 ->preload()
                 ->dehydrated(false)
                 ->columnSpanFull(),
+
+            Forms\Components\Select::make('crm_team_ids')
+                ->label(__('laravel-crm-filament::labels.sections.teams'))
+                ->multiple()
+                ->options(fn () => Team::query()->orderBy('name')->pluck('name', 'id'))
+                ->searchable()
+                ->preload()
+                ->dehydrated(false)
+                ->columnSpanFull(),
+
+            ContactFieldsSchema::phonesRepeater(),
+            ContactFieldsSchema::addressesRepeater(),
         ]);
     }
 
@@ -175,5 +191,48 @@ class UserResource extends Resource
             'view' => ViewUser::route('/{record}'),
             'edit' => EditUser::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Diff-sync a polymorphic morphMany rowset by id.
+     * Update existing rows, create new ones (with a fresh UUID external_id
+     * + 'primary' boolean), delete any rows whose id is no longer in the
+     * incoming payload. Mirrors the PersonService update*Phones/Addresses
+     * pattern for users.
+     *
+     * @param  Model  $record
+     * @param  array<int, array<string, mixed>>  $payload
+     * @param  array<int, string>  $columns
+     */
+    public static function syncMorphRows($record, string $relation, array $payload, string $modelClass, array $columns): void
+    {
+        if (! method_exists($record, $relation)) {
+            return;
+        }
+
+        $seenIds = [];
+
+        foreach ($payload as $row) {
+            $rowData = [];
+            foreach ($columns as $col) {
+                $rowData[$col] = $row[$col] ?? null;
+            }
+            $rowData['primary'] = ! empty($row['primary']);
+
+            if (! empty($row['id']) && $existing = $modelClass::query()->find($row['id'])) {
+                $existing->update($rowData);
+                $seenIds[] = (int) $existing->id;
+            } elseif (! empty(array_filter($rowData, fn ($v) => $v !== null && $v !== false && $v !== ''))) {
+                $rowData['external_id'] = (string) Uuid::uuid4();
+                $created = $record->{$relation}()->create($rowData);
+                $seenIds[] = (int) $created->id;
+            }
+        }
+
+        foreach ($record->{$relation}()->get() as $existing) {
+            if (! in_array((int) $existing->id, $seenIds, true)) {
+                $existing->delete();
+            }
+        }
     }
 }
