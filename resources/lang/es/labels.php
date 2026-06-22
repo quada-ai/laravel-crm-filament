@@ -135,6 +135,10 @@ return [
         'last_checked_at' => 'Última verificación',
         'last_status_changed_at' => 'Último cambio de estado',
         'down_since_at' => 'Inactivo desde',
+        'error_message' => 'Mensaje de error',
+        'checked_at' => 'Verificado en',
+        'status_code' => 'Código de estado',
+        'response_time' => 'Tiempo de respuesta (ms)',
         'ssl_status' => 'Estado SSL',
         'ssl_issuer' => 'Emisor SSL',
         'ssl_expires_at' => 'SSL expira el',
@@ -406,6 +410,7 @@ return [
         'delivery' => 'Entrega',
         'upload' => 'Subir',
         'back_to_monitors' => 'Volver a monitores',
+        'run_check_now' => 'Ejecutar verificación ahora',
     ],
 
     'import' => [

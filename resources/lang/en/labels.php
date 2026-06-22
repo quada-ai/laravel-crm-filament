@@ -136,6 +136,10 @@ return [
         'last_checked_at' => 'Last checked at',
         'last_status_changed_at' => 'Last status changed at',
         'down_since_at' => 'Down since',
+        'error_message' => 'Error message',
+        'checked_at' => 'Checked at',
+        'status_code' => 'Status code',
+        'response_time' => 'Response time (ms)',
         'ssl_status' => 'SSL status',
         'ssl_issuer' => 'SSL issuer',
         'ssl_expires_at' => 'SSL expires at',
@@ -451,6 +455,7 @@ return [
         'delivery' => 'Delivery',
         'upload' => 'Upload',
         'back_to_monitors' => 'Back to monitors',
+        'run_check_now' => 'Run check now',
     ],
 
     // CSV import

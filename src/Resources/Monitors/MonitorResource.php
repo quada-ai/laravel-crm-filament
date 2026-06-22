@@ -7,6 +7,7 @@ use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -14,6 +15,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use VentureDrake\LaravelCrm\Jobs\RunMonitorCheck;
 use VentureDrake\LaravelCrm\Models\Monitor;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
@@ -469,5 +471,26 @@ class MonitorResource extends Resource
             ->icon('heroicon-o-arrow-left')
             ->color('gray')
             ->url(static::getUrl('index'));
+    }
+
+    public static function runCheckNowAction(): Action
+    {
+        return Action::make('runCheckNow')
+            ->label(__('laravel-crm-filament::labels.actions.run_check_now'))
+            ->icon('heroicon-o-bolt')
+            ->color('primary')
+            ->requiresConfirmation()
+            ->action(function (Monitor $record): void {
+                // dispatchSync is used (not dispatch) so the check runs immediately in the
+                // current request regardless of the host's queue connection. Without it,
+                // hosts on a database/redis queue would see the action return before the
+                // check ran, and the admin would not get an immediate result row.
+                RunMonitorCheck::dispatchSync($record->id);
+
+                Notification::make()
+                    ->title(__('laravel-crm-filament::labels.actions.run_check_now'))
+                    ->success()
+                    ->send();
+            });
     }
 }

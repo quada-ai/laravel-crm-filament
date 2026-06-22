@@ -3,14 +3,10 @@
 namespace VentureDrake\LaravelCrmFilament\RelationManagers;
 
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
-/**
- * Stub MonitorChecks relation manager. US-007 will flesh out the table
- * columns + filters + actions for surfacing the per-check history on the
- * Monitor show page. For now this provides a registrable class so
- * MonitorResource::getRelations() can reference it.
- */
 class MonitorChecksRelationManager extends RelationManager
 {
     protected static string $relationship = 'checks';
@@ -26,7 +22,51 @@ class MonitorChecksRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('status')
-            ->columns([])
+            ->columns([
+                Tables\Columns\TextColumn::make('type')
+                    ->label(__('laravel-crm-filament::labels.fields.type'))
+                    ->badge()
+                    ->color(fn (?string $state): string => match ($state) {
+                        'uptime' => 'info',
+                        'ssl' => 'warning',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label(__('laravel-crm-filament::labels.fields.status'))
+                    ->badge()
+                    ->color(fn (?string $state): string => match ($state) {
+                        'up', 'valid' => 'success',
+                        'down', 'invalid', 'error' => 'danger',
+                        'slow' => 'warning',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('status_code')
+                    ->label(__('laravel-crm-filament::labels.fields.status_code'))
+                    ->numeric()
+                    ->sortable()
+                    ->placeholder('—'),
+                Tables\Columns\TextColumn::make('response_time')
+                    ->label(__('laravel-crm-filament::labels.fields.response_time'))
+                    ->numeric()
+                    ->sortable()
+                    ->placeholder('—'),
+                Tables\Columns\TextColumn::make('error_message')
+                    ->label(__('laravel-crm-filament::labels.fields.error_message'))
+                    ->limit(60)
+                    ->tooltip(fn (Model $record): ?string => $record->error_message)
+                    ->placeholder('—'),
+                Tables\Columns\TextColumn::make('checked_at')
+                    ->label(__('laravel-crm-filament::labels.fields.checked_at'))
+                    ->dateTime()
+                    ->since()
+                    ->tooltip(fn (Model $record): ?string => optional($record->checked_at)->toDateTimeString())
+                    ->sortable(),
+            ])
+            ->defaultSort('checked_at', 'desc')
+            ->paginated([10, 25, 50, 100])
+            ->defaultPaginationPageOption(25)
             ->headerActions([])
             ->recordActions([])
             ->toolbarActions([]);

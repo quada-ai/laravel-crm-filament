@@ -30,6 +30,7 @@ class ViewMonitor extends ViewRecord
     {
         return [
             MonitorResource::backToIndexAction(),
+            MonitorResource::runCheckNowAction(),
             Actions\EditAction::make()
                 ->button()
                 ->hiddenLabel()
