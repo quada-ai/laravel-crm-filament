@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Teams;
 
 use BackedEnum;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -102,5 +103,14 @@ class CrmTeamResource extends Resource
             'view' => ViewCrmTeam::route('/{record}'),
             'edit' => EditCrmTeam::route('/{record}/edit'),
         ];
+    }
+
+    public static function backToIndexAction(): Action
+    {
+        return Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_teams'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
     }
 }

@@ -350,6 +350,7 @@ return [
         'back_to_quotes' => 'Retour aux devis',
         'back_to_deals' => 'Retour aux affaires',
         'back_to_people' => 'Retour aux personnes',
+        'back_to_teams' => 'Retour aux équipes',
         'back_to_users' => 'Retour aux utilisateurs',
         'back_to_organizations' => 'Retour aux organisations',
         'add_organization' => 'Associer une organisation...',
