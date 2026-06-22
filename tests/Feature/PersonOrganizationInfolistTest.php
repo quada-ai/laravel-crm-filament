@@ -35,12 +35,12 @@ it('declares infolist() locally on the Resource', function (string $resource): v
     expect($declaringClass)->toBe($resource);
 })->with('poResourceModelPage');
 
-it('Organization infolist source contains Identity / Contact / Custom fields section headings', function (): void {
+it('Organization infolist source contains Details + Custom fields section headings only', function (): void {
     $src = file_get_contents((new ReflectionClass(OrganizationResource::class))->getFileName());
 
-    expect($src)->toContain("Section::make(__('laravel-crm-filament::labels.sections.identity'))");
-    expect($src)->toContain("Section::make(__('laravel-crm-filament::labels.sections.contact'))");
+    expect($src)->toContain("Section::make(__('laravel-crm-filament::labels.sections.details'))");
     expect($src)->toContain("Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))");
+    expect($src)->not->toContain("Section::make(__('laravel-crm-filament::labels.sections.contact'))");
 });
 
 it('Person infolist source contains Identity + Custom fields section headings only', function (): void {
@@ -51,13 +51,12 @@ it('Person infolist source contains Identity + Custom fields section headings on
     expect($src)->not->toContain("Section::make(__('laravel-crm-filament::labels.sections.contact'))");
 });
 
-it('Organization infolist exposes three top-level Sections in Identity / Contact / Custom fields order', function (): void {
+it('Organization infolist exposes two top-level Sections in Details / Custom fields order', function (): void {
     $sections = poInfolistSections(OrganizationResource::class, Organization::class, ViewOrganization::class);
 
-    expect($sections)->toHaveCount(3);
-    expect($sections[0]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.identity'));
-    expect($sections[1]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.contact'));
-    expect($sections[2]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.custom_fields'));
+    expect($sections)->toHaveCount(2);
+    expect($sections[0]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.details'));
+    expect($sections[1]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.custom_fields'));
 });
 
 it('Person infolist exposes two top-level Sections in Identity / Custom fields order', function (): void {
@@ -87,20 +86,27 @@ it('Person infolist Identity carries first/last/middle name + per-row phones / e
     expect($src)->toContain("TextEntry::make('ownerUser.name')");
 });
 
-it('Organization infolist Identity carries name + industry + employees + revenue', function (): void {
+it('Organization infolist Details carries the core CRM detail fields + per-row phones/emails/addresses + labels + integrations + owner', function (): void {
     $src = file_get_contents((new ReflectionClass(OrganizationResource::class))->getFileName());
 
-    expect($src)->toContain("TextEntry::make('name')");
+    // Scalar identity-style fields ordered to match the laravel-crm
+    // Details card.
+    expect($src)->toContain("TextEntry::make('organizationType.name')");
+    expect($src)->toContain("TextEntry::make('vat_number')");
     expect($src)->toContain("TextEntry::make('industry.name')");
+    expect($src)->toContain("TextEntry::make('timezone.name')");
     expect($src)->toContain("TextEntry::make('number_of_employees')");
     expect($src)->toContain("TextEntry::make('annual_revenue')");
-});
+    expect($src)->toContain("TextEntry::make('linkedin')");
+    expect($src)->toContain("TextEntry::make('description')");
 
-it('Organization infolist renders an addresses TextEntry via static::formatAddresses', function (): void {
-    $src = file_get_contents((new ReflectionClass(OrganizationResource::class))->getFileName());
-
-    expect($src)->toContain("TextEntry::make('addresses')");
-    expect($src)->toContain('static::formatAddresses($record)');
+    // Per-row loops + tail entries (labels, integrations, owner).
+    expect($src)->toContain('foreach ($record->phones as $i => $phone)');
+    expect($src)->toContain('foreach ($record->emails as $i => $email)');
+    expect($src)->toContain('foreach ($record->addresses as $i => $address)');
+    expect($src)->toContain("TextEntry::make('labels.name')");
+    expect($src)->toContain("TextEntry::make('integrations')");
+    expect($src)->toContain("TextEntry::make('ownerUser.name')");
 });
 
 it('Person infolist renders per-row address TextEntries instead of one merged addresses field', function (): void {

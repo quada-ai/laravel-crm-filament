@@ -7,7 +7,6 @@ use BackedEnum;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Forms;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -229,29 +228,11 @@ class OrganizationResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make(__('laravel-crm-filament::labels.sections.identity'))
-                ->schema(fn (?Organization $record) => array_merge([
-                    TextEntry::make('name')
-                        ->label(__('laravel-crm-filament::labels.fields.name')),
-
-                    TextEntry::make('industry.name')
-                        ->label(__('laravel-crm-filament::labels.money.industry')),
-
-                    TextEntry::make('number_of_employees')
-                        ->label(__('laravel-crm-filament::labels.money.employees')),
-
-                    TextEntry::make('annual_revenue')
-                        ->label(__('laravel-crm-filament::labels.money.revenue'))
-                        ->money(fn ($record) => config('laravel-crm.default_currency', 'USD')),
-                ], $record ? static::crmCustomFieldEntries($record, false) : [])),
-
-            Section::make(__('laravel-crm-filament::labels.sections.contact'))
-                ->schema([
-                    TextEntry::make('addresses')
-                        ->label(__('laravel-crm-filament::labels.fields.addresses'))
-                        ->state(fn ($record) => $record instanceof Organization ? static::formatAddresses($record) : null)
-                        ->columnSpanFull(),
-                ]),
+            Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->schema(fn (?Organization $record) => array_merge(
+                    static::organizationDetailEntries($record),
+                    $record ? static::crmCustomFieldEntries($record, false) : [],
+                )),
 
             Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
                 ->schema(fn (?Organization $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
@@ -265,6 +246,115 @@ class OrganizationResource extends Resource
                         ->exists();
                 }),
         ])->columns(1);
+    }
+
+    /**
+     * @return array<int, \Filament\Infolists\Components\TextEntry>
+     */
+    protected static function organizationDetailEntries(?Organization $record): array
+    {
+        $entries = [
+            TextEntry::make('organizationType.name')
+                ->label(__('laravel-crm-filament::labels.fields.type')),
+
+            TextEntry::make('vat_number')
+                ->label(__('laravel-crm-filament::labels.fields.vat_number')),
+
+            TextEntry::make('industry.name')
+                ->label(__('laravel-crm-filament::labels.fields.industry')),
+
+            TextEntry::make('timezone.name')
+                ->label(__('laravel-crm-filament::labels.fields.timezone')),
+
+            TextEntry::make('number_of_employees')
+                ->label(__('laravel-crm-filament::labels.fields.number_of_employees')),
+
+            TextEntry::make('annual_revenue')
+                ->label(__('laravel-crm-filament::labels.fields.annual_revenue'))
+                ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+
+            TextEntry::make('linkedin')
+                ->label(__('laravel-crm-filament::labels.fields.linkedin'))
+                ->state(fn ($record) => $record?->linkedin
+                    ? 'https://linkedin.com/company/' . $record->linkedin
+                    : null)
+                ->url(fn ($record) => $record?->linkedin
+                    ? 'https://linkedin.com/company/' . $record->linkedin
+                    : null, shouldOpenInNewTab: true),
+
+            TextEntry::make('description')
+                ->label(__('laravel-crm-filament::labels.fields.description'))
+                ->columnSpanFull(),
+        ];
+
+        if (! $record instanceof Organization) {
+            return $entries;
+        }
+
+        foreach ($record->phones as $i => $phone) {
+            $typePrefix = $phone->type ? ucfirst($phone->type) . ' ' : '';
+            $entries[] = TextEntry::make('phone_' . $i)
+                ->label($typePrefix . __('laravel-crm-filament::labels.fields.phone'))
+                ->state(trim(($phone->number ?? '') . ($phone->primary ? ' (Primary)' : '')));
+        }
+
+        foreach ($record->emails as $i => $email) {
+            $typePrefix = $email->type ? ucfirst($email->type) . ' ' : '';
+            $entries[] = TextEntry::make('email_' . $i)
+                ->label($typePrefix . __('laravel-crm-filament::labels.fields.email'))
+                ->state(trim(($email->address ?? '') . ($email->primary ? ' (Primary)' : '')));
+        }
+
+        foreach ($record->addresses as $i => $address) {
+            $typePrefix = $address->addressType?->name ? ucfirst($address->addressType->name) . ' ' : '';
+            $line = trim((string) static::formatAddressLine($address));
+            if ($address->primary) {
+                $line = trim($line . ' (Primary)');
+            }
+            $entries[] = TextEntry::make('address_' . $i)
+                ->label($typePrefix . __('laravel-crm-filament::labels.fields.address'))
+                ->state($line)
+                ->columnSpanFull();
+        }
+
+        $entries[] = TextEntry::make('labels.name')
+            ->label(__('laravel-crm-filament::labels.fields.labels'))
+            ->badge()
+            ->color(function ($state, $record) {
+                $label = $record?->labels?->firstWhere('name', $state);
+                $hex = $label?->hex;
+
+                if (! $hex) {
+                    return 'gray';
+                }
+
+                return '#' . ltrim($hex, '#');
+            });
+
+        $entries[] = TextEntry::make('integrations')
+            ->label(__('laravel-crm-filament::labels.fields.integrations'))
+            ->state(fn ($record) => $record?->xeroContact !== null ? 'Xero' : null);
+
+        $entries[] = TextEntry::make('ownerUser.name')
+            ->label(__('laravel-crm-filament::labels.fields.owner'))
+            ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'));
+
+        return $entries;
+    }
+
+    protected static function formatAddressLine($address): ?string
+    {
+        $parts = array_filter([
+            $address->line1 ?? null,
+            $address->line2 ?? null,
+            $address->line3 ?? null,
+            $address->city ?? null,
+            $address->state ?? null,
+            $address->code ?? null,
+            $address->country ?? null,
+        ]);
+
+        return $parts === [] ? null : implode(', ', $parts);
     }
 
     protected static function formatAddresses(Organization $record): ?string
