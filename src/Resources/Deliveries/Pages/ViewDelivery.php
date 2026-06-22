@@ -6,6 +6,7 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrmFilament\Concerns\DownloadsPdf;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\DeliveryResource;
@@ -73,5 +74,12 @@ class ViewDelivery extends ViewRecord
             'fromName' => $settings->get('organization_name'),
             'logo' => $settings->get('logo_file'),
         ];
+    }
+
+    public function getHeading(): string | Htmlable
+    {
+        $title = $this->record?->title;
+
+        return $title !== null && $title !== '' ? $title : parent::getHeading();
     }
 }
