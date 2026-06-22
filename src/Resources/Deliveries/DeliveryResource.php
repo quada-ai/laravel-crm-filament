@@ -362,4 +362,13 @@ class DeliveryResource extends Resource
             'edit' => EditDelivery::route('/{record}/edit'),
         ];
     }
+
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_deliveries'))
+            ->color('gray')
+            ->icon('heroicon-o-arrow-left')
+            ->url(static::getUrl('index'));
+    }
 }

@@ -335,6 +335,7 @@ return [
         'pay' => 'Payer',
         'back_to_invoices' => 'Retour aux factures',
         'back_to_purchase_orders' => 'Retour aux bons de commande',
+        'back_to_deliveries' => 'Retour aux livraisons',
         'purchase_order' => 'Bon de commande',
         'delivery' => 'Livraison',
         'upload' => 'Téléverser',

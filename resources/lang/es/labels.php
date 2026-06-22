@@ -335,6 +335,7 @@ return [
         'pay' => 'Pagar',
         'back_to_invoices' => 'Volver a facturas',
         'back_to_purchase_orders' => 'Volver a órdenes de compra',
+        'back_to_deliveries' => 'Volver a entregas',
         'purchase_order' => 'Orden de compra',
         'delivery' => 'Entrega',
         'upload' => 'Subir',

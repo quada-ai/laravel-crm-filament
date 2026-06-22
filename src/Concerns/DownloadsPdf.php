@@ -74,6 +74,7 @@ trait DownloadsPdf
     private function pdfFilename(Model $record, string $type, string $prefix): string
     {
         $numberAttr = match ($type) {
+            'delivery' => 'delivery_id',
             'order' => 'order_id',
             'quote' => 'quote_id',
             'invoice' => 'invoice_id',

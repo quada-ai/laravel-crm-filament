@@ -380,6 +380,7 @@ return [
         'pay' => 'Pay',
         'back_to_invoices' => 'Back to invoices',
         'back_to_purchase_orders' => 'Back to purchase orders',
+        'back_to_deliveries' => 'Back to deliveries',
         'purchase_order' => 'Purchase Order',
         'delivery' => 'Delivery',
         'upload' => 'Upload',
