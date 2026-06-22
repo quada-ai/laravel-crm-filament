@@ -6,6 +6,7 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResource;
 
 class ViewPurchaseOrder extends ViewRecord
@@ -51,5 +52,10 @@ class ViewPurchaseOrder extends ViewRecord
                 $this->getRelationManagersContentComponent()->columnSpan(['lg' => 1]),
             ]),
         ]);
+    }
+
+    public function getHeading(): string | Htmlable
+    {
+        return $this->record?->title ?? parent::getHeading();
     }
 }
