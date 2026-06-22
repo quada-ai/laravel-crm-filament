@@ -205,6 +205,9 @@ class OrganizationResource extends Resource
                 Actions\EditAction::make()
                     ->button()
                     ->hiddenLabel(),
+                Actions\DeleteAction::make()
+                    ->button()
+                    ->hiddenLabel(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
