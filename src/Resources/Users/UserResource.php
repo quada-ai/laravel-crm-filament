@@ -58,9 +58,9 @@ class UserResource extends Resource
                 ->revealable()
                 ->dehydrateStateUsing(fn ($state) => filled($state) ? bcrypt($state) : null)
                 ->dehydrated(fn ($state) => filled($state))
-                ->required(fn (string $operation) => $operation === 'create')
+                ->required()
                 ->minLength(8)
-                ->helperText('Leave blank when editing to keep the existing password.')
+                ->visibleOn('create')
                 ->columnSpanFull(),
 
             Forms\Components\Toggle::make('crm_access')
@@ -68,13 +68,12 @@ class UserResource extends Resource
                 ->helperText('Required for the user to reach the Filament panel.')
                 ->default(true),
 
-            Forms\Components\Select::make('roles')
-                ->label(__('laravel-crm-filament::labels.fields.roles'))
-                ->multiple()
-                ->relationship('roles', 'name')
+            Forms\Components\Select::make('role_id')
+                ->label(__('laravel-crm-filament::labels.fields.role'))
                 ->options(fn () => Role::query()->orderBy('name')->pluck('name', 'id'))
                 ->searchable()
                 ->preload()
+                ->dehydrated(false)
                 ->columnSpanFull(),
         ]);
     }
