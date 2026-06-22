@@ -60,6 +60,7 @@ return [
         'roles' => 'Roles',
         'permissions' => 'Permissions',
         'members' => 'Members',
+        'users' => 'Users',
         'options' => 'Options',
         'applies_to' => 'Applies to',
         'available_on' => 'Available on',

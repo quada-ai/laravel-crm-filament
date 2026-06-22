@@ -9,6 +9,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\Team;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\CreateCrmTeam;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\EditCrmTeam;
@@ -44,20 +45,33 @@ class CrmTeamResource extends Resource
         ]);
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withCount('users');
+    }
+
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('laravel-crm-filament::labels.fields.name'))
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('users_count')
-                    ->label(__('laravel-crm-filament::labels.fields.members'))
-                    ->counts('users'),
+                    ->label(__('laravel-crm-filament::labels.fields.users'))
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('userCreated.name')
                     ->label(__('laravel-crm-filament::labels.fields.created_by'))
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('ownerUser.name')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'))
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
                     ->toggleable(),
             ])
             ->defaultSort('name')

@@ -2,6 +2,7 @@
 
 namespace VentureDrake\LaravelCrmFilament;
 
+use App\User;
 use Filament\Actions\EditAction;
 use Illuminate\Filesystem\Filesystem;
 use Spatie\LaravelPackageTools\Package;
@@ -24,6 +25,7 @@ use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrm\Models\SmsCampaign;
 use VentureDrake\LaravelCrm\Models\SmsCampaignClick;
 use VentureDrake\LaravelCrm\Models\SmsCampaignRecipient;
+use VentureDrake\LaravelCrm\Models\Team;
 use VentureDrake\LaravelCrmFilament\Console\InstallCommand;
 use VentureDrake\LaravelCrmFilament\Models\Audit;
 
@@ -108,6 +110,17 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
                 return $model->morphMany(Activity::class, 'timelineable');
             });
         }
+
+        // Core CRM's Team model only declares `userCreated()` for the
+        // `user_id` column. Filament's parity table column shape names an
+        // `ownerUser` relation (analogous to every other entity in the
+        // family) for surfacing an explicit team owner — but core's
+        // crm_teams table doesn't ship a `user_owner_id` column yet.
+        // Register the relation so the column renders cleanly with its
+        // `Unallocated` placeholder until upstream lands the column.
+        Team::resolveRelationUsing('ownerUser', function ($model) {
+            return $model->belongsTo(User::class, 'user_owner_id');
+        });
 
         // Core CRM declares `clicks()` on EmailCampaignRecipient / SmsCampaignRecipient
         // but not on the campaign model itself. The ClicksRelationManager binds

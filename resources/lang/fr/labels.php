@@ -59,6 +59,7 @@ return [
         'roles' => 'Rôles',
         'permissions' => 'Permissions',
         'members' => 'Membres',
+        'users' => 'Utilisateurs',
         'options' => 'Options',
         'applies_to' => "S'applique à",
         'available_on' => 'Disponible le',

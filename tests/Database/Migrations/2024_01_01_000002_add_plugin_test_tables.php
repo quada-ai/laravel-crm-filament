@@ -99,10 +99,21 @@ return new class extends Migration
             });
         }
 
+        if (! Schema::hasTable($prefix . 'teams')) {
+            Schema::create($prefix . 'teams', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('user_id');
+                $table->unsignedBigInteger('user_owner_id')->nullable();
+                $table->string('name');
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
         if (! Schema::hasTable($prefix . 'team_user')) {
             Schema::create($prefix . 'team_user', function (Blueprint $table) {
                 $table->bigIncrements('id');
-                $table->unsignedBigInteger('team_id');
+                $table->unsignedBigInteger('crm_team_id');
                 $table->unsignedBigInteger('user_id');
                 $table->timestamps();
             });

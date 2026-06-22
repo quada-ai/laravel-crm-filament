@@ -41,6 +41,7 @@ class RoleSeeder
         'sms-templates',
         'customers',
         'products',
+        'teams',
     ];
 
     /** @var list<string> */
