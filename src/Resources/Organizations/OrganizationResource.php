@@ -262,7 +262,7 @@ class OrganizationResource extends Resource
                 ->label(__('laravel-crm-filament::labels.fields.vat_number')),
 
             TextEntry::make('industry.name')
-                ->label(__('laravel-crm-filament::labels.fields.industry')),
+                ->label(__('laravel-crm-filament::labels.money.industry')),
 
             TextEntry::make('timezone.name')
                 ->label(__('laravel-crm-filament::labels.fields.timezone')),
