@@ -56,7 +56,9 @@ class RelatedOrganizationsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Actions\CreateAction::make()
-                    ->label(__('laravel-crm-filament::labels.actions.add_organization'))
+                    ->iconButton()
+                    ->icon('heroicon-m-plus')
+                    ->tooltip(__('laravel-crm-filament::labels.actions.add_organization'))
                     ->modalHeading(__('laravel-crm-filament::labels.actions.add_organization'))
                     ->using(function (array $data): Contact {
                         $owner = $this->getOwnerRecord();
@@ -83,6 +85,8 @@ class RelatedOrganizationsRelationManager extends RelationManager
             ->recordActions([
                 Actions\DeleteAction::make()
                     ->iconButton()
+                    ->icon('heroicon-m-x-mark')
+                    ->color('danger')
                     ->using(function (Contact $record): void {
                         $owner = $this->getOwnerRecord();
                         $relatedType = $record->entityable_type;
