@@ -6,7 +6,9 @@ use BackedEnum;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -86,6 +88,25 @@ class CrmTeamResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->schema([
+                    TextEntry::make('name')
+                        ->label(__('laravel-crm-filament::labels.fields.name')),
+
+                    TextEntry::make('userCreated.name')
+                        ->label(__('laravel-crm-filament::labels.fields.created_by'))
+                        ->placeholder('—'),
+
+                    TextEntry::make('created_at')
+                        ->label(__('laravel-crm-filament::labels.fields.created'))
+                        ->since(),
+                ]),
+        ])->columns(1);
     }
 
     public static function getRelations(): array

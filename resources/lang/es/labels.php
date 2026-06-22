@@ -375,6 +375,8 @@ return [
     'misc' => [
         'unallocated' => 'Sin asignar',
         'no_teams' => 'Sin equipos',
+        'no_users' => 'Sin usuarios',
+        'users' => 'Usuarios',
         'crm' => 'CRM',
         'crm_access' => 'Acceso al CRM',
         'has_crm_access' => 'Tiene acceso al CRM',

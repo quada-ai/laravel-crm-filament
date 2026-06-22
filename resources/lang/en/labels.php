@@ -422,6 +422,8 @@ return [
     'misc' => [
         'unallocated' => 'Unallocated',
         'no_teams' => 'No teams',
+        'no_users' => 'No users',
+        'users' => 'Users',
         'crm' => 'CRM',
         'crm_access' => 'CRM access',
         'has_crm_access' => 'Has CRM access',
