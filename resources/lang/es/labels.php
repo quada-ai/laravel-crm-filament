@@ -343,6 +343,7 @@ return [
         'back_to_quotes' => 'Volver a presupuestos',
         'back_to_deals' => 'Volver a negocios',
         'back_to_people' => 'Volver a personas',
+        'back_to_organizations' => 'Volver a organizaciones',
         'add_organization' => 'Vincular una organización...',
         'add_person' => 'Vincular una persona...',
         'back_to_orders' => 'Volver a pedidos',

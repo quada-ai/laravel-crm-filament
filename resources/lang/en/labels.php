@@ -388,6 +388,7 @@ return [
         'back_to_quotes' => 'Back to quotes',
         'back_to_deals' => 'Back to deals',
         'back_to_people' => 'Back to people',
+        'back_to_organizations' => 'Back to organizations',
         'add_organization' => 'Link an organization...',
         'add_person' => 'Link a person...',
         'back_to_orders' => 'Back to orders',

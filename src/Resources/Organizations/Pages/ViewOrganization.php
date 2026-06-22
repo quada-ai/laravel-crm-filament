@@ -8,6 +8,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 use VentureDrake\LaravelCrmFilament\RelationManagers\RelatedOrganizationsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\RelatedPeopleRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
@@ -16,9 +17,24 @@ class ViewOrganization extends ViewRecord
 {
     protected static string $resource = OrganizationResource::class;
 
+    public function getTitle(): string | Htmlable
+    {
+        return $this->getRecordTitle();
+    }
+
     protected function getHeaderActions(): array
     {
-        return [Actions\EditAction::make()->color('gray')];
+        return [
+            OrganizationResource::backToIndexAction(),
+            Actions\EditAction::make()
+                ->icon('heroicon-m-pencil-square')
+                ->hiddenLabel()
+                ->tooltip('Edit'),
+            Actions\DeleteAction::make()
+                ->icon('heroicon-m-trash')
+                ->hiddenLabel()
+                ->tooltip('Delete'),
+        ];
     }
 
     public function content(Schema $schema): Schema

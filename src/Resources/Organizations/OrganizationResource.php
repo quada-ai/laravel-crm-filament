@@ -5,6 +5,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Organizations;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -322,5 +323,14 @@ class OrganizationResource extends Resource
             'view' => ViewOrganization::route('/{record}'),
             'edit' => EditOrganization::route('/{record}/edit'),
         ];
+    }
+
+    public static function backToIndexAction(): Action
+    {
+        return Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_organizations'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
     }
 }

@@ -343,6 +343,7 @@ return [
         'back_to_quotes' => 'Retour aux devis',
         'back_to_deals' => 'Retour aux affaires',
         'back_to_people' => 'Retour aux personnes',
+        'back_to_organizations' => 'Retour aux organisations',
         'add_organization' => 'Associer une organisation...',
         'add_person' => 'Associer une personne...',
         'back_to_orders' => 'Retour aux commandes',
