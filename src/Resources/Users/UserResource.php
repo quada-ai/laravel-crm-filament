@@ -1,6 +1,6 @@
 <?php
 
-namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users;
+namespace VentureDrake\LaravelCrmFilament\Resources\Users;
 
 use App\Models\User;
 use BackedEnum;
@@ -12,20 +12,21 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Spatie\Permission\Models\Role;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\Pages\CreateUser;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\Pages\EditUser;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\Pages\ListUsers;
+use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\CreateUser;
+use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\EditUser;
+use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\ListUsers;
 
 class UserResource extends Resource
 {
-    protected static ?string $cluster = Settings::class;
-
     protected static ?string $slug = 'users';
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-users';
+
+    protected static string | \UnitEnum | null $navigationGroup = 'Contacts';
+
+    protected static ?int $navigationSort = 50;
 
     public static function getModel(): string
     {

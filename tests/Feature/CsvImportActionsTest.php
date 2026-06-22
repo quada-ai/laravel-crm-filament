@@ -1,6 +1,5 @@
 <?php
 
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\Pages\ListUsers;
 use VentureDrake\LaravelCrmFilament\Concerns\Imports\OrganizationImporter;
 use VentureDrake\LaravelCrmFilament\Concerns\Imports\PersonImporter;
 use VentureDrake\LaravelCrmFilament\Concerns\Imports\ProductImporter;
@@ -9,6 +8,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\ImportsCsv;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\ListOrganizations;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ListPeople;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\ListProducts;
+use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\ListUsers;
 
 /**
  * Structural assertions for the v0.6 CSV import actions.

@@ -25,7 +25,6 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Roles\RoleResour
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\SmsTemplates\SmsTemplateResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\TaxRates\TaxRateResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Timezones\TimezoneResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\UserResource;
 use VentureDrake\LaravelCrmFilament\Pages\CalendarPage;
 use VentureDrake\LaravelCrmFilament\Pages\Dashboard;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\ActivityResource;
@@ -49,6 +48,7 @@ use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResour
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
+use VentureDrake\LaravelCrmFilament\Resources\Users\UserResource;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroContactResource;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroInvoiceResource;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroItemResource;

@@ -1,12 +1,12 @@
 <?php
 
-namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\Pages;
+namespace VentureDrake\LaravelCrmFilament\Resources\Users\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Users\UserResource;
 use VentureDrake\LaravelCrmFilament\Concerns\Imports\UserImporter;
 use VentureDrake\LaravelCrmFilament\Concerns\ImportsCsv;
+use VentureDrake\LaravelCrmFilament\Resources\Users\UserResource;
 
 class ListUsers extends ListRecords
 {
