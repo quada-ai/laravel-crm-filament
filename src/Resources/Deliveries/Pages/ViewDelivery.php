@@ -40,6 +40,10 @@ class ViewDelivery extends ViewRecord
                 ->button()
                 ->hiddenLabel()
                 ->icon('heroicon-m-pencil-square'),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 
