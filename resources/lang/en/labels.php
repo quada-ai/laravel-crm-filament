@@ -388,6 +388,8 @@ return [
         'back_to_quotes' => 'Back to quotes',
         'back_to_deals' => 'Back to deals',
         'back_to_people' => 'Back to people',
+        'add_organization' => 'Add related organization',
+        'add_person' => 'Add related person',
         'back_to_orders' => 'Back to orders',
         'pay' => 'Pay',
         'back_to_invoices' => 'Back to invoices',
@@ -420,4 +422,9 @@ return [
         'complete' => 'Complete',
         'pending' => 'Pending',
     ],
+    'notifications' => [
+        'related_contact_added' => 'Related contact added',
+        'related_contact_removed' => 'Related contact removed',
+    ],
+
 ];

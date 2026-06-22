@@ -33,6 +33,8 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\RelatedOrganizationsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\RelatedPeopleRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
@@ -376,6 +378,8 @@ class PersonResource extends Resource
             CrmMeetingsRelationManager::class,
             CrmLunchesRelationManager::class,
             CrmFilesRelationManager::class,
+            RelatedPeopleRelationManager::class,
+            RelatedOrganizationsRelationManager::class,
         ];
     }
 

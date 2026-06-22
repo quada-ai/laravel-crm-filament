@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use VentureDrake\LaravelCrm\Models\Activity;
+use VentureDrake\LaravelCrm\Models\Contact;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
@@ -120,6 +121,33 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
         // `Unallocated` placeholder until upstream lands the column.
         Team::resolveRelationUsing('ownerUser', function ($model) {
             return $model->belongsTo(User::class, 'user_owner_id');
+        });
+
+        // Core CRM's Person/Organization expose a `contacts()` morphMany that
+        // mixes related-people and related-organizations rows. The Filament
+        // RelationManager contract uses a single `$relationship` per RM, so
+        // register two filtered variants (`relatedPeopleContacts` /
+        // `relatedOrganizationContacts`) that scope the morphMany by the
+        // related entity's morph type. Mirrors the v0.x labels/audits
+        // polyfill pattern.
+        Person::resolveRelationUsing('relatedPeopleContacts', function ($model) {
+            return $model->morphMany(Contact::class, 'contactable')
+                ->where('entityable_type', 'like', '%Person%');
+        });
+
+        Person::resolveRelationUsing('relatedOrganizationContacts', function ($model) {
+            return $model->morphMany(Contact::class, 'contactable')
+                ->where('entityable_type', 'like', '%Organization%');
+        });
+
+        Organization::resolveRelationUsing('relatedPeopleContacts', function ($model) {
+            return $model->morphMany(Contact::class, 'contactable')
+                ->where('entityable_type', 'like', '%Person%');
+        });
+
+        Organization::resolveRelationUsing('relatedOrganizationContacts', function ($model) {
+            return $model->morphMany(Contact::class, 'contactable')
+                ->where('entityable_type', 'like', '%Organization%');
         });
 
         // Core CRM declares `clicks()` on EmailCampaignRecipient / SmsCampaignRecipient

@@ -343,6 +343,8 @@ return [
         'back_to_quotes' => 'Retour aux devis',
         'back_to_deals' => 'Retour aux affaires',
         'back_to_people' => 'Retour aux personnes',
+        'add_organization' => 'Ajouter une organisation liée',
+        'add_person' => 'Ajouter une personne liée',
         'back_to_orders' => 'Retour aux commandes',
         'pay' => 'Payer',
         'back_to_invoices' => 'Retour aux factures',
@@ -409,4 +411,9 @@ return [
         'complete' => 'Terminée',
         'pending' => 'En attente',
     ],
+    'notifications' => [
+        'related_contact_added' => 'Contact lié ajouté',
+        'related_contact_removed' => 'Contact lié supprimé',
+    ],
+
 ];
