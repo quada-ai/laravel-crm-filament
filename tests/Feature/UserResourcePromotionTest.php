@@ -31,7 +31,7 @@ it('declares navigationSort=50 on UserResource', function () {
 });
 
 it('routes its three pages under the new namespace', function () {
-    expect(array_keys(UserResource::getPages()))->toEqual(['index', 'create', 'edit']);
+    expect(array_keys(UserResource::getPages()))->toEqual(['index', 'create', 'view', 'edit']);
     foreach ([CreateUser::class, EditUser::class, ListUsers::class] as $page) {
         expect($page)->toStartWith('VentureDrake\\LaravelCrmFilament\\Resources\\Users\\Pages\\');
         $reflection = new ReflectionProperty($page, 'resource');

@@ -165,7 +165,7 @@ it('preserves UserResource page registration and getModel hook', function () {
     // Locked-in regression: this story only rewrites table(), not the
     // surrounding Resource scaffolding.
     expect(UserResource::getModel())->toBe(User::class);
-    expect(array_keys(UserResource::getPages()))->toBe(['index', 'create', 'edit']);
+    expect(array_keys(UserResource::getPages()))->toBe(['index', 'create', 'view', 'edit']);
 });
 
 it('end-to-end: the listing renders without error for a freshly seeded user', function () {

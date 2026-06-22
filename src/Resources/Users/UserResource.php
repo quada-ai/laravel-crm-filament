@@ -15,6 +15,7 @@ use Spatie\Permission\Models\Role;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\CreateUser;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\EditUser;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\ListUsers;
+use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\ViewUser;
 
 class UserResource extends Resource
 {
@@ -109,7 +110,11 @@ class UserResource extends Resource
             ->filters([
                 Tables\Filters\TernaryFilter::make('crm_access')->label(__('laravel-crm-filament::labels.misc.has_crm_access')),
             ])
-            ->recordActions([Actions\EditAction::make()])
+            ->recordActions([
+                Actions\ViewAction::make()->button()->hiddenLabel(),
+                Actions\EditAction::make()->button()->hiddenLabel(),
+                Actions\DeleteAction::make()->button()->hiddenLabel(),
+            ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
             ]);
@@ -120,6 +125,7 @@ class UserResource extends Resource
         return [
             'index' => ListUsers::route('/'),
             'create' => CreateUser::route('/create'),
+            'view' => ViewUser::route('/{record}'),
             'edit' => EditUser::route('/{record}/edit'),
         ];
     }
