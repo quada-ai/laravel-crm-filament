@@ -40,6 +40,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 use VentureDrake\LaravelCrmFilament\Resources\Lunches\LunchResource;
 use VentureDrake\LaravelCrmFilament\Resources\Meetings\MeetingResource;
+use VentureDrake\LaravelCrmFilament\Resources\Monitors\MonitorResource;
 use VentureDrake\LaravelCrmFilament\Resources\Notes\NoteResource;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
@@ -260,6 +261,10 @@ class LaravelCrmPlugin implements Plugin
 
         if ($this->isModuleEnabled('features')) {
             $resources[] = FeatureResource::class;
+        }
+
+        if ($this->isModuleEnabled('monitoring')) {
+            $resources[] = MonitorResource::class;
         }
 
         // Products aren't a gated module in core; surface them whenever the panel runs.

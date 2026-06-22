@@ -1,0 +1,251 @@
+<?php
+
+use Filament\Panel;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\LaravelCrmFilamentServiceProvider;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
+use VentureDrake\LaravelCrmFilament\RelationManagers\MonitorChecksRelationManager;
+use VentureDrake\LaravelCrmFilament\Resources\Monitors\MonitorResource;
+use VentureDrake\LaravelCrmFilament\Resources\Monitors\Pages\CreateMonitor;
+use VentureDrake\LaravelCrmFilament\Resources\Monitors\Pages\EditMonitor;
+use VentureDrake\LaravelCrmFilament\Resources\Monitors\Pages\ListMonitors;
+use VentureDrake\LaravelCrmFilament\Resources\Monitors\Pages\ViewMonitor;
+
+it('binds MonitorResource to the Monitor model with external_id routing and the monitors slug', function () {
+    expect(MonitorResource::getModel())->toBe('VentureDrake\\LaravelCrm\\Models\\Monitor');
+    expect(MonitorResource::getSlug())->toBe('monitors');
+    expect(MonitorResource::getRecordRouteKeyName())->toBe('external_id');
+});
+
+it('uses ONLY the UsesExternalIdRouting trait (not HasLabels/HasCrmCustomFields/HasCrmActivities/HasPrimaryBulkActions)', function () {
+    $traits = class_uses_recursive(MonitorResource::class);
+
+    expect($traits)->toContain(UsesExternalIdRouting::class);
+    // Monitor does NOT carry these traits per AC
+    expect($traits)->not->toContain(HasLabels::class);
+    expect($traits)->not->toContain(HasCrmCustomFields::class);
+    expect($traits)->not->toContain(HasCrmCustomFieldEntries::class);
+    expect($traits)->not->toContain(HasPrimaryBulkActions::class);
+});
+
+it('exposes list, create, view, and edit pages on MonitorResource', function () {
+    expect(array_keys(MonitorResource::getPages()))
+        ->toEqual(['index', 'create', 'view', 'edit']);
+});
+
+it('routes Monitor page classes back to MonitorResource', function () {
+    foreach ([CreateMonitor::class, EditMonitor::class, ListMonitors::class, ViewMonitor::class] as $page) {
+        $reflection = new ReflectionProperty($page, 'resource');
+        $reflection->setAccessible(true);
+        expect($reflection->getValue())->toBe(MonitorResource::class);
+    }
+});
+
+it('declares all AC-named form fields: name nullable, description, type/method Selects, url, headers KeyValue, interval, timeout, expected_status_code, perf_threshold_ms, downtime_minutes_before_alert, is_active, uptime_enabled, ssl_enabled, user_owner_id, user_assigned_id', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    expect($source)->toContain("Forms\\Components\\TextInput::make('name')");
+    expect($source)->toContain("Forms\\Components\\Textarea::make('description')");
+    expect($source)->toContain("Forms\\Components\\Select::make('type')");
+    expect($source)->toContain("Forms\\Components\\Select::make('method')");
+    expect($source)->toContain("Forms\\Components\\TextInput::make('url')");
+    expect($source)->toContain("Forms\\Components\\KeyValue::make('headers')");
+    expect($source)->toContain("Forms\\Components\\TextInput::make('interval')");
+    expect($source)->toContain("Forms\\Components\\TextInput::make('timeout')");
+    expect($source)->toContain("Forms\\Components\\TextInput::make('expected_status_code')");
+    expect($source)->toContain("Forms\\Components\\TextInput::make('perf_threshold_ms')");
+    expect($source)->toContain("Forms\\Components\\TextInput::make('downtime_minutes_before_alert')");
+    expect($source)->toContain("Forms\\Components\\Toggle::make('is_active')");
+    expect($source)->toContain("Forms\\Components\\Toggle::make('uptime_enabled')");
+    expect($source)->toContain("Forms\\Components\\Toggle::make('ssl_enabled')");
+    expect($source)->toContain("Forms\\Components\\Select::make('user_owner_id')");
+    expect($source)->toContain("Forms\\Components\\Select::make('user_assigned_id')");
+});
+
+it('does NOT make name required (nullable per AC since Monitor model declared name as nullable)', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    // name has no ->required() chain.  The regex captures the make('name') call and a few lines after, then asserts ->required() does NOT appear in that vicinity.
+    expect($source)->toMatch("/Forms\\\\Components\\\\TextInput::make\\('name'\\)[^;]{0,200}->maxLength\\(255\\)/");
+    // url IS required
+    expect($source)->toMatch("/Forms\\\\Components\\\\TextInput::make\\('url'\\)[\\s\\S]{0,200}->required\\(\\)/");
+});
+
+it('renders the AC table columns in source: name, url, type, last_status, last_response_time, last_checked_at, is_active, uptime_enabled, ssl_enabled, ownerUser.name, created_at', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    expect($source)->toContain("Tables\\Columns\\TextColumn::make('name')");
+    expect($source)->toContain("Tables\\Columns\\TextColumn::make('url')");
+    expect($source)->toContain("Tables\\Columns\\TextColumn::make('type')");
+    expect($source)->toContain("Tables\\Columns\\TextColumn::make('last_status')");
+    expect($source)->toContain("Tables\\Columns\\TextColumn::make('last_response_time')");
+    expect($source)->toContain("Tables\\Columns\\TextColumn::make('last_checked_at')");
+    expect($source)->toContain("Tables\\Columns\\IconColumn::make('is_active')");
+    expect($source)->toContain("Tables\\Columns\\IconColumn::make('uptime_enabled')");
+    expect($source)->toContain("Tables\\Columns\\IconColumn::make('ssl_enabled')");
+    expect($source)->toContain("Tables\\Columns\\TextColumn::make('ownerUser.name')");
+    expect($source)->toContain("Tables\\Columns\\TextColumn::make('created_at')");
+});
+
+it('renders columns in the expected order: name, url, type, last_status, last_response_time, last_checked_at, is_active, uptime_enabled, ssl_enabled, ownerUser.name, created_at', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    // Find the first occurrence of each column's make() declaration.
+    $names = [
+        'name', 'url', 'type', 'last_status', 'last_response_time', 'last_checked_at',
+        'is_active', 'uptime_enabled', 'ssl_enabled', 'ownerUser.name', 'created_at',
+    ];
+    $positions = [];
+    foreach ($names as $col) {
+        // First occurrence of either TextColumn::make('col') or IconColumn::make('col')
+        $textPos = strpos($source, "TextColumn::make('{$col}')");
+        $iconPos = strpos($source, "IconColumn::make('{$col}')");
+        $pos = false;
+        if ($textPos !== false && $iconPos !== false) {
+            $pos = min($textPos, $iconPos);
+        } elseif ($textPos !== false) {
+            $pos = $textPos;
+        } elseif ($iconPos !== false) {
+            $pos = $iconPos;
+        }
+        expect($pos)->not->toBe(false, "Column {$col} not found");
+        $positions[$col] = $pos;
+    }
+    $sorted = $positions;
+    asort($sorted);
+    expect(array_keys($sorted))->toBe($names);
+});
+
+it('maps the last_status badge color: up=success, down=danger, slow=warning, null=gray', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    expect($source)->toContain("'up' => 'success'");
+    expect($source)->toContain("'down' => 'danger'");
+    expect($source)->toContain("'slow' => 'warning'");
+    expect($source)->toContain("default => 'gray'");
+});
+
+it('declares default sort created_at desc and uses ->since() for last_checked_at and created_at', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    expect($source)->toContain("->defaultSort('created_at', 'desc')");
+    expect($source)->toContain('->since()');
+});
+
+it('registers type, last_status, is_active, ssl_enabled, and user_owner_id filters on the table', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    expect($source)->toContain("Tables\\Filters\\SelectFilter::make('type')");
+    expect($source)->toContain("Tables\\Filters\\SelectFilter::make('last_status')");
+    expect($source)->toContain("Tables\\Filters\\TernaryFilter::make('is_active')");
+    expect($source)->toContain("Tables\\Filters\\TernaryFilter::make('ssl_enabled')");
+    expect($source)->toContain("Tables\\Filters\\SelectFilter::make('user_owner_id')");
+});
+
+it('registers View, Edit, Delete record actions with Delete requiring confirmation', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    expect($source)->toMatch('/recordActions\\(\\[(?:\\s|\\S)*?Actions\\\\ViewAction::make\\(\\)(?:\\s|\\S)*?Actions\\\\EditAction::make\\(\\)(?:\\s|\\S)*?Actions\\\\DeleteAction::make\\(\\)(?:\\s|\\S)*?->requiresConfirmation\\(\\)/');
+});
+
+it('returns exactly [MonitorChecksRelationManager, AuditsRelationManager] from getRelations()', function () {
+    expect(MonitorResource::getRelations())->toEqual([
+        MonitorChecksRelationManager::class,
+        AuditsRelationManager::class,
+    ]);
+});
+
+it('declares an infolist override with Details + SSL + Status sections', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    $reflection = new ReflectionMethod(MonitorResource::class, 'infolist');
+    expect($reflection->getDeclaringClass()->getName())->toBe(MonitorResource::class);
+
+    expect($source)->toContain("Section::make(__('laravel-crm-filament::labels.sections.details'))");
+    expect($source)->toContain("Section::make(__('laravel-crm-filament::labels.sections.ssl'))");
+    expect($source)->toContain("Section::make(__('laravel-crm-filament::labels.sections.status'))");
+});
+
+it('gates the SSL section on ssl_enabled being true', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    // Section::make(...ssl...) ... ->hidden(... ssl_enabled ...)
+    expect($source)->toMatch("/Section::make\\(__\\('laravel-crm-filament::labels.sections.ssl'\\)\\)[\\s\\S]*?->hidden\\(/");
+    expect($source)->toContain('ssl_enabled');
+});
+
+it('routes Create/Edit pages through MonitorService::create() and update() so URL normalization fires', function () {
+    $createSource = file_get_contents((new ReflectionClass(CreateMonitor::class))->getFileName());
+    $editSource = file_get_contents((new ReflectionClass(EditMonitor::class))->getFileName());
+
+    expect($createSource)->toContain('MonitorService::class');
+    expect($createSource)->toContain('->create(');
+
+    expect($editSource)->toContain('MonitorService::class');
+    expect($editSource)->toContain('->update(');
+});
+
+it('overrides ViewMonitor::content() with the canonical 2-col Grid (infolist left, RMs right)', function () {
+    $source = file_get_contents((new ReflectionClass(ViewMonitor::class))->getFileName());
+
+    expect($source)->toContain("Grid::make(['default' => 1, 'lg' => 2])");
+    expect($source)->toContain('getInfolistContentComponent()');
+    expect($source)->toContain('getRelationManagersContentComponent()');
+    expect($source)->toContain("->columnSpan(['lg' => 1])");
+
+    $reflection = new ReflectionMethod(ViewMonitor::class, 'content');
+    expect($reflection->getDeclaringClass()->getName())->toBe(ViewMonitor::class);
+});
+
+it('ViewMonitor::getHeaderActions() returns Back, Edit, Delete in that order', function () {
+    $source = file_get_contents((new ReflectionClass(ViewMonitor::class))->getFileName());
+
+    expect($source)->toContain('MonitorResource::backToIndexAction()');
+    expect($source)->toContain('Actions\\EditAction::make()');
+    expect($source)->toContain('Actions\\DeleteAction::make()');
+
+    $backPos = strpos($source, 'MonitorResource::backToIndexAction()');
+    $editPos = strpos($source, 'Actions\\EditAction::make()');
+    $deletePos = strpos($source, 'Actions\\DeleteAction::make()');
+
+    expect($backPos)->toBeLessThan($editPos);
+    expect($editPos)->toBeLessThan($deletePos);
+});
+
+it('declares backToIndexAction factory on MonitorResource', function () {
+    expect(method_exists(MonitorResource::class, 'backToIndexAction'))->toBeTrue();
+
+    $reflection = new ReflectionMethod(MonitorResource::class, 'backToIndexAction');
+    expect($reflection->isStatic())->toBeTrue();
+    expect($reflection->isPublic())->toBeTrue();
+});
+
+it('gates MonitorResource registration on the monitoring module flag', function () {
+    // With the monitoring module on, the resource should be registered.
+    $plugin = LaravelCrmPlugin::make()->modules(['monitoring' => true]);
+    $panel = Panel::make()->id('admin-monitoring-on')->default();
+    $plugin->register($panel);
+
+    expect($panel->getResources())->toContain(MonitorResource::class);
+
+    // With the monitoring module off, the resource should NOT be registered.
+    $plugin = LaravelCrmPlugin::make()->modules(['monitoring' => false]);
+    $panel = Panel::make()->id('admin-monitoring-off')->default();
+    $plugin->register($panel);
+
+    expect($panel->getResources())->not->toContain(MonitorResource::class);
+});
+
+it('adds Monitor::class to auditableModels() ONLY (not timelineActivityModels)', function () {
+    expect(LaravelCrmFilamentServiceProvider::auditableModels())
+        ->toContain('VentureDrake\\LaravelCrm\\Models\\Monitor');
+
+    // Monitor has no HasCrmActivities trait, so it must NOT be in timelineActivityModels()
+    expect(LaravelCrmFilamentServiceProvider::timelineActivityModels())
+        ->not->toContain('VentureDrake\\LaravelCrm\\Models\\Monitor');
+});

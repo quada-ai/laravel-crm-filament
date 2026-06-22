@@ -116,6 +116,29 @@ return [
         'submitted_by' => 'Soumis par',
         'admin_reply' => 'Réponse admin',
         'voted_at' => 'Voté le',
+        'method' => 'Méthode',
+        'url' => 'URL',
+        'host' => 'Hôte',
+        'headers' => 'En-têtes',
+        'body' => 'Corps',
+        'expected_status_code' => 'Code de statut attendu',
+        'interval' => 'Intervalle (minutes)',
+        'timeout' => 'Délai (secondes)',
+        'is_active' => 'Actif',
+        'uptime_enabled' => 'Surveillance de disponibilité activée',
+        'ssl_enabled' => 'Surveillance SSL activée',
+        'perf_threshold_ms' => 'Seuil de performance (ms)',
+        'downtime_minutes_before_alert' => 'Minutes d\'arrêt avant alerte',
+        'last_status' => 'Dernier statut',
+        'last_response_time' => 'Dernier temps de réponse (ms)',
+        'last_status_code' => 'Dernier code de statut',
+        'last_checked_at' => 'Dernière vérification',
+        'last_status_changed_at' => 'Dernier changement de statut',
+        'down_since_at' => 'Hors service depuis',
+        'ssl_status' => 'Statut SSL',
+        'ssl_issuer' => 'Émetteur SSL',
+        'ssl_expires_at' => 'SSL expire le',
+        'ssl_last_checked_at' => 'SSL dernière vérification',
     ],
 
     'contact' => [
@@ -156,6 +179,8 @@ return [
         'delivery_instructions' => 'Instructions de livraison',
         'shipping_address' => 'Adresse de livraison',
         'features' => 'Fonctionnalités',
+        'monitoring' => 'Surveillance',
+        'monitors' => 'Moniteurs',
     ],
 
     'money' => [
@@ -293,6 +318,11 @@ return [
         'two_factor_authentication' => 'Authentification à deux facteurs',
         'browser_sessions' => 'Sessions de navigateur',
         'identity' => 'Identité',
+        'monitor_settings' => 'Paramètres du moniteur',
+        'request' => 'Requête',
+        'thresholds' => 'Seuils',
+        'ssl' => 'SSL',
+        'status' => 'Statut',
     ],
 
     'actions' => [
@@ -375,6 +405,7 @@ return [
         'purchase_order' => 'Bon de commande',
         'delivery' => 'Livraison',
         'upload' => 'Téléverser',
+        'back_to_monitors' => 'Retour aux moniteurs',
     ],
 
     'import' => [

@@ -117,6 +117,29 @@ return [
         'submitted_by' => 'Submitted by',
         'admin_reply' => 'Admin reply',
         'voted_at' => 'Voted at',
+        'method' => 'Method',
+        'url' => 'URL',
+        'host' => 'Host',
+        'headers' => 'Headers',
+        'body' => 'Body',
+        'expected_status_code' => 'Expected status code',
+        'interval' => 'Interval (minutes)',
+        'timeout' => 'Timeout (seconds)',
+        'is_active' => 'Active',
+        'uptime_enabled' => 'Uptime monitoring enabled',
+        'ssl_enabled' => 'SSL monitoring enabled',
+        'perf_threshold_ms' => 'Performance threshold (ms)',
+        'downtime_minutes_before_alert' => 'Downtime minutes before alert',
+        'last_status' => 'Last status',
+        'last_response_time' => 'Last response time (ms)',
+        'last_status_code' => 'Last status code',
+        'last_checked_at' => 'Last checked at',
+        'last_status_changed_at' => 'Last status changed at',
+        'down_since_at' => 'Down since',
+        'ssl_status' => 'SSL status',
+        'ssl_issuer' => 'SSL issuer',
+        'ssl_expires_at' => 'SSL expires at',
+        'ssl_last_checked_at' => 'SSL last checked at',
     ],
 
     // Contact / address fields
@@ -159,6 +182,8 @@ return [
         'delivery_instructions' => 'Delivery instructions',
         'shipping_address' => 'Shipping address',
         'features' => 'Features',
+        'monitoring' => 'Monitoring',
+        'monitors' => 'Monitors',
     ],
 
     // Money / orders / lines
@@ -337,6 +362,11 @@ return [
         'two_factor_authentication' => 'Two-factor authentication',
         'browser_sessions' => 'Browser sessions',
         'identity' => 'Identity',
+        'monitor_settings' => 'Monitor settings',
+        'request' => 'Request',
+        'thresholds' => 'Thresholds',
+        'ssl' => 'SSL',
+        'status' => 'Status',
     ],
 
     // Actions
@@ -420,6 +450,7 @@ return [
         'purchase_order' => 'Purchase Order',
         'delivery' => 'Delivery',
         'upload' => 'Upload',
+        'back_to_monitors' => 'Back to monitors',
     ],
 
     // CSV import

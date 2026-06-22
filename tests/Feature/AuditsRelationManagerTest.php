@@ -82,9 +82,10 @@ it('lists models considered auditable by the plugin', function () {
 
     expect($auditable)->toContain(Lead::class, Deal::class, Quote::class, Order::class, Invoice::class)
         ->and($auditable)->toContain(Delivery::class, PurchaseOrder::class, Person::class, Organization::class, Product::class)
-        ->and($auditable)->toContain('VentureDrake\\LaravelCrm\\Models\\Feature');
-    // Feature was added in US-003 (features+monitors series) so the list is now 11.
-    expect(count($auditable))->toBe(11);
+        ->and($auditable)->toContain('VentureDrake\\LaravelCrm\\Models\\Feature')
+        ->and($auditable)->toContain('VentureDrake\\LaravelCrm\\Models\\Monitor');
+    // Feature was added in US-003 + Monitor in US-006 (features+monitors series) so the list is now 12.
+    expect(count($auditable))->toBe(12);
 });
 
 it('filters the audit feed by auditable_type and auditable_id', function () {

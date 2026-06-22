@@ -19,6 +19,7 @@ use VentureDrake\LaravelCrm\Models\Feature;
 use VentureDrake\LaravelCrm\Models\Invoice;
 use VentureDrake\LaravelCrm\Models\Label;
 use VentureDrake\LaravelCrm\Models\Lead;
+use VentureDrake\LaravelCrm\Models\Monitor;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Organization;
 use VentureDrake\LaravelCrm\Models\Person;
@@ -245,6 +246,7 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             Organization::class,
             Product::class,
             Feature::class,
+            Monitor::class,
         ];
     }
 

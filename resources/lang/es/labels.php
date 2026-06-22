@@ -116,6 +116,29 @@ return [
         'submitted_by' => 'Enviado por',
         'admin_reply' => 'Respuesta admin',
         'voted_at' => 'Votado el',
+        'method' => 'Método',
+        'url' => 'URL',
+        'host' => 'Host',
+        'headers' => 'Encabezados',
+        'body' => 'Cuerpo',
+        'expected_status_code' => 'Código de estado esperado',
+        'interval' => 'Intervalo (minutos)',
+        'timeout' => 'Tiempo de espera (segundos)',
+        'is_active' => 'Activo',
+        'uptime_enabled' => 'Monitoreo de disponibilidad habilitado',
+        'ssl_enabled' => 'Monitoreo SSL habilitado',
+        'perf_threshold_ms' => 'Umbral de rendimiento (ms)',
+        'downtime_minutes_before_alert' => 'Minutos de inactividad antes de alerta',
+        'last_status' => 'Último estado',
+        'last_response_time' => 'Último tiempo de respuesta (ms)',
+        'last_status_code' => 'Último código de estado',
+        'last_checked_at' => 'Última verificación',
+        'last_status_changed_at' => 'Último cambio de estado',
+        'down_since_at' => 'Inactivo desde',
+        'ssl_status' => 'Estado SSL',
+        'ssl_issuer' => 'Emisor SSL',
+        'ssl_expires_at' => 'SSL expira el',
+        'ssl_last_checked_at' => 'SSL última verificación',
     ],
 
     'contact' => [
@@ -156,6 +179,8 @@ return [
         'delivery_instructions' => 'Instrucciones de entrega',
         'shipping_address' => 'Dirección de envío',
         'features' => 'Características',
+        'monitoring' => 'Monitoreo',
+        'monitors' => 'Monitores',
     ],
 
     'money' => [
@@ -293,6 +318,11 @@ return [
         'two_factor_authentication' => 'Autenticación de dos factores',
         'browser_sessions' => 'Sesiones del navegador',
         'identity' => 'Identidad',
+        'monitor_settings' => 'Configuración del monitor',
+        'request' => 'Solicitud',
+        'thresholds' => 'Umbrales',
+        'ssl' => 'SSL',
+        'status' => 'Estado',
     ],
 
     'actions' => [
@@ -375,6 +405,7 @@ return [
         'purchase_order' => 'Orden de compra',
         'delivery' => 'Entrega',
         'upload' => 'Subir',
+        'back_to_monitors' => 'Volver a monitores',
     ],
 
     'import' => [
