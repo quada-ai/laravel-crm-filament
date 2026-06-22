@@ -3,14 +3,26 @@
 namespace VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders;
 
 use BackedEnum;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
+use VentureDrake\LaravelCrm\Mail\SendPurchaseOrder;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LineItemsRepeater;
@@ -178,6 +190,19 @@ class PurchaseOrderResource extends Resource
                     ->preload(),
             ])
             ->recordActions([
+                static::sendPurchaseOrderActionFactory()
+                    ->button()
+                    ->label(__('laravel-crm-filament::labels.actions.send'))
+                    ->color('gray'),
+                static::downloadPurchaseOrderPdfActionFactory()
+                    ->button()
+                    ->hiddenLabel()
+                    ->icon('heroicon-m-arrow-down-tray'),
+                static::purchaseOrderPortalActionFactory()
+                    ->button()
+                    ->hiddenLabel()
+                    ->icon('heroicon-m-arrow-top-right-on-square')
+                    ->color('gray'),
                 Actions\ViewAction::make()
                     ->button()
                     ->hiddenLabel(),
@@ -300,9 +325,109 @@ class PurchaseOrderResource extends Resource
         ];
     }
 
-    public static function backToIndexAction(): Actions\Action
+    public static function sendPurchaseOrderActionFactory(): Action
     {
-        return Actions\Action::make('backToIndex')
+        return Action::make('send')
+            ->label(__('laravel-crm-filament::labels.actions.send'))
+            ->icon('heroicon-o-paper-airplane')
+            ->color('success')
+            ->modalHeading('Send purchase order')
+            ->modalSubmitActionLabel('Send')
+            ->schema(fn (PurchaseOrder $record): array => [
+                TextInput::make('to')
+                    ->label(__('laravel-crm-filament::labels.campaign.to'))
+                    ->email()
+                    ->required(),
+                TextInput::make('subject')
+                    ->required()
+                    ->default(fn () => 'Purchase Order ' . $record->purchase_order_id),
+                Textarea::make('message')
+                    ->rows(8)
+                    ->default("Hi,\n\nPlease find the purchase order here: [Online Purchase Order Link]\n\nThanks."),
+                Checkbox::make('cc')
+                    ->label(__('laravel-crm-filament::labels.campaign.send_me_a_copy')),
+            ])
+            ->action(function (array $data, PurchaseOrder $record): void {
+                static::dispatchPurchaseOrderSend($record, $data);
+
+                Notification::make()
+                    ->title('Purchase order sent')
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public static function purchaseOrderPortalActionFactory(): Action
+    {
+        return Action::make('previewPortal')
+            ->label(__('laravel-crm-filament::labels.actions.preview_portal'))
+            ->icon('heroicon-o-arrow-top-right-on-square')
+            ->color('primary')
+            ->url(fn (PurchaseOrder $record): string => url('p/purchase-orders/' . $record->external_id))
+            ->openUrlInNewTab();
+    }
+
+    public static function downloadPurchaseOrderPdfActionFactory(): Action
+    {
+        return Action::make('downloadPdf')
+            ->label(__('laravel-crm-filament::labels.actions.download_pdf'))
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('gray')
+            ->action(function (PurchaseOrder $record) {
+                $relative = static::renderPurchaseOrderPdfToDisk($record);
+
+                return Response::download(
+                    storage_path($relative),
+                    'purchase-order-' . strtolower((string) ($record->purchase_order_id ?? $record->external_id)) . '.pdf',
+                );
+            });
+    }
+
+    protected static function dispatchPurchaseOrderSend(PurchaseOrder $record, array $data): void
+    {
+        $signedUrl = Route::has('laravel-crm.portal.purchase-orders.show')
+            ? URL::temporarySignedRoute('laravel-crm.portal.purchase-orders.show', now()->addDays(14), ['purchaseOrder' => $record])
+            : url('p/purchase-orders/' . $record->external_id);
+
+        $pdfPath = static::renderPurchaseOrderPdfToDisk($record);
+
+        Mail::send(new SendPurchaseOrder([
+            'to' => $data['to'],
+            'subject' => $data['subject'],
+            'message' => $data['message'],
+            'cc' => ! empty($data['cc']) ? 1 : 0,
+            'onlinePurchaseOrderLink' => $signedUrl,
+            'pdf' => $pdfPath,
+        ]));
+    }
+
+    protected static function renderPurchaseOrderPdfToDisk(PurchaseOrder $record): string
+    {
+        $settings = app('laravel-crm.settings');
+
+        $data = [
+            'purchaseOrder' => $record,
+            'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
+            'fromName' => $settings->get('organization_name'),
+            'logo' => $settings->get('logo_file'),
+        ];
+
+        $relativeDir = 'laravel-crm/purchaseorder/' . $record->id;
+        Storage::makeDirectory($relativeDir);
+
+        $filename = 'purchase-order-' . strtolower((string) ($record->purchase_order_id ?? $record->external_id)) . '.pdf';
+        $pdfRelative = 'app/' . $relativeDir . '/' . $filename;
+
+        Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
+            ->loadView('laravel-crm::purchase-orders.pdf', $data)
+            ->save(storage_path($pdfRelative));
+
+        return $pdfRelative;
+    }
+
+    public static function backToIndexAction(): Action
+    {
+        return Action::make('backToIndex')
             ->label(__('laravel-crm-filament::labels.actions.back_to_purchase_orders'))
             ->color('gray')
             ->icon('heroicon-o-arrow-left')
