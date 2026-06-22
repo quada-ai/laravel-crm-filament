@@ -148,6 +148,20 @@ class LaravelCrmPlugin implements Plugin
         return $this;
     }
 
+    public function withFeatures(bool $enabled = true): static
+    {
+        $this->modules['features'] = $enabled;
+
+        return $this;
+    }
+
+    public function withMonitoring(bool $enabled = true): static
+    {
+        $this->modules['monitoring'] = $enabled;
+
+        return $this;
+    }
+
     public function withDashboard(bool $enabled = true): static
     {
         $this->registerDashboard = $enabled;
@@ -259,14 +273,6 @@ class LaravelCrmPlugin implements Plugin
             $resources[] = CustomerResource::class;
         }
 
-        if ($this->isModuleEnabled('features')) {
-            $resources[] = FeatureResource::class;
-        }
-
-        if ($this->isModuleEnabled('monitoring')) {
-            $resources[] = MonitorResource::class;
-        }
-
         // Products aren't a gated module in core; surface them whenever the panel runs.
         $resources[] = ProductResource::class;
 
@@ -318,6 +324,16 @@ class LaravelCrmPlugin implements Plugin
             $resources[] = XeroItemResource::class;
             $resources[] = XeroInvoiceResource::class;
             $resources[] = XeroPurchaseOrderResource::class;
+        }
+
+        // Roadmap + monitoring resources are registered LAST so a class-not-found in either's
+        // upstream model doesn't short-circuit the panel boot before its other resources land.
+        if ($this->isModuleEnabled('features')) {
+            $resources[] = FeatureResource::class;
+        }
+
+        if ($this->isModuleEnabled('monitoring')) {
+            $resources[] = MonitorResource::class;
         }
 
         // Branding overrides: prefer plugin setters, fall back to laravel-crm settings.

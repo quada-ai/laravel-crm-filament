@@ -411,6 +411,8 @@ return [
         'upload' => 'Subir',
         'back_to_monitors' => 'Volver a monitores',
         'run_check_now' => 'Ejecutar verificación ahora',
+        'add_comment' => 'Añadir comentario',
+        'add_status' => 'Añadir estado',
     ],
 
     'import' => [

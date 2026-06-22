@@ -456,6 +456,8 @@ return [
         'upload' => 'Upload',
         'back_to_monitors' => 'Back to monitors',
         'run_check_now' => 'Run check now',
+        'add_comment' => 'Add comment',
+        'add_status' => 'Add status',
     ],
 
     // CSV import

@@ -411,6 +411,8 @@ return [
         'upload' => 'Téléverser',
         'back_to_monitors' => 'Retour aux moniteurs',
         'run_check_now' => 'Exécuter la vérification maintenant',
+        'add_comment' => 'Ajouter un commentaire',
+        'add_status' => 'Ajouter un statut',
     ],
 
     'import' => [
