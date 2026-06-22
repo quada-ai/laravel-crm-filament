@@ -35,6 +35,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\FeatureCommentsRelationMana
 use VentureDrake\LaravelCrmFilament\RelationManagers\FeatureVotersRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\CreateFeature;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\EditFeature;
+use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\FeatureKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\ListFeatures;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\ViewFeature;
 
@@ -274,6 +275,7 @@ class FeatureResource extends Resource
     {
         return [
             'index' => ListFeatures::route('/'),
+            'kanban' => FeatureKanban::route('/kanban'),
             'create' => CreateFeature::route('/create'),
             'view' => ViewFeature::route('/{record}'),
             'edit' => EditFeature::route('/{record}/edit'),
@@ -385,7 +387,7 @@ class FeatureResource extends Resource
                 ->view('laravel-crm-filament::components.list-kanban-toggle', [
                     'current' => $current,
                     'listUrl' => static::getUrl('index'),
-                    'kanbanUrl' => static::getUrl('index'),
+                    'kanbanUrl' => static::getUrl('kanban'),
                 ]),
         ];
     }

@@ -2,6 +2,8 @@
 
 use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\DealKanban;
+use VentureDrake\LaravelCrmFilament\Resources\Features\FeatureResource;
+use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\FeatureKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\Pages\LeadKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\QuoteKanban;
@@ -11,6 +13,7 @@ dataset('kanbanPages', [
     'Lead' => [LeadKanban::class, LeadResource::class, 'moveLead'],
     'Deal' => [DealKanban::class, DealResource::class, 'moveDeal'],
     'Quote' => [QuoteKanban::class, QuoteResource::class, 'moveQuote'],
+    'Feature' => [FeatureKanban::class, FeatureResource::class, 'moveFeature'],
 ]);
 
 it('declares each kanban page as a sub-resource page', function (string $page, string $resource) {

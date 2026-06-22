@@ -40,9 +40,9 @@ it('uses the shared trait family (UsesExternalIdRouting, HasLabels, HasCrmCustom
     expect($traits)->toContain(HasPrimaryBulkActions::class);
 });
 
-it('exposes list, create, view, and edit pages on FeatureResource', function () {
+it('exposes list, kanban, create, view, and edit pages on FeatureResource', function () {
     expect(array_keys(FeatureResource::getPages()))
-        ->toEqual(['index', 'create', 'view', 'edit']);
+        ->toEqual(['index', 'kanban', 'create', 'view', 'edit']);
 });
 
 it('routes Feature page classes back to FeatureResource', function () {

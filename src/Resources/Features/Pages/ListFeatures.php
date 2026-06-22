@@ -13,6 +13,7 @@ class ListFeatures extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            ...FeatureResource::listKanbanToggleActions('list'),
             Actions\CreateAction::make(),
         ];
     }
