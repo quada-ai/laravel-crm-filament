@@ -16,8 +16,8 @@ class ViewPerson extends ViewRecord
     {
         return [
             PersonResource::backToIndexAction(),
-            Actions\EditAction::make(),
-            Actions\DeleteAction::make(),
+            Actions\EditAction::make()->iconButton(),
+            Actions\DeleteAction::make()->iconButton(),
         ];
     }
 
