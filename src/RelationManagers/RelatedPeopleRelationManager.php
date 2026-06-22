@@ -9,7 +9,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Contact;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
@@ -19,16 +18,6 @@ class RelatedPeopleRelationManager extends RelationManager
     protected static string $relationship = 'relatedPeopleContacts';
 
     protected static ?string $title = 'Related people';
-
-    public function canCreate(): bool
-    {
-        return true;
-    }
-
-    public function canDelete(Model $record): bool
-    {
-        return true;
-    }
 
     public function form(Schema $schema): Schema
     {
@@ -83,6 +72,7 @@ class RelatedPeopleRelationManager extends RelationManager
             ])
             ->headerActions([
                 Actions\CreateAction::make()
+                    ->authorize(fn (): bool => true)
                     ->icon('heroicon-m-plus')
                     ->hiddenLabel()
                     ->tooltip(__('laravel-crm-filament::labels.actions.add_person'))
@@ -115,6 +105,7 @@ class RelatedPeopleRelationManager extends RelationManager
             ])
             ->recordActions([
                 Actions\DeleteAction::make()
+                    ->authorize(fn (): bool => true)
                     ->icon('heroicon-m-x-mark')
                     ->hiddenLabel()
                     ->tooltip('Remove')

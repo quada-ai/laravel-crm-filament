@@ -9,7 +9,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Contact;
 use VentureDrake\LaravelCrm\Models\Organization;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
@@ -19,16 +18,6 @@ class RelatedOrganizationsRelationManager extends RelationManager
     protected static string $relationship = 'relatedOrganizationContacts';
 
     protected static ?string $title = 'Related organizations';
-
-    public function canCreate(): bool
-    {
-        return true;
-    }
-
-    public function canDelete(Model $record): bool
-    {
-        return true;
-    }
 
     public function form(Schema $schema): Schema
     {
@@ -67,6 +56,7 @@ class RelatedOrganizationsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Actions\CreateAction::make()
+                    ->authorize(fn (): bool => true)
                     ->icon('heroicon-m-plus')
                     ->hiddenLabel()
                     ->tooltip(__('laravel-crm-filament::labels.actions.add_organization'))
@@ -95,6 +85,7 @@ class RelatedOrganizationsRelationManager extends RelationManager
             ])
             ->recordActions([
                 Actions\DeleteAction::make()
+                    ->authorize(fn (): bool => true)
                     ->icon('heroicon-m-x-mark')
                     ->hiddenLabel()
                     ->tooltip('Remove')
