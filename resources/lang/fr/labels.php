@@ -89,6 +89,13 @@ return [
         'phone' => 'Téléphone',
         'addresses' => 'Adresses',
         'terms' => 'Conditions',
+        'open_deals' => 'Affaires ouvertes',
+        'lost_deals' => 'Affaires perdues',
+        'won_deals' => 'Affaires gagnées',
+        'next_activity' => 'Prochaine activité',
+        'last_online' => 'Dernière connexion',
+        'role' => 'Rôle',
+        'crm_access' => 'Accès au CRM',
     ],
 
     'contact' => [

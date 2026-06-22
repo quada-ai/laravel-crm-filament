@@ -90,6 +90,13 @@ return [
         'phone' => 'Phone',
         'addresses' => 'Addresses',
         'terms' => 'Terms',
+        'open_deals' => 'Open deals',
+        'lost_deals' => 'Lost deals',
+        'won_deals' => 'Won deals',
+        'next_activity' => 'Next activity',
+        'last_online' => 'Last online',
+        'role' => 'Role',
+        'crm_access' => 'CRM access',
     ],
 
     // Contact / address fields
