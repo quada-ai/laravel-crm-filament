@@ -36,7 +36,7 @@ class CrmTeamResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'CRM Teams';
+        return 'Teams';
     }
 
     public static function form(Schema $schema): Schema
