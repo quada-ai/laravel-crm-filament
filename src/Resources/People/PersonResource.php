@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\People;
 
 use BackedEnum;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -342,5 +343,14 @@ class PersonResource extends Resource
             'view' => ViewPerson::route('/{record}'),
             'edit' => EditPerson::route('/{record}/edit'),
         ];
+    }
+
+    public static function backToIndexAction(): Action
+    {
+        return Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_people'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
     }
 }

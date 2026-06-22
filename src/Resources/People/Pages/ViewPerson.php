@@ -14,7 +14,11 @@ class ViewPerson extends ViewRecord
 
     protected function getHeaderActions(): array
     {
-        return [Actions\EditAction::make()];
+        return [
+            PersonResource::backToIndexAction(),
+            Actions\EditAction::make(),
+            Actions\DeleteAction::make(),
+        ];
     }
 
     public function content(Schema $schema): Schema

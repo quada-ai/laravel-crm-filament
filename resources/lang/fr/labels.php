@@ -339,6 +339,7 @@ return [
         'back_to_leads' => 'Retour aux pistes',
         'back_to_quotes' => 'Retour aux devis',
         'back_to_deals' => 'Retour aux affaires',
+        'back_to_people' => 'Retour aux personnes',
         'back_to_orders' => 'Retour aux commandes',
         'pay' => 'Payer',
         'back_to_invoices' => 'Retour aux factures',
