@@ -35,22 +35,38 @@ it('declares infolist() locally on the Resource', function (string $resource): v
     expect($declaringClass)->toBe($resource);
 })->with('poResourceModelPage');
 
-it('infolist source contains Identity / Contact / Custom fields section headings', function (string $resource): void {
-    $src = file_get_contents((new ReflectionClass($resource))->getFileName());
+it('Organization infolist source contains Identity / Contact / Custom fields section headings', function (): void {
+    $src = file_get_contents((new ReflectionClass(OrganizationResource::class))->getFileName());
 
     expect($src)->toContain("Section::make(__('laravel-crm-filament::labels.sections.identity'))");
     expect($src)->toContain("Section::make(__('laravel-crm-filament::labels.sections.contact'))");
     expect($src)->toContain("Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))");
-})->with('poResourceModelPage');
+});
 
-it('infolist exposes three top-level Sections in Identity / Contact / Custom fields order', function (string $resource, string $model, string $page): void {
-    $sections = poInfolistSections($resource, $model, $page);
+it('Person infolist source contains Identity + Custom fields section headings only', function (): void {
+    $src = file_get_contents((new ReflectionClass(PersonResource::class))->getFileName());
+
+    expect($src)->toContain("Section::make(__('laravel-crm-filament::labels.sections.identity'))");
+    expect($src)->toContain("Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))");
+    expect($src)->not->toContain("Section::make(__('laravel-crm-filament::labels.sections.contact'))");
+});
+
+it('Organization infolist exposes three top-level Sections in Identity / Contact / Custom fields order', function (): void {
+    $sections = poInfolistSections(OrganizationResource::class, Organization::class, ViewOrganization::class);
 
     expect($sections)->toHaveCount(3);
     expect($sections[0]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.identity'));
     expect($sections[1]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.contact'));
     expect($sections[2]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.custom_fields'));
-})->with('poResourceModelPage');
+});
+
+it('Person infolist exposes two top-level Sections in Identity / Custom fields order', function (): void {
+    $sections = poInfolistSections(PersonResource::class, Person::class, ViewPerson::class);
+
+    expect($sections)->toHaveCount(2);
+    expect($sections[0]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.identity'));
+    expect($sections[1]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.custom_fields'));
+});
 
 it('Person infolist Identity carries first/last/middle name + per-row phones / emails / addresses + labels + owner', function (): void {
     $src = file_get_contents((new ReflectionClass(PersonResource::class))->getFileName());
@@ -69,13 +85,6 @@ it('Person infolist Identity carries first/last/middle name + per-row phones / e
     expect($src)->toContain('foreach ($record->addresses as $i => $address)');
     expect($src)->toContain("TextEntry::make('labels.name')");
     expect($src)->toContain("TextEntry::make('ownerUser.name')");
-});
-
-it('Person Contact section deep-links the organization via OrganizationResource', function (): void {
-    $src = file_get_contents((new ReflectionClass(PersonResource::class))->getFileName());
-
-    expect($src)->toContain("TextEntry::make('organization.name')");
-    expect($src)->toContain("OrganizationResource::getUrl('view'");
 });
 
 it('Organization infolist Identity carries name + industry + employees + revenue', function (): void {
@@ -112,7 +121,8 @@ it('both infolists merge ungrouped custom field entries into Identity', function
 
 it('Custom fields section is hidden when the record has no grouped FieldValues', function (string $resource, string $model, string $page): void {
     $sections = poInfolistSections($resource, $model, $page);
-    $custom = $sections[2];
+    // Custom fields is the LAST section regardless of how many sections precede it.
+    $custom = $sections[array_key_last($sections)];
 
     $ref = new ReflectionProperty($custom, 'isHidden');
     $ref->setAccessible(true);

@@ -33,7 +33,6 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
-use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ListPeople;
@@ -226,15 +225,6 @@ class PersonResource extends Resource
                     static::personDetailEntries($record),
                     $record ? static::crmCustomFieldEntries($record, false) : [],
                 )),
-
-            Section::make(__('laravel-crm-filament::labels.sections.contact'))
-                ->schema([
-                    TextEntry::make('organization.name')
-                        ->label(__('laravel-crm-filament::labels.fields.organization'))
-                        ->url(fn ($record) => $record?->organization
-                            ? OrganizationResource::getUrl('view', ['record' => $record->organization])
-                            : null),
-                ]),
 
             Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
                 ->schema(fn (?Person $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
