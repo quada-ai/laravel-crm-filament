@@ -3,7 +3,9 @@
 namespace VentureDrake\LaravelCrmFilament\Resources\Deliveries;
 
 use BackedEnum;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -13,6 +15,8 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 use VentureDrake\LaravelCrm\Models\AddressType;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\Order;
@@ -228,6 +232,15 @@ class DeliveryResource extends Resource
                     ->preload(),
             ])
             ->recordActions([
+                static::downloadDeliveryPdfActionFactory()
+                    ->button()
+                    ->hiddenLabel()
+                    ->icon('heroicon-m-arrow-down-tray'),
+                static::deliveryPortalActionFactory()
+                    ->button()
+                    ->hiddenLabel()
+                    ->icon('heroicon-m-arrow-top-right-on-square')
+                    ->color('gray'),
                 Actions\ViewAction::make()
                     ->button()
                     ->hiddenLabel(),
@@ -363,9 +376,65 @@ class DeliveryResource extends Resource
         ];
     }
 
-    public static function backToIndexAction(): Actions\Action
+    public static function deliveryPortalActionFactory(): Action
     {
-        return Actions\Action::make('backToIndex')
+        return Action::make('previewPortal')
+            ->label(__('laravel-crm-filament::labels.actions.preview_portal'))
+            ->icon('heroicon-o-arrow-top-right-on-square')
+            ->color('primary')
+            ->url(fn (Delivery $record): string => url('p/deliveries/' . $record->external_id))
+            ->openUrlInNewTab();
+    }
+
+    public static function downloadDeliveryPdfActionFactory(): Action
+    {
+        return Action::make('downloadPdf')
+            ->label(__('laravel-crm-filament::labels.actions.download_pdf'))
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('gray')
+            ->action(function (Delivery $record) {
+                $relative = static::renderDeliveryPdfToDisk($record);
+
+                return Response::download(
+                    storage_path($relative),
+                    'delivery-' . strtolower((string) ($record->delivery_id ?? $record->external_id)) . '.pdf',
+                );
+            });
+    }
+
+    protected static function renderDeliveryPdfToDisk(Delivery $record): string
+    {
+        $settings = app('laravel-crm.settings');
+        $order = $record->order;
+
+        $data = [
+            'delivery' => $record,
+            'order' => $order,
+            'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
+            'email' => optional($order?->person)->getPrimaryEmail(),
+            'phone' => optional($order?->person)->getPrimaryPhone(),
+            'address' => optional($order?->person)->getPrimaryAddress(),
+            'organization_address' => optional($order?->organization)->getPrimaryAddress(),
+            'fromName' => $settings->get('organization_name'),
+            'logo' => $settings->get('logo_file'),
+        ];
+
+        $relativeDir = 'laravel-crm/delivery/' . $record->id;
+        Storage::makeDirectory($relativeDir);
+
+        $filename = 'delivery-' . strtolower((string) ($record->delivery_id ?? $record->external_id)) . '.pdf';
+        $pdfRelative = 'app/' . $relativeDir . '/' . $filename;
+
+        Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
+            ->loadView('laravel-crm::deliveries.pdf', $data)
+            ->save(storage_path($pdfRelative));
+
+        return $pdfRelative;
+    }
+
+    public static function backToIndexAction(): Action
+    {
+        return Action::make('backToIndex')
             ->label(__('laravel-crm-filament::labels.actions.back_to_deliveries'))
             ->color('gray')
             ->icon('heroicon-o-arrow-left')
