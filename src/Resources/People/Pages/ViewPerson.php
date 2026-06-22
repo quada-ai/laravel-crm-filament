@@ -6,11 +6,17 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 
 class ViewPerson extends ViewRecord
 {
     protected static string $resource = PersonResource::class;
+
+    public function getTitle(): string | Htmlable
+    {
+        return $this->getRecordTitle();
+    }
 
     protected function getHeaderActions(): array
     {
