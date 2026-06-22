@@ -34,6 +34,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Customers\CustomerResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\DeliveryResource;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
+use VentureDrake\LaravelCrmFilament\Resources\Features\FeatureResource;
 use VentureDrake\LaravelCrmFilament\Resources\Files\FileResource;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
@@ -255,6 +256,10 @@ class LaravelCrmPlugin implements Plugin
 
         if ($this->isModuleEnabled('customers')) {
             $resources[] = CustomerResource::class;
+        }
+
+        if ($this->isModuleEnabled('features')) {
+            $resources[] = FeatureResource::class;
         }
 
         // Products aren't a gated module in core; surface them whenever the panel runs.

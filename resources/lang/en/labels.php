@@ -109,6 +109,12 @@ return [
         'crm_access' => 'CRM access',
         'is_default' => 'Is default',
         'is_closed' => 'Is closed',
+        'is_public' => 'Is public',
+        'feature_status' => 'Feature status',
+        'votes' => 'Votes',
+        'comments' => 'Comments',
+        'views' => 'Views',
+        'submitted_by' => 'Submitted by',
     ],
 
     // Contact / address fields
@@ -408,6 +414,7 @@ return [
         'back_to_invoices' => 'Back to invoices',
         'back_to_purchase_orders' => 'Back to purchase orders',
         'back_to_deliveries' => 'Back to deliveries',
+        'back_to_features' => 'Back to features',
         'purchase_order' => 'Purchase Order',
         'delivery' => 'Delivery',
         'upload' => 'Upload',

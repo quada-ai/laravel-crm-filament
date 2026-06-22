@@ -108,6 +108,12 @@ return [
         'crm_access' => 'Accès au CRM',
         'is_default' => 'Par défaut',
         'is_closed' => 'Fermé',
+        'is_public' => 'Public',
+        'feature_status' => 'Statut de la fonctionnalité',
+        'votes' => 'Votes',
+        'comments' => 'Commentaires',
+        'views' => 'Vues',
+        'submitted_by' => 'Soumis par',
     ],
 
     'contact' => [
@@ -363,6 +369,7 @@ return [
         'back_to_invoices' => 'Retour aux factures',
         'back_to_purchase_orders' => 'Retour aux bons de commande',
         'back_to_deliveries' => 'Retour aux livraisons',
+        'back_to_features' => 'Retour aux fonctionnalités',
         'purchase_order' => 'Bon de commande',
         'delivery' => 'Livraison',
         'upload' => 'Téléverser',

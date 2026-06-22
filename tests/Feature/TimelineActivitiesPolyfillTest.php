@@ -102,7 +102,8 @@ it('leaves the existing audits and labels polyfills unchanged', function (): voi
 it('polyfills timelineActivities on every primary model named by timelineActivityModels', function (): void {
     $models = LaravelCrmFilamentServiceProvider::timelineActivityModels();
 
-    expect($models)->toHaveCount(9);
+    // Lead/Deal/Quote/Order/Invoice/PurchaseOrder/Delivery/Person/Organization + Feature (US-003).
+    expect($models)->toHaveCount(10);
     expect($models)->toContain(Lead::class);
     expect($models)->toContain(Deal::class);
     expect($models)->toContain(Quote::class);
@@ -112,8 +113,17 @@ it('polyfills timelineActivities on every primary model named by timelineActivit
     expect($models)->toContain(Delivery::class);
     expect($models)->toContain(Person::class);
     expect($models)->toContain(Organization::class);
+    expect($models)->toContain('VentureDrake\\LaravelCrm\\Models\\Feature');
 
     foreach ($models as $modelClass) {
+        // Optional models (e.g. Feature, depending on the vendor version) may
+        // not be installed in the test environment; the polyfill loop in
+        // packageBooted() guards on class_exists, so mirror the same guard
+        // here to keep the test forwards-compatible.
+        if (! class_exists($modelClass)) {
+            continue;
+        }
+
         $instance = new $modelClass;
         $relation = $instance->timelineActivities();
         expect($relation)->toBeInstanceOf(MorphMany::class);

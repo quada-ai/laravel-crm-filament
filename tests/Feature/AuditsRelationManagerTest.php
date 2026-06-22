@@ -81,8 +81,10 @@ it('lists models considered auditable by the plugin', function () {
     $auditable = LaravelCrmFilamentServiceProvider::auditableModels();
 
     expect($auditable)->toContain(Lead::class, Deal::class, Quote::class, Order::class, Invoice::class)
-        ->and($auditable)->toContain(Delivery::class, PurchaseOrder::class, Person::class, Organization::class, Product::class);
-    expect(count($auditable))->toBe(10);
+        ->and($auditable)->toContain(Delivery::class, PurchaseOrder::class, Person::class, Organization::class, Product::class)
+        ->and($auditable)->toContain('VentureDrake\\LaravelCrm\\Models\\Feature');
+    // Feature was added in US-003 (features+monitors series) so the list is now 11.
+    expect(count($auditable))->toBe(11);
 });
 
 it('filters the audit feed by auditable_type and auditable_id', function () {

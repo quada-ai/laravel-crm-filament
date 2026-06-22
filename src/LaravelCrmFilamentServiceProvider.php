@@ -15,6 +15,7 @@ use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Models\EmailCampaignClick;
 use VentureDrake\LaravelCrm\Models\EmailCampaignRecipient;
+use VentureDrake\LaravelCrm\Models\Feature;
 use VentureDrake\LaravelCrm\Models\Invoice;
 use VentureDrake\LaravelCrm\Models\Label;
 use VentureDrake\LaravelCrm\Models\Lead;
@@ -96,6 +97,9 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
         // AuditsRelationManager can hang off the standard
         // `protected static string $relationship = 'audits'` contract.
         foreach (static::auditableModels() as $auditableModel) {
+            if (! class_exists($auditableModel)) {
+                continue;
+            }
             $auditableModel::resolveRelationUsing('audits', function ($model) {
                 return $model->morphMany(Audit::class, 'auditable');
             });
@@ -109,6 +113,9 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
         // Mirrors the audits/labels precedent above; extended to every primary
         // model so the Crm* RM family attaches uniformly.
         foreach (static::timelineActivityModels() as $timelineModel) {
+            if (! class_exists($timelineModel)) {
+                continue;
+            }
             $timelineModel::resolveRelationUsing('timelineActivities', function ($model) {
                 return $model->morphMany(Activity::class, 'timelineable');
             });
@@ -237,6 +244,7 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             Person::class,
             Organization::class,
             Product::class,
+            Feature::class,
         ];
     }
 
@@ -255,6 +263,7 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             Delivery::class,
             Person::class,
             Organization::class,
+            Feature::class,
         ];
     }
 

@@ -108,6 +108,12 @@ return [
         'crm_access' => 'Acceso al CRM',
         'is_default' => 'Predeterminado',
         'is_closed' => 'Cerrado',
+        'is_public' => 'Público',
+        'feature_status' => 'Estado de la característica',
+        'votes' => 'Votos',
+        'comments' => 'Comentarios',
+        'views' => 'Vistas',
+        'submitted_by' => 'Enviado por',
     ],
 
     'contact' => [
@@ -363,6 +369,7 @@ return [
         'back_to_invoices' => 'Volver a facturas',
         'back_to_purchase_orders' => 'Volver a órdenes de compra',
         'back_to_deliveries' => 'Volver a entregas',
+        'back_to_features' => 'Volver a características',
         'purchase_order' => 'Orden de compra',
         'delivery' => 'Entrega',
         'upload' => 'Subir',
