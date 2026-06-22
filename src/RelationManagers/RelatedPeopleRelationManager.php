@@ -83,8 +83,8 @@ class RelatedPeopleRelationManager extends RelationManager
             ])
             ->headerActions([
                 Actions\CreateAction::make()
-                    ->iconButton()
                     ->icon('heroicon-m-plus')
+                    ->hiddenLabel()
                     ->tooltip(__('laravel-crm-filament::labels.actions.add_person'))
                     ->modalHeading(__('laravel-crm-filament::labels.actions.add_person'))
                     ->using(function (array $data): Contact {
@@ -115,8 +115,9 @@ class RelatedPeopleRelationManager extends RelationManager
             ])
             ->recordActions([
                 Actions\DeleteAction::make()
-                    ->iconButton()
                     ->icon('heroicon-m-x-mark')
+                    ->hiddenLabel()
+                    ->tooltip('Remove')
                     ->color('danger')
                     ->using(function (Contact $record): void {
                         /** @var Person $owner */

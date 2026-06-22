@@ -67,8 +67,8 @@ class RelatedOrganizationsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Actions\CreateAction::make()
-                    ->iconButton()
                     ->icon('heroicon-m-plus')
+                    ->hiddenLabel()
                     ->tooltip(__('laravel-crm-filament::labels.actions.add_organization'))
                     ->modalHeading(__('laravel-crm-filament::labels.actions.add_organization'))
                     ->using(function (array $data): Contact {
@@ -95,8 +95,9 @@ class RelatedOrganizationsRelationManager extends RelationManager
             ])
             ->recordActions([
                 Actions\DeleteAction::make()
-                    ->iconButton()
                     ->icon('heroicon-m-x-mark')
+                    ->hiddenLabel()
+                    ->tooltip('Remove')
                     ->color('danger')
                     ->using(function (Contact $record): void {
                         $owner = $this->getOwnerRecord();
