@@ -42,6 +42,8 @@ class RoleSeeder
         'customers',
         'products',
         'teams',
+        'features',
+        'monitors',
     ];
 
     /** @var list<string> */
@@ -65,7 +67,7 @@ class RoleSeeder
 
         // Settings perms used by SettingPolicy / RolePolicy /
         // PermissionPolicy / UserPolicy.
-        foreach (['view crm settings', 'edit crm settings', 'create crm users', 'view crm users', 'edit crm users', 'delete crm users'] as $perm) {
+        foreach (['view crm settings', 'edit crm settings', 'create crm users', 'view crm users', 'edit crm users', 'delete crm users', 'manage crm feature statuses'] as $perm) {
             Permission::findOrCreate($perm);
         }
 

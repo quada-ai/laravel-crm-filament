@@ -734,6 +734,161 @@ return new class extends Migration
                 $table->softDeletes();
             });
         }
+
+        if (! Schema::hasTable($prefix . 'features')) {
+            Schema::create($prefix . 'features', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id');
+                $table->unsignedBigInteger('team_id')->nullable()->index();
+                $table->unsignedInteger('number')->nullable();
+                $table->string('feature_id')->nullable();
+                $table->string('title');
+                $table->text('description')->nullable();
+                $table->boolean('is_public')->default(true);
+                $table->unsignedInteger('votes_count')->default(0);
+                $table->unsignedInteger('comments_count')->default(0);
+                $table->unsignedInteger('views_count')->default(0);
+                $table->unsignedBigInteger('feature_status_id')->nullable()->index();
+                $table->unsignedBigInteger('submitted_by_user_id')->nullable();
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('user_deleted_id')->nullable();
+                $table->unsignedBigInteger('user_restored_id')->nullable();
+                $table->unsignedBigInteger('user_owner_id')->nullable();
+                $table->unsignedBigInteger('user_assigned_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'feature_statuses')) {
+            Schema::create($prefix . 'feature_statuses', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id');
+                $table->unsignedBigInteger('team_id')->nullable()->index();
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->string('color')->nullable();
+                $table->tinyInteger('order')->default(0);
+                $table->boolean('is_default')->default(false);
+                $table->boolean('is_closed')->default(false);
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('user_deleted_id')->nullable();
+                $table->unsignedBigInteger('user_restored_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'feature_votes')) {
+            Schema::create($prefix . 'feature_votes', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('team_id')->nullable()->index();
+                $table->unsignedBigInteger('feature_id')->index();
+                $table->unsignedBigInteger('user_id')->index();
+                $table->timestamps();
+
+                $table->unique(['feature_id', 'user_id'], 'crm_feature_votes_feature_user_unique');
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'feature_comments')) {
+            Schema::create($prefix . 'feature_comments', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id');
+                $table->unsignedBigInteger('team_id')->nullable()->index();
+                $table->unsignedBigInteger('feature_id')->index();
+                $table->unsignedBigInteger('parent_id')->nullable()->index();
+                $table->text('body');
+                $table->boolean('is_admin_reply')->default(false);
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('user_deleted_id')->nullable();
+                $table->unsignedBigInteger('user_restored_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'feature_views')) {
+            Schema::create($prefix . 'feature_views', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('feature_id')->index();
+                $table->unsignedBigInteger('user_id')->nullable()->index();
+                $table->unsignedBigInteger('team_id')->nullable()->index();
+                $table->string('ip_hash', 64)->nullable()->index();
+                $table->timestamp('viewed_at')->index();
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'monitors')) {
+            Schema::create($prefix . 'monitors', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id');
+                $table->string('monitor_id')->nullable();
+                $table->unsignedInteger('number')->nullable();
+                $table->unsignedBigInteger('team_id')->nullable()->index();
+                $table->string('name')->nullable();
+                $table->text('description')->nullable();
+                $table->string('type')->default('https');
+                $table->string('url', 1024);
+                $table->string('host')->nullable();
+                $table->string('method', 16)->default('GET');
+                $table->json('headers')->nullable();
+                $table->text('body')->nullable();
+                $table->unsignedInteger('expected_status_code')->default(200);
+                $table->unsignedInteger('interval')->default(5);
+                $table->unsignedInteger('timeout')->default(30);
+                $table->boolean('is_active')->default(true);
+                $table->boolean('uptime_enabled')->default(true);
+                $table->boolean('ssl_enabled')->default(false);
+                $table->unsignedInteger('perf_threshold_ms')->nullable();
+                $table->unsignedInteger('downtime_minutes_before_alert')->nullable();
+                $table->string('last_status')->nullable();
+                $table->unsignedInteger('last_response_time')->nullable();
+                $table->unsignedInteger('last_status_code')->nullable();
+                $table->timestamp('last_checked_at')->nullable();
+                $table->timestamp('last_status_changed_at')->nullable();
+                $table->timestamp('down_since_at')->nullable();
+                $table->timestamp('notified_at')->nullable();
+                $table->timestamp('ssl_last_checked_at')->nullable();
+                $table->string('ssl_status')->nullable();
+                $table->string('ssl_issuer')->nullable();
+                $table->timestamp('ssl_expires_at')->nullable();
+                $table->timestamp('ssl_notified_at')->nullable();
+                $table->unsignedBigInteger('user_created_id')->nullable();
+                $table->unsignedBigInteger('user_updated_id')->nullable();
+                $table->unsignedBigInteger('user_deleted_id')->nullable();
+                $table->unsignedBigInteger('user_restored_id')->nullable();
+                $table->unsignedBigInteger('user_owner_id')->nullable();
+                $table->unsignedBigInteger('user_assigned_id')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+
+                $table->index(['team_id', 'last_checked_at']);
+            });
+        }
+
+        if (! Schema::hasTable($prefix . 'monitor_checks')) {
+            Schema::create($prefix . 'monitor_checks', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('external_id');
+                $table->unsignedBigInteger('team_id')->nullable()->index();
+                $table->unsignedBigInteger('monitor_id');
+                $table->string('type')->default('http');
+                $table->string('status');
+                $table->unsignedInteger('response_time')->nullable();
+                $table->unsignedInteger('status_code')->nullable();
+                $table->text('error_message')->nullable();
+                $table->longText('response_body')->nullable();
+                $table->timestamp('ssl_expires_at')->nullable();
+                $table->timestamp('checked_at');
+                $table->timestamps();
+
+                $table->index(['monitor_id', 'type', 'checked_at']);
+            });
+        }
     }
 
     public function down(): void
