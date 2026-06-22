@@ -135,8 +135,9 @@ it('renders last_online_at with ->since() and a Never placeholder', function () 
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('last_online_at')");
     expect($source)->toContain('->placeholder(\'Never\')');
 
-    // Two ->since() call sites: one for created_at, one for last_online_at.
-    expect(substr_count($source, '->since()'))->toBe(2);
+    // Four ->since() call sites total: two in the table (created_at +
+    // last_online_at) and two in the infolist (created_at + last_online_at).
+    expect(substr_count($source, '->since()'))->toBe(4);
 });
 
 it('drops the prior column inventory entries not in the plan', function () {

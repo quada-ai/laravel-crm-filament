@@ -304,6 +304,7 @@ return [
         'add_lunch' => 'Add lunch',
         'add_file' => 'Add file',
         'details' => 'Details',
+        'teams' => 'Teams',
         'lead_qualification' => 'Lead Qualification',
         'contact' => 'Contact',
         'organization' => 'Organization',
@@ -394,6 +395,7 @@ return [
         'back_to_quotes' => 'Back to quotes',
         'back_to_deals' => 'Back to deals',
         'back_to_people' => 'Back to people',
+        'back_to_users' => 'Back to users',
         'back_to_organizations' => 'Back to organizations',
         'add_organization' => 'Link an organization...',
         'add_person' => 'Link a person...',
@@ -418,6 +420,7 @@ return [
     // Misc / settings
     'misc' => [
         'unallocated' => 'Unallocated',
+        'no_teams' => 'No teams',
         'crm' => 'CRM',
         'crm_access' => 'CRM access',
         'has_crm_access' => 'Has CRM access',

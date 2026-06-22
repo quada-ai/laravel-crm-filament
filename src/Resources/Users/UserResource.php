@@ -5,9 +5,12 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Users;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -118,6 +121,51 @@ class UserResource extends Resource
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
             ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->schema([
+                    TextEntry::make('name')
+                        ->label(__('laravel-crm-filament::labels.fields.name')),
+
+                    TextEntry::make('email')
+                        ->label(__('laravel-crm-filament::labels.fields.email')),
+
+                    TextEntry::make('email_verified_at')
+                        ->label(__('laravel-crm-filament::labels.fields.verified'))
+                        ->dateTime()
+                        ->placeholder('—'),
+
+                    TextEntry::make('crm_access')
+                        ->label(__('laravel-crm-filament::labels.fields.crm_access'))
+                        ->formatStateUsing(fn ($state): string => $state ? 'Yes' : 'No'),
+
+                    TextEntry::make('role')
+                        ->label(__('laravel-crm-filament::labels.fields.role'))
+                        ->state(fn ($record) => $record?->roles?->first()?->name),
+
+                    TextEntry::make('created_at')
+                        ->label(__('laravel-crm-filament::labels.fields.created'))
+                        ->since(),
+
+                    TextEntry::make('last_online_at')
+                        ->label(__('laravel-crm-filament::labels.fields.last_online'))
+                        ->since()
+                        ->placeholder('Never'),
+                ]),
+        ])->columns(1);
+    }
+
+    public static function backToIndexAction(): Action
+    {
+        return Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_users'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
     }
 
     public static function getPages(): array

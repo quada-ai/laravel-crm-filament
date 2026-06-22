@@ -260,6 +260,7 @@ return [
         'add_lunch' => 'Ajouter un déjeuner',
         'add_file' => 'Ajouter un fichier',
         'details' => 'Détails',
+        'teams' => 'Équipes',
         'lead_qualification' => 'Qualification du prospect',
         'contact' => 'Contact',
         'organization' => 'Organisation',
@@ -349,6 +350,7 @@ return [
         'back_to_quotes' => 'Retour aux devis',
         'back_to_deals' => 'Retour aux affaires',
         'back_to_people' => 'Retour aux personnes',
+        'back_to_users' => 'Retour aux utilisateurs',
         'back_to_organizations' => 'Retour aux organisations',
         'add_organization' => 'Associer une organisation...',
         'add_person' => 'Associer une personne...',
@@ -371,6 +373,7 @@ return [
 
     'misc' => [
         'unallocated' => 'Non attribué',
+        'no_teams' => 'Aucune équipe',
         'crm' => 'CRM',
         'crm_access' => 'Accès au CRM',
         'has_crm_access' => 'A accès au CRM',
