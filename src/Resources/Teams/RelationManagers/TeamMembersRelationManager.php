@@ -1,6 +1,6 @@
 <?php
 
-namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\RelationManagers;
+namespace VentureDrake\LaravelCrmFilament\Resources\Teams\RelationManagers;
 
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;

@@ -1,9 +1,9 @@
 <?php
 
-namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\Pages;
+namespace VentureDrake\LaravelCrmFilament\Resources\Teams\Pages;
 
 use Filament\Resources\Pages\CreateRecord;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\CrmTeamResource;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\CrmTeamResource;
 
 class CreateCrmTeam extends CreateRecord
 {

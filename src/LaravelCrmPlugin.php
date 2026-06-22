@@ -7,7 +7,6 @@ use Filament\Panel;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\AddressTypes\AddressTypeResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\ChatWidgetResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ContactTypes\ContactTypeResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\CrmTeamResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\EmailTemplates\EmailTemplateResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FieldGroups\FieldGroupResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Fields\FieldResource;
@@ -48,6 +47,7 @@ use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResour
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\CrmTeamResource;
 use VentureDrake\LaravelCrmFilament\Resources\Users\UserResource;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroContactResource;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroInvoiceResource;

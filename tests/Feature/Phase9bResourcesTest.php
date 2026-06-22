@@ -7,17 +7,17 @@ use VentureDrake\LaravelCrm\Models\PipelineStageProbability;
 use VentureDrake\LaravelCrm\Models\Team;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Pages\Updates;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\CrmTeamResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\Pages\CreateCrmTeam;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\Pages\EditCrmTeam;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\Pages\ListCrmTeams;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\Pages\ViewCrmTeam;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\RelationManagers\TeamMembersRelationManager;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadStatuses\LeadStatusResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStageProbabilities\PipelineStageProbabilityResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\PipelineStageResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\CrmTeamResource;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\CreateCrmTeam;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\EditCrmTeam;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\ListCrmTeams;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\ViewCrmTeam;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\RelationManagers\TeamMembersRelationManager;
 
 it('binds LeadStatusResource to the LeadStatus model and lives in the Settings cluster', function () {
     expect(LeadStatusResource::getModel())->toBe(LeadStatus::class);
@@ -51,10 +51,27 @@ it('wires a pipeline_stage_probability_id Select onto the PipelineStage form', f
     expect($source)->toContain('PipelineStageProbability::query()');
 });
 
-it('binds CrmTeamResource to the Team model and lives in the Settings cluster', function () {
+it('binds CrmTeamResource to the Team model as a top-level Contacts-group resource', function () {
     expect(CrmTeamResource::getModel())->toBe(Team::class);
-    expect(CrmTeamResource::getCluster())->toBe(Settings::class);
+    expect(CrmTeamResource::getCluster())->toBeNull();
     expect(CrmTeamResource::getSlug())->toBe('crm-teams');
+});
+
+it('declares Contacts as the navigation group on CrmTeamResource', function () {
+    $reflection = new ReflectionProperty(CrmTeamResource::class, 'navigationGroup');
+    $reflection->setAccessible(true);
+    expect($reflection->getValue())->toBe('Contacts');
+});
+
+it('declares navigationSort=60 on CrmTeamResource', function () {
+    $reflection = new ReflectionProperty(CrmTeamResource::class, 'navigationSort');
+    $reflection->setAccessible(true);
+    expect($reflection->getValue())->toBe(60);
+});
+
+it('lives under the top-level Resources\\Teams namespace, not the Settings cluster namespace', function () {
+    expect(CrmTeamResource::class)->toStartWith('VentureDrake\\LaravelCrmFilament\\Resources\\Teams\\');
+    expect(class_exists('VentureDrake\\LaravelCrmFilament\\Clusters\\Settings\\Resources\\CrmTeams\\CrmTeamResource'))->toBeFalse();
 });
 
 it('exposes CRUD pages on CrmTeamResource at the expected slug', function () {
@@ -62,8 +79,9 @@ it('exposes CRUD pages on CrmTeamResource at the expected slug', function () {
     expect(array_keys($pages))->toEqual(['index', 'create', 'view', 'edit']);
 });
 
-it('routes CrmTeam page classes back to CrmTeamResource', function () {
+it('routes CrmTeam page classes back to CrmTeamResource under the new namespace', function () {
     foreach ([CreateCrmTeam::class, EditCrmTeam::class, ListCrmTeams::class, ViewCrmTeam::class] as $page) {
+        expect($page)->toStartWith('VentureDrake\\LaravelCrmFilament\\Resources\\Teams\\Pages\\');
         $reflection = new ReflectionProperty($page, 'resource');
         $reflection->setAccessible(true);
         expect($reflection->getValue())->toBe(CrmTeamResource::class);

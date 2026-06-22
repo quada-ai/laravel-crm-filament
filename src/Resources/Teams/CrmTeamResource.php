@@ -1,6 +1,6 @@
 <?php
 
-namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams;
+namespace VentureDrake\LaravelCrmFilament\Resources\Teams;
 
 use BackedEnum;
 use Filament\Actions;
@@ -10,24 +10,25 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Team;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\Pages\CreateCrmTeam;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\Pages\EditCrmTeam;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\Pages\ListCrmTeams;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\Pages\ViewCrmTeam;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\CrmTeams\RelationManagers\TeamMembersRelationManager;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\CreateCrmTeam;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\EditCrmTeam;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\ListCrmTeams;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\ViewCrmTeam;
+use VentureDrake\LaravelCrmFilament\Resources\Teams\RelationManagers\TeamMembersRelationManager;
 
 class CrmTeamResource extends Resource
 {
     protected static ?string $model = Team::class;
-
-    protected static ?string $cluster = Settings::class;
 
     protected static ?string $slug = 'crm-teams';
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
+
+    protected static string | \UnitEnum | null $navigationGroup = 'Contacts';
+
+    protected static ?int $navigationSort = 60;
 
     public static function getNavigationLabel(): string
     {
