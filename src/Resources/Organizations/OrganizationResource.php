@@ -7,6 +7,7 @@ use BackedEnum;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -249,7 +250,7 @@ class OrganizationResource extends Resource
     }
 
     /**
-     * @return array<int, \Filament\Infolists\Components\TextEntry>
+     * @return array<int, TextEntry>
      */
     protected static function organizationDetailEntries(?Organization $record): array
     {
