@@ -106,6 +106,8 @@ return [
         'gender' => 'Genre',
         'role' => 'Rôle',
         'crm_access' => 'Accès au CRM',
+        'is_default' => 'Par défaut',
+        'is_closed' => 'Fermé',
     ],
 
     'contact' => [
@@ -145,6 +147,7 @@ return [
         'delivery_address' => 'Adresse de livraison',
         'delivery_instructions' => 'Instructions de livraison',
         'shipping_address' => 'Adresse de livraison',
+        'features' => 'Fonctionnalités',
     ],
 
     'money' => [

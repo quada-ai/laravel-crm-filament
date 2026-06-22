@@ -8,6 +8,7 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\AddressTypes\Add
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\ChatWidgetResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ContactTypes\ContactTypeResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\EmailTemplates\EmailTemplateResource;
+use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FeatureStatuses\FeatureStatusResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FieldGroups\FieldGroupResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Fields\FieldResource;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Industries\IndustryResource;
@@ -276,6 +277,7 @@ class LaravelCrmPlugin implements Plugin
         $resources[] = PipelineStageResource::class;
         $resources[] = PipelineStageProbabilityResource::class;
         $resources[] = LeadStatusResource::class;
+        $resources[] = FeatureStatusResource::class;
         $resources[] = CrmTeamResource::class;
         $resources[] = LabelResource::class;
         $resources[] = LeadSourceResource::class;

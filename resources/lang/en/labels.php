@@ -107,6 +107,8 @@ return [
         'gender' => 'Gender',
         'role' => 'Role',
         'crm_access' => 'CRM access',
+        'is_default' => 'Is default',
+        'is_closed' => 'Is closed',
     ],
 
     // Contact / address fields
@@ -148,6 +150,7 @@ return [
         'delivery_address' => 'Delivery address',
         'delivery_instructions' => 'Delivery instructions',
         'shipping_address' => 'Shipping address',
+        'features' => 'Features',
     ],
 
     // Money / orders / lines
