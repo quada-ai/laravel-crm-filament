@@ -13,6 +13,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Person;
@@ -221,40 +222,10 @@ class PersonResource extends Resource
     {
         return $schema->components([
             Section::make(__('laravel-crm-filament::labels.sections.identity'))
-                ->schema(fn (?Person $record) => array_merge([
-                    TextEntry::make('first_name')
-                        ->label(__('laravel-crm-filament::labels.fields.first_name')),
-
-                    TextEntry::make('last_name')
-                        ->label(__('laravel-crm-filament::labels.fields.last_name')),
-
-                    TextEntry::make('middle_name')
-                        ->label(__('laravel-crm-filament::labels.fields.middle_name')),
-
-                    TextEntry::make('email')
-                        ->label(__('laravel-crm-filament::labels.fields.email'))
-                        ->state(function ($record) {
-                            $email = $record?->emails()->first();
-
-                            if (! $email) {
-                                return null;
-                            }
-
-                            return trim(($email->address ?? '') . ($email->type ? ' (' . $email->type . ')' : ''));
-                        }),
-
-                    TextEntry::make('phone')
-                        ->label(__('laravel-crm-filament::labels.fields.phone'))
-                        ->state(function ($record) {
-                            $phone = $record?->phones()->first();
-
-                            if (! $phone) {
-                                return null;
-                            }
-
-                            return trim(($phone->number ?? '') . ($phone->type ? ' (' . $phone->type . ')' : ''));
-                        }),
-                ], $record ? static::crmCustomFieldEntries($record, false) : [])),
+                ->schema(fn (?Person $record) => array_merge(
+                    static::personDetailEntries($record),
+                    $record ? static::crmCustomFieldEntries($record, false) : [],
+                )),
 
             Section::make(__('laravel-crm-filament::labels.sections.contact'))
                 ->schema([
@@ -263,11 +234,6 @@ class PersonResource extends Resource
                         ->url(fn ($record) => $record?->organization
                             ? OrganizationResource::getUrl('view', ['record' => $record->organization])
                             : null),
-
-                    TextEntry::make('addresses')
-                        ->label(__('laravel-crm-filament::labels.fields.addresses'))
-                        ->state(fn ($record) => $record instanceof Person ? static::formatAddresses($record) : null)
-                        ->columnSpanFull(),
                 ]),
 
             Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
@@ -282,6 +248,99 @@ class PersonResource extends Resource
                         ->exists();
                 }),
         ])->columns(1);
+    }
+
+    /**
+     * @return array<int, TextEntry>
+     */
+    protected static function personDetailEntries(?Person $record): array
+    {
+        $entries = [
+            TextEntry::make('first_name')
+                ->label(__('laravel-crm-filament::labels.fields.first_name')),
+
+            TextEntry::make('middle_name')
+                ->label(__('laravel-crm-filament::labels.fields.middle_name')),
+
+            TextEntry::make('last_name')
+                ->label(__('laravel-crm-filament::labels.fields.last_name')),
+
+            TextEntry::make('gender')
+                ->label(__('laravel-crm-filament::labels.fields.gender'))
+                ->formatStateUsing(fn ($state) => $state ? ucfirst((string) $state) : null),
+
+            TextEntry::make('birthday')
+                ->label(__('laravel-crm-filament::labels.fields.birthday')),
+
+            TextEntry::make('description')
+                ->label(__('laravel-crm-filament::labels.fields.description'))
+                ->columnSpanFull(),
+        ];
+
+        if (! $record instanceof Person) {
+            return $entries;
+        }
+
+        foreach ($record->phones as $i => $phone) {
+            $typePrefix = $phone->type ? ucfirst($phone->type) . ' ' : '';
+            $entries[] = TextEntry::make('phone_' . $i)
+                ->label($typePrefix . __('laravel-crm-filament::labels.fields.phone'))
+                ->state(trim(($phone->number ?? '') . ($phone->primary ? ' (Primary)' : '')));
+        }
+
+        foreach ($record->emails as $i => $email) {
+            $typePrefix = $email->type ? ucfirst($email->type) . ' ' : '';
+            $entries[] = TextEntry::make('email_' . $i)
+                ->label($typePrefix . __('laravel-crm-filament::labels.fields.email'))
+                ->state(trim(($email->address ?? '') . ($email->primary ? ' (Primary)' : '')));
+        }
+
+        foreach ($record->addresses as $i => $address) {
+            $typePrefix = $address->addressType?->name ? ucfirst($address->addressType->name) . ' ' : '';
+            $line = trim((string) static::formatAddressLine($address));
+            if ($address->primary) {
+                $line = trim($line . ' (Primary)');
+            }
+            $entries[] = TextEntry::make('address_' . $i)
+                ->label($typePrefix . __('laravel-crm-filament::labels.fields.address'))
+                ->state($line)
+                ->columnSpanFull();
+        }
+
+        $entries[] = TextEntry::make('labels.name')
+            ->label(__('laravel-crm-filament::labels.fields.labels'))
+            ->badge()
+            ->color(function ($state, $record) {
+                $label = $record?->labels?->firstWhere('name', $state);
+                $hex = $label?->hex;
+
+                if (! $hex) {
+                    return 'gray';
+                }
+
+                return '#' . ltrim($hex, '#');
+            });
+
+        $entries[] = TextEntry::make('ownerUser.name')
+            ->label(__('laravel-crm-filament::labels.fields.owner'))
+            ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'));
+
+        return $entries;
+    }
+
+    protected static function formatAddressLine($address): ?string
+    {
+        $parts = array_filter([
+            $address->line1 ?? null,
+            $address->line2 ?? null,
+            $address->line3 ?? null,
+            $address->city ?? null,
+            $address->state ?? null,
+            $address->code ?? null,
+            $address->country ?? null,
+        ]);
+
+        return $parts === [] ? null : implode(', ', $parts);
     }
 
     protected static function formatAddresses(Person $record): ?string
@@ -333,6 +392,20 @@ class PersonResource extends Resource
     protected static function crmEncryptedSearchAccessor(): \Closure
     {
         return fn ($r) => trim((($r->first_name ?? '') . ' ' . ($r->middle_name ?? '') . ' ' . ($r->last_name ?? '') . ' ' . ($r->maiden_name ?? '')));
+    }
+
+    public static function getRecordTitle(?Model $record): string | Htmlable | null
+    {
+        if (! $record) {
+            return static::getModelLabel();
+        }
+
+        $composed = trim(implode(' ', array_filter([
+            $record->first_name ?? null,
+            $record->last_name ?? null,
+        ])));
+
+        return $composed !== '' ? $composed : ($record->name ?? static::getModelLabel());
     }
 
     public static function getPages(): array

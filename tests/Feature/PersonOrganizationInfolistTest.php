@@ -52,16 +52,23 @@ it('infolist exposes three top-level Sections in Identity / Contact / Custom fie
     expect($sections[2]->getHeading())->toBe(__('laravel-crm-filament::labels.sections.custom_fields'));
 })->with('poResourceModelPage');
 
-it('Person infolist Identity carries first/last/middle name + email + phone fields', function (): void {
+it('Person infolist Identity carries first/last/middle name + per-row phones / emails / addresses + labels + owner', function (): void {
     $src = file_get_contents((new ReflectionClass(PersonResource::class))->getFileName());
 
     expect($src)->toContain("TextEntry::make('first_name')");
     expect($src)->toContain("TextEntry::make('last_name')");
     expect($src)->toContain("TextEntry::make('middle_name')");
-    expect($src)->toContain("TextEntry::make('email')");
-    expect($src)->toContain("TextEntry::make('phone')");
-    expect($src)->toContain('$record?->emails()->first()');
-    expect($src)->toContain('$record?->phones()->first()');
+    expect($src)->toContain("TextEntry::make('gender')");
+    expect($src)->toContain("TextEntry::make('birthday')");
+    expect($src)->toContain("TextEntry::make('description')");
+    // Per-row loops over phones / emails / addresses produce dynamic
+    // entry names (phone_0, email_0, address_0, ...) inside the
+    // personDetailEntries() helper.
+    expect($src)->toContain('foreach ($record->phones as $i => $phone)');
+    expect($src)->toContain('foreach ($record->emails as $i => $email)');
+    expect($src)->toContain('foreach ($record->addresses as $i => $address)');
+    expect($src)->toContain("TextEntry::make('labels.name')");
+    expect($src)->toContain("TextEntry::make('ownerUser.name')");
 });
 
 it('Person Contact section deep-links the organization via OrganizationResource', function (): void {
@@ -80,12 +87,21 @@ it('Organization infolist Identity carries name + industry + employees + revenue
     expect($src)->toContain("TextEntry::make('annual_revenue')");
 });
 
-it('both infolists render an addresses TextEntry via static::formatAddresses', function (string $resource): void {
-    $src = file_get_contents((new ReflectionClass($resource))->getFileName());
+it('Organization infolist renders an addresses TextEntry via static::formatAddresses', function (): void {
+    $src = file_get_contents((new ReflectionClass(OrganizationResource::class))->getFileName());
 
     expect($src)->toContain("TextEntry::make('addresses')");
     expect($src)->toContain('static::formatAddresses($record)');
-})->with('poResourceModelPage');
+});
+
+it('Person infolist renders per-row address TextEntries instead of one merged addresses field', function (): void {
+    $src = file_get_contents((new ReflectionClass(PersonResource::class))->getFileName());
+
+    // Per-row entries land in personDetailEntries() as
+    // TextEntry::make('address_0'), TextEntry::make('address_1'), ...
+    expect($src)->toContain("TextEntry::make('address_' . \$i)");
+    expect($src)->toContain('static::formatAddressLine($address)');
+});
 
 it('both infolists merge ungrouped custom field entries into Identity', function (string $resource): void {
     $src = file_get_contents((new ReflectionClass($resource))->getFileName());
