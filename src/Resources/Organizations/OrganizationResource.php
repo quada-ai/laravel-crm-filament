@@ -33,8 +33,6 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\CrmLunchesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmMeetingsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmNotesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmTasksRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\RelatedOrganizationsRelationManager;
-use VentureDrake\LaravelCrmFilament\RelationManagers\RelatedPeopleRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\CreateOrganization;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\EditOrganization;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\ListOrganizations;
@@ -298,8 +296,6 @@ class OrganizationResource extends Resource
             CrmMeetingsRelationManager::class,
             CrmLunchesRelationManager::class,
             CrmFilesRelationManager::class,
-            RelatedPeopleRelationManager::class,
-            RelatedOrganizationsRelationManager::class,
         ];
     }
 
