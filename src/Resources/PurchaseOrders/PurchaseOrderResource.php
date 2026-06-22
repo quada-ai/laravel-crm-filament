@@ -299,4 +299,13 @@ class PurchaseOrderResource extends Resource
             'edit' => EditPurchaseOrder::route('/{record}/edit'),
         ];
     }
+
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_purchase_orders'))
+            ->color('gray')
+            ->icon('heroicon-o-arrow-left')
+            ->url(static::getUrl('index'));
+    }
 }

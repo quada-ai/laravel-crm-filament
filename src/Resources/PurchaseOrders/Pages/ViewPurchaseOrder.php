@@ -18,15 +18,28 @@ class ViewPurchaseOrder extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            PurchaseOrderResource::backToIndexAction(),
+            $this->purchaseOrderSendAction()
+                ->button()
+                ->label(__('laravel-crm-filament::labels.actions.send'))
+                ->color('gray'),
+            $this->purchaseOrderDownloadPdfAction()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-arrow-down-tray'),
             $this->purchaseOrderPortalAction()
                 ->button()
-                ->hiddenLabel(),
+                ->hiddenLabel()
+                ->icon('heroicon-m-arrow-top-right-on-square')
+                ->color('gray'),
             Actions\EditAction::make()
                 ->button()
                 ->hiddenLabel()
                 ->icon('heroicon-m-pencil-square'),
-            $this->purchaseOrderSendAction(),
-            $this->purchaseOrderDownloadPdfAction(),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
         ];
     }
 
