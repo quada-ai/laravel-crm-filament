@@ -16,8 +16,8 @@ class ViewPerson extends ViewRecord
     {
         return [
             PersonResource::backToIndexAction(),
-            Actions\EditAction::make()->iconButton(),
-            Actions\DeleteAction::make()->iconButton(),
+            Actions\EditAction::make()->hiddenLabel()->tooltip('Edit'),
+            Actions\DeleteAction::make()->hiddenLabel()->tooltip('Delete'),
         ];
     }
 
