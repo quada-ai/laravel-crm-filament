@@ -62,6 +62,8 @@ class RelatedOrganizationsRelationManager extends RelationManager
                     ->hiddenLabel()
                     ->tooltip(__('laravel-crm-filament::labels.actions.add_organization'))
                     ->modalHeading(__('laravel-crm-filament::labels.actions.add_organization'))
+                    ->modalSubmitActionLabel('Link')
+                    ->createAnother(false)
                     ->using(function (array $data): Contact {
                         $owner = $this->getOwnerRecord();
                         $related = Organization::findOrFail($data['organization_id']);

@@ -78,6 +78,8 @@ class RelatedPeopleRelationManager extends RelationManager
                     ->hiddenLabel()
                     ->tooltip(__('laravel-crm-filament::labels.actions.add_person'))
                     ->modalHeading(__('laravel-crm-filament::labels.actions.add_person'))
+                    ->modalSubmitActionLabel('Link')
+                    ->createAnother(false)
                     ->using(function (array $data): Contact {
                         /** @var Person $owner */
                         $owner = $this->getOwnerRecord();
