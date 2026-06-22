@@ -9,6 +9,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Contact;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
@@ -18,6 +19,16 @@ class RelatedPeopleRelationManager extends RelationManager
     protected static string $relationship = 'relatedPeopleContacts';
 
     protected static ?string $title = 'Related people';
+
+    public function canCreate(): bool
+    {
+        return true;
+    }
+
+    public function canDelete(Model $record): bool
+    {
+        return true;
+    }
 
     public function form(Schema $schema): Schema
     {
