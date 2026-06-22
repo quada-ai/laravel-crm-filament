@@ -79,21 +79,31 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('email')->sortable()->searchable()->toggleable(),
-                Tables\Columns\IconColumn::make('crm_access')->label(__('laravel-crm-filament::labels.misc.crm'))->boolean(),
-                Tables\Columns\TextColumn::make('roles.name')
-                    ->label(__('laravel-crm-filament::labels.fields.roles'))
-                    ->badge()
-                    ->color('gray'),
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('laravel-crm-filament::labels.fields.name'))
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('email')
+                    ->label(__('laravel-crm-filament::labels.fields.email'))
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('email_verified_at')
                     ->label(__('laravel-crm-filament::labels.fields.verified'))
-                    ->dateTime()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->date()
+                    ->toggleable(),
+                Tables\Columns\IconColumn::make('crm_access')
+                    ->label(__('laravel-crm-filament::labels.fields.crm_access'))
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label(__('laravel-crm-filament::labels.fields.role'))
+                    ->state(fn ($record) => $record->roles->first()?->name),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since(),
+                Tables\Columns\TextColumn::make('last_online_at')
+                    ->label(__('laravel-crm-filament::labels.fields.last_online'))
+                    ->since()
+                    ->placeholder('Never'),
             ])
             ->defaultSort('name')
             ->filters([

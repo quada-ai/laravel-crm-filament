@@ -635,6 +635,18 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasTable('users') && ! Schema::hasColumn('users', 'crm_access')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->boolean('crm_access')->default(true);
+            });
+        }
+
+        if (Schema::hasTable('users') && ! Schema::hasColumn('users', 'last_online_at')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->timestamp('last_online_at')->nullable();
+            });
+        }
+
         if (! Schema::hasTable($prefix . 'invoice_payments')) {
             Schema::create($prefix . 'invoice_payments', function (Blueprint $table) {
                 $table->bigIncrements('id');
