@@ -144,6 +144,7 @@ return [
         'ssl_issuer' => 'SSL issuer',
         'ssl_expires_at' => 'SSL expires at',
         'ssl_last_checked_at' => 'SSL last checked at',
+        'unit' => 'Unit',
     ],
 
     // Contact / address fields
@@ -235,6 +236,7 @@ return [
         'start_at' => 'Start at',
         'finish_at' => 'Finish at',
         'revenue' => 'Revenue',
+        'price' => 'Price',
     ],
 
     // Campaigns / messaging

@@ -143,6 +143,7 @@ return [
         'ssl_issuer' => 'Émetteur SSL',
         'ssl_expires_at' => 'SSL expire le',
         'ssl_last_checked_at' => 'SSL dernière vérification',
+        'unit' => 'Unité',
     ],
 
     'contact' => [
@@ -231,6 +232,7 @@ return [
         'start_at' => 'Début',
         'finish_at' => 'Fin',
         'revenue' => 'Chiffre d\'affaires',
+        'price' => 'Prix',
     ],
 
     'campaign' => [
