@@ -175,7 +175,21 @@ class ProductResource extends Resource
                     ->sortable()
                     ->toggleable(),
             ])
-            ->defaultSort('name')
+            ->defaultSort('created_at', 'desc')
+            ->filters([
+                Tables\Filters\SelectFilter::make('user_owner_id')
+                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->multiple()
+                    ->relationship('ownerUser', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('labels')
+                    ->label(__('laravel-crm-filament::labels.fields.labels'))
+                    ->multiple()
+                    ->relationship('labels', 'name')
+                    ->preload(),
+            ])
             ->recordActions([
                 Actions\ViewAction::make()
                     ->button()
@@ -183,6 +197,10 @@ class ProductResource extends Resource
                 Actions\EditAction::make()
                     ->button()
                     ->hiddenLabel(),
+                Actions\DeleteAction::make()
+                    ->button()
+                    ->hiddenLabel()
+                    ->requiresConfirmation(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
