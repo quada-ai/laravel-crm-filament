@@ -16,7 +16,7 @@ class ViewChatWidget extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            Actions\EditAction::make()->color('gray'),
             Actions\DeleteAction::make(),
         ];
     }
