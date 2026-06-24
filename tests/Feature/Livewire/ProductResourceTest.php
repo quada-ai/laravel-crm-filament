@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Product;
+use VentureDrake\LaravelCrm\Models\Setting;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\ListProducts;
 use VentureDrake\LaravelCrmFilament\Resources\Products\ProductResource;
 use VentureDrake\LaravelCrmFilament\Tests\RoleSeeder;
@@ -10,6 +11,10 @@ use VentureDrake\LaravelCrmFilament\Tests\Stubs\User;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
+    Setting::query()->firstOrCreate(
+        ['name' => 'currency'],
+        ['external_id' => (string) Str::uuid(), 'value' => 'USD']
+    );
     RoleSeeder::seed();
     $this->user = User::create([
         'name' => 'Product Tester',
