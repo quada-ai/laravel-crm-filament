@@ -123,8 +123,8 @@ it('wires an industry_id Select onto the Organization form', function () {
     expect($source)->toContain('Industry::query()');
 });
 
-it('attaches the ProductVariations relation manager to ProductResource', function () {
-    expect(ProductResource::getRelations())->toContain(ProductVariationsRelationManager::class);
+it('no longer attaches the ProductVariations relation manager to ProductResource', function () {
+    expect(ProductResource::getRelations())->not->toContain(ProductVariationsRelationManager::class);
 });
 
 it('wires a product_attribute_id Select onto the ProductVariations form', function () {

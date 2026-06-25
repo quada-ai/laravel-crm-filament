@@ -5,20 +5,22 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Products;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\TaxRate;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
-use VentureDrake\LaravelCrmFilament\RelationManagers\ProductVariationsRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\CreateProduct;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\EditProduct;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\ListProducts;
@@ -26,6 +28,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\ViewProduct;
 
 class ProductResource extends Resource
 {
+    use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use HasLabels;
     use HasPrimaryBulkActions;
@@ -209,11 +212,53 @@ class ProductResource extends Resource
             ]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->schema(fn (?Product $record) => array_merge([
+                    TextEntry::make('code')
+                        ->label(__('laravel-crm-filament::labels.money.sku')),
+
+                    TextEntry::make('barcode'),
+
+                    TextEntry::make('purchase_account'),
+
+                    TextEntry::make('sales_account'),
+
+                    TextEntry::make('unit'),
+
+                    TextEntry::make('taxRate.name'),
+
+                    TextEntry::make('taxRate.rate')
+                        ->suffix('%'),
+
+                    TextEntry::make('productCategory.name'),
+
+                    TextEntry::make('description')
+                        ->columnSpanFull(),
+
+                    TextEntry::make('ownerUser.name')
+                        ->placeholder('Unallocated'),
+                ], $record ? static::crmCustomFieldEntries($record, false) : [])),
+
+            Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
+                ->schema(fn (?Product $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
+                ->hidden(function ($record): bool {
+                    if (! $record instanceof Product) {
+                        return true;
+                    }
+
+                    return ! $record->fields()
+                        ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
+                        ->exists();
+                }),
+        ])->columns(1);
+    }
+
     public static function getRelations(): array
     {
-        return [
-            ProductVariationsRelationManager::class,
-        ];
+        return [];
     }
 
     public static function getPages(): array
