@@ -266,19 +266,27 @@ class FeatureResource extends Resource
         return $schema->components([
             Section::make(__('laravel-crm-filament::labels.sections.details'))
                 ->schema(fn (?Feature $record) => array_merge([
+                    TextEntry::make('feature_id')
+                        ->label(__('laravel-crm-filament::labels.fields.number')),
+
                     TextEntry::make('created_at')
                         ->label(__('laravel-crm-filament::labels.fields.created'))
                         ->since(),
-
-                    TextEntry::make('feature_id')
-                        ->label(__('laravel-crm-filament::labels.fields.number')),
 
                     TextEntry::make('description')
                         ->label(__('laravel-crm-filament::labels.fields.description'))
                         ->columnSpanFull(),
 
+                    TextEntry::make('submittedBy.name')
+                        ->label(__('laravel-crm-filament::labels.fields.submitted_by'))
+                        ->placeholder('—'),
+
+                    TextEntry::make('ownerUser.name')
+                        ->label(__('laravel-crm-filament::labels.fields.owner'))
+                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
+
                     TextEntry::make('status.name')
-                        ->label(__('laravel-crm-filament::labels.fields.feature_status'))
+                        ->label(__('laravel-crm-filament::labels.fields.status'))
                         ->badge()
                         ->color(function ($state, $record) {
                             $hex = $record?->status?->color;
@@ -289,47 +297,6 @@ class FeatureResource extends Resource
 
                             return '#' . ltrim($hex, '#');
                         }),
-
-                    TextEntry::make('is_public')
-                        ->label(__('laravel-crm-filament::labels.fields.is_public'))
-                        ->state(fn ($record) => $record?->is_public
-                            ? __('laravel-crm::lang.yes')
-                            : __('laravel-crm::lang.no')),
-
-                    TextEntry::make('votes_count')
-                        ->label(__('laravel-crm-filament::labels.fields.votes')),
-
-                    TextEntry::make('comments_count')
-                        ->label(__('laravel-crm-filament::labels.fields.comments')),
-
-                    TextEntry::make('views_count')
-                        ->label(__('laravel-crm-filament::labels.fields.views')),
-
-                    TextEntry::make('labels.name')
-                        ->label(__('laravel-crm-filament::labels.fields.labels'))
-                        ->badge()
-                        ->color(function ($state, $record) {
-                            $label = $record?->labels?->firstWhere('name', $state);
-                            $hex = $label?->hex;
-
-                            if (! $hex) {
-                                return 'gray';
-                            }
-
-                            return '#' . ltrim($hex, '#');
-                        }),
-
-                    TextEntry::make('submittedBy.name')
-                        ->label(__('laravel-crm-filament::labels.fields.submitted_by'))
-                        ->placeholder('—'),
-
-                    TextEntry::make('ownerUser.name')
-                        ->label(__('laravel-crm-filament::labels.fields.owner'))
-                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
-
-                    TextEntry::make('assignedToUser.name')
-                        ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
-                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
                 ], $record ? static::crmCustomFieldEntries($record, false) : [])),
 
             Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))

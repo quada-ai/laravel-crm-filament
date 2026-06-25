@@ -168,6 +168,87 @@ it('declares an infolist override that wraps Details and Custom fields sections'
     expect($source)->toContain('static::crmCustomFieldEntries($record, true)');
 });
 
+// AC: Details section contains exactly the 6 AC-named TextEntries in the prescribed
+// order. Cursor-walked strpos sequence asserts every TextEntry::make literal appears
+// in the right relative position — catches a future reorder OR removal in one
+// assertion. Modeled on ProductInfolistTest::it('infolist source contains Details +
+// Custom fields section headings in order').
+it('renders the 6 AC-named Details TextEntries in feature_id, created_at, description, submittedBy, ownerUser, status order', function () {
+    $source = file_get_contents((new ReflectionClass(FeatureResource::class))->getFileName());
+
+    // Restrict the search to the Details Section closure body so the test does not
+    // accidentally match the same TextEntry-shaped strings if Custom fields ever
+    // grew to reference these names. The Details closure runs from the
+    // ->schema(fn (?Feature $record) => array_merge([ marker through the matching
+    // ], $record ? static::crmCustomFieldEntries($record, false) : []) closure tail.
+    $detailsStart = strpos($source, '->schema(fn (?Feature $record) => array_merge([');
+    $detailsEnd = strpos($source, '], $record ? static::crmCustomFieldEntries($record, false)', $detailsStart);
+    expect($detailsStart)->not->toBeFalse();
+    expect($detailsEnd)->not->toBeFalse();
+    $detailsBody = substr($source, $detailsStart, $detailsEnd - $detailsStart);
+
+    $needles = [
+        "TextEntry::make('feature_id')",
+        "TextEntry::make('created_at')",
+        "TextEntry::make('description')",
+        "TextEntry::make('submittedBy.name')",
+        "TextEntry::make('ownerUser.name')",
+        "TextEntry::make('status.name')",
+    ];
+
+    $cursor = 0;
+    foreach ($needles as $needle) {
+        $pos = strpos($detailsBody, $needle, $cursor);
+        expect($pos)->not->toBeFalse(
+            "Expected to find {$needle} in the Details section closure at or after position {$cursor}"
+        );
+        $cursor = $pos + strlen($needle);
+    }
+});
+
+// AC: The Details section source MUST NOT reference the 6 dropped fields. Confined
+// to the Details Section closure so the table()'s votes/comments/is_public columns
+// stay untouched.
+it('drops is_public, votes_count, comments_count, views_count, labels.name, and assignedToUser.name from the Details section closure', function () {
+    $source = file_get_contents((new ReflectionClass(FeatureResource::class))->getFileName());
+
+    $detailsStart = strpos($source, '->schema(fn (?Feature $record) => array_merge([');
+    $detailsEnd = strpos($source, '], $record ? static::crmCustomFieldEntries($record, false)', $detailsStart);
+    expect($detailsStart)->not->toBeFalse();
+    expect($detailsEnd)->not->toBeFalse();
+    $detailsBody = substr($source, $detailsStart, $detailsEnd - $detailsStart);
+
+    expect($detailsBody)->not->toContain("TextEntry::make('is_public')");
+    expect($detailsBody)->not->toContain("TextEntry::make('votes_count')");
+    expect($detailsBody)->not->toContain("TextEntry::make('comments_count')");
+    expect($detailsBody)->not->toContain("TextEntry::make('views_count')");
+    expect($detailsBody)->not->toContain("TextEntry::make('labels.name')");
+    expect($detailsBody)->not->toContain("TextEntry::make('assignedToUser.name')");
+});
+
+// AC: Custom Fields section + its closure-typed ->hidden() gate must be preserved
+// byte-for-byte. Locks the exact contract via a single literal-source assertion —
+// any reformat/refactor that drifts the section's shape will trip this guard.
+it('preserves the Custom Fields section + its ->hidden() gate byte-for-byte', function () {
+    $source = file_get_contents((new ReflectionClass(FeatureResource::class))->getFileName());
+
+    $expected = <<<'PHP'
+Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
+                ->schema(fn (?Feature $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
+                ->hidden(function ($record): bool {
+                    if (! $record instanceof Feature) {
+                        return true;
+                    }
+
+                    return ! $record->fields()
+                        ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
+                        ->exists();
+                })
+PHP;
+
+    expect($source)->toContain($expected);
+});
+
 it('routes Create/Edit pages through FeatureService::create() and update()', function () {
     $createSource = file_get_contents((new ReflectionClass(CreateFeature::class))->getFileName());
     $editSource = file_get_contents((new ReflectionClass(EditFeature::class))->getFileName());
