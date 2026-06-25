@@ -89,6 +89,7 @@ return [
         'email' => 'E-mail',
         'phone' => 'Téléphone',
         'addresses' => 'Adresses',
+        'publicly_visible_to_portal_users' => 'Visible publiquement aux utilisateurs du portail',
         'terms' => 'Conditions',
         'open_deals' => 'Affaires ouvertes',
         'lost_deals' => 'Affaires perdues',
@@ -448,6 +449,7 @@ return [
         'add_comment' => 'Ajouter un commentaire',
         'add_status' => 'Ajouter un statut',
         'public_view' => 'Vue publique',
+        'submit_feature' => 'Soumettre une fonctionnalité',
     ],
 
     'import' => [

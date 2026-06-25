@@ -90,6 +90,7 @@ return [
         'email' => 'Email',
         'phone' => 'Phone',
         'addresses' => 'Addresses',
+        'publicly_visible_to_portal_users' => 'Publicly visible to portal users',
         'terms' => 'Terms',
         'open_deals' => 'Open deals',
         'lost_deals' => 'Lost deals',
@@ -493,6 +494,7 @@ return [
         'add_comment' => 'Add comment',
         'add_status' => 'Add status',
         'public_view' => 'Public view',
+        'submit_feature' => 'Submit feature',
     ],
 
     // CSV import
