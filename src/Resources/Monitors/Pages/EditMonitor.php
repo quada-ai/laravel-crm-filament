@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Monitors\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Enums\Width;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Monitor;
 use VentureDrake\LaravelCrm\Services\MonitorService;
@@ -33,5 +34,10 @@ class EditMonitor extends EditRecord
         app(MonitorService::class)->update($record, $data);
 
         return $record->refresh();
+    }
+
+    public function getMaxContentWidth(): Width | string | null
+    {
+        return Width::Full;
     }
 }
