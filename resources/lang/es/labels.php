@@ -146,6 +146,8 @@ return [
         'unit' => 'Unidad',
         'performance' => 'Rendimiento',
         'last_checked' => 'Última verificación',
+        'website_url' => 'URL del sitio web',
+        'friendly_name' => 'Nombre amigable',
     ],
 
     'contact' => [
@@ -207,6 +209,10 @@ return [
         'this_year' => 'Este año',
         'last_year' => 'El año pasado',
         'all_time' => 'Todo el tiempo',
+        'friendly_name_helper' => 'Si especifica un nombre amigable, lo mostraremos en lugar de la URL.',
+        'method_helper' => 'Qué método de solicitud HTTP usar.',
+        'downtime_helper' => 'El tiempo que su sitio debe estar inactivo antes de que le alertemos.',
+        'threshold_helper' => 'Enviaremos alertas una vez que este sitio sea constantemente más lento que este umbral.',
     ],
 
     'money' => [

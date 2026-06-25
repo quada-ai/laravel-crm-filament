@@ -146,6 +146,8 @@ return [
         'unit' => 'Unité',
         'performance' => 'Performance',
         'last_checked' => 'Dernière vérification',
+        'website_url' => 'URL du site Web',
+        'friendly_name' => 'Nom convivial',
     ],
 
     'contact' => [
@@ -207,6 +209,10 @@ return [
         'this_year' => 'Cette année',
         'last_year' => 'L\'année dernière',
         'all_time' => 'Tout le temps',
+        'friendly_name_helper' => 'Si vous spécifiez un nom convivial, nous l\'afficherons à la place de l\'URL.',
+        'method_helper' => 'Méthode de requête HTTP à utiliser.',
+        'downtime_helper' => 'Le temps que votre site doit être en panne avant que nous vous alertions.',
+        'threshold_helper' => 'Nous enverrons des alertes une fois que ce site sera systématiquement plus lent que ce seuil.',
     ],
 
     'money' => [

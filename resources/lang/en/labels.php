@@ -147,6 +147,8 @@ return [
         'unit' => 'Unit',
         'performance' => 'Performance',
         'last_checked' => 'Last checked',
+        'website_url' => 'Website url',
+        'friendly_name' => 'Friendly name',
     ],
 
     // Contact / address fields
@@ -210,6 +212,10 @@ return [
         'this_year' => 'This year',
         'last_year' => 'Last year',
         'all_time' => 'All time',
+        'friendly_name_helper' => 'If you specify a friendly name we\'ll display this instead of the url.',
+        'method_helper' => 'Which HTTP request method to use.',
+        'downtime_helper' => 'The amount of time your site needs to be down for before we alert you.',
+        'threshold_helper' => 'We\'ll send out alerts once this site is consistently slower than this threshold.',
     ],
 
     // Money / orders / lines

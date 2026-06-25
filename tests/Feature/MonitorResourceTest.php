@@ -46,34 +46,57 @@ it('routes Monitor page classes back to MonitorResource', function () {
     }
 });
 
-it('declares all AC-named form fields: name nullable, description, type/method Selects, url, headers KeyValue, interval, timeout, expected_status_code, perf_threshold_ms, downtime_minutes_before_alert, is_active, uptime_enabled, ssl_enabled, user_owner_id, user_assigned_id', function () {
+it('declares the 2-col create/edit form fields: url, name (Friendly name), description, method, expected_status_code, interval, downtime_minutes_before_alert, perf_threshold_ms, user_owner_id, is_active toggle + hidden type=https', function () {
     $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
 
+    // Fields surfaced in the 2-col layout (matches the screenshot reference)
+    expect($source)->toContain("Forms\\Components\\TextInput::make('url')");
     expect($source)->toContain("Forms\\Components\\TextInput::make('name')");
     expect($source)->toContain("Forms\\Components\\Textarea::make('description')");
-    expect($source)->toContain("Forms\\Components\\Select::make('type')");
     expect($source)->toContain("Forms\\Components\\Select::make('method')");
-    expect($source)->toContain("Forms\\Components\\TextInput::make('url')");
-    expect($source)->toContain("Forms\\Components\\KeyValue::make('headers')");
-    expect($source)->toContain("Forms\\Components\\TextInput::make('interval')");
-    expect($source)->toContain("Forms\\Components\\TextInput::make('timeout')");
     expect($source)->toContain("Forms\\Components\\TextInput::make('expected_status_code')");
-    expect($source)->toContain("Forms\\Components\\TextInput::make('perf_threshold_ms')");
+    expect($source)->toContain("Forms\\Components\\TextInput::make('interval')");
     expect($source)->toContain("Forms\\Components\\TextInput::make('downtime_minutes_before_alert')");
-    expect($source)->toContain("Forms\\Components\\Toggle::make('is_active')");
-    expect($source)->toContain("Forms\\Components\\Toggle::make('uptime_enabled')");
-    expect($source)->toContain("Forms\\Components\\Toggle::make('ssl_enabled')");
+    expect($source)->toContain("Forms\\Components\\TextInput::make('perf_threshold_ms')");
     expect($source)->toContain("Forms\\Components\\Select::make('user_owner_id')");
-    expect($source)->toContain("Forms\\Components\\Select::make('user_assigned_id')");
+    expect($source)->toContain("Forms\\Components\\Toggle::make('is_active')");
+
+    // Hidden type defaults to https (URL prefix shows protocol visually).
+    expect($source)->toContain("Forms\\Components\\Hidden::make('type')->default('https')");
+
+    // The screenshot layout drops these from the visible form.
+    expect($source)->not->toContain("Forms\\Components\\Select::make('type')");
+    expect($source)->not->toContain("Forms\\Components\\KeyValue::make('headers')");
+    expect($source)->not->toContain("Forms\\Components\\TextInput::make('timeout')");
+    expect($source)->not->toContain("Forms\\Components\\Toggle::make('uptime_enabled')");
+    expect($source)->not->toContain("Forms\\Components\\Toggle::make('ssl_enabled')");
+    expect($source)->not->toContain("Forms\\Components\\Select::make('user_assigned_id')");
+});
+
+it('renders the form in a 2-col Section layout with the screenshot-style helper texts', function () {
+    $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
+
+    // The Section is configured with ->columns(2) for the 2-col layout.
+    expect($source)->toMatch("/Section::make\\(__\\('laravel-crm-filament::labels\\.sections\\.monitor_settings'\\)\\)[\\s\\S]{0,200}->columns\\(2\\)/");
+
+    // URL has https:// prefix and example.com placeholder per the screenshot.
+    expect($source)->toContain("->prefix('https://')");
+    expect($source)->toContain("->placeholder('example.com')");
+
+    // The 4 helper-text translation keys are wired
+    expect($source)->toContain('labels.sales.friendly_name_helper');
+    expect($source)->toContain('labels.sales.method_helper');
+    expect($source)->toContain('labels.sales.downtime_helper');
+    expect($source)->toContain('labels.sales.threshold_helper');
 });
 
 it('does NOT make name required (nullable per AC since Monitor model declared name as nullable)', function () {
     $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
 
     // name has no ->required() chain.  The regex captures the make('name') call and a few lines after, then asserts ->required() does NOT appear in that vicinity.
-    expect($source)->toMatch("/Forms\\\\Components\\\\TextInput::make\\('name'\\)[^;]{0,200}->maxLength\\(255\\)/");
+    expect($source)->toMatch("/Forms\\\\Components\\\\TextInput::make\\('name'\\)[^;]{0,400}->maxLength\\(255\\)/");
     // url IS required
-    expect($source)->toMatch("/Forms\\\\Components\\\\TextInput::make\\('url'\\)[\\s\\S]{0,200}->required\\(\\)/");
+    expect($source)->toMatch("/Forms\\\\Components\\\\TextInput::make\\('url'\\)[\\s\\S]{0,400}->required\\(\\)/");
 });
 
 it('renders the 6 core-aligned columns in source: monitor_id, name, last_status, performance, last_response_time, last_checked_at', function () {

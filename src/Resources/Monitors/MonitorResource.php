@@ -10,7 +10,6 @@ use Filament\Forms;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -53,110 +52,88 @@ class MonitorResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
+        // Mirrors the 2-col create/edit monitor form: each row pairs a left
+        // and right field. Order: URL / Friendly name, Description / Method,
+        // Expected status code / Run check every, Minutes downtime /
+        // Performance threshold, Owner / Active. The `type` column is
+        // captured as a Hidden default of 'https' since the URL field shows
+        // the protocol via a prefix instead of a visible Select.
         return $schema->components([
             Section::make(__('laravel-crm-filament::labels.sections.monitor_settings'))
+                ->columns(2)
                 ->schema([
+                    Forms\Components\Hidden::make('type')->default('https'),
+
+                    Forms\Components\TextInput::make('url')
+                        ->label(__('laravel-crm-filament::labels.fields.website_url'))
+                        ->prefix('https://')
+                        ->placeholder('example.com')
+                        ->required()
+                        ->maxLength(1024),
+
                     Forms\Components\TextInput::make('name')
+                        ->label(__('laravel-crm-filament::labels.fields.friendly_name'))
+                        ->helperText(__('laravel-crm-filament::labels.sales.friendly_name_helper'))
                         ->maxLength(255),
 
                     Forms\Components\Textarea::make('description')
-                        ->rows(3)
-                        ->columnSpanFull(),
+                        ->label(__('laravel-crm-filament::labels.fields.description'))
+                        ->rows(4),
 
-                    Grid::make(2)->schema([
-                        Forms\Components\Select::make('type')
-                            ->label(__('laravel-crm-filament::labels.fields.type'))
-                            ->options([
-                                'http' => 'HTTP',
-                                'https' => 'HTTPS',
-                            ])
-                            ->default('https')
-                            ->required(),
+                    Forms\Components\Select::make('method')
+                        ->label(__('laravel-crm-filament::labels.fields.method'))
+                        ->helperText(__('laravel-crm-filament::labels.sales.method_helper'))
+                        ->options([
+                            'GET' => 'GET',
+                            'POST' => 'POST',
+                            'HEAD' => 'HEAD',
+                            'PUT' => 'PUT',
+                            'DELETE' => 'DELETE',
+                            'PATCH' => 'PATCH',
+                        ])
+                        ->default('GET')
+                        ->required(),
 
-                        Forms\Components\Select::make('method')
-                            ->label(__('laravel-crm-filament::labels.fields.method'))
-                            ->options([
-                                'GET' => 'GET',
-                                'POST' => 'POST',
-                                'HEAD' => 'HEAD',
-                                'PUT' => 'PUT',
-                                'DELETE' => 'DELETE',
-                                'PATCH' => 'PATCH',
-                            ])
-                            ->default('GET')
-                            ->required(),
-                    ]),
+                    Forms\Components\TextInput::make('expected_status_code')
+                        ->label(__('laravel-crm-filament::labels.fields.expected_status_code'))
+                        ->numeric()
+                        ->minValue(100)
+                        ->maxValue(599)
+                        ->default(200),
 
-                    Forms\Components\TextInput::make('url')
-                        ->label(__('laravel-crm-filament::labels.fields.url'))
-                        ->required()
-                        ->maxLength(1024)
-                        ->columnSpanFull(),
+                    Forms\Components\TextInput::make('interval')
+                        ->label(__('laravel-crm-filament::labels.sales.run_check_every'))
+                        ->suffix(__('laravel-crm-filament::labels.sales.minutes'))
+                        ->numeric()
+                        ->minValue(1)
+                        ->default(5),
 
-                    Forms\Components\KeyValue::make('headers')
-                        ->label(__('laravel-crm-filament::labels.fields.headers'))
-                        ->columnSpanFull(),
+                    Forms\Components\TextInput::make('downtime_minutes_before_alert')
+                        ->label(__('laravel-crm-filament::labels.sales.minutes_downtime_before_alert'))
+                        ->suffix(__('laravel-crm-filament::labels.sales.minutes'))
+                        ->helperText(__('laravel-crm-filament::labels.sales.downtime_helper'))
+                        ->numeric()
+                        ->minValue(0)
+                        ->default(5),
 
-                    Grid::make(3)->schema([
-                        Forms\Components\TextInput::make('interval')
-                            ->label(__('laravel-crm-filament::labels.fields.interval'))
-                            ->numeric()
-                            ->minValue(1)
-                            ->default(5),
+                    Forms\Components\TextInput::make('perf_threshold_ms')
+                        ->label(__('laravel-crm-filament::labels.sales.performance_threshold'))
+                        ->suffix('ms')
+                        ->helperText(__('laravel-crm-filament::labels.sales.threshold_helper'))
+                        ->numeric()
+                        ->minValue(0)
+                        ->default(3500),
 
-                        Forms\Components\TextInput::make('timeout')
-                            ->label(__('laravel-crm-filament::labels.fields.timeout'))
-                            ->numeric()
-                            ->minValue(1)
-                            ->default(30),
+                    Forms\Components\Select::make('user_owner_id')
+                        ->label(__('laravel-crm-filament::labels.fields.owner'))
+                        ->relationship('ownerUser', 'name')
+                        ->searchable()
+                        ->preload(),
 
-                        Forms\Components\TextInput::make('expected_status_code')
-                            ->label(__('laravel-crm-filament::labels.fields.expected_status_code'))
-                            ->numeric()
-                            ->minValue(100)
-                            ->maxValue(599)
-                            ->default(200),
-                    ]),
-
-                    Grid::make(2)->schema([
-                        Forms\Components\TextInput::make('perf_threshold_ms')
-                            ->label(__('laravel-crm-filament::labels.fields.perf_threshold_ms'))
-                            ->numeric()
-                            ->minValue(0),
-
-                        Forms\Components\TextInput::make('downtime_minutes_before_alert')
-                            ->label(__('laravel-crm-filament::labels.fields.downtime_minutes_before_alert'))
-                            ->numeric()
-                            ->minValue(0),
-                    ]),
-
-                    Grid::make(3)->schema([
-                        Forms\Components\Toggle::make('is_active')
-                            ->label(__('laravel-crm-filament::labels.fields.is_active'))
-                            ->default(true),
-
-                        Forms\Components\Toggle::make('uptime_enabled')
-                            ->label(__('laravel-crm-filament::labels.fields.uptime_enabled'))
-                            ->default(true),
-
-                        Forms\Components\Toggle::make('ssl_enabled')
-                            ->label(__('laravel-crm-filament::labels.fields.ssl_enabled'))
-                            ->default(false),
-                    ]),
-
-                    Grid::make(2)->schema([
-                        Forms\Components\Select::make('user_owner_id')
-                            ->label(__('laravel-crm-filament::labels.fields.owner'))
-                            ->relationship('ownerUser', 'name')
-                            ->searchable()
-                            ->preload(),
-
-                        Forms\Components\Select::make('user_assigned_id')
-                            ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
-                            ->relationship('assignedToUser', 'name')
-                            ->searchable()
-                            ->preload(),
-                    ]),
+                    Forms\Components\Toggle::make('is_active')
+                        ->label(__('laravel-crm-filament::labels.fields.active'))
+                        ->default(true)
+                        ->inline(false),
                 ]),
         ]);
     }
