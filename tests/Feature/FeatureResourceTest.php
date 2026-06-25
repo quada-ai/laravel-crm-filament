@@ -260,17 +260,42 @@ it('routes Create/Edit pages through FeatureService::create() and update()', fun
     expect($editSource)->toContain('->update(');
 });
 
-it('overrides ViewFeature::content() with the canonical 2-col Grid (infolist left, RMs right)', function () {
+it('overrides ViewFeature::content() with three top-level rows (two 2-col Grids + a full-width voters embed) and does NOT call getRelationManagersContentComponent()', function () {
     $source = file_get_contents((new ReflectionClass(ViewFeature::class))->getFileName());
 
+    // Row 1 + Row 2 are both 2-col Grids.
     expect($source)->toContain("Grid::make(['default' => 1, 'lg' => 2])");
+    // Row 1 includes the resource's infolist on the left.
     expect($source)->toContain('getInfolistContentComponent()');
-    expect($source)->toContain('getRelationManagersContentComponent()');
+    // Each Grid child uses lg=1 columnSpan; the trailing voters embed uses columnSpanFull().
     expect($source)->toContain("->columnSpan(['lg' => 1])");
+    expect($source)->toContain('->columnSpanFull()');
+
+    // Regression guard: the show page must NOT fall back to Filament's default
+    // RM tab renderer — the new layout owns the voters embed directly.
+    expect($source)->not->toContain('getRelationManagersContentComponent()');
 
     // content() must be declared on ViewFeature itself, not inherited
     $reflection = new ReflectionMethod(ViewFeature::class, 'content');
     expect($reflection->getDeclaringClass()->getName())->toBe(ViewFeature::class);
+});
+
+it('embeds the three new widgets in content() via Livewire::make and keys each off the record primary key', function () {
+    $source = file_get_contents((new ReflectionClass(ViewFeature::class))->getFileName());
+
+    // Row 1 right column: activity stats
+    expect($source)->toContain("Livewire::make(FeatureActivityStatsWidget::class, ['record' => \$record])");
+    expect($source)->toContain("->key('feature-activity-' . \$key)");
+
+    // Row 2: two charts
+    expect($source)->toContain("Livewire::make(FeatureVotesChart::class, ['record' => \$record])");
+    expect($source)->toContain("->key('feature-votes-chart-' . \$key)");
+    expect($source)->toContain("Livewire::make(FeatureViewsChart::class, ['record' => \$record])");
+    expect($source)->toContain("->key('feature-views-chart-' . \$key)");
+
+    // Row 3: voters relation manager full-width
+    expect($source)->toContain('Livewire::make(FeatureVotersRelationManager::class, $ownerData)');
+    expect($source)->toContain("->key('feature-voters-' . \$key)");
 });
 
 it('ViewFeature::getTitle() returns the bare title attribute', function () {
@@ -280,20 +305,74 @@ it('ViewFeature::getTitle() returns the bare title attribute', function () {
     expect($source)->toContain('$this->record?->title');
 });
 
-it('ViewFeature::getHeaderActions() returns Back, Edit, Delete in that order', function () {
+it('ViewFeature::getSubheading() returns an HtmlString with a status pill and a Private pill, branching on status presence and is_public', function () {
+    $source = file_get_contents((new ReflectionClass(ViewFeature::class))->getFileName());
+
+    // Signature + return type contract
+    expect($source)->toContain('public function getSubheading(): string | Htmlable | null');
+
+    // Status pill renders the status color background; Private pill ties to misc.private
+    expect($source)->toContain('background-color:');
+    expect($source)->toContain('laravel-crm-filament::labels.misc.private');
+
+    // Returns null only when both status is missing AND record is public
+    expect($source)->toContain('return new HtmlString');
+
+    // Imports are present
+    expect($source)->toContain('use Illuminate\\Contracts\\Support\\Htmlable;');
+    expect($source)->toContain('use Illuminate\\Support\\HtmlString;');
+});
+
+it('ViewFeature::getHeaderActions() returns Back, Public view (conditional), Edit, Delete in that order', function () {
     $source = file_get_contents((new ReflectionClass(ViewFeature::class))->getFileName());
 
     expect($source)->toContain('FeatureResource::backToIndexAction()');
+    expect($source)->toContain("Actions\\Action::make('publicView')");
     expect($source)->toContain('Actions\\EditAction::make()');
     expect($source)->toContain('Actions\\DeleteAction::make()');
 
-    // Back must come before Edit which must come before Delete in source order
+    // Back -> Public view -> Edit -> Delete order
     $backPos = strpos($source, 'FeatureResource::backToIndexAction()');
+    $publicPos = strpos($source, "Actions\\Action::make('publicView')");
     $editPos = strpos($source, 'Actions\\EditAction::make()');
     $deletePos = strpos($source, 'Actions\\DeleteAction::make()');
 
-    expect($backPos)->toBeLessThan($editPos);
+    expect($backPos)->toBeLessThan($publicPos);
+    expect($publicPos)->toBeLessThan($editPos);
     expect($editPos)->toBeLessThan($deletePos);
+});
+
+it('ViewFeature::publicView action uses Route::has guard + portal route + openUrlInNewTab + is_public visibility', function () {
+    $source = file_get_contents((new ReflectionClass(ViewFeature::class))->getFileName());
+
+    // Label routes through the actions.public_view translation key
+    expect($source)->toContain('laravel-crm-filament::labels.actions.public_view');
+
+    // Visibility gate on is_public
+    expect($source)->toContain('->visible(fn (Feature $r) => $r->is_public)');
+
+    // openUrlInNewTab is set
+    expect($source)->toContain('->openUrlInNewTab()');
+
+    // URL closure uses Route::has guard around the portal route, falling back to '#'
+    expect($source)->toContain("Route::has('laravel-crm.portal.features.show')");
+    expect($source)->toContain("route('laravel-crm.portal.features.show', \$r->external_id)");
+
+    // The Illuminate\Support\Facades\Route import is in place
+    expect($source)->toContain('use Illuminate\\Support\\Facades\\Route;');
+});
+
+it('ViewFeature::getAllRelationManagers() returns an empty array so the 10 RM tabs are hidden on the show page only', function () {
+    $reflection = new ReflectionMethod(ViewFeature::class, 'getAllRelationManagers');
+    expect($reflection->getDeclaringClass()->getName())->toBe(ViewFeature::class);
+
+    $page = (new ReflectionClass(ViewFeature::class))->newInstanceWithoutConstructor();
+    $reflection->setAccessible(true);
+    expect($reflection->invoke($page))->toBe([]);
+
+    // Regression guard: FeatureResource::getRelations() still returns the
+    // full 10-element list — EditFeature's RM tabs stay untouched.
+    expect(FeatureResource::getRelations())->toHaveCount(10);
 });
 
 it('declares backToIndexAction and listKanbanToggleActions factories on FeatureResource', function () {
