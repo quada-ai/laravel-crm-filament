@@ -36,6 +36,19 @@ class EditMonitor extends EditRecord
         return $record->refresh();
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        // Fall back to the same defaults used by the Create form so existing
+        // monitors that pre-date these columns still show populated inputs
+        // rather than blank fields.
+        $data['downtime_minutes_before_alert'] ??= 5;
+        $data['perf_threshold_ms'] ??= 3500;
+        $data['expected_status_code'] ??= 200;
+        $data['interval'] ??= 5;
+
+        return $data;
+    }
+
     public function getMaxContentWidth(): Width | string | null
     {
         return Width::Full;
