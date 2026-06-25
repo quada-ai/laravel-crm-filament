@@ -60,6 +60,7 @@ class MonitorResource extends Resource
         // the protocol via a prefix instead of a visible Select.
         return $schema->components([
             Section::make(__('laravel-crm-filament::labels.sections.monitor_settings'))
+                ->columnSpanFull()
                 ->columns(2)
                 ->schema([
                     Forms\Components\Hidden::make('type')->default('https'),
