@@ -153,7 +153,7 @@ class ProductResource extends Resource
                     ->money(fn ($record) => $record?->getDefaultPrice()?->currency ?: config('laravel-crm.default_currency', 'USD')),
 
                 Tables\Columns\TextColumn::make('taxRate.name')
-                    ->label(__('laravel-crm-filament::labels.fields.tax'))
+                    ->label(__('laravel-crm-filament::labels.money.tax'))
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('taxRate.rate')
