@@ -4,11 +4,12 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Monitors\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use VentureDrake\LaravelCrm\Models\Monitor;
 use VentureDrake\LaravelCrmFilament\Resources\Monitors\MonitorResource;
+use VentureDrake\LaravelCrmFilament\Widgets\MonitorResponseTimeChart;
+use VentureDrake\LaravelCrmFilament\Widgets\MonitorStatsWidget;
 
 class ViewMonitor extends ViewRecord
 {
@@ -24,6 +25,20 @@ class ViewMonitor extends ViewRecord
         }
 
         return $record->name ?: ($record->host ?: ($record->url ?: (string) $record->getKey()));
+    }
+
+    public function getSubheading(): string | Htmlable | null
+    {
+        /** @var Monitor|null $record */
+        $record = $this->record;
+
+        if ($record === null) {
+            return null;
+        }
+
+        $parts = array_filter([$record->monitor_id, $record->url], fn ($v) => filled($v));
+
+        return $parts === [] ? null : implode(' — ', $parts);
     }
 
     protected function getHeaderActions(): array
@@ -42,13 +57,24 @@ class ViewMonitor extends ViewRecord
         ];
     }
 
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            MonitorStatsWidget::class,
+            MonitorResponseTimeChart::class,
+        ];
+    }
+
+    public function getHeaderWidgetsColumns(): array | int
+    {
+        return 1;
+    }
+
     public function content(Schema $schema): Schema
     {
         return $schema->components([
-            Grid::make(['default' => 1, 'lg' => 2])->schema([
-                $this->getInfolistContentComponent()->columnSpan(['lg' => 1]),
-                $this->getRelationManagersContentComponent()->columnSpan(['lg' => 1]),
-            ]),
+            $this->getInfolistContentComponent(),
+            $this->getRelationManagersContentComponent(),
         ]);
     }
 }

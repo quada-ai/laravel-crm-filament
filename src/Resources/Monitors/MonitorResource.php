@@ -296,87 +296,60 @@ class MonitorResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
+        // Mirrors core CRM's monitors/monitor-show layout: a 2-column Details
+        // card showing exactly the 8 fields core surfaces, plus a conditional
+        // SSL section preserved from the previous infolist. The 4 quick stat
+        // cards (status / response time / status code / last checked) and the
+        // response-time chart are wired as ViewMonitor header widgets, not
+        // here, so the infolist tells only the "configuration" story.
         return $schema->components([
             Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->columns(2)
                 ->schema([
-                    TextEntry::make('created_at')
-                        ->label(__('laravel-crm-filament::labels.fields.created'))
-                        ->since(),
-
-                    TextEntry::make('monitor_id')
-                        ->label(__('laravel-crm-filament::labels.fields.number'))
-                        ->placeholder('—'),
-
-                    TextEntry::make('name')
-                        ->label(__('laravel-crm-filament::labels.fields.name'))
-                        ->placeholder('—'),
-
-                    TextEntry::make('description')
-                        ->label(__('laravel-crm-filament::labels.fields.description'))
-                        ->placeholder('—')
-                        ->columnSpanFull(),
-
                     TextEntry::make('type')
                         ->label(__('laravel-crm-filament::labels.fields.type'))
-                        ->badge(),
+                        ->formatStateUsing(fn (?string $state): string => $state ? strtoupper($state) : '')
+                        ->placeholder('—'),
 
                     TextEntry::make('method')
                         ->label(__('laravel-crm-filament::labels.fields.method'))
-                        ->badge(),
-
-                    TextEntry::make('url')
-                        ->label(__('laravel-crm-filament::labels.fields.url'))
-                        ->columnSpanFull(),
-
-                    TextEntry::make('host')
-                        ->label(__('laravel-crm-filament::labels.fields.host'))
                         ->placeholder('—'),
 
                     TextEntry::make('expected_status_code')
-                        ->label(__('laravel-crm-filament::labels.fields.expected_status_code')),
+                        ->label(__('laravel-crm-filament::labels.fields.expected_status_code'))
+                        ->placeholder('—'),
 
                     TextEntry::make('interval')
-                        ->label(__('laravel-crm-filament::labels.fields.interval')),
-
-                    TextEntry::make('timeout')
-                        ->label(__('laravel-crm-filament::labels.fields.timeout')),
-
-                    TextEntry::make('perf_threshold_ms')
-                        ->label(__('laravel-crm-filament::labels.fields.perf_threshold_ms'))
-                        ->placeholder('—'),
+                        ->label(__('laravel-crm-filament::labels.sales.run_check_every'))
+                        ->state(fn (?Monitor $record): string => $record?->interval !== null
+                            ? $record->interval . ' ' . __('laravel-crm-filament::labels.sales.minutes')
+                            : '—'),
 
                     TextEntry::make('downtime_minutes_before_alert')
-                        ->label(__('laravel-crm-filament::labels.fields.downtime_minutes_before_alert'))
-                        ->placeholder('—'),
+                        ->label(__('laravel-crm-filament::labels.sales.minutes_downtime_before_alert'))
+                        ->state(fn (?Monitor $record): string => $record?->downtime_minutes_before_alert !== null
+                            ? $record->downtime_minutes_before_alert . ' ' . __('laravel-crm-filament::labels.sales.minutes')
+                            : '—'),
 
-                    TextEntry::make('is_active')
-                        ->label(__('laravel-crm-filament::labels.fields.is_active'))
-                        ->state(fn (?Monitor $record): string => $record?->is_active
-                            ? __('laravel-crm::lang.yes')
-                            : __('laravel-crm::lang.no')),
-
-                    TextEntry::make('uptime_enabled')
-                        ->label(__('laravel-crm-filament::labels.fields.uptime_enabled'))
-                        ->state(fn (?Monitor $record): string => $record?->uptime_enabled
-                            ? __('laravel-crm::lang.yes')
-                            : __('laravel-crm::lang.no')),
-
-                    TextEntry::make('ssl_enabled')
-                        ->label(__('laravel-crm-filament::labels.fields.ssl_enabled'))
-                        ->state(fn (?Monitor $record): string => $record?->ssl_enabled
-                            ? __('laravel-crm::lang.yes')
-                            : __('laravel-crm::lang.no')),
+                    TextEntry::make('perf_threshold_ms')
+                        ->label(__('laravel-crm-filament::labels.sales.performance_threshold'))
+                        ->state(fn (?Monitor $record): string => $record?->perf_threshold_ms !== null
+                            ? $record->perf_threshold_ms . ' ms'
+                            : '—'),
 
                     TextEntry::make('ownerUser.name')
                         ->label(__('laravel-crm-filament::labels.fields.owner'))
                         ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
 
-                    TextEntry::make('assignedToUser.name')
-                        ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
-                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
+                    TextEntry::make('is_active')
+                        ->label(__('laravel-crm-filament::labels.fields.active'))
+                        ->state(fn (?Monitor $record): string => $record?->is_active
+                            ? __('laravel-crm::lang.yes')
+                            : __('laravel-crm::lang.no')),
                 ]),
 
             Section::make(__('laravel-crm-filament::labels.sections.ssl'))
+                ->columns(2)
                 ->schema([
                     TextEntry::make('ssl_status')
                         ->label(__('laravel-crm-filament::labels.fields.ssl_status'))
@@ -398,46 +371,6 @@ class MonitorResource extends Resource
                         ->placeholder('—'),
                 ])
                 ->hidden(fn (?Monitor $record): bool => ! ($record?->ssl_enabled ?? false)),
-
-            Section::make(__('laravel-crm-filament::labels.sections.status'))
-                ->schema([
-                    TextEntry::make('last_status')
-                        ->label(__('laravel-crm-filament::labels.fields.last_status'))
-                        ->badge()
-                        ->color(fn (?string $state): string => match ($state) {
-                            'up' => 'success',
-                            'down' => 'danger',
-                            'slow' => 'warning',
-                            default => 'gray',
-                        })
-                        ->placeholder('—'),
-
-                    TextEntry::make('last_response_time')
-                        ->label(__('laravel-crm-filament::labels.fields.last_response_time'))
-                        ->placeholder('—'),
-
-                    TextEntry::make('last_status_code')
-                        ->label(__('laravel-crm-filament::labels.fields.last_status_code'))
-                        ->placeholder('—'),
-
-                    TextEntry::make('last_checked_at')
-                        ->label(__('laravel-crm-filament::labels.fields.last_checked_at'))
-                        ->dateTime()
-                        ->since()
-                        ->placeholder('—'),
-
-                    TextEntry::make('last_status_changed_at')
-                        ->label(__('laravel-crm-filament::labels.fields.last_status_changed_at'))
-                        ->dateTime()
-                        ->since()
-                        ->placeholder('—'),
-
-                    TextEntry::make('down_since_at')
-                        ->label(__('laravel-crm-filament::labels.fields.down_since_at'))
-                        ->dateTime()
-                        ->since()
-                        ->placeholder('—'),
-                ]),
         ])->columns(1);
     }
 

@@ -160,7 +160,7 @@ it('returns exactly [MonitorChecksRelationManager, AuditsRelationManager] from g
     ]);
 });
 
-it('declares an infolist override with Details + SSL + Status sections', function () {
+it('declares an infolist override with Details + SSL sections (Status moved to stat-card header widget)', function () {
     $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
 
     $reflection = new ReflectionMethod(MonitorResource::class, 'infolist');
@@ -168,7 +168,6 @@ it('declares an infolist override with Details + SSL + Status sections', functio
 
     expect($source)->toContain("Section::make(__('laravel-crm-filament::labels.sections.details'))");
     expect($source)->toContain("Section::make(__('laravel-crm-filament::labels.sections.ssl'))");
-    expect($source)->toContain("Section::make(__('laravel-crm-filament::labels.sections.status'))");
 });
 
 it('gates the SSL section on ssl_enabled being true', function () {
@@ -190,16 +189,30 @@ it('routes Create/Edit pages through MonitorService::create() and update() so UR
     expect($editSource)->toContain('->update(');
 });
 
-it('overrides ViewMonitor::content() with the canonical 2-col Grid (infolist left, RMs right)', function () {
+it('overrides ViewMonitor::content() with infolist on top of relation managers (vertical stack), mirroring core CRM monitor-show layout', function () {
     $source = file_get_contents((new ReflectionClass(ViewMonitor::class))->getFileName());
 
-    expect($source)->toContain("Grid::make(['default' => 1, 'lg' => 2])");
     expect($source)->toContain('getInfolistContentComponent()');
     expect($source)->toContain('getRelationManagersContentComponent()');
-    expect($source)->toContain("->columnSpan(['lg' => 1])");
 
     $reflection = new ReflectionMethod(ViewMonitor::class, 'content');
     expect($reflection->getDeclaringClass()->getName())->toBe(ViewMonitor::class);
+});
+
+it('registers MonitorStatsWidget + MonitorResponseTimeChart as header widgets on ViewMonitor', function () {
+    $source = file_get_contents((new ReflectionClass(ViewMonitor::class))->getFileName());
+
+    expect($source)->toContain('getHeaderWidgets()');
+    expect($source)->toContain('MonitorStatsWidget::class');
+    expect($source)->toContain('MonitorResponseTimeChart::class');
+});
+
+it('declares ViewMonitor::getSubheading() returning monitor_id and url', function () {
+    $source = file_get_contents((new ReflectionClass(ViewMonitor::class))->getFileName());
+
+    expect($source)->toContain('public function getSubheading()');
+    expect($source)->toContain('monitor_id');
+    expect($source)->toContain('url');
 });
 
 it('ViewMonitor::getHeaderActions() returns Back, Edit, Delete in that order', function () {
