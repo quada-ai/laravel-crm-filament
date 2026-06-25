@@ -131,7 +131,8 @@ class ProductResource extends Resource
                 Tables\Columns\IconColumn::make('xero_contact_indicator')
                     ->label('')
                     ->state(fn ($record) => $record?->xeroItem !== null)
-                    ->boolean(),
+                    ->boolean()
+                    ->visible(fn (): bool => LaravelCrmPlugin::get()->isModuleEnabled('xero')),
 
                 Tables\Columns\TextColumn::make('code')
                     ->label(__('laravel-crm-filament::labels.money.sku'))

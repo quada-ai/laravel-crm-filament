@@ -128,7 +128,8 @@ class OrganizationResource extends Resource
                 Tables\Columns\IconColumn::make('xero_contact')
                     ->label('')
                     ->state(fn ($record) => $record?->xeroContact !== null)
-                    ->boolean(),
+                    ->boolean()
+                    ->visible(fn (): bool => LaravelCrmPlugin::get()->isModuleEnabled('xero')),
 
                 Tables\Columns\TextColumn::make('organizationType.name')
                     ->label(__('laravel-crm-filament::labels.fields.type'))
