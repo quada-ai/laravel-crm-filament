@@ -92,6 +92,12 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             return $model->morphToMany(Label::class, $morphName);
         });
 
+        if (class_exists(Feature::class)) {
+            Feature::resolveRelationUsing('labels', function ($model) use ($morphName) {
+                return $model->morphToMany(Label::class, $morphName);
+            });
+        }
+
         // Core CRM's base Model does not implement OwenIt\Auditing\Auditable
         // even though the audits table ships with the install. Resolve an
         // `audits()` morphMany on every primary model so the
