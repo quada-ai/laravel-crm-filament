@@ -149,6 +149,7 @@ return [
         'last_checked' => 'Last checked',
         'website_url' => 'Website url',
         'friendly_name' => 'Friendly name',
+        'public' => 'Public',
     ],
 
     // Contact / address fields

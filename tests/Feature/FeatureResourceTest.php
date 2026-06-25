@@ -72,22 +72,34 @@ it('orders the feature_status_id Select by the status order column', function ()
     expect($source)->toContain("->orderBy('order')");
 });
 
-it('renders the AC table columns in source: created_at, feature_id, title, status.name, labels.name, is_public, votes_count, comments_count, views_count, ownerUser.name', function () {
+it('renders the 7 core-aligned columns in source: created_at, feature_id, title, status.name, votes_count, comments_count, is_public', function () {
     $source = file_get_contents((new ReflectionClass(FeatureResource::class))->getFileName());
 
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('created_at')");
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('feature_id')");
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('title')");
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('status.name')");
-    expect($source)->toContain("Tables\\Columns\\TextColumn::make('labels.name')");
-    expect($source)->toContain("Tables\\Columns\\IconColumn::make('is_public')");
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('votes_count')");
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('comments_count')");
-    expect($source)->toContain("Tables\\Columns\\TextColumn::make('views_count')");
-    expect($source)->toContain("Tables\\Columns\\TextColumn::make('ownerUser.name')");
+    expect($source)->toContain("Tables\\Columns\\TextColumn::make('is_public')");
+
+    // Regression guard: dropped columns should not be present
+    expect($source)->not->toContain("Tables\\Columns\\TextColumn::make('labels.name')");
+    expect($source)->not->toContain("Tables\\Columns\\TextColumn::make('views_count')");
+    expect($source)->not->toContain("Tables\\Columns\\TextColumn::make('ownerUser.name')");
+    expect($source)->not->toContain("Tables\\Columns\\IconColumn::make('is_public')");
 });
 
-it('reads votes_count/comments_count/views_count straight off the model without withCount duplication', function () {
+it('renders is_public as a Yes/No formatted TextColumn matching core CRM', function () {
+    $source = file_get_contents((new ReflectionClass(FeatureResource::class))->getFileName());
+
+    // is_public uses TextColumn + formatStateUsing returning lang.yes/no — not IconColumn boolean
+    expect($source)->toMatch("/TextColumn::make\\('is_public'\\)[\\s\\S]{0,400}->formatStateUsing/");
+    expect($source)->toContain("__('laravel-crm::lang.yes')");
+    expect($source)->toContain("__('laravel-crm::lang.no')");
+});
+
+it('reads votes_count/comments_count straight off the model without withCount duplication', function () {
     $source = file_get_contents((new ReflectionClass(FeatureResource::class))->getFileName());
 
     // No withCount calls anywhere — these are persisted columns on crm_features
@@ -111,13 +123,15 @@ it('declares default sort created_at desc and uses ->since() for created_at colu
     expect($source)->toContain('->since()');
 });
 
-it('registers feature_status_id, user_owner_id, labels, is_public filters on the table', function () {
+it('registers exactly the 2 core-aligned filters: feature_status_id (Status) and is_public (Visibility)', function () {
     $source = file_get_contents((new ReflectionClass(FeatureResource::class))->getFileName());
 
     expect($source)->toContain("Tables\\Filters\\SelectFilter::make('feature_status_id')");
-    expect($source)->toContain("Tables\\Filters\\SelectFilter::make('user_owner_id')");
-    expect($source)->toContain("Tables\\Filters\\SelectFilter::make('labels')");
     expect($source)->toContain("Tables\\Filters\\TernaryFilter::make('is_public')");
+
+    // Regression guard: owner + labels filters are dropped to match core's drawer
+    expect($source)->not->toContain("Tables\\Filters\\SelectFilter::make('user_owner_id')");
+    expect($source)->not->toContain("Tables\\Filters\\SelectFilter::make('labels')");
 });
 
 it('registers View, Edit, Delete record actions with Delete requiring confirmation', function () {

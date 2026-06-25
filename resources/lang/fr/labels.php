@@ -148,6 +148,7 @@ return [
         'last_checked' => 'Dernière vérification',
         'website_url' => 'URL du site Web',
         'friendly_name' => 'Nom convivial',
+        'public' => 'Public',
     ],
 
     'contact' => [

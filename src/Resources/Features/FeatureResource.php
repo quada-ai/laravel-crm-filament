@@ -123,11 +123,15 @@ class FeatureResource extends Resource
     {
         return $table
             ->columns([
+                // Mirrors core CRM's Livewire FeatureIndex::headers() column set:
+                // created_at, feature_id, title, status.name (non-sortable badge),
+                // votes_count, comments_count, is_public (Yes/No). The previously
+                // surfaced labels/views_count/ownerUser columns are dropped to
+                // stay column-for-column aligned with core.
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('laravel-crm-filament::labels.fields.created'))
                     ->since()
-                    ->sortable()
-                    ->toggleable(),
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('feature_id')
                     ->label(__('laravel-crm-filament::labels.fields.number'))
@@ -135,12 +139,13 @@ class FeatureResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('title')
+                    ->label(__('laravel-crm-filament::labels.fields.title'))
                     ->sortable()
                     ->limit(60)
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('status.name')
-                    ->label(__('laravel-crm-filament::labels.fields.feature_status'))
+                    ->label(__('laravel-crm-filament::labels.fields.status'))
                     ->badge()
                     ->color(function ($state, $record) {
                         $hex = $record?->status?->color;
@@ -150,17 +155,7 @@ class FeatureResource extends Resource
                         }
 
                         return '#' . ltrim($hex, '#');
-                    })
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('labels.name')
-                    ->label(__('laravel-crm-filament::labels.fields.labels'))
-                    ->badge()
-                    ->limitList(3),
-
-                Tables\Columns\IconColumn::make('is_public')
-                    ->label(__('laravel-crm-filament::labels.fields.is_public'))
-                    ->boolean(),
+                    }),
 
                 Tables\Columns\TextColumn::make('votes_count')
                     ->label(__('laravel-crm-filament::labels.fields.votes'))
@@ -170,42 +165,26 @@ class FeatureResource extends Resource
                 Tables\Columns\TextColumn::make('comments_count')
                     ->label(__('laravel-crm-filament::labels.fields.comments'))
                     ->numeric()
-                    ->toggleable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('views_count')
-                    ->label(__('laravel-crm-filament::labels.fields.views'))
-                    ->numeric()
-                    ->toggleable()
+                Tables\Columns\TextColumn::make('is_public')
+                    ->label(__('laravel-crm-filament::labels.fields.public'))
+                    ->formatStateUsing(fn (?bool $state): string => $state
+                        ? __('laravel-crm::lang.yes')
+                        : __('laravel-crm::lang.no'))
                     ->sortable(),
-
-                Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label(__('laravel-crm-filament::labels.fields.owner'))
-                    ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'))
-                    ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                // Mirrors core's drawer: only Status (multi) and Visibility
+                // (is_public ternary). Owner + labels filters are dropped.
                 Tables\Filters\SelectFilter::make('feature_status_id')
-                    ->label(__('laravel-crm-filament::labels.fields.feature_status'))
+                    ->label(__('laravel-crm-filament::labels.fields.status'))
                     ->multiple()
                     ->options(fn () => FeatureStatus::query()->orderBy('order')->pluck('name', 'id')),
 
-                Tables\Filters\SelectFilter::make('user_owner_id')
-                    ->label(__('laravel-crm-filament::labels.fields.owner'))
-                    ->multiple()
-                    ->relationship('ownerUser', 'name')
-                    ->searchable()
-                    ->preload(),
-
-                Tables\Filters\SelectFilter::make('labels')
-                    ->label(__('laravel-crm-filament::labels.fields.labels'))
-                    ->multiple()
-                    ->relationship('labels', 'name')
-                    ->preload(),
-
                 Tables\Filters\TernaryFilter::make('is_public')
-                    ->label(__('laravel-crm-filament::labels.fields.is_public')),
+                    ->label(__('laravel-crm-filament::labels.fields.public')),
             ])
             ->recordActions([
                 Actions\ViewAction::make()
