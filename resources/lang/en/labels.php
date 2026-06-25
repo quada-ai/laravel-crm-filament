@@ -145,6 +145,8 @@ return [
         'ssl_expires_at' => 'SSL expires at',
         'ssl_last_checked_at' => 'SSL last checked at',
         'unit' => 'Unit',
+        'performance' => 'Performance',
+        'last_checked' => 'Last checked',
     ],
 
     // Contact / address fields

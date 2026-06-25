@@ -3,6 +3,7 @@
 namespace VentureDrake\LaravelCrmFilament\Resources\Monitors;
 
 use BackedEnum;
+use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -17,6 +18,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Jobs\RunMonitorCheck;
 use VentureDrake\LaravelCrm\Models\Monitor;
+use VentureDrake\LaravelCrm\Models\MonitorCheck;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
@@ -164,26 +166,25 @@ class MonitorResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('monitor_id')
+                    ->label(__('laravel-crm-filament::labels.fields.number'))
+                    ->sortable()
+                    ->searchable(),
+
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('laravel-crm-filament::labels.fields.name'))
+                    ->state(fn (?Model $record): string => $record?->displayName() ?? '')
                     ->sortable()
-                    ->searchable()
-                    ->placeholder('—'),
-
-                Tables\Columns\TextColumn::make('url')
-                    ->label(__('laravel-crm-filament::labels.fields.url'))
-                    ->limit(60)
-                    ->searchable()
-                    ->tooltip(fn (?Model $record): ?string => $record?->url),
-
-                Tables\Columns\TextColumn::make('type')
-                    ->label(__('laravel-crm-filament::labels.fields.type'))
-                    ->badge()
-                    ->toggleable(),
+                    ->searchable(query: fn ($query, string $search) => $query->where(
+                        fn ($q) => $q->where('name', 'like', "%{$search}%")
+                            ->orWhere('url', 'like', "%{$search}%")
+                            ->orWhere('monitor_id', 'like', "%{$search}%")
+                    )),
 
                 Tables\Columns\TextColumn::make('last_status')
-                    ->label(__('laravel-crm-filament::labels.fields.last_status'))
+                    ->label(__('laravel-crm-filament::labels.fields.status'))
                     ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state ? ucfirst($state) : '—')
                     ->color(fn (?string $state): string => match ($state) {
                         'up' => 'success',
                         'down' => 'danger',
@@ -192,43 +193,19 @@ class MonitorResource extends Resource
                     })
                     ->sortable(),
 
+                Tables\Columns\ViewColumn::make('performance')
+                    ->label(__('laravel-crm-filament::labels.fields.performance'))
+                    ->view('laravel-crm-filament::monitors.performance-bars'),
+
                 Tables\Columns\TextColumn::make('last_response_time')
-                    ->label(__('laravel-crm-filament::labels.fields.last_response_time'))
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(),
+                    ->label(__('laravel-crm-filament::labels.fields.response_time'))
+                    ->formatStateUsing(fn (?int $state): string => $state !== null ? "{$state} ms" : '—')
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('last_checked_at')
-                    ->label(__('laravel-crm-filament::labels.fields.last_checked_at'))
-                    ->since()
-                    ->sortable()
-                    ->toggleable(),
-
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label(__('laravel-crm-filament::labels.fields.is_active'))
-                    ->boolean()
-                    ->toggleable(),
-
-                Tables\Columns\IconColumn::make('uptime_enabled')
-                    ->label(__('laravel-crm-filament::labels.fields.uptime_enabled'))
-                    ->boolean()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\IconColumn::make('ssl_enabled')
-                    ->label(__('laravel-crm-filament::labels.fields.ssl_enabled'))
-                    ->boolean()
-                    ->toggleable(),
-
-                Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label(__('laravel-crm-filament::labels.fields.owner'))
-                    ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'))
-                    ->toggleable(),
-
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('laravel-crm-filament::labels.fields.created'))
-                    ->since()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label(__('laravel-crm-filament::labels.fields.last_checked'))
+                    ->formatStateUsing(fn ($state): string => $state ? $state->format('Y-m-d H:i') : '—')
+                    ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -492,5 +469,43 @@ class MonitorResource extends Resource
                     ->success()
                     ->send();
             });
+    }
+
+    /**
+     * Compute the last-7-days uptime response-time sparkline for a Monitor.
+     * Mirrors core CRM's MonitorIndex::performanceData() shape: an array of
+     * 7 ints (oldest -> newest) where each value is the average response_time
+     * for that day's uptime checks (0 when no data).
+     *
+     * @return array<int, int>
+     */
+    public static function performanceBars(Monitor $record): array
+    {
+        $start = Carbon::now()->subDays(6)->startOfDay();
+
+        $rows = MonitorCheck::query()
+            ->where('monitor_id', $record->id)
+            ->where('type', 'uptime')
+            ->whereNotNull('response_time')
+            ->where('checked_at', '>=', $start)
+            ->get(['response_time', 'checked_at']);
+
+        $buckets = array_fill(0, 7, ['sum' => 0, 'count' => 0]);
+
+        foreach ($rows as $row) {
+            $dayIndex = (int) floor(($row->checked_at->getTimestamp() - $start->getTimestamp()) / 86400);
+
+            if ($dayIndex < 0 || $dayIndex > 6) {
+                continue;
+            }
+
+            $buckets[$dayIndex]['sum'] += (int) $row->response_time;
+            $buckets[$dayIndex]['count']++;
+        }
+
+        return array_map(
+            fn ($b) => $b['count'] === 0 ? 0 : (int) round($b['sum'] / $b['count']),
+            $buckets,
+        );
     }
 }

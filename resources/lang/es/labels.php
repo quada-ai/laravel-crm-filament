@@ -144,6 +144,8 @@ return [
         'ssl_expires_at' => 'SSL expira el',
         'ssl_last_checked_at' => 'SSL última verificación',
         'unit' => 'Unidad',
+        'performance' => 'Rendimiento',
+        'last_checked' => 'Última verificación',
     ],
 
     'contact' => [

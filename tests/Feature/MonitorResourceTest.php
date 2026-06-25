@@ -76,43 +76,44 @@ it('does NOT make name required (nullable per AC since Monitor model declared na
     expect($source)->toMatch("/Forms\\\\Components\\\\TextInput::make\\('url'\\)[\\s\\S]{0,200}->required\\(\\)/");
 });
 
-it('renders the AC table columns in source: name, url, type, last_status, last_response_time, last_checked_at, is_active, uptime_enabled, ssl_enabled, ownerUser.name, created_at', function () {
+it('renders the 6 core-aligned columns in source: monitor_id, name, last_status, performance, last_response_time, last_checked_at', function () {
     $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
 
+    expect($source)->toContain("Tables\\Columns\\TextColumn::make('monitor_id')");
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('name')");
-    expect($source)->toContain("Tables\\Columns\\TextColumn::make('url')");
-    expect($source)->toContain("Tables\\Columns\\TextColumn::make('type')");
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('last_status')");
+    expect($source)->toContain("Tables\\Columns\\ViewColumn::make('performance')");
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('last_response_time')");
     expect($source)->toContain("Tables\\Columns\\TextColumn::make('last_checked_at')");
-    expect($source)->toContain("Tables\\Columns\\IconColumn::make('is_active')");
-    expect($source)->toContain("Tables\\Columns\\IconColumn::make('uptime_enabled')");
-    expect($source)->toContain("Tables\\Columns\\IconColumn::make('ssl_enabled')");
-    expect($source)->toContain("Tables\\Columns\\TextColumn::make('ownerUser.name')");
-    expect($source)->toContain("Tables\\Columns\\TextColumn::make('created_at')");
+
+    // Regression guard: dropped columns should not be present
+    expect($source)->not->toContain("Tables\\Columns\\TextColumn::make('url')");
+    expect($source)->not->toContain("Tables\\Columns\\TextColumn::make('type')");
+    expect($source)->not->toContain("Tables\\Columns\\IconColumn::make('is_active')");
+    expect($source)->not->toContain("Tables\\Columns\\IconColumn::make('uptime_enabled')");
+    expect($source)->not->toContain("Tables\\Columns\\IconColumn::make('ssl_enabled')");
+    expect($source)->not->toContain("Tables\\Columns\\TextColumn::make('ownerUser.name')");
+    expect($source)->not->toContain("Tables\\Columns\\TextColumn::make('created_at')");
 });
 
-it('renders columns in the expected order: name, url, type, last_status, last_response_time, last_checked_at, is_active, uptime_enabled, ssl_enabled, ownerUser.name, created_at', function () {
+it('renders columns in the expected order: monitor_id, name, last_status, performance, last_response_time, last_checked_at', function () {
     $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
 
     // Find the first occurrence of each column's make() declaration.
     $names = [
-        'name', 'url', 'type', 'last_status', 'last_response_time', 'last_checked_at',
-        'is_active', 'uptime_enabled', 'ssl_enabled', 'ownerUser.name', 'created_at',
+        'monitor_id', 'name', 'last_status', 'performance', 'last_response_time', 'last_checked_at',
     ];
     $positions = [];
     foreach ($names as $col) {
-        // First occurrence of either TextColumn::make('col') or IconColumn::make('col')
-        $textPos = strpos($source, "TextColumn::make('{$col}')");
-        $iconPos = strpos($source, "IconColumn::make('{$col}')");
-        $pos = false;
-        if ($textPos !== false && $iconPos !== false) {
-            $pos = min($textPos, $iconPos);
-        } elseif ($textPos !== false) {
-            $pos = $textPos;
-        } elseif ($iconPos !== false) {
-            $pos = $iconPos;
+        // First occurrence of TextColumn::make('col'), IconColumn::make('col'), or ViewColumn::make('col')
+        $candidates = [];
+        foreach (["TextColumn::make('{$col}')", "IconColumn::make('{$col}')", "ViewColumn::make('{$col}')"] as $needle) {
+            $p = strpos($source, $needle);
+            if ($p !== false) {
+                $candidates[] = $p;
+            }
         }
+        $pos = $candidates === [] ? false : min($candidates);
         expect($pos)->not->toBe(false, "Column {$col} not found");
         $positions[$col] = $pos;
     }
@@ -130,11 +131,10 @@ it('maps the last_status badge color: up=success, down=danger, slow=warning, nul
     expect($source)->toContain("default => 'gray'");
 });
 
-it('declares default sort created_at desc and uses ->since() for last_checked_at and created_at', function () {
+it('declares default sort created_at desc', function () {
     $source = file_get_contents((new ReflectionClass(MonitorResource::class))->getFileName());
 
     expect($source)->toContain("->defaultSort('created_at', 'desc')");
-    expect($source)->toContain('->since()');
 });
 
 it('registers type, last_status, is_active, ssl_enabled, and user_owner_id filters on the table', function () {
