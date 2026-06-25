@@ -217,6 +217,8 @@ return [
         'method_helper' => 'Which HTTP request method to use.',
         'downtime_helper' => 'The amount of time your site needs to be down for before we alert you.',
         'threshold_helper' => 'We\'ll send out alerts once this site is consistently slower than this threshold.',
+        'votes_over_time' => 'Votes over time',
+        'views_over_time' => 'Views over time',
     ],
 
     // Money / orders / lines
@@ -490,6 +492,7 @@ return [
         'run_check_now' => 'Run check now',
         'add_comment' => 'Add comment',
         'add_status' => 'Add status',
+        'public_view' => 'Public view',
     ],
 
     // CSV import
@@ -512,6 +515,7 @@ return [
         'hours_before' => 'Hours before',
         'attribute' => 'Attribute',
         'diff_from_gmt' => 'Diff from GMT',
+        'private' => 'Private',
     ],
     'status' => [
         'complete' => 'Complete',

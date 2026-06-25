@@ -214,6 +214,8 @@ return [
         'method_helper' => 'Méthode de requête HTTP à utiliser.',
         'downtime_helper' => 'Le temps que votre site doit être en panne avant que nous vous alertions.',
         'threshold_helper' => 'Nous enverrons des alertes une fois que ce site sera systématiquement plus lent que ce seuil.',
+        'votes_over_time' => 'Votes au fil du temps',
+        'views_over_time' => 'Vues au fil du temps',
     ],
 
     'money' => [
@@ -445,6 +447,7 @@ return [
         'run_check_now' => 'Exécuter la vérification maintenant',
         'add_comment' => 'Ajouter un commentaire',
         'add_status' => 'Ajouter un statut',
+        'public_view' => 'Vue publique',
     ],
 
     'import' => [
@@ -465,6 +468,7 @@ return [
         'hours_before' => "Heures à l'avance",
         'attribute' => 'Attribut',
         'diff_from_gmt' => 'Décalage GMT',
+        'private' => 'Privé',
     ],
 
     'xero' => [
