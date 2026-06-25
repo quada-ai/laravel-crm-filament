@@ -35,14 +35,14 @@ class CreateFeature extends CreateRecord
     {
         return $schema->components([
             Section::make()
+                ->columnSpanFull()
                 ->schema([
                     Forms\Components\TextInput::make('title')
                         ->required()
                         ->maxLength(255),
 
                     Forms\Components\Textarea::make('description')
-                        ->rows(5)
-                        ->columnSpanFull(),
+                        ->rows(5),
 
                     Forms\Components\Select::make('feature_status_id')
                         ->label(__('laravel-crm-filament::labels.fields.status'))
@@ -57,7 +57,7 @@ class CreateFeature extends CreateRecord
                         ->label(__('laravel-crm-filament::labels.fields.publicly_visible_to_portal_users'))
                         ->default(false),
                 ]),
-        ]);
+        ])->columns(1);
     }
 
     protected function getCreateFormAction(): Action
