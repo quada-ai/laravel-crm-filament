@@ -153,11 +153,16 @@ it('registers View, Edit, Delete record actions with Delete requiring confirmati
     expect($source)->toMatch('/recordActions\\(\\[(?:\\s|\\S)*?Actions\\\\ViewAction::make\\(\\)(?:\\s|\\S)*?Actions\\\\EditAction::make\\(\\)(?:\\s|\\S)*?Actions\\\\DeleteAction::make\\(\\)(?:\\s|\\S)*?->requiresConfirmation\\(\\)/');
 });
 
-it('returns exactly [MonitorChecksRelationManager, AuditsRelationManager] from getRelations()', function () {
+it('returns exactly [MonitorChecksRelationManager] from getRelations() (audit History tab removed)', function () {
     expect(MonitorResource::getRelations())->toEqual([
         MonitorChecksRelationManager::class,
-        AuditsRelationManager::class,
     ]);
+});
+
+it('does not register AuditsRelationManager on MonitorResource (history tab intentionally absent)', function () {
+    expect(MonitorResource::getRelations())->not->toContain(
+        AuditsRelationManager::class
+    );
 });
 
 it('declares an infolist override with Details + SSL sections (Status moved to stat-card header widget)', function () {

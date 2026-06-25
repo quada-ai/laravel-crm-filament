@@ -21,7 +21,6 @@ use VentureDrake\LaravelCrm\Models\Monitor;
 use VentureDrake\LaravelCrm\Models\MonitorCheck;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
-use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MonitorChecksRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Monitors\Pages\CreateMonitor;
 use VentureDrake\LaravelCrmFilament\Resources\Monitors\Pages\EditMonitor;
@@ -260,7 +259,6 @@ class MonitorResource extends Resource
     {
         return [
             MonitorChecksRelationManager::class,
-            AuditsRelationManager::class,
         ];
     }
 
