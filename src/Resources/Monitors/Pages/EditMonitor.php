@@ -40,4 +40,9 @@ class EditMonitor extends EditRecord
     {
         return Width::Full;
     }
+
+    protected function getAllRelationManagers(): array
+    {
+        return [];
+    }
 }
