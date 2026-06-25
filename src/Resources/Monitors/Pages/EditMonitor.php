@@ -45,6 +45,7 @@ class EditMonitor extends EditRecord
         $data['perf_threshold_ms'] ??= 3500;
         $data['expected_status_code'] ??= 200;
         $data['interval'] ??= 5;
+        $data['user_owner_id'] ??= auth()->id();
 
         return $data;
     }
