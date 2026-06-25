@@ -329,6 +329,7 @@ return [
         'thresholds' => 'Umbrales',
         'ssl' => 'SSL',
         'status' => 'Estado',
+        'prices' => 'Precios',
     ],
 
     'actions' => [

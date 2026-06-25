@@ -329,6 +329,7 @@ return [
         'thresholds' => 'Seuils',
         'ssl' => 'SSL',
         'status' => 'Statut',
+        'prices' => 'Prix',
     ],
 
     'actions' => [

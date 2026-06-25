@@ -373,6 +373,7 @@ return [
         'thresholds' => 'Thresholds',
         'ssl' => 'SSL',
         'status' => 'Status',
+        'prices' => 'Prices',
     ],
 
     // Actions
