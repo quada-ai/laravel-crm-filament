@@ -442,6 +442,7 @@ return [
         'back_to_leads' => 'Back to leads',
         'back_to_quotes' => 'Back to quotes',
         'back_to_deals' => 'Back to deals',
+        'back_to_products' => 'Back to products',
         'back_to_people' => 'Back to people',
         'back_to_teams' => 'Back to teams',
         'back_to_users' => 'Back to users',

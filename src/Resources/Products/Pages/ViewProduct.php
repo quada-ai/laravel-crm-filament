@@ -16,7 +16,17 @@ class ViewProduct extends ViewRecord
 
     protected function getHeaderActions(): array
     {
-        return [Actions\EditAction::make()->color('gray')];
+        return [
+            ProductResource::backToIndexAction(),
+            Actions\EditAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
+        ];
     }
 
     public function content(Schema $schema): Schema
