@@ -34,7 +34,7 @@ class ProductPricesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('currency')
                     ->label(__('laravel-crm-filament::labels.fields.currency')),
             ])
-            ->defaultSort('default', 'desc')
+            ->defaultSort('id', 'asc')
             ->headerActions([])
             ->recordActions([])
             ->toolbarActions([]);

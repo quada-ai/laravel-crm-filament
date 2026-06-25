@@ -71,12 +71,12 @@ it('labels unit_price via money.unit_price and currency via fields.currency', fu
         ->and($source)->toContain("__('laravel-crm-filament::labels.fields.currency')");
 });
 
-it('sets default sort on the default flag desc so default-flagged price renders first', function () {
+it('sets default sort on id asc for stable insertion-order rendering', function () {
     $source = file_get_contents(
         (new ReflectionClass(ProductPricesRelationManager::class))->getFileName(),
     );
 
-    expect($source)->toContain("->defaultSort('default', 'desc')");
+    expect($source)->toContain("->defaultSort('id', 'asc')");
 });
 
 it('does not surface cost columns or the default boolean as a visible column', function () {
