@@ -264,19 +264,6 @@ class FeatureResource extends Resource
                     TextEntry::make('submittedBy.name')
                         ->label(__('laravel-crm-filament::labels.fields.submitted_by'))
                         ->placeholder('—'),
-
-                    TextEntry::make('status.name')
-                        ->label(__('laravel-crm-filament::labels.fields.status'))
-                        ->badge()
-                        ->color(function ($state, $record) {
-                            $hex = $record?->status?->color;
-
-                            if (! $hex) {
-                                return 'gray';
-                            }
-
-                            return '#' . ltrim($hex, '#');
-                        }),
                 ], $record ? static::crmCustomFieldEntries($record, false) : [])),
 
             Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))

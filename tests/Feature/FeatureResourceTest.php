@@ -177,7 +177,7 @@ it('declares an infolist override that wraps Details and Custom fields sections'
 // in the right relative position — catches a future reorder OR removal in one
 // assertion. Modeled on ProductInfolistTest::it('infolist source contains Details +
 // Custom fields section headings in order').
-it('renders the 5 AC-named Details TextEntries in feature_id, created_at, description, submittedBy, status order', function () {
+it('renders the 4 AC-named Details TextEntries in feature_id, created_at, description, submittedBy order', function () {
     $source = file_get_contents((new ReflectionClass(FeatureResource::class))->getFileName());
 
     // Restrict the search to the Details Section closure body so the test does not
@@ -196,7 +196,6 @@ it('renders the 5 AC-named Details TextEntries in feature_id, created_at, descri
         "TextEntry::make('created_at')",
         "TextEntry::make('description')",
         "TextEntry::make('submittedBy.name')",
-        "TextEntry::make('status.name')",
     ];
 
     $cursor = 0;
@@ -212,7 +211,7 @@ it('renders the 5 AC-named Details TextEntries in feature_id, created_at, descri
 // AC: The Details section source MUST NOT reference the 6 dropped fields. Confined
 // to the Details Section closure so the table()'s votes/comments/is_public columns
 // stay untouched.
-it('drops is_public, votes_count, comments_count, views_count, labels.name, assignedToUser.name, and ownerUser.name from the Details section closure', function () {
+it('drops is_public, votes_count, comments_count, views_count, labels.name, assignedToUser.name, ownerUser.name, and status.name from the Details section closure', function () {
     $source = file_get_contents((new ReflectionClass(FeatureResource::class))->getFileName());
 
     $detailsStart = strpos($source, '->schema(fn (?Feature $record) => array_merge([');
@@ -228,6 +227,7 @@ it('drops is_public, votes_count, comments_count, views_count, labels.name, assi
     expect($detailsBody)->not->toContain("TextEntry::make('labels.name')");
     expect($detailsBody)->not->toContain("TextEntry::make('assignedToUser.name')");
     expect($detailsBody)->not->toContain("TextEntry::make('ownerUser.name')");
+    expect($detailsBody)->not->toContain("TextEntry::make('status.name')");
 });
 
 // AC: Custom Fields section + its closure-typed ->hidden() gate must be preserved
