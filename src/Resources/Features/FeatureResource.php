@@ -115,8 +115,9 @@ class FeatureResource extends Resource
 
         return $schema->components([
             Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->columnSpanFull()
                 ->schema($details),
-        ]);
+        ])->columns(1);
     }
 
     public static function table(Table $table): Table
