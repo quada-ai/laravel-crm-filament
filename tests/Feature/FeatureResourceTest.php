@@ -53,16 +53,20 @@ it('routes Feature page classes back to FeatureResource', function () {
     }
 });
 
-it('declares title + description + is_public + feature_status_id + user_owner_id + user_assigned_id + labels in the form', function () {
+it('declares title + description + is_public + feature_status_id in the form and excludes owner/assigned_to/labels', function () {
     $source = file_get_contents((new ReflectionClass(FeatureResource::class))->getFileName());
 
     expect($source)->toContain("Forms\\Components\\TextInput::make('title')");
     expect($source)->toContain("Forms\\Components\\Textarea::make('description')");
     expect($source)->toContain("Forms\\Components\\Toggle::make('is_public')");
     expect($source)->toContain("Forms\\Components\\Select::make('feature_status_id')");
-    expect($source)->toContain("Forms\\Components\\Select::make('user_owner_id')");
-    expect($source)->toContain("Forms\\Components\\Select::make('user_assigned_id')");
-    expect($source)->toContain('static::labelsField()');
+
+    // Regression guard: owner / assigned-to / labels are intentionally dropped
+    // from the Feature edit form per product decision (these still exist on
+    // the Feature model and are surfaced on the show page).
+    expect($source)->not->toContain("Forms\\Components\\Select::make('user_owner_id')");
+    expect($source)->not->toContain("Forms\\Components\\Select::make('user_assigned_id')");
+    expect($source)->not->toContain('static::labelsField()');
 });
 
 it('orders the feature_status_id Select by the status order column', function () {

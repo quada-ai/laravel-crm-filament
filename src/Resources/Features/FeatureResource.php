@@ -8,7 +8,6 @@ use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -91,22 +90,6 @@ class FeatureResource extends Resource
                     ->all())
                 ->searchable()
                 ->preload(),
-
-            Grid::make(2)->schema([
-                Forms\Components\Select::make('user_owner_id')
-                    ->label(__('laravel-crm-filament::labels.fields.owner'))
-                    ->relationship('ownerUser', 'name')
-                    ->searchable()
-                    ->preload(),
-
-                Forms\Components\Select::make('user_assigned_id')
-                    ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
-                    ->relationship('assignedToUser', 'name')
-                    ->searchable()
-                    ->preload(),
-            ]),
-
-            static::labelsField(),
         ];
 
         if ($customFields = static::crmCustomFieldsSection(Feature::class)) {
