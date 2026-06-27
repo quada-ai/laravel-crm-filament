@@ -5,9 +5,8 @@ use Filament\Panel;
 use VentureDrake\LaravelCrm\Models\LeadStatus;
 use VentureDrake\LaravelCrm\Models\PipelineStageProbability;
 use VentureDrake\LaravelCrm\Models\Team;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Pages\Updates;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\Pages\Updates;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 use VentureDrake\LaravelCrmFilament\Resources\LeadStatuses\LeadStatusResource;
 use VentureDrake\LaravelCrmFilament\Resources\PipelineStageProbabilities\PipelineStageProbabilityResource;
@@ -98,8 +97,8 @@ it('targets the users relationship on the Team model from the TeamMembers RM', f
     expect($reflection->getValue())->toBe('users');
 });
 
-it('declares the Updates settings page in the Settings cluster at /updates', function () {
-    expect(Updates::getCluster())->toBe(Settings::class);
+it('declares the Updates page as a top-level Page (no longer in the Settings cluster) at /updates', function () {
+    expect(Updates::getCluster())->toBeNull();
     expect(Updates::getSlug())->toBe('updates');
 });
 

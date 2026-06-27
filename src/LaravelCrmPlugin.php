@@ -5,7 +5,12 @@ namespace VentureDrake\LaravelCrmFilament;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use VentureDrake\LaravelCrmFilament\Pages\CalendarPage;
+use VentureDrake\LaravelCrmFilament\Pages\ClickSendIntegration;
 use VentureDrake\LaravelCrmFilament\Pages\Dashboard;
+use VentureDrake\LaravelCrmFilament\Pages\GeneralSettings;
+use VentureDrake\LaravelCrmFilament\Pages\Integrations;
+use VentureDrake\LaravelCrmFilament\Pages\Reminders;
+use VentureDrake\LaravelCrmFilament\Pages\Updates;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\ActivityResource;
 use VentureDrake\LaravelCrmFilament\Resources\AddressTypes\AddressTypeResource;
 use VentureDrake\LaravelCrmFilament\Resources\Calls\CallResource;
@@ -357,6 +362,11 @@ class LaravelCrmPlugin implements Plugin
 
         $pages = [
             CalendarPage::class,
+            GeneralSettings::class,
+            Integrations::class,
+            ClickSendIntegration::class,
+            Reminders::class,
+            Updates::class,
         ];
 
         if ($this->registerDashboard && ! $this->panelHasDashboard($panel)) {
@@ -364,11 +374,6 @@ class LaravelCrmPlugin implements Plugin
         }
 
         $panel->pages($pages);
-
-        $panel->discoverClusters(
-            in: __DIR__ . '/Clusters',
-            for: 'VentureDrake\\LaravelCrmFilament\\Clusters',
-        );
 
         $widgets = [
             CrmStatsOverview::class,

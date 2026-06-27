@@ -1,7 +1,6 @@
 <?php
 
 use Spatie\Permission\Models\Role;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Resources\ChatWidgets\ChatWidgetResource;
 use VentureDrake\LaravelCrmFilament\Resources\EmailTemplates\EmailTemplateResource;
 use VentureDrake\LaravelCrmFilament\Resources\FieldGroups\FieldGroupResource;
@@ -48,8 +47,10 @@ it('routes other settings resources by external_id', function () {
     }
 });
 
-it('declares the Settings cluster nav icon', function () {
-    expect(Settings::getNavigationIcon())->toBe('heroicon-o-cog-6-tooth');
+it('no longer ships the Settings cluster class', function () {
+    // US-002 removed src/Clusters/Settings.php and the empty src/Clusters/ directory
+    // after the 5 cluster pages were promoted to the top-level Pages namespace.
+    expect(class_exists('VentureDrake\\LaravelCrmFilament\\Clusters\\Settings'))->toBeFalse();
 });
 
 it('protects Owner/Admin Spatie roles from edit/delete on RoleResource', function () {

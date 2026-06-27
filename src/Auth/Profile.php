@@ -24,7 +24,7 @@ use PragmaRX\Google2FA\Google2FA;
 use PragmaRX\Google2FAQRCode\QRCode\Chillerlan;
 use Throwable;
 use VentureDrake\LaravelCrm\Models\Setting;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Pages\Reminders;
+use VentureDrake\LaravelCrmFilament\Pages\Reminders;
 
 /**
  * Branded profile page for the CRM panel.

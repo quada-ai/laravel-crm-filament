@@ -3,10 +3,9 @@
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Filament\Resources\Pages\Page as ResourcePage;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Pages\Reminders;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Pages\CalendarPage;
+use VentureDrake\LaravelCrmFilament\Pages\Reminders;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\TaskKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
 
@@ -56,8 +55,8 @@ it('groups tasks into four status columns', function () {
     expect($blade)->toContain('data-status="{{ $status }}"');
 });
 
-it('declares the Reminders settings page in the Settings cluster at /reminders', function () {
-    expect(Reminders::getCluster())->toBe(Settings::class);
+it('declares the Reminders page as a top-level Page (no longer in the Settings cluster) at /reminders', function () {
+    expect(Reminders::getCluster())->toBeNull();
     expect(Reminders::getSlug())->toBe('reminders');
 });
 
