@@ -3,8 +3,8 @@
 use Filament\Auth\Pages\EditProfile;
 use VentureDrake\LaravelCrmFilament\Auth\Login;
 use VentureDrake\LaravelCrmFilament\Auth\Profile;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\ChatWidgetResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\Pages\ViewChatWidget;
+use VentureDrake\LaravelCrmFilament\Resources\ChatWidgets\ChatWidgetResource;
+use VentureDrake\LaravelCrmFilament\Resources\ChatWidgets\Pages\ViewChatWidget;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\Concerns\HasInvoicePortalAction;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\ViewInvoice;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\Pages\Concerns\HasQuotePortalAction;

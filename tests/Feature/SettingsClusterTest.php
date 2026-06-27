@@ -2,18 +2,18 @@
 
 use Spatie\Permission\Models\Role;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ChatWidgets\ChatWidgetResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\EmailTemplates\EmailTemplateResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FieldGroups\FieldGroupResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Fields\FieldResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Labels\LabelResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadSources\LeadSourceResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Pipelines\PipelineResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\PipelineStageResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ProductCategories\ProductCategoryResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Roles\RoleResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\SmsTemplates\SmsTemplateResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\TaxRates\TaxRateResource;
+use VentureDrake\LaravelCrmFilament\Resources\ChatWidgets\ChatWidgetResource;
+use VentureDrake\LaravelCrmFilament\Resources\EmailTemplates\EmailTemplateResource;
+use VentureDrake\LaravelCrmFilament\Resources\FieldGroups\FieldGroupResource;
+use VentureDrake\LaravelCrmFilament\Resources\Fields\FieldResource;
+use VentureDrake\LaravelCrmFilament\Resources\Labels\LabelResource;
+use VentureDrake\LaravelCrmFilament\Resources\LeadSources\LeadSourceResource;
+use VentureDrake\LaravelCrmFilament\Resources\Pipelines\PipelineResource;
+use VentureDrake\LaravelCrmFilament\Resources\PipelineStages\PipelineStageResource;
+use VentureDrake\LaravelCrmFilament\Resources\ProductCategories\ProductCategoryResource;
+use VentureDrake\LaravelCrmFilament\Resources\Roles\RoleResource;
+use VentureDrake\LaravelCrmFilament\Resources\SmsTemplates\SmsTemplateResource;
+use VentureDrake\LaravelCrmFilament\Resources\TaxRates\TaxRateResource;
 
 dataset('settingsResources', [
     'Pipeline' => [PipelineResource::class],
@@ -30,8 +30,8 @@ dataset('settingsResources', [
     'ChatWidget' => [ChatWidgetResource::class],
 ]);
 
-it('declares the Settings cluster on every cluster resource', function (string $resource) {
-    expect($resource::getCluster())->toBe(Settings::class);
+it('no longer declares the Settings cluster after the move to top-level Resources', function (string $resource) {
+    expect($resource::getCluster())->toBeNull();
 })->with('settingsResources');
 
 it('routes TaxRate by integer id since it has no external_id column', function () {

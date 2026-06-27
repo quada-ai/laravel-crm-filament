@@ -3,16 +3,16 @@
 use Filament\Facades\Filament;
 use Filament\Panel;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FeatureStatuses\FeatureStatusResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FeatureStatuses\Pages\CreateFeatureStatus;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FeatureStatuses\Pages\EditFeatureStatus;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FeatureStatuses\Pages\ListFeatureStatuses;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\FeatureStatusResource;
+use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\CreateFeatureStatus;
+use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\EditFeatureStatus;
+use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\ListFeatureStatuses;
 
-it('binds FeatureStatusResource to the FeatureStatus model and lives in the Settings cluster', function () {
+it('binds FeatureStatusResource to the FeatureStatus model as a top-level Resource (no longer in the Settings cluster)', function () {
     expect(FeatureStatusResource::getModel())->toBe('VentureDrake\\LaravelCrm\\Models\\FeatureStatus');
-    expect(FeatureStatusResource::getCluster())->toBe(Settings::class);
+    expect(FeatureStatusResource::getCluster())->toBeNull();
     expect(FeatureStatusResource::getRecordRouteKeyName())->toBe('external_id');
 });
 
@@ -91,7 +91,7 @@ it('does not gate FeatureStatusResource on a module flag in LaravelCrmPlugin sou
     $source = file_get_contents((new ReflectionClass(LaravelCrmPlugin::class))->getFileName());
     // The registration line should sit in the "always-registered" Settings cluster block,
     // not inside an isModuleEnabled() conditional.
-    expect($source)->toMatch("/\\\$resources\\[\\] = FeatureStatusResource::class;/");
+    expect($source)->toMatch('/\\$resources\\[\\] = FeatureStatusResource::class;/');
 
     // Locate FeatureStatusResource registration and assert no nearby isModuleEnabled guard wraps it.
     $needle = '$resources[] = FeatureStatusResource::class;';

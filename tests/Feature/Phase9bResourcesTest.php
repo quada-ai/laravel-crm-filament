@@ -7,11 +7,11 @@ use VentureDrake\LaravelCrm\Models\PipelineStageProbability;
 use VentureDrake\LaravelCrm\Models\Team;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Clusters\Settings\Pages\Updates;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\LeadStatuses\LeadStatusResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStageProbabilities\PipelineStageProbabilityResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\PipelineStages\PipelineStageResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
+use VentureDrake\LaravelCrmFilament\Resources\LeadStatuses\LeadStatusResource;
+use VentureDrake\LaravelCrmFilament\Resources\PipelineStageProbabilities\PipelineStageProbabilityResource;
+use VentureDrake\LaravelCrmFilament\Resources\PipelineStages\PipelineStageResource;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\CrmTeamResource;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\CreateCrmTeam;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\EditCrmTeam;
@@ -19,9 +19,9 @@ use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\ListCrmTeams;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\ViewCrmTeam;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\RelationManagers\TeamMembersRelationManager;
 
-it('binds LeadStatusResource to the LeadStatus model and lives in the Settings cluster', function () {
+it('binds LeadStatusResource to the LeadStatus model as a top-level Resource (no longer in the Settings cluster)', function () {
     expect(LeadStatusResource::getModel())->toBe(LeadStatus::class);
-    expect(LeadStatusResource::getCluster())->toBe(Settings::class);
+    expect(LeadStatusResource::getCluster())->toBeNull();
     expect(LeadStatusResource::getRecordRouteKeyName())->toBe('external_id');
 });
 
@@ -29,9 +29,9 @@ it('exposes list+create+edit pages on LeadStatusResource', function () {
     expect(array_keys(LeadStatusResource::getPages()))->toEqual(['index', 'create', 'edit']);
 });
 
-it('binds PipelineStageProbabilityResource to the model and lives in the Settings cluster', function () {
+it('binds PipelineStageProbabilityResource to the model as a top-level Resource (no longer in the Settings cluster)', function () {
     expect(PipelineStageProbabilityResource::getModel())->toBe(PipelineStageProbability::class);
-    expect(PipelineStageProbabilityResource::getCluster())->toBe(Settings::class);
+    expect(PipelineStageProbabilityResource::getCluster())->toBeNull();
     expect(PipelineStageProbabilityResource::getRecordRouteKeyName())->toBe('external_id');
 });
 

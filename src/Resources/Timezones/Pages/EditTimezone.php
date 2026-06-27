@@ -1,0 +1,17 @@
+<?php
+
+namespace VentureDrake\LaravelCrmFilament\Resources\Timezones\Pages;
+
+use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
+use VentureDrake\LaravelCrmFilament\Resources\Timezones\TimezoneResource;
+
+class EditTimezone extends EditRecord
+{
+    protected static string $resource = TimezoneResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [Actions\DeleteAction::make()];
+    }
+}

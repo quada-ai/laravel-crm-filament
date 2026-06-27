@@ -9,22 +9,21 @@ use VentureDrake\LaravelCrm\Models\Industry;
 use VentureDrake\LaravelCrm\Models\OrganizationType;
 use VentureDrake\LaravelCrm\Models\ProductAttribute;
 use VentureDrake\LaravelCrm\Models\Timezone;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\AddressTypes\AddressTypeResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ContactTypes\ContactTypeResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Industries\IndustryResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\OrganizationTypes\OrganizationTypeResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\ProductAttributes\ProductAttributeResource;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\Timezones\TimezoneResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\ProductVariationsRelationManager;
+use VentureDrake\LaravelCrmFilament\Resources\AddressTypes\AddressTypeResource;
+use VentureDrake\LaravelCrmFilament\Resources\ContactTypes\ContactTypeResource;
 use VentureDrake\LaravelCrmFilament\Resources\Customers\CustomerResource;
 use VentureDrake\LaravelCrmFilament\Resources\Customers\Pages\CreateCustomer;
 use VentureDrake\LaravelCrmFilament\Resources\Customers\Pages\EditCustomer;
 use VentureDrake\LaravelCrmFilament\Resources\Customers\Pages\ListCustomers;
 use VentureDrake\LaravelCrmFilament\Resources\Customers\Pages\ViewCustomer;
+use VentureDrake\LaravelCrmFilament\Resources\Industries\IndustryResource;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
+use VentureDrake\LaravelCrmFilament\Resources\OrganizationTypes\OrganizationTypeResource;
+use VentureDrake\LaravelCrmFilament\Resources\ProductAttributes\ProductAttributeResource;
 use VentureDrake\LaravelCrmFilament\Resources\Products\ProductResource;
+use VentureDrake\LaravelCrmFilament\Resources\Timezones\TimezoneResource;
 use VentureDrake\LaravelCrmFilament\Services\CustomerService;
 
 dataset('lookupResources', [
@@ -73,8 +72,8 @@ it('binds each lookup resource to its core model', function (string $resource, s
     expect($resource::getModel())->toBe($model);
 })->with('lookupResources');
 
-it('places every lookup resource inside the Settings cluster', function (string $resource) {
-    expect($resource::getCluster())->toBe(Settings::class);
+it('no longer places lookup resources inside the Settings cluster after the move to top-level Resources', function (string $resource) {
+    expect($resource::getCluster())->toBeNull();
 })->with('lookupResources');
 
 it('exposes list+create+edit pages on each lookup resource', function (string $resource) {

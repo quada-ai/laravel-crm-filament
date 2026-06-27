@@ -1,9 +1,9 @@
 <?php
 
 use Filament\Panel;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings\Resources\FeatureStatuses\FeatureStatusResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Features\FeatureResource;
+use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\FeatureStatusResource;
 use VentureDrake\LaravelCrmFilament\Resources\Monitors\MonitorResource;
 
 // AC: Register FeatureResource and MonitorResource in LaravelCrmPlugin::register()
