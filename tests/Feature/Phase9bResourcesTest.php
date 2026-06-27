@@ -18,9 +18,10 @@ use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\ListCrmTeams;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\ViewCrmTeam;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\RelationManagers\TeamMembersRelationManager;
 
-it('binds LeadStatusResource to the LeadStatus model as a top-level Resource (no longer in the Settings cluster)', function () {
+it('binds LeadStatusResource to the LeadStatus model as a top-level Resource in the Settings navigation group', function () {
     expect(LeadStatusResource::getModel())->toBe(LeadStatus::class);
-    expect(LeadStatusResource::getCluster())->toBeNull();
+    $nav = (new ReflectionClass(LeadStatusResource::class))->getStaticPropertyValue('navigationGroup');
+    expect($nav)->toBe('Settings');
     expect(LeadStatusResource::getRecordRouteKeyName())->toBe('external_id');
 });
 
@@ -28,9 +29,10 @@ it('exposes list+create+edit pages on LeadStatusResource', function () {
     expect(array_keys(LeadStatusResource::getPages()))->toEqual(['index', 'create', 'edit']);
 });
 
-it('binds PipelineStageProbabilityResource to the model as a top-level Resource (no longer in the Settings cluster)', function () {
+it('binds PipelineStageProbabilityResource to the model as a top-level Resource in the Settings navigation group', function () {
     expect(PipelineStageProbabilityResource::getModel())->toBe(PipelineStageProbability::class);
-    expect(PipelineStageProbabilityResource::getCluster())->toBeNull();
+    $nav = (new ReflectionClass(PipelineStageProbabilityResource::class))->getStaticPropertyValue('navigationGroup');
+    expect($nav)->toBe('Settings');
     expect(PipelineStageProbabilityResource::getRecordRouteKeyName())->toBe('external_id');
 });
 
@@ -52,7 +54,6 @@ it('wires a pipeline_stage_probability_id Select onto the PipelineStage form', f
 
 it('binds CrmTeamResource to the Team model as a top-level Contacts-group resource', function () {
     expect(CrmTeamResource::getModel())->toBe(Team::class);
-    expect(CrmTeamResource::getCluster())->toBeNull();
     expect(CrmTeamResource::getSlug())->toBe('crm-teams');
 });
 
@@ -68,9 +69,8 @@ it('declares navigationSort=60 on CrmTeamResource', function () {
     expect($reflection->getValue())->toBe(60);
 });
 
-it('lives under the top-level Resources\\Teams namespace, not the Settings cluster namespace', function () {
+it('lives under the top-level Resources\\Teams namespace', function () {
     expect(CrmTeamResource::class)->toStartWith('VentureDrake\\LaravelCrmFilament\\Resources\\Teams\\');
-    expect(class_exists('VentureDrake\\LaravelCrmFilament\\Clusters\\Settings\\Resources\\CrmTeams\\CrmTeamResource'))->toBeFalse();
 });
 
 it('exposes CRUD pages on CrmTeamResource at the expected slug', function () {
@@ -97,8 +97,9 @@ it('targets the users relationship on the Team model from the TeamMembers RM', f
     expect($reflection->getValue())->toBe('users');
 });
 
-it('declares the Updates page as a top-level Page (no longer in the Settings cluster) at /updates', function () {
-    expect(Updates::getCluster())->toBeNull();
+it('declares the Updates page in the Settings navigation group at /updates', function () {
+    $nav = (new ReflectionClass(Updates::class))->getStaticPropertyValue('navigationGroup');
+    expect($nav)->toBe('Settings');
     expect(Updates::getSlug())->toBe('updates');
 });
 

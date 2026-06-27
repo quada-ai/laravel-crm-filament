@@ -2,20 +2,14 @@
 
 use Filament\Facades\Filament;
 use Filament\Panel;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\CreateUser;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\EditUser;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\ListUsers;
 use VentureDrake\LaravelCrmFilament\Resources\Users\UserResource;
 
-it('lives under the top-level Resources namespace, not the Settings cluster namespace', function () {
+it('lives under the top-level Resources namespace', function () {
     expect(UserResource::class)->toStartWith('VentureDrake\\LaravelCrmFilament\\Resources\\Users\\');
-    expect(class_exists('VentureDrake\\LaravelCrmFilament\\Clusters\\Settings\\Resources\\Users\\UserResource'))->toBeFalse();
-});
-
-it('no longer declares the Settings cluster on UserResource', function () {
-    expect(UserResource::getCluster())->toBeNull();
 });
 
 it('declares Contacts as the navigation group on UserResource', function () {

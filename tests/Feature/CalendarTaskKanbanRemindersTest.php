@@ -55,8 +55,9 @@ it('groups tasks into four status columns', function () {
     expect($blade)->toContain('data-status="{{ $status }}"');
 });
 
-it('declares the Reminders page as a top-level Page (no longer in the Settings cluster) at /reminders', function () {
-    expect(Reminders::getCluster())->toBeNull();
+it('declares the Reminders page in the Settings navigation group at /reminders', function () {
+    $nav = (new ReflectionClass(Reminders::class))->getStaticPropertyValue('navigationGroup');
+    expect($nav)->toBe('Settings');
     expect(Reminders::getSlug())->toBe('reminders');
 });
 

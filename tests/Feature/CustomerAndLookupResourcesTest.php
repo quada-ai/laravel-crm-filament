@@ -72,8 +72,9 @@ it('binds each lookup resource to its core model', function (string $resource, s
     expect($resource::getModel())->toBe($model);
 })->with('lookupResources');
 
-it('no longer places lookup resources inside the Settings cluster after the move to top-level Resources', function (string $resource) {
-    expect($resource::getCluster())->toBeNull();
+it('places every lookup resource in the Settings navigation group', function (string $resource) {
+    $nav = (new ReflectionClass($resource))->getStaticPropertyValue('navigationGroup');
+    expect($nav)->toBe('Settings');
 })->with('lookupResources');
 
 it('exposes list+create+edit pages on each lookup resource', function (string $resource) {

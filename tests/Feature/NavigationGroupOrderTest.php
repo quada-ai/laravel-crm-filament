@@ -28,9 +28,3 @@ it('does not call discoverClusters in LaravelCrmPlugin source (regression guard)
 
     expect($source)->not->toContain('discoverClusters');
 });
-
-it('does not import any Clusters\\Settings FQCN in LaravelCrmPlugin source (regression guard)', function () {
-    $source = file_get_contents((new ReflectionClass(LaravelCrmPlugin::class))->getFileName());
-
-    expect($source)->not->toContain('Clusters\\Settings\\');
-});

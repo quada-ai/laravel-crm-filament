@@ -2,7 +2,6 @@
 
 use Filament\Facades\Filament;
 use Filament\Panel;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\FeatureStatusResource;
@@ -10,9 +9,10 @@ use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\CreateFeatur
 use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\EditFeatureStatus;
 use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\ListFeatureStatuses;
 
-it('binds FeatureStatusResource to the FeatureStatus model as a top-level Resource (no longer in the Settings cluster)', function () {
+it('binds FeatureStatusResource to the FeatureStatus model as a top-level Resource in the Settings navigation group', function () {
     expect(FeatureStatusResource::getModel())->toBe('VentureDrake\\LaravelCrm\\Models\\FeatureStatus');
-    expect(FeatureStatusResource::getCluster())->toBeNull();
+    $nav = (new ReflectionClass(FeatureStatusResource::class))->getStaticPropertyValue('navigationGroup');
+    expect($nav)->toBe('Settings');
     expect(FeatureStatusResource::getRecordRouteKeyName())->toBe('external_id');
 });
 

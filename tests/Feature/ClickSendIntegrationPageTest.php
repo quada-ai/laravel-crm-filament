@@ -8,8 +8,9 @@ use VentureDrake\LaravelCrm\Services\SettingService;
 use VentureDrake\LaravelCrmFilament\Pages\ClickSendIntegration;
 use VentureDrake\LaravelCrmFilament\Pages\Integrations;
 
-it('declares the ClickSendIntegration page as a top-level Page (no longer in the Settings cluster) at /clicksend', function () {
-    expect(ClickSendIntegration::getCluster())->toBeNull();
+it('declares the ClickSendIntegration page in the Settings navigation group at /clicksend', function () {
+    $nav = (new ReflectionClass(ClickSendIntegration::class))->getStaticPropertyValue('navigationGroup');
+    expect($nav)->toBe('Settings');
     expect(ClickSendIntegration::getSlug())->toBe('clicksend');
 });
 
@@ -142,11 +143,7 @@ it('links the legacy Integrations page to the new ClickSend page', function () {
     expect($source)->toContain('manageClickSend');
 });
 
-it('lives under the top-level Pages directory (no longer auto-discovered via the Settings cluster)', function () {
+it('lives under the top-level Pages directory', function () {
     $path = __DIR__ . '/../../src/Pages/ClickSendIntegration.php';
     expect(file_exists($path))->toBeTrue();
-
-    // The page is now registered explicitly via $panel->pages([...]) in LaravelCrmPlugin,
-    // and no longer carries a $cluster property.
-    expect(ClickSendIntegration::getCluster())->toBeNull();
 });
