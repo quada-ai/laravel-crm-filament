@@ -48,11 +48,12 @@ it('registers UserResource on the panel as a top-level resource', function () {
     expect($panel->getResources())->toContain(UserResource::class);
 });
 
-it('Settings cluster resources dataset does not include UserResource', function () {
-    // SettingsClusterTest's `settingsResources` dataset is the source of truth for
-    // which resources live in the Settings cluster. UserResource MUST NOT appear
-    // there after the promotion.
-    $file = dirname(__DIR__) . '/Feature/SettingsClusterTest.php';
+it('Settings nav-group resources dataset does not include UserResource', function () {
+    // SettingsNavGroupTest's `settingsNavGroupResources` dataset enumerates the
+    // promoted Settings resources whose `$navigationGroup` is asserted to be
+    // 'Settings'. UserResource MUST NOT appear there after the promotion to the
+    // Contacts navigation group.
+    $file = dirname(__DIR__) . '/Feature/SettingsNavGroupTest.php';
     $src = file_get_contents($file);
     expect($src)->not->toContain('UserResource');
 });

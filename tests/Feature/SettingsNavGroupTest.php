@@ -14,7 +14,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Roles\RoleResource;
 use VentureDrake\LaravelCrmFilament\Resources\SmsTemplates\SmsTemplateResource;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\TaxRateResource;
 
-dataset('settingsResources', [
+dataset('settingsNavGroupResources', [
     'Pipeline' => [PipelineResource::class],
     'PipelineStage' => [PipelineStageResource::class],
     'Label' => [LabelResource::class],
@@ -29,9 +29,10 @@ dataset('settingsResources', [
     'ChatWidget' => [ChatWidgetResource::class],
 ]);
 
-it('no longer declares the Settings cluster after the move to top-level Resources', function (string $resource) {
-    expect($resource::getCluster())->toBeNull();
-})->with('settingsResources');
+it('declares "Settings" as the navigationGroup on every promoted Settings resource', function (string $resource) {
+    $nav = (new ReflectionClass($resource))->getStaticPropertyValue('navigationGroup');
+    expect($nav)->toBe('Settings');
+})->with('settingsNavGroupResources');
 
 it('routes TaxRate by integer id since it has no external_id column', function () {
     expect(TaxRateResource::getRecordRouteKeyName())->toBeNull();
@@ -45,12 +46,6 @@ it('routes other settings resources by external_id', function () {
         ChatWidgetResource::class] as $r) {
         expect($r::getRecordRouteKeyName())->toBe('external_id');
     }
-});
-
-it('no longer ships the Settings cluster class', function () {
-    // US-002 removed src/Clusters/Settings.php and the empty src/Clusters/ directory
-    // after the 5 cluster pages were promoted to the top-level Pages namespace.
-    expect(class_exists('VentureDrake\\LaravelCrmFilament\\Clusters\\Settings'))->toBeFalse();
 });
 
 it('protects Owner/Admin Spatie roles from edit/delete on RoleResource', function () {
