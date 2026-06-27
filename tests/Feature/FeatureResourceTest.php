@@ -309,15 +309,22 @@ it('ViewFeature::getTitle() returns the bare title attribute', function () {
     expect($source)->toContain('$this->record?->title');
 });
 
-it('ViewFeature::getSubheading() returns an HtmlString with a status pill and a Private pill, branching on status presence and is_public', function () {
+it('ViewFeature::getSubheading() returns an HtmlString with Lead-style dark pills for status and Private, branching on status presence and is_public', function () {
     $source = file_get_contents((new ReflectionClass(ViewFeature::class))->getFileName());
 
     // Signature + return type contract
     expect($source)->toContain('public function getSubheading(): string | Htmlable | null');
 
-    // Status pill renders the status color background; Private pill ties to misc.private
-    expect($source)->toContain('background-color:');
+    // Visual parity with Lead: dark gray-900 pill with white text (flips for dark mode).
+    // Drops the per-status colored background in favor of the family-wide pill style.
+    expect($source)->toContain('bg-gray-900');
+    expect($source)->toContain('text-white');
+
+    // Private pill ties to misc.private translation key
     expect($source)->toContain('laravel-crm-filament::labels.misc.private');
+
+    // Regression guard: the prior per-status inline colored pill is gone
+    expect($source)->not->toContain('background-color:');
 
     // Returns null only when both status is missing AND record is public
     expect($source)->toContain('return new HtmlString');

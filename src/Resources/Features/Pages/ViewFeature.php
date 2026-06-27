@@ -34,31 +34,28 @@ class ViewFeature extends ViewRecord
             return null;
         }
 
-        $status = $record->status;
-        $hex = $status?->color;
-        $statusName = $status?->name;
+        $statusName = $record->status?->name;
         $isPublic = (bool) $record->is_public;
 
         if (! $statusName && $isPublic) {
             return null;
         }
 
+        // Mirror the Lead show-page subheading shape: a single dark pill per
+        // info chip, so Feature reads visually alongside Lead / Deal / Quote
+        // rather than introducing a per-status colored pill of its own.
+        $pillClass = 'inline-flex items-center rounded-md bg-gray-900 px-3 py-1 text-sm font-medium text-white dark:bg-gray-100 dark:text-gray-900';
+
         $pills = [];
 
         if ($statusName) {
-            $bg = $hex ? '#' . ltrim($hex, '#') : '#6b7280';
-            $pills[] = sprintf(
-                '<span style="background-color: %s; color: #ffffff; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 500;">%s</span>',
-                e($bg),
-                e($statusName),
-            );
+            $pills[] = '<span class="' . $pillClass . '">' . e($statusName) . '</span>';
         }
 
         if (! $isPublic) {
-            $pills[] = sprintf(
-                '<span style="background-color: #6b7280; color: #ffffff; padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 500;">%s</span>',
-                e(__('laravel-crm-filament::labels.misc.private')),
-            );
+            $pills[] = '<span class="' . $pillClass . '">'
+                . e(__('laravel-crm-filament::labels.misc.private'))
+                . '</span>';
         }
 
         return new HtmlString(implode(' ', $pills));
