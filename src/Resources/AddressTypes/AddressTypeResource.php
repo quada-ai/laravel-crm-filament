@@ -24,6 +24,10 @@ class AddressTypeResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-map-pin';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 135;
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([

@@ -25,6 +25,10 @@ class TaxRateResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-percent-badge';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 110;
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([

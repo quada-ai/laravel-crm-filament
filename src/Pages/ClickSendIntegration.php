@@ -27,11 +27,13 @@ class ClickSendIntegration extends Page implements HasForms
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
     protected static ?string $title = 'ClickSend (SMS)';
 
     protected static ?string $slug = 'clicksend';
 
-    protected static ?int $navigationSort = -4;
+    protected static ?int $navigationSort = 30;
 
     protected string $view = 'filament-panels::pages.page';
 

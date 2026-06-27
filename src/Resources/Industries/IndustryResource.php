@@ -24,6 +24,10 @@ class IndustryResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-building-library';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 150;
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([

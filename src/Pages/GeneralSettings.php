@@ -25,11 +25,13 @@ class GeneralSettings extends Page implements HasForms
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-vertical';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
     protected static ?string $title = 'General';
 
     protected static ?string $slug = 'general';
 
-    protected static ?int $navigationSort = -10;
+    protected static ?int $navigationSort = 10;
 
     protected string $view = 'filament-panels::pages.page';
 

@@ -12,11 +12,13 @@ class Updates extends Page
 {
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
     protected static ?string $title = 'Updates';
 
     protected static ?string $slug = 'updates';
 
-    protected static ?int $navigationSort = 100;
+    protected static ?int $navigationSort = 250;
 
     protected string $view = 'laravel-crm-filament::clusters.settings.pages.updates';
 

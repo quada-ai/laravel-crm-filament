@@ -24,6 +24,10 @@ class ProductCategoryResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 120;
+
     public static function getRecordRouteKeyName(): ?string
     {
         return 'external_id';

@@ -11,10 +11,10 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\FeatureStatus;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\CreateFeatureStatus;
 use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\EditFeatureStatus;
 use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\ListFeatureStatuses;
-use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 
 class FeatureStatusResource extends Resource
 {
@@ -27,6 +27,10 @@ class FeatureStatusResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-flag';
+
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 80;
 
     public static function form(Schema $schema): Schema
     {

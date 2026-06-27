@@ -11,11 +11,11 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\ChatWidget;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\ChatWidgets\Pages\CreateChatWidget;
 use VentureDrake\LaravelCrmFilament\Resources\ChatWidgets\Pages\EditChatWidget;
 use VentureDrake\LaravelCrmFilament\Resources\ChatWidgets\Pages\ListChatWidgets;
 use VentureDrake\LaravelCrmFilament\Resources\ChatWidgets\Pages\ViewChatWidget;
-use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 
 class ChatWidgetResource extends Resource
 {
@@ -28,6 +28,10 @@ class ChatWidgetResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-window';
+
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 220;
 
     public static function form(Schema $schema): Schema
     {

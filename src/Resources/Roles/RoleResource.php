@@ -27,6 +27,10 @@ class RoleResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shield-check';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 230;
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([

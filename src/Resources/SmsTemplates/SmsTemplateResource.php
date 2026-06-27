@@ -24,6 +24,10 @@ class SmsTemplateResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 210;
+
     public static function getRecordRouteKeyName(): ?string
     {
         return 'external_id';

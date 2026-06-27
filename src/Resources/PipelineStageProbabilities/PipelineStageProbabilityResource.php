@@ -11,10 +11,10 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\PipelineStageProbability;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\PipelineStageProbabilities\Pages\CreatePipelineStageProbability;
 use VentureDrake\LaravelCrmFilament\Resources\PipelineStageProbabilities\Pages\EditPipelineStageProbability;
 use VentureDrake\LaravelCrmFilament\Resources\PipelineStageProbabilities\Pages\ListPipelineStageProbabilities;
-use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 
 class PipelineStageProbabilityResource extends Resource
 {
@@ -27,6 +27,10 @@ class PipelineStageProbabilityResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chart-pie';
+
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 60;
 
     public static function form(Schema $schema): Schema
     {

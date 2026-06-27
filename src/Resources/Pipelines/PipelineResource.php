@@ -31,6 +31,10 @@ class PipelineResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-funnel';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 40;
+
     public static function getRecordRouteKeyName(): ?string
     {
         return 'external_id';

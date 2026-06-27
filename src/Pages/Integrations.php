@@ -19,11 +19,13 @@ class Integrations extends Page implements HasForms
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-puzzle-piece';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
     protected static ?string $title = 'Integrations';
 
     protected static ?string $slug = 'integrations';
 
-    protected static ?int $navigationSort = -5;
+    protected static ?int $navigationSort = 20;
 
     protected string $view = 'filament-panels::pages.page';
 

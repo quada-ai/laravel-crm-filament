@@ -25,6 +25,10 @@ class TimezoneResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-globe-alt';
 
+    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 160;
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
