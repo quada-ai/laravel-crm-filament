@@ -265,10 +265,6 @@ class FeatureResource extends Resource
                         ->label(__('laravel-crm-filament::labels.fields.submitted_by'))
                         ->placeholder('—'),
 
-                    TextEntry::make('ownerUser.name')
-                        ->label(__('laravel-crm-filament::labels.fields.owner'))
-                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
-
                     TextEntry::make('status.name')
                         ->label(__('laravel-crm-filament::labels.fields.status'))
                         ->badge()
