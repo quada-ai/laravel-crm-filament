@@ -1,6 +1,6 @@
 <?php
 
-namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Pages;
+namespace VentureDrake\LaravelCrmFilament\Pages;
 
 use BackedEnum;
 use Filament\Actions\Action;
@@ -13,7 +13,6 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 
 /**
  * Generic settings page backed by `SettingService` (`laravel-crm.settings`).
@@ -23,8 +22,6 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 class GeneralSettings extends Page implements HasForms
 {
     use InteractsWithForms;
-
-    protected static ?string $cluster = Settings::class;
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-vertical';
 

@@ -1,18 +1,15 @@
 <?php
 
-namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Pages;
+namespace VentureDrake\LaravelCrmFilament\Pages;
 
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Artisan;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 
 class Updates extends Page
 {
-    protected static ?string $cluster = Settings::class;
-
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     protected static ?string $title = 'Updates';

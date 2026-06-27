@@ -1,6 +1,6 @@
 <?php
 
-namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Pages;
+namespace VentureDrake\LaravelCrmFilament\Pages;
 
 use BackedEnum;
 use Dcblogdev\Xero\Facades\Xero;
@@ -12,13 +12,10 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 
 class Integrations extends Page implements HasForms
 {
     use InteractsWithForms;
-
-    protected static ?string $cluster = Settings::class;
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-puzzle-piece';
 

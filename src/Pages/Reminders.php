@@ -1,6 +1,6 @@
 <?php
 
-namespace VentureDrake\LaravelCrmFilament\Clusters\Settings\Pages;
+namespace VentureDrake\LaravelCrmFilament\Pages;
 
 use BackedEnum;
 use Filament\Actions\Action;
@@ -14,7 +14,6 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use VentureDrake\LaravelCrm\Models\Setting;
-use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 
 /**
  * Per-user reminder preferences. One toggle + "hours before" input per type;
@@ -27,8 +26,6 @@ use VentureDrake\LaravelCrmFilament\Clusters\Settings;
 class Reminders extends Page implements HasForms
 {
     use InteractsWithForms;
-
-    protected static ?string $cluster = Settings::class;
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-bell-alert';
 
