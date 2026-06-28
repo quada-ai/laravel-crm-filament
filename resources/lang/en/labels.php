@@ -408,6 +408,7 @@ return [
         'behaviour' => 'Behaviour',
         'document_defaults' => 'Document defaults',
         'localisation' => 'Localisation',
+        'pipeline_stages' => 'Pipeline stages',
     ],
 
     // Actions

@@ -364,6 +364,7 @@ return [
         'behaviour' => 'Comportamiento',
         'document_defaults' => 'Valores predeterminados de documento',
         'localisation' => 'Localización',
+        'pipeline_stages' => 'Etapas del pipeline',
     ],
 
     'actions' => [

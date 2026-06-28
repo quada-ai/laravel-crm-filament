@@ -89,6 +89,21 @@ return new class extends Migration
             });
         }
 
+        // US-004: pipeline_stages column patches (description / color / pipeline_stage_probability_id)
+        if (Schema::hasTable($prefix . 'pipeline_stages')) {
+            Schema::table($prefix . 'pipeline_stages', function (Blueprint $table) use ($prefix) {
+                if (! Schema::hasColumn($prefix . 'pipeline_stages', 'description')) {
+                    $table->text('description')->nullable();
+                }
+                if (! Schema::hasColumn($prefix . 'pipeline_stages', 'color')) {
+                    $table->string('color')->nullable();
+                }
+                if (! Schema::hasColumn($prefix . 'pipeline_stages', 'pipeline_stage_probability_id')) {
+                    $table->unsignedBigInteger('pipeline_stage_probability_id')->nullable();
+                }
+            });
+        }
+
         if (! Schema::hasTable('teams')) {
             Schema::create('teams', function (Blueprint $table) {
                 $table->bigIncrements('id');

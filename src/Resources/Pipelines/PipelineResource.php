@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrm\Models\Quote;
+use VentureDrake\LaravelCrmFilament\RelationManagers\PipelineStagesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\CreatePipeline;
 use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\EditPipeline;
 use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\ListPipelines;
@@ -92,6 +93,13 @@ class PipelineResource extends Resource
             'index' => ListPipelines::route('/'),
             'create' => CreatePipeline::route('/create'),
             'edit' => EditPipeline::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            PipelineStagesRelationManager::class,
         ];
     }
 }
