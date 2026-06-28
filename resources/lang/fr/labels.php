@@ -361,6 +361,9 @@ return [
         'ssl' => 'SSL',
         'status' => 'Statut',
         'prices' => 'Prix',
+        'behaviour' => 'Comportement',
+        'document_defaults' => 'Modèles de documents',
+        'localisation' => 'Localisation',
     ],
 
     'actions' => [

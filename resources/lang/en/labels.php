@@ -405,6 +405,9 @@ return [
         'ssl' => 'SSL',
         'status' => 'Status',
         'prices' => 'Prices',
+        'behaviour' => 'Behaviour',
+        'document_defaults' => 'Document defaults',
+        'localisation' => 'Localisation',
     ],
 
     // Actions
