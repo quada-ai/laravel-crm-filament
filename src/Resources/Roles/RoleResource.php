@@ -43,6 +43,8 @@ class RoleResource extends Resource
                     ->required()
                     ->maxLength(255),
             ]),
+            Forms\Components\TextInput::make('description')
+                ->maxLength(255),
             Forms\Components\CheckboxList::make('permissions')
                 ->relationship('permissions', 'name')
                 ->options(fn () => Permission::query()->orderBy('name')->pluck('name', 'id'))
@@ -59,12 +61,19 @@ class RoleResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('guard_name')->toggleable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->limit(60)
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('permissions_count')
                     ->counts('permissions')
                     ->label(__('laravel-crm-filament::labels.fields.permissions'))
                     ->toggleable(),
             ])
             ->defaultSort('name')
+            ->filters([
+                Tables\Filters\TernaryFilter::make('crm_role')
+                    ->label(__('laravel-crm-filament::labels.misc.crm')),
+            ])
             ->recordActions([
                 Actions\EditAction::make()
                     ->visible(fn ($record) => ! in_array($record->name, ['Owner', 'Admin'], true)),

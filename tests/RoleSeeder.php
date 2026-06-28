@@ -44,6 +44,8 @@ class RoleSeeder
         'teams',
         'features',
         'monitors',
+        'tax rates',
+        'roles',
     ];
 
     /** @var list<string> */

@@ -23,6 +23,18 @@ return new class extends Migration
             });
         }
 
+        // US-006: roles table patches (description / crm_role) for RoleResource parity with core
+        if (Schema::hasTable('roles')) {
+            Schema::table('roles', function (Blueprint $table) {
+                if (! Schema::hasColumn('roles', 'description')) {
+                    $table->string('description')->nullable();
+                }
+                if (! Schema::hasColumn('roles', 'crm_role')) {
+                    $table->boolean('crm_role')->default(false);
+                }
+            });
+        }
+
         if (! Schema::hasTable($prefix . 'industries')) {
             Schema::create($prefix . 'industries', function (Blueprint $table) {
                 $table->bigIncrements('id');

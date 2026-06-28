@@ -60,6 +60,10 @@ class TaxRateResource extends Resource
                 Tables\Columns\TextColumn::make('rate')->suffix('%')->sortable(),
                 Tables\Columns\TextColumn::make('tax_type')->label(__('laravel-crm-filament::labels.fields.type'))->toggleable(),
                 Tables\Columns\IconColumn::make('default')->boolean(),
+                Tables\Columns\TextColumn::make('products_count')
+                    ->counts('products')
+                    ->label(__('laravel-crm-filament::labels.sales.products'))
+                    ->toggleable(),
             ])
             ->defaultSort('name')
             ->recordActions([
