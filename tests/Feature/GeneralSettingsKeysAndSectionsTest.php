@@ -37,10 +37,10 @@ it('declares the full 26-key scalar setting map on GeneralSettings', function ()
     ]);
 });
 
-it('renders 6 top-level Sections in branding/localisation/prefixes/document_defaults/tax/behaviour order', function (): void {
+it('renders 9 top-level Sections including the phones/emails/addresses repeaters', function (): void {
     $page = (new ReflectionClass(GeneralSettings::class))->newInstanceWithoutConstructor();
     $components = generalSettingsTopLevelSections($page);
-    expect($components)->toHaveCount(6);
+    expect($components)->toHaveCount(9);
 
     // Section::make's first arg is the section identifier, but Filament v5
     // doesn't expose it as a public getter (no Section::getName). Walk the
@@ -48,7 +48,7 @@ it('renders 6 top-level Sections in branding/localisation/prefixes/document_defa
     $src = file_get_contents((new ReflectionClass(GeneralSettings::class))->getFileName());
 
     $cursor = 0;
-    foreach (['branding', 'localisation', 'prefixes', 'document_defaults', 'tax', 'behaviour'] as $name) {
+    foreach (['branding', 'localisation', 'prefixes', 'document_defaults', 'tax', 'behaviour', 'phones', 'emails', 'addresses'] as $name) {
         $needle = "Section::make('{$name}')";
         $pos = strpos($src, $needle, $cursor);
         expect($pos)->not->toBeFalse("expected Section::make('{$name}') after cursor {$cursor}");

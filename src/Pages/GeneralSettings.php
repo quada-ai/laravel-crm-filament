@@ -4,6 +4,8 @@ namespace VentureDrake\LaravelCrmFilament\Pages;
 
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -15,14 +17,28 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Ramsey\Uuid\Uuid;
+use VentureDrake\LaravelCrm\Models\Address;
+use VentureDrake\LaravelCrm\Models\AddressType;
+use VentureDrake\LaravelCrm\Models\Email;
+use VentureDrake\LaravelCrm\Models\Phone;
+use VentureDrake\LaravelCrm\Models\Setting;
 
 /**
  * General settings page backed by `SettingService` (`laravel-crm.settings`).
  *
- * Each form field maps to a Setting row; submit upserts via SettingService::set
- * and clears the cache. Mirrors the scalar surface of core CRM's
- * Livewire SettingEdit component (vendor/venturedrake/laravel-crm/src/Livewire/
- * Settings/SettingEdit.php).
+ * Scalar fields persist via `SettingService::set`. Phones / emails / addresses
+ * are polymorphic rows attached to the `Setting{name='team'}` anchor: read raw
+ * in `mount()`, diff submitted state in `save()` calling create/update/delete
+ * on the model directly. Pattern lifted from
+ * vendor/venturedrake/laravel-crm/src/Livewire/Settings/SettingEdit.php::save().
+ *
+ * Phone/Email use the `type` ENUM column (work/home/mobile/fax/other and
+ * work/home/other respectively) because no PhoneType/EmailType lookup model
+ * ships in core CRM — verified against the migration stubs at
+ * vendor/venturedrake/laravel-crm/database/migrations/create_laravel_crm_tables.php.stub
+ * (per the Codebase Patterns warning). Address uses `address_type_id` (real FK
+ * to crm_address_types) since the AddressType model exists.
  */
 class GeneralSettings extends Page implements HasForms
 {
@@ -90,6 +106,30 @@ class GeneralSettings extends Page implements HasForms
         foreach (array_keys(static::KEYS) as $key) {
             $this->data[$key] = $settings->get($key);
         }
+
+        $anchor = $this->resolveAnchor();
+        $this->data['phones'] = $anchor->phones->map(fn (Phone $p) => [
+            'id' => $p->id,
+            'type' => $p->type,
+            'number' => $p->number,
+        ])->values()->all();
+        $this->data['emails'] = $anchor->emails->map(fn (Email $e) => [
+            'id' => $e->id,
+            'type' => $e->type,
+            'address' => $e->address,
+        ])->values()->all();
+        $this->data['addresses'] = $anchor->addresses->map(fn (Address $a) => [
+            'id' => $a->id,
+            'address_type_id' => $a->address_type_id,
+            'line1' => $a->line1,
+            'line2' => $a->line2,
+            'line3' => $a->line3,
+            'city' => $a->city,
+            'state' => $a->state,
+            'code' => $a->code,
+            'country' => $a->country,
+        ])->values()->all();
+
         $this->form->fill($this->data);
     }
 
@@ -177,6 +217,79 @@ class GeneralSettings extends Page implements HasForms
                         Toggle::make('show_related_activity')->label(static::KEYS['show_related_activity']),
                         Toggle::make('dynamic_products')->label(static::KEYS['dynamic_products']),
                     ]),
+
+                Section::make('phones')
+                    ->heading(__('laravel-crm-filament::labels.contact.phone_numbers'))
+                    ->schema([
+                        Repeater::make('phones')
+                            ->hiddenLabel()
+                            ->schema([
+                                Hidden::make('id'),
+                                Select::make('type')
+                                    ->label(__('laravel-crm-filament::labels.fields.type'))
+                                    ->options(static::phoneTypeOptions())
+                                    ->default('work'),
+                                TextInput::make('number')
+                                    ->label(__('laravel-crm-filament::labels.contact.number'))
+                                    ->required()
+                                    ->tel()
+                                    ->maxLength(50),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(0)
+                            ->reorderable(false)
+
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('emails')
+                    ->heading(__('laravel-crm-filament::labels.contact.email_addresses'))
+                    ->schema([
+                        Repeater::make('emails')
+                            ->hiddenLabel()
+                            ->schema([
+                                Hidden::make('id'),
+                                Select::make('type')
+                                    ->label(__('laravel-crm-filament::labels.fields.type'))
+                                    ->options(static::emailTypeOptions())
+                                    ->default('work'),
+                                TextInput::make('address')
+                                    ->label(__('laravel-crm-filament::labels.contact.email'))
+                                    ->required()
+                                    ->email()
+                                    ->maxLength(255),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(0)
+                            ->reorderable(false)
+
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('addresses')
+                    ->heading(__('laravel-crm-filament::labels.contact.addresses'))
+                    ->schema([
+                        Repeater::make('addresses')
+                            ->hiddenLabel()
+                            ->schema([
+                                Hidden::make('id'),
+                                Select::make('address_type_id')
+                                    ->label(__('laravel-crm-filament::labels.fields.type'))
+                                    ->options(fn () => AddressType::query()->orderBy('name')->pluck('name', 'id')->toArray()),
+                                TextInput::make('line1')->label(__('laravel-crm-filament::labels.contact.line1'))->maxLength(255),
+                                TextInput::make('line2')->label(__('laravel-crm-filament::labels.contact.line2'))->maxLength(255),
+                                TextInput::make('line3')->label(__('laravel-crm-filament::labels.contact.line3'))->maxLength(255),
+                                TextInput::make('city')->label(__('laravel-crm-filament::labels.contact.city'))->maxLength(100),
+                                TextInput::make('state')->label(__('laravel-crm-filament::labels.contact.state'))->maxLength(100),
+                                TextInput::make('code')->label(__('laravel-crm-filament::labels.contact.post_code'))->maxLength(20),
+                                TextInput::make('country')->label(__('laravel-crm-filament::labels.contact.country'))->maxLength(100),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(0)
+                            ->reorderable(false)
+
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -198,6 +311,11 @@ class GeneralSettings extends Page implements HasForms
             $settings->set($key, $data[$key] ?? null, $label);
         }
 
+        $anchor = $this->resolveAnchor();
+        $this->syncPhones($anchor, $data['phones'] ?? []);
+        $this->syncEmails($anchor, $data['emails'] ?? []);
+        $this->syncAddresses($anchor, $data['addresses'] ?? []);
+
         if (method_exists($settings, 'forgetCache')) {
             $settings->forgetCache();
         }
@@ -206,6 +324,128 @@ class GeneralSettings extends Page implements HasForms
             ->title('Settings saved')
             ->success()
             ->send();
+    }
+
+    /**
+     * Resolve (or lazily create) the Setting row that anchors polymorphic
+     * phones/emails/addresses for the current team. Core CRM's Settings
+     * middleware seeds this row on every request, but the Filament page may
+     * be exercised before that middleware runs (e.g. in tests), so a
+     * firstOrCreate guard belongs here too.
+     */
+    protected function resolveAnchor(): Setting
+    {
+        $anchor = Setting::firstOrCreate(
+            ['name' => 'team'],
+            ['value' => 'related']
+        );
+
+        // Force-load the morphMany collections so mount() and save() see the
+        // current state in one query batch rather than three N+1 reads.
+        $anchor->load(['phones', 'emails', 'addresses']);
+
+        return $anchor;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $rows
+     */
+    protected function syncPhones(Setting $anchor, array $rows): void
+    {
+        $keptIds = [];
+        foreach ($rows as $row) {
+            $id = $row['id'] ?? null;
+            $attrs = [
+                'number' => $row['number'] ?? null,
+                'type' => $row['type'] ?? null,
+            ];
+
+            if ($id && $phone = Phone::find($id)) {
+                $phone->update($attrs);
+                $keptIds[] = (int) $phone->id;
+            } elseif (! empty($attrs['number'])) {
+                $phone = $anchor->phones()->create(array_merge($attrs, [
+                    'external_id' => Uuid::uuid4()->toString(),
+                ]));
+                $keptIds[] = (int) $phone->id;
+            }
+        }
+
+        foreach ($anchor->phones()->get() as $existing) {
+            if (! in_array((int) $existing->id, $keptIds, true)) {
+                $existing->delete();
+            }
+        }
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $rows
+     */
+    protected function syncEmails(Setting $anchor, array $rows): void
+    {
+        $keptIds = [];
+        foreach ($rows as $row) {
+            $id = $row['id'] ?? null;
+            $attrs = [
+                'address' => $row['address'] ?? null,
+                'type' => $row['type'] ?? null,
+            ];
+
+            if ($id && $email = Email::find($id)) {
+                $email->update($attrs);
+                $keptIds[] = (int) $email->id;
+            } elseif (! empty($attrs['address'])) {
+                $email = $anchor->emails()->create(array_merge($attrs, [
+                    'external_id' => Uuid::uuid4()->toString(),
+                ]));
+                $keptIds[] = (int) $email->id;
+            }
+        }
+
+        foreach ($anchor->emails()->get() as $existing) {
+            if (! in_array((int) $existing->id, $keptIds, true)) {
+                $existing->delete();
+            }
+        }
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $rows
+     */
+    protected function syncAddresses(Setting $anchor, array $rows): void
+    {
+        $keptIds = [];
+        foreach ($rows as $row) {
+            $id = $row['id'] ?? null;
+            $attrs = [
+                'address_type_id' => $row['address_type_id'] ?? null,
+                'line1' => $row['line1'] ?? null,
+                'line2' => $row['line2'] ?? null,
+                'line3' => $row['line3'] ?? null,
+                'city' => $row['city'] ?? null,
+                'state' => $row['state'] ?? null,
+                'code' => $row['code'] ?? null,
+                'country' => $row['country'] ?? null,
+            ];
+
+            $hasContent = collect($attrs)->contains(fn ($v) => $v !== null && $v !== '');
+
+            if ($id && $address = Address::find($id)) {
+                $address->update($attrs);
+                $keptIds[] = (int) $address->id;
+            } elseif ($hasContent) {
+                $address = $anchor->addresses()->create(array_merge($attrs, [
+                    'external_id' => Uuid::uuid4()->toString(),
+                ]));
+                $keptIds[] = (int) $address->id;
+            }
+        }
+
+        foreach ($anchor->addresses()->get() as $existing) {
+            if (! in_array((int) $existing->id, $keptIds, true)) {
+                $existing->delete();
+            }
+        }
     }
 
     protected static function countryOptions(): array
@@ -260,5 +500,39 @@ class GeneralSettings extends Page implements HasForms
         }
 
         return [];
+    }
+
+    protected static function phoneTypeOptions(): array
+    {
+        if (function_exists('VentureDrake\\LaravelCrm\\Http\\Helpers\\SelectOptions\\phoneTypes')) {
+            $opts = \VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\phoneTypes();
+            if (! empty($opts)) {
+                return $opts;
+            }
+        }
+
+        return [
+            'work' => 'Work',
+            'home' => 'Home',
+            'mobile' => 'Mobile',
+            'fax' => 'Fax',
+            'other' => 'Other',
+        ];
+    }
+
+    protected static function emailTypeOptions(): array
+    {
+        if (function_exists('VentureDrake\\LaravelCrm\\Http\\Helpers\\SelectOptions\\emailTypes')) {
+            $opts = \VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\emailTypes();
+            if (! empty($opts)) {
+                return $opts;
+            }
+        }
+
+        return [
+            'work' => 'Work',
+            'home' => 'Home',
+            'other' => 'Other',
+        ];
     }
 }
