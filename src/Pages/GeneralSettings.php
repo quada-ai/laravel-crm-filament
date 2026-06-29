@@ -54,7 +54,7 @@ class GeneralSettings extends Page implements HasForms
 
     protected static ?int $navigationSort = 10;
 
-    protected string $view = 'filament-panels::pages.page';
+    protected string $view = 'laravel-crm-filament::general-settings';
 
     /**
      * Scalar setting keys this page edits, with a friendly label for the form
