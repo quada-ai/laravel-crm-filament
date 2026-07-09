@@ -217,6 +217,8 @@ return [
         'threshold_helper' => 'Enviaremos alertas una vez que este sitio sea constantemente más lento que este umbral.',
         'votes_over_time' => 'Votos a lo largo del tiempo',
         'views_over_time' => 'Vistas a lo largo del tiempo',
+        'my_activity' => 'Mi actividad',
+        'all_activity' => 'Toda la actividad',
     ],
 
     'money' => [

@@ -217,6 +217,8 @@ return [
         'threshold_helper' => 'Nous enverrons des alertes une fois que ce site sera systématiquement plus lent que ce seuil.',
         'votes_over_time' => 'Votes au fil du temps',
         'views_over_time' => 'Vues au fil du temps',
+        'my_activity' => 'Mon activité',
+        'all_activity' => 'Toute l\'activité',
     ],
 
     'money' => [

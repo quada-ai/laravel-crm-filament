@@ -220,6 +220,8 @@ return [
         'threshold_helper' => 'We\'ll send out alerts once this site is consistently slower than this threshold.',
         'votes_over_time' => 'Votes over time',
         'views_over_time' => 'Views over time',
+        'my_activity' => 'My activity',
+        'all_activity' => 'All activity',
     ],
 
     // Money / orders / lines
