@@ -245,7 +245,7 @@ it('DeleteBulkAction is registered on the TaskResource toolbar bulk-action group
     expect($source)->toContain('Actions\DeleteBulkAction::make()');
 });
 
-it('ViewTask uses a 2-col Grid content() override and TaskResource declares an infolist() Details section', function () {
+it('ViewTask renders infolist full-width in content() and TaskResource declares an infolist() Details section', function () {
     // Follow-on to the original US-004 AC. Task show page has been upgraded
     // from Filament's default form-rendered-read-only view to a dedicated
     // infolist with Details + Custom fields sections, rendered inside the
@@ -254,11 +254,11 @@ it('ViewTask uses a 2-col Grid content() override and TaskResource declares an i
     $viewSource = file_get_contents(__DIR__ . '/../../src/Resources/Tasks/Pages/ViewTask.php');
     $resourceSource = file_get_contents(__DIR__ . '/../../src/Resources/Tasks/TaskResource.php');
 
-    // ViewTask::content() declared with the canonical 2-col Grid.
+    // ViewTask::content() renders the infolist full-width (Task has no
+    // relation managers so a 2-col Grid would leave the right column empty).
     expect($viewSource)->toContain('public function content(Schema $schema): Schema')
-        ->and($viewSource)->toContain("Grid::make(['default' => 1, 'lg' => 2])")
         ->and($viewSource)->toContain('getInfolistContentComponent()')
-        ->and($viewSource)->toContain('getRelationManagersContentComponent()');
+        ->and($viewSource)->not->toContain('getRelationManagersContentComponent()');
 
     // TaskResource::infolist() declares the Details section with the AC-named
     // TextEntries plus a hidden Custom fields section.

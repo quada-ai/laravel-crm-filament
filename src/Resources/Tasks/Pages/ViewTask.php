@@ -4,7 +4,6 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\TaskResource;
 
@@ -29,11 +28,10 @@ class ViewTask extends ViewRecord
 
     public function content(Schema $schema): Schema
     {
+        // Task has no RelationManagers, so render the infolist full-width
+        // rather than squeezing it into the left half of a 2-col Grid.
         return $schema->components([
-            Grid::make(['default' => 1, 'lg' => 2])->schema([
-                $this->getInfolistContentComponent()->columnSpan(['lg' => 1]),
-                $this->getRelationManagersContentComponent()->columnSpan(['lg' => 1]),
-            ]),
+            $this->getInfolistContentComponent(),
         ]);
     }
 }
