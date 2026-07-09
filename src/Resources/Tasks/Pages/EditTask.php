@@ -16,10 +16,17 @@ class EditTask extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [Actions\ViewAction::make()
-            ->button()
-            ->hiddenLabel()
-            ->icon('heroicon-m-eye'), Actions\DeleteAction::make()];
+        return [
+            TaskResource::completeAction(),
+            Actions\ViewAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-eye'),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash'),
+        ];
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
