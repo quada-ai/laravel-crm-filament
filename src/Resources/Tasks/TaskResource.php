@@ -131,7 +131,7 @@ class TaskResource extends Resource
                     ->placeholder('—'),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
-                    ->label(__('laravel-crm-filament::labels.fields.owner'))
+                    ->label(__('laravel-crm-filament::labels.fields.created_by'))
                     ->toggleable()
                     ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
 

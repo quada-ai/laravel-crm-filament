@@ -127,7 +127,7 @@ it('renders due_at with since() + tooltip datetime format + sortable + em-dash p
     expect($source)->toContain("->tooltip(fn (Task \$record): ?string => optional(\$record->due_at)->format('M d, Y H:i'))");
 });
 
-it('renders ownerUser.name with owner label + toggleable + Unallocated placeholder', function () {
+it('renders ownerUser.name with created_by label + toggleable + Unallocated placeholder', function () {
     $cols = taskTableColumns();
 
     expect($cols['ownerUser.name']->isToggleable())->toBeTrue();
@@ -135,7 +135,7 @@ it('renders ownerUser.name with owner label + toggleable + Unallocated placehold
 
     $source = file_get_contents(__DIR__ . '/../../src/Resources/Tasks/TaskResource.php');
     expect($source)->toContain("TextColumn::make('ownerUser.name')");
-    expect($source)->toContain('labels.fields.owner');
+    expect($source)->toContain('labels.fields.created_by');
     expect($source)->toContain('labels.misc.unallocated');
 });
 
