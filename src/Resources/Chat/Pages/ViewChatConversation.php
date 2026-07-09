@@ -3,7 +3,6 @@
 namespace VentureDrake\LaravelCrmFilament\Resources\Chat\Pages;
 
 use Filament\Actions;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
@@ -116,43 +115,6 @@ class ViewChatConversation extends ViewRecord
     {
         return [
             ChatConversationResource::backToIndexAction(),
-            Actions\Action::make('reply')
-                ->label(__('laravel-crm-filament::labels.actions.reply'))
-                ->icon('heroicon-o-paper-airplane')
-                ->color('primary')
-                ->visible(fn (ChatConversation $record) => $record->status !== 'closed')
-                ->schema([
-                    Textarea::make('body')
-                        ->label(__('laravel-crm-filament::labels.fields.message'))
-                        ->required()
-                        ->rows(4),
-                ])
-                ->action(function (array $data, ChatConversation $record, $livewire): void {
-                    app(ChatService::class)->sendAgentMessage(
-                        $record,
-                        (int) auth()->id(),
-                        $data['body'],
-                    );
-
-                    app(ChatService::class)->markRead($record, 'visitor');
-                    if ($record->status === 'open') {
-                        $record->update(['status' => 'pending']);
-                    }
-
-                    $livewire->refreshMessages();
-                    Notification::make()->title('Reply sent')->success()->send();
-                }),
-            Actions\Action::make('markReplied')
-                ->label(__('laravel-crm-filament::labels.actions.mark_replied'))
-                ->icon('heroicon-o-check')
-                ->color('success')
-                ->visible(fn (ChatConversation $record) => $record->status === 'open')
-                ->action(function (ChatConversation $record, $livewire): void {
-                    app(ChatService::class)->markRead($record, 'visitor');
-                    $record->update(['status' => 'pending']);
-                    $livewire->refreshMessages();
-                    Notification::make()->title('Marked as replied')->success()->send();
-                }),
             Actions\Action::make('reopen')
                 ->label(__('laravel-crm-filament::labels.actions.reopen'))
                 ->icon('heroicon-o-arrow-uturn-left')
@@ -163,44 +125,8 @@ class ViewChatConversation extends ViewRecord
                     $livewire->refreshMessages();
                     Notification::make()->title('Conversation reopened')->success()->send();
                 }),
-            Actions\Action::make('changeStatus')
-                ->label(__('laravel-crm-filament::labels.actions.change_status'))
-                ->icon('heroicon-o-arrows-up-down')
-                ->color('gray')
-                ->schema([
-                    Select::make('status')
-                        ->label(__('laravel-crm-filament::labels.fields.status'))
-                        ->options(ChatConversationResource::STATUSES)
-                        ->required()
-                        ->default(fn (ChatConversation $record) => $record->status),
-                ])
-                ->action(function (array $data, ChatConversation $record, $livewire): void {
-                    $previous = $record->status;
-                    $next = $data['status'];
-
-                    if ($previous === $next) {
-                        Notification::make()->title('Status unchanged')->info()->send();
-
-                        return;
-                    }
-
-                    $patch = ['status' => $next];
-                    if ($next === 'closed' && $previous !== 'closed') {
-                        $patch['closed_at'] = now();
-                    }
-                    if ($previous === 'closed' && $next !== 'closed') {
-                        $patch['closed_at'] = null;
-                    }
-                    $record->update($patch);
-                    $livewire->refreshMessages();
-
-                    Notification::make()
-                        ->title('Status updated to ' . $next)
-                        ->success()
-                        ->send();
-                }),
-            ChatConversationResource::closeAction(),
             ChatConversationResource::convertToLeadAction(),
+            ChatConversationResource::closeAction(),
             Actions\DeleteAction::make()
                 ->button()
                 ->hiddenLabel()

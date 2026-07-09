@@ -184,39 +184,6 @@ it('inline reply is rejected when the conversation is closed', function () {
     )->toBe(0);
 });
 
-it('exposes a reply header action that requires a body and posts via ChatService', function () {
-    Event::fake([ChatMessageSent::class]);
-
-    livewire(ViewChatConversation::class, ['record' => $this->conversation->external_id])
-        ->callAction('reply', ['body' => 'Header-action reply.']);
-
-    $message = ChatMessage::query()
-        ->where('chat_conversation_id', $this->conversation->id)
-        ->where('sender_type', 'user')
-        ->first();
-
-    expect($message)->not->toBeNull();
-    expect($message->body)->toBe('Header-action reply.');
-
-    Event::assertDispatched(ChatMessageSent::class);
-});
-
-it('mark-replied header action flips status and marks visitor messages read', function () {
-    seedMessage($this->conversation, 'visitor', 'help me');
-
-    livewire(ViewChatConversation::class, ['record' => $this->conversation->external_id])
-        ->callAction('markReplied');
-
-    expect($this->conversation->fresh()->status)->toBe('pending');
-
-    $unread = ChatMessage::query()
-        ->where('chat_conversation_id', $this->conversation->id)
-        ->where('sender_type', 'visitor')
-        ->whereNull('read_at')
-        ->count();
-    expect($unread)->toBe(0);
-});
-
 it('close header action stamps closed_at and status', function () {
     livewire(ViewChatConversation::class, ['record' => $this->conversation->external_id])
         ->callAction('close');
@@ -234,26 +201,6 @@ it('reopen header action only shows on non-open conversations', function () {
 
     livewire(ViewChatConversation::class, ['record' => $this->conversation->external_id])
         ->callAction('reopen');
-
-    $fresh = $this->conversation->fresh();
-    expect($fresh->status)->toBe('open');
-    expect($fresh->closed_at)->toBeNull();
-});
-
-it('changeStatus header action persists the selected status', function () {
-    livewire(ViewChatConversation::class, ['record' => $this->conversation->external_id])
-        ->callAction('changeStatus', ['status' => 'closed']);
-
-    $fresh = $this->conversation->fresh();
-    expect($fresh->status)->toBe('closed');
-    expect($fresh->closed_at)->not->toBeNull();
-});
-
-it('changeStatus header action clears closed_at when moving away from closed', function () {
-    $this->conversation->update(['status' => 'closed', 'closed_at' => now()]);
-
-    livewire(ViewChatConversation::class, ['record' => $this->conversation->external_id])
-        ->callAction('changeStatus', ['status' => 'open']);
 
     $fresh = $this->conversation->fresh();
     expect($fresh->status)->toBe('open');
