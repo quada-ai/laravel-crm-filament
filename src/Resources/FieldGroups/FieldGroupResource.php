@@ -29,6 +29,8 @@ class FieldGroupResource extends Resource
 
     protected static ?int $navigationSort = 100;
 
+    protected static ?string $navigationLabel = 'Custom Field Groups';
+
     public static function getRecordRouteKeyName(): ?string
     {
         return 'external_id';

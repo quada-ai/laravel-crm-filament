@@ -65,6 +65,8 @@ class FieldResource extends Resource
 
     protected static ?int $navigationSort = 90;
 
+    protected static ?string $navigationLabel = 'Custom Fields';
+
     public static function getRecordRouteKeyName(): ?string
     {
         return 'external_id';
