@@ -151,6 +151,12 @@ return [
         'website_url' => 'Website url',
         'friendly_name' => 'Friendly name',
         'public' => 'Public',
+        'online' => 'Online',
+        'offline' => 'Offline',
+        'unread' => 'Unread',
+        'last_message' => 'Last message',
+        'updated' => 'Updated',
+        'last_active' => 'Last active',
     ],
 
     // Contact / address fields

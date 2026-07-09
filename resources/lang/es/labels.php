@@ -150,6 +150,12 @@ return [
         'website_url' => 'URL del sitio web',
         'friendly_name' => 'Nombre amigable',
         'public' => 'Público',
+        'online' => 'En línea',
+        'offline' => 'Sin conexión',
+        'unread' => 'No leídos',
+        'last_message' => 'Último mensaje',
+        'updated' => 'Actualizado',
+        'last_active' => 'Última actividad',
     ],
 
     'contact' => [
