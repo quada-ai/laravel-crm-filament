@@ -152,7 +152,7 @@ class TaskResource extends Resource
                         ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
                         ->exists();
                 }),
-        ])->columns(2);
+        ])->columns(1);
     }
 
     public static function table(Table $table): Table
