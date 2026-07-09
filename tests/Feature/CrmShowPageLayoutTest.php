@@ -1,5 +1,8 @@
 <?php
 
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Delivery;
@@ -43,19 +46,27 @@ dataset('crmShowPages', [
     'ViewOrganization' => [ViewOrganization::class, Organization::class],
 ]);
 
-it('content() renders both the infolist and the relation-managers tab strip as top-level schema components', function (string $pageClass, string $modelClass) {
-    // Reverted from the 2-col Grid layout in favor of Filament's default vertical
-    // stack because wrapping getRelationManagersContentComponent() inside a Grid
-    // with columnSpan broke the Livewire tab-switching for the RM tabs strip.
-    // Filament's default ViewRecord::content() places infolist and RM tabs as
-    // top-level schema siblings, which is what these View pages now inherit (or,
-    // for ViewPerson / ViewOrganization, flatten to explicitly).
+it('content() root is a 2-col Grid (default=1, lg=2) with a Group left + View right', function (string $pageClass, string $modelClass) {
+    // Layout: infolist on the left (wrapped in Group so pages like ViewPerson
+    // can stack extra Livewire embeds beneath it), and a custom tabs-strip View
+    // on the right. See src/Concerns/HasCrmSideBySideRelationManagers.php for
+    // why we roll our own tabs strip instead of using Filament's stock
+    // getRelationManagersContentComponent() (which breaks tab switching when
+    // nested inside a Grid columnSpan).
     $components = crmShowPageContentComponents($pageClass, $modelClass);
 
-    $classes = array_map(fn ($c) => get_class($c), $components);
+    expect($components)->toHaveCount(1);
+    expect($components[0])->toBeInstanceOf(Grid::class);
+    expect($components[0]->getColumns())->toBe(['default' => 1, 'lg' => 2]);
 
-    // Every page should surface at least one Livewire-embed / Filament-managed
-    // content component (both getInfolistContentComponent() and
-    // getRelationManagersContentComponent() return schema components).
-    expect(count($classes))->toBeGreaterThanOrEqual(2);
+    $ref = new ReflectionProperty($components[0], 'childComponents');
+    $ref->setAccessible(true);
+    $children = $ref->getValue($components[0]);
+    $children = $children['default'] ?? $children;
+
+    expect($children)->toHaveCount(2);
+    expect($children[0])->toBeInstanceOf(Group::class);
+    expect($children[1])->toBeInstanceOf(View::class);
+    expect($children[0]->getColumnSpan())->toBe(['lg' => 1]);
+    expect($children[1]->getColumnSpan())->toBe(['lg' => 1]);
 })->with('crmShowPages');

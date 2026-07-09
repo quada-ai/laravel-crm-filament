@@ -6,6 +6,7 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmSideBySideRelationManagers;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 
 class ViewQuote extends ViewRecord
@@ -16,6 +17,7 @@ class ViewQuote extends ViewRecord
     use Concerns\HasQuoteRejectAction;
     use Concerns\HasQuoteSendAction;
     use Concerns\HasQuoteUnacceptAction;
+    use HasCrmSideBySideRelationManagers;
 
     protected static string $resource = QuoteResource::class;
 

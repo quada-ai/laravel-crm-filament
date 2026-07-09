@@ -7,6 +7,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrmFilament\Concerns\DownloadsPdf;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmSideBySideRelationManagers;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 
 class ViewOrder extends ViewRecord
@@ -14,6 +15,7 @@ class ViewOrder extends ViewRecord
     use Concerns\HasOrderConvertToDeliveryAction;
     use Concerns\HasOrderConvertToPurchaseOrderAction;
     use DownloadsPdf;
+    use HasCrmSideBySideRelationManagers;
 
     protected static string $resource = OrderResource::class;
 

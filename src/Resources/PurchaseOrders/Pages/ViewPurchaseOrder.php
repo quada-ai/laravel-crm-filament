@@ -5,12 +5,14 @@ namespace VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmSideBySideRelationManagers;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResource;
 
 class ViewPurchaseOrder extends ViewRecord
 {
     use Concerns\HasPurchaseOrderPortalAction;
     use Concerns\HasPurchaseOrderSendAction;
+    use HasCrmSideBySideRelationManagers;
 
     protected static string $resource = PurchaseOrderResource::class;
 

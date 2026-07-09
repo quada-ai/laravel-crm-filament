@@ -6,6 +6,7 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmSideBySideRelationManagers;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\Concerns\HasDealMarkLostAction;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\Concerns\HasDealMarkWonAction;
@@ -13,6 +14,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\Concerns\HasDealReopen
 
 class ViewDeal extends ViewRecord
 {
+    use HasCrmSideBySideRelationManagers;
     use HasDealMarkLostAction;
     use HasDealMarkWonAction;
     use HasDealReopenAction;

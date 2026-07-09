@@ -6,10 +6,13 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmSideBySideRelationManagers;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
 
 class ViewLead extends ViewRecord
 {
+    use HasCrmSideBySideRelationManagers;
+
     protected static string $resource = LeadResource::class;
 
     protected function getHeaderActions(): array

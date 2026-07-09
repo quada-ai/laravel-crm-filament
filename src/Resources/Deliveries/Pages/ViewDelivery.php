@@ -7,12 +7,14 @@ use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrmFilament\Concerns\DownloadsPdf;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmSideBySideRelationManagers;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\DeliveryResource;
 
 class ViewDelivery extends ViewRecord
 {
     use Concerns\HasDeliveryPortalAction;
     use DownloadsPdf;
+    use HasCrmSideBySideRelationManagers;
 
     protected static string $resource = DeliveryResource::class;
 

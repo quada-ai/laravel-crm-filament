@@ -1,7 +1,6 @@
 <?php
 
 use Filament\Infolists\Components\TextEntry;
-use Filament\Resources\Pages\ViewRecord;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -12,6 +11,7 @@ use VentureDrake\LaravelCrm\Models\Field;
 use VentureDrake\LaravelCrm\Models\FieldGroup;
 use VentureDrake\LaravelCrm\Models\FieldValue;
 use VentureDrake\LaravelCrm\Models\Lead;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmSideBySideRelationManagers;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmCallsRelationManager;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmFilesRelationManager;
@@ -220,13 +220,15 @@ it('Lead Qualification section exposes a nested Section keyed by FieldGroup name
 // AC (4): ViewLead::content() Grid with two child columns (lg 2 + lg 1)
 // ────────────────────────────────────────────────────────────────────────
 
-it('ViewLead uses Filament default content() layout (vertical stack)', function () {
-    // Reverted the 2-col Grid layout from US-004 of the lead show-page series
-    // because nesting getRelationManagersContentComponent() in a Grid columnSpan
-    // broke the Livewire tab-switching. ViewLead now falls back to Filament's
-    // default vertical stack (infolist top, RM tabs strip below).
-    $method = new ReflectionMethod(ViewLead::class, 'content');
-    expect($method->getDeclaringClass()->getName())->toBe(ViewRecord::class);
+it('ViewLead uses the shared side-by-side trait for the 2-col layout', function () {
+    // 2-col layout (infolist left, custom tabs strip right) lives in the shared
+    // HasCrmSideBySideRelationManagers trait. We rolled our own tabs strip
+    // instead of using Filament's stock getRelationManagersContentComponent()
+    // because the latter breaks tab switching when nested in a Grid columnSpan.
+    expect(in_array(
+        HasCrmSideBySideRelationManagers::class,
+        class_uses_recursive(ViewLead::class)
+    ))->toBeTrue();
 });
 
 // ────────────────────────────────────────────────────────────────────────

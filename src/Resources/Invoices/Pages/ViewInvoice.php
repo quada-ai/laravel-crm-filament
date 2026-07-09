@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrm\Models\Invoice;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmSideBySideRelationManagers;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
 
 class ViewInvoice extends ViewRecord
@@ -15,6 +16,7 @@ class ViewInvoice extends ViewRecord
     use Concerns\HasInvoiceMarkPaidAction;
     use Concerns\HasInvoicePortalAction;
     use Concerns\HasInvoiceSendAction;
+    use HasCrmSideBySideRelationManagers;
 
     protected static string $resource = InvoiceResource::class;
 
