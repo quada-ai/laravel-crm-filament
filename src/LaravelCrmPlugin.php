@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use VentureDrake\LaravelCrmFilament\Pages\ActivityFeed;
 use VentureDrake\LaravelCrmFilament\Pages\CalendarPage;
 use VentureDrake\LaravelCrmFilament\Pages\ClickSendIntegration;
 use VentureDrake\LaravelCrmFilament\Pages\Dashboard;
@@ -374,6 +375,7 @@ class LaravelCrmPlugin implements Plugin
         ]);
 
         $pages = [
+            ActivityFeed::class,
             CalendarPage::class,
             GeneralSettings::class,
             Integrations::class,
