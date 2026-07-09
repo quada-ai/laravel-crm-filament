@@ -20,7 +20,7 @@ class CalendarPage extends Page
 
     protected static ?string $slug = 'calendar';
 
-    protected static ?int $navigationSort = 80;
+    protected static ?int $navigationSort = 30;
 
     protected string $view = 'laravel-crm-filament::calendar.index';
 

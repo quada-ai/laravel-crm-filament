@@ -32,7 +32,7 @@ class TaskResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-check-circle';
 
-    protected static ?int $navigationSort = 60;
+    protected static ?int $navigationSort = 10;
 
     public static function getNavigationGroup(): ?string
     {

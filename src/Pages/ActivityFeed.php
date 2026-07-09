@@ -32,6 +32,8 @@ class ActivityFeed extends Page
 
     protected static ?string $slug = 'activities';
 
+    protected static ?int $navigationSort = 40;
+
     protected string $view = 'laravel-crm-filament::activity-feed';
 
     #[Url]

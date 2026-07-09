@@ -26,7 +26,7 @@ class ChatConversationResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
-    protected static ?int $navigationSort = 80;
+    protected static ?int $navigationSort = 20;
 
     /**
      * Status enum mirror for the conversations table. Matches the core
