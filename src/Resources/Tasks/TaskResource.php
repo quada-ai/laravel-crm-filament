@@ -5,14 +5,17 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Tasks;
 use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use VentureDrake\LaravelCrm\Models\Task;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
@@ -24,6 +27,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\ViewTask;
 
 class TaskResource extends Resource
 {
+    use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use UsesExternalIdRouting;
 
@@ -86,6 +90,69 @@ class TaskResource extends Resource
         }
 
         return $schema->components($components)->columns(1);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make(__('laravel-crm-filament::labels.sections.details'))
+                ->schema(fn (?Task $record) => array_merge([
+                    TextEntry::make('created_at')
+                        ->label(__('laravel-crm-filament::labels.fields.created'))
+                        ->since(),
+
+                    TextEntry::make('name')
+                        ->label(__('laravel-crm-filament::labels.fields.name')),
+
+                    TextEntry::make('description')
+                        ->label(__('laravel-crm-filament::labels.fields.description'))
+                        ->columnSpanFull()
+                        ->placeholder('—'),
+
+                    TextEntry::make('status')
+                        ->label(__('laravel-crm-filament::labels.fields.status'))
+                        ->state(fn (?Task $r) => $r?->completed_at ? 'Completed' : 'Pending')
+                        ->badge()
+                        ->color(fn (string $state): string => match ($state) {
+                            'Completed' => 'success',
+                            'Pending' => 'warning',
+                            default => 'gray',
+                        }),
+
+                    TextEntry::make('due_at')
+                        ->label(__('laravel-crm-filament::labels.money.due_at'))
+                        ->since()
+                        ->tooltip(fn (?Task $r): ?string => optional($r?->due_at)->format('M d, Y H:i'))
+                        ->placeholder('—'),
+
+                    TextEntry::make('completed_at')
+                        ->label(__('laravel-crm-filament::labels.fields.completed'))
+                        ->since()
+                        ->tooltip(fn (?Task $r): ?string => optional($r?->completed_at)->format('M d, Y H:i'))
+                        ->placeholder('—')
+                        ->visible(fn (?Task $r): bool => $r?->completed_at !== null),
+
+                    TextEntry::make('ownerUser.name')
+                        ->label(__('laravel-crm-filament::labels.fields.created_by'))
+                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
+
+                    TextEntry::make('assignedToUser.name')
+                        ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
+                        ->placeholder('—'),
+                ], $record ? static::crmCustomFieldEntries($record, false) : [])),
+
+            Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
+                ->schema(fn (?Task $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
+                ->hidden(function ($record): bool {
+                    if (! $record instanceof Task) {
+                        return true;
+                    }
+
+                    return ! $record->fields()
+                        ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
+                        ->exists();
+                }),
+        ])->columns(2);
     }
 
     public static function table(Table $table): Table

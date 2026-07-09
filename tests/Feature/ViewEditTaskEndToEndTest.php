@@ -245,15 +245,30 @@ it('DeleteBulkAction is registered on the TaskResource toolbar bulk-action group
     expect($source)->toContain('Actions\DeleteBulkAction::make()');
 });
 
-it('ViewTask page class does NOT declare an infolist() override (AC out-of-scope guard)', function () {
-    // The AC explicitly says "Do NOT add a new infolist() override — out
-    // of scope." This regression guard confirms ViewTask stays as a
-    // bare ViewRecord subclass and TaskResource does NOT declare
-    // infolist() — Filament's default form-rendered-read-only behavior
-    // is what the AC expects on the show page.
+it('ViewTask uses a 2-col Grid content() override and TaskResource declares an infolist() Details section', function () {
+    // Follow-on to the original US-004 AC. Task show page has been upgraded
+    // from Filament's default form-rendered-read-only view to a dedicated
+    // infolist with Details + Custom fields sections, rendered inside the
+    // canonical 2-col Grid (infolist | relation managers) mirroring
+    // LeadResource/DealResource/QuoteResource show pages.
     $viewSource = file_get_contents(__DIR__ . '/../../src/Resources/Tasks/Pages/ViewTask.php');
     $resourceSource = file_get_contents(__DIR__ . '/../../src/Resources/Tasks/TaskResource.php');
 
-    expect($viewSource)->not->toContain('function infolist(')
-        ->and($resourceSource)->not->toContain('public static function infolist(');
+    // ViewTask::content() declared with the canonical 2-col Grid.
+    expect($viewSource)->toContain('public function content(Schema $schema): Schema')
+        ->and($viewSource)->toContain("Grid::make(['default' => 1, 'lg' => 2])")
+        ->and($viewSource)->toContain('getInfolistContentComponent()')
+        ->and($viewSource)->toContain('getRelationManagersContentComponent()');
+
+    // TaskResource::infolist() declares the Details section with the AC-named
+    // TextEntries plus a hidden Custom fields section.
+    expect($resourceSource)->toContain('public static function infolist(Schema $schema): Schema')
+        ->and($resourceSource)->toContain('sections.details')
+        ->and($resourceSource)->toContain('sections.custom_fields')
+        ->and($resourceSource)->toContain("TextEntry::make('name')")
+        ->and($resourceSource)->toContain("TextEntry::make('description')")
+        ->and($resourceSource)->toContain("TextEntry::make('due_at')")
+        ->and($resourceSource)->toContain("TextEntry::make('ownerUser.name')")
+        ->and($resourceSource)->toContain("TextEntry::make('assignedToUser.name')")
+        ->and($resourceSource)->toContain("TextEntry::make('status')");
 });
