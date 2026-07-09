@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\CreateTask;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\EditTask;
@@ -24,6 +25,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\ViewTask;
 class TaskResource extends Resource
 {
     use HasCrmCustomFields;
+    use UsesExternalIdRouting;
 
     protected static ?string $model = Task::class;
 
@@ -50,11 +52,6 @@ class TaskResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         return 'warning';
-    }
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
     }
 
     public static function form(Schema $schema): Schema
