@@ -61,6 +61,11 @@ class ChatConversationResource extends Resource
         return 'external_id';
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return 'Chat';
+    }
+
     public static function getPluralModelLabel(): string
     {
         return 'Conversations';
