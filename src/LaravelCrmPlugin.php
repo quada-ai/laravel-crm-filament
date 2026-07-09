@@ -360,9 +360,18 @@ class LaravelCrmPlugin implements Plugin
 
         $panel->resources($resources);
 
-        // Pin the visible nav-group order: Contacts first, Settings right after.
-        // Filament renders any other groups after this listed pair via default trailing behavior.
-        $panel->navigationGroups(['Contacts', 'Settings']);
+        // Pin the visible nav-group order end-to-end. Any groups not listed here
+        // (e.g. Integrations from the Xero mirrors) render after the pinned sequence.
+        $panel->navigationGroups([
+            'Activity',
+            'Marketing',
+            'Sales',
+            'Contacts',
+            'Roadmap',
+            'Monitoring',
+            'Catalog',
+            'Settings',
+        ]);
 
         $pages = [
             CalendarPage::class,
