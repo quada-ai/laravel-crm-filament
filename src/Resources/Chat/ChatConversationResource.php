@@ -4,6 +4,7 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Chat;
 
 use BackedEnum;
 use Filament\Actions;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -135,7 +136,8 @@ class ChatConversationResource extends Resource
                 Actions\ViewAction::make()
                     ->button()
                     ->hiddenLabel(),
-                Actions\Action::make('markReplied')
+                Action::make('markReplied')
+                    ->button()
                     ->label(__('laravel-crm-filament::labels.actions.mark_replied'))
                     ->icon('heroicon-o-check')
                     ->color('success')
@@ -145,7 +147,8 @@ class ChatConversationResource extends Resource
                         $record->update(['status' => 'pending']);
                         Notification::make()->title('Marked as replied')->success()->send();
                     }),
-                Actions\Action::make('close')
+                Action::make('close')
+                    ->button()
                     ->label(__('laravel-crm-filament::labels.actions.close'))
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
@@ -192,6 +195,15 @@ class ChatConversationResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function backToIndexAction(): Action
+    {
+        return Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_conversations'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
     }
 
     public static function getPages(): array

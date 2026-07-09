@@ -457,6 +457,7 @@ return [
         'delivery' => 'Livraison',
         'upload' => 'Téléverser',
         'back_to_monitors' => 'Retour aux moniteurs',
+        'back_to_conversations' => 'Retour aux conversations',
         'run_check_now' => 'Exécuter la vérification maintenant',
         'add_comment' => 'Ajouter un commentaire',
         'add_status' => 'Ajouter un statut',

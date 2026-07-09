@@ -118,6 +118,7 @@ class ViewChatConversation extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            ChatConversationResource::backToIndexAction(),
             Actions\Action::make('reply')
                 ->label(__('laravel-crm-filament::labels.actions.reply'))
                 ->icon('heroicon-o-paper-airplane')

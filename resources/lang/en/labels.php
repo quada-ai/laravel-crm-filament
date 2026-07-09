@@ -502,6 +502,7 @@ return [
         'delivery' => 'Delivery',
         'upload' => 'Upload',
         'back_to_monitors' => 'Back to monitors',
+        'back_to_conversations' => 'Back to conversations',
         'run_check_now' => 'Run check now',
         'add_comment' => 'Add comment',
         'add_status' => 'Add status',
