@@ -4,7 +4,15 @@ namespace VentureDrake\LaravelCrmFilament\Pages;
 
 use BackedEnum;
 use Filament\Pages\Page;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Url;
+use VentureDrake\LaravelCrm\Models\Activity;
+use VentureDrake\LaravelCrm\Models\Call;
+use VentureDrake\LaravelCrm\Models\File;
+use VentureDrake\LaravelCrm\Models\Lunch;
+use VentureDrake\LaravelCrm\Models\Meeting;
+use VentureDrake\LaravelCrm\Models\Note;
+use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 /**
@@ -45,5 +53,35 @@ class ActivityFeed extends Page
     public function setTab(string $tab): void
     {
         $this->tab = $tab;
+    }
+
+    public function getActivities(): LengthAwarePaginator
+    {
+        $query = Activity::query()->latest();
+
+        if ($this->scope === 'mine') {
+            $query->where('causeable_id', auth()->id())
+                ->where('causeable_type', auth()->user()->getMorphClass());
+        }
+
+        $map = $this->recordableTypeMap();
+
+        if ($this->tab !== 'all' && isset($map[$this->tab])) {
+            $query->where('recordable_type', $map[$this->tab]);
+        }
+
+        return $query->paginate(25);
+    }
+
+    private function recordableTypeMap(): array
+    {
+        return [
+            'notes' => Note::class,
+            'tasks' => Task::class,
+            'calls' => Call::class,
+            'meetings' => Meeting::class,
+            'lunches' => Lunch::class,
+            'files' => File::class,
+        ];
     }
 }
