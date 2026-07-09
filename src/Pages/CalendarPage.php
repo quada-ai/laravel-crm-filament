@@ -3,6 +3,7 @@
 namespace VentureDrake\LaravelCrmFilament\Pages;
 
 use BackedEnum;
+use Carbon\Carbon;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
 use VentureDrake\LaravelCrm\Models\Activity;
@@ -49,18 +50,23 @@ class CalendarPage extends Page
     }
 
     /**
-     * Returns FullCalendar-shaped events for the current filter state.
+     * Returns FullCalendar-shaped events for the given date window and current filter state.
      *
      * @return array<int,array<string,mixed>>
      */
-    public function getEvents(): array
+    public function getEventsForRange(string $start, string $end): array
     {
+        $startCarbon = Carbon::parse($start);
+        $endCarbon = Carbon::parse($end);
+
         $events = [];
 
         if ($this->typeFilters['task'] ?? false) {
             $tasks = Task::query()
                 ->whereNotNull('due_at')
+                ->whereBetween('due_at', [$startCarbon, $endCarbon])
                 ->when($this->ownerFilter, fn ($q) => $q->where('user_owner_id', $this->ownerFilter))
+                ->limit(1000)
                 ->get();
             foreach ($tasks as $task) {
                 $events[] = [
@@ -92,7 +98,9 @@ class CalendarPage extends Page
 
             $records = $class::query()
                 ->whereNotNull('start_at')
+                ->whereBetween('start_at', [$startCarbon, $endCarbon])
                 ->when($this->ownerFilter, fn ($q) => $q->where('user_owner_id', $this->ownerFilter))
+                ->limit(1000)
                 ->get();
 
             foreach ($records as $record) {

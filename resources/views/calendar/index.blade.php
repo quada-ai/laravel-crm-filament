@@ -1,6 +1,11 @@
 <x-filament-panels::page>
     @php
-        $events = $this->getEvents();
+        // Fetch a broad default window so FullCalendar has data on initial mount.
+        // A follow-up story wires FullCalendar's events() callback to call getEventsForRange
+        // with the currently-visible range.
+        $rangeStart = now()->subMonths(2)->startOfMonth()->toIso8601String();
+        $rangeEnd = now()->addMonths(2)->endOfMonth()->toIso8601String();
+        $events = $this->getEventsForRange($rangeStart, $rangeEnd);
     @endphp
 
     <style>
