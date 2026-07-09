@@ -204,7 +204,35 @@ class TaskResource extends Resource
                     ->placeholder('—'),
             ])
             ->defaultSort('due_at', 'asc')
-            ->filters([])
+            ->filters([
+                Tables\Filters\SelectFilter::make('user_owner_id')
+                    ->label(__('laravel-crm-filament::labels.fields.created_by'))
+                    ->multiple()
+                    ->relationship('ownerUser', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('user_assigned_id')
+                    ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
+                    ->multiple()
+                    ->relationship('assignedToUser', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('status')
+                    ->label(__('laravel-crm-filament::labels.fields.status'))
+                    ->options([
+                        'pending' => 'Pending',
+                        'completed' => 'Completed',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return match ($data['value'] ?? null) {
+                            'pending' => $query->whereNull('completed_at'),
+                            'completed' => $query->whereNotNull('completed_at'),
+                            default => $query,
+                        };
+                    }),
+            ])
             ->recordActions([
                 static::completeAction()
                     ->button()
