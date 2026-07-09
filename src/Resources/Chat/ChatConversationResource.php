@@ -85,14 +85,29 @@ class ChatConversationResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('chat_id')
-                    ->label(__('laravel-crm-filament::labels.fields.id'))
+                    ->label('#')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('visitor_online')
+                    ->label('')
+                    ->badge()
+                    ->state(fn (ChatConversation $record): string => $record->visitor?->isOnline() ? 'Online' : 'Offline')
+                    ->color(fn (string $state): string => $state === 'Online' ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('visitor.name')
                     ->label(__('laravel-crm-filament::labels.chat.visitor'))
                     ->placeholder('Anonymous')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('subject')->limit(40)->toggleable(),
+                Tables\Columns\TextColumn::make('unread_count')
+                    ->label('')
+                    ->badge()
+                    ->color('danger')
+                    ->state(fn (ChatConversation $record): int => $record->unreadForAgents())
+                    ->formatStateUsing(fn ($state) => $state > 0 ? $state : null),
+                Tables\Columns\TextColumn::make('last_message_preview')
+                    ->label(__('laravel-crm-filament::labels.fields.last_message'))
+                    ->state(fn (ChatConversation $record): ?string => $record->latestMessage?->body)
+                    ->limit(60)
+                    ->tooltip(fn (ChatConversation $record): ?string => $record->latestMessage?->body),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -101,13 +116,15 @@ class ChatConversationResource extends Resource
                         'closed' => 'gray',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('assignedToUser.name')
-                    ->label(__('laravel-crm-filament::labels.fields.assigned'))
-                    ->toggleable(),
                 Tables\Columns\TextColumn::make('last_message_at')
-                    ->label(__('laravel-crm-filament::labels.fields.last_activity'))
+                    ->label(__('laravel-crm-filament::labels.fields.updated'))
                     ->since()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('visitor_last_seen_at')
+                    ->label(__('laravel-crm-filament::labels.fields.last_active'))
+                    ->state(fn (ChatConversation $record) => $record->visitor?->last_seen_at)
+                    ->since()
+                    ->placeholder('—'),
             ])
             ->defaultSort('last_message_at', 'desc')
             ->filters([
