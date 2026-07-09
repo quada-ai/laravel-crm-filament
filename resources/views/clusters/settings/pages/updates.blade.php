@@ -1,12 +1,5 @@
 <x-filament-panels::page>
     <div class="space-y-6">
-        <x-filament::section heading="Current version">
-            <div class="text-lg font-semibold">{{ $this->currentVersion }}</div>
-            @if ($this->installId)
-                <div class="text-sm text-gray-500 mt-1">Install ID: {{ $this->installId }}</div>
-            @endif
-        </x-filament::section>
-
         <x-filament::section heading="Latest available">
             @if ($this->latestVersion)
                 <div class="text-lg font-semibold">{{ $this->latestVersion }}</div>
