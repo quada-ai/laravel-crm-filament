@@ -27,7 +27,7 @@ class EmailTemplateResource extends Resource
 
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 200;
+    protected static ?int $navigationSort = 170;
 
     public static function getRecordRouteKeyName(): ?string
     {

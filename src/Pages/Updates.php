@@ -18,7 +18,7 @@ class Updates extends Page
 
     protected static ?string $slug = 'updates';
 
-    protected static ?int $navigationSort = 250;
+    protected static ?int $navigationSort = 200;
 
     protected string $view = 'laravel-crm-filament::clusters.settings.pages.updates';
 

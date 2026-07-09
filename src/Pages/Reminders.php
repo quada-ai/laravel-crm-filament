@@ -35,7 +35,7 @@ class Reminders extends Page implements HasForms
 
     protected static ?string $slug = 'reminders';
 
-    protected static ?int $navigationSort = 240;
+    protected static ?int $navigationSort = 190;
 
     protected string $view = 'laravel-crm-filament::clusters.settings.pages.reminders';
 

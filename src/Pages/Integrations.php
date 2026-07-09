@@ -25,7 +25,7 @@ class Integrations extends Page implements HasForms
 
     protected static ?string $slug = 'integrations';
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 110;
 
     protected string $view = 'filament-panels::pages.page';
 

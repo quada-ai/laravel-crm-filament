@@ -34,7 +34,7 @@ class PipelineResource extends Resource
 
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 40;
+    protected static ?int $navigationSort = 30;
 
     public static function getRecordRouteKeyName(): ?string
     {

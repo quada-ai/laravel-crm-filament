@@ -26,7 +26,7 @@ class SmsTemplateResource extends Resource
 
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 210;
+    protected static ?int $navigationSort = 180;
 
     public static function getRecordRouteKeyName(): ?string
     {

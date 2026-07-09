@@ -33,7 +33,7 @@ class ClickSendIntegration extends Page implements HasForms
 
     protected static ?string $slug = 'clicksend';
 
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 115;
 
     protected string $view = 'filament-panels::pages.page';
 

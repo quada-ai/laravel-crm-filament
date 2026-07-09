@@ -30,7 +30,7 @@ class LeadStatusResource extends Resource
 
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 70;
+    protected static ?int $navigationSort = 85;
 
     public static function form(Schema $schema): Schema
     {

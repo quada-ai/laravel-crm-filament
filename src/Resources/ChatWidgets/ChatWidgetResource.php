@@ -31,7 +31,7 @@ class ChatWidgetResource extends Resource
 
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
-    protected static ?int $navigationSort = 220;
+    protected static ?int $navigationSort = 120;
 
     public static function form(Schema $schema): Schema
     {
