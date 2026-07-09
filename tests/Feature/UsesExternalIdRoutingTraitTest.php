@@ -9,6 +9,7 @@ use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\Resources\Chat\ChatConversationResource;
 use VentureDrake\LaravelCrmFilament\Resources\ChatWidgets\ChatWidgetResource;
 use VentureDrake\LaravelCrmFilament\Resources\Customers\CustomerResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
@@ -39,6 +40,7 @@ $traitResources = [
     'LeadStatusResource' => LeadStatusResource::class,
     'PipelineStageProbabilityResource' => PipelineStageProbabilityResource::class,
     'ChatWidgetResource' => ChatWidgetResource::class,
+    'ChatConversationResource' => ChatConversationResource::class,
 ];
 
 $traitDataset = [];

@@ -12,12 +12,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use VentureDrake\LaravelCrm\Models\ChatConversation;
 use VentureDrake\LaravelCrm\Services\ChatService;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Chat\Pages\ListChatConversations;
 use VentureDrake\LaravelCrmFilament\Resources\Chat\Pages\ViewChatConversation;
 
 class ChatConversationResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = ChatConversation::class;
 
     protected static ?string $slug = 'chat';
@@ -54,11 +57,6 @@ class ChatConversationResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         return 'success';
-    }
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
     }
 
     public static function getNavigationLabel(): string
