@@ -96,6 +96,7 @@ class TaskResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
                     ->since()
                     ->sortable()
                     ->toggleable(),
