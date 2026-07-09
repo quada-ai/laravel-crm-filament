@@ -87,12 +87,14 @@
             @endforeach
         </div>
 
-        <div class="crm-timeline" data-testid="crm-timeline">
-            @forelse ($activities as $activity)
-                @include('laravel-crm-filament::crm-activity', ['activity' => $activity, 'last' => $loop->last])
-            @empty
-                <div class="crm-card-empty">No activity yet.</div>
-            @endforelse
+        <div class="crm-card-area-activity">
+            <div class="crm-timeline" data-testid="crm-timeline">
+                @forelse ($activities as $activity)
+                    @include('laravel-crm-filament::crm-activity', ['activity' => $activity, 'last' => $loop->last])
+                @empty
+                    <div class="crm-card-empty">No activity yet.</div>
+                @endforelse
+            </div>
         </div>
 
         <div style="margin-top: 1rem;">
