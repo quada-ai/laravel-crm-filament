@@ -1,5 +1,7 @@
 <?php
 
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Illuminate\Support\Carbon;
@@ -101,12 +103,16 @@ it('preserves the default sort of due_at asc', function () {
     expect($source)->toContain("->defaultSort('due_at', 'asc')");
 });
 
-it('exposes row actions in the order [view, edit]', function () {
+it('exposes row actions in the order [markComplete, view, edit, delete]', function () {
     $actions = array_values(livewire(ListTasks::class)->instance()->getTable()->getRecordActions());
 
-    expect($actions)->toHaveCount(2);
-    expect($actions[0])->toBeInstanceOf(ViewAction::class);
-    expect($actions[1])->toBeInstanceOf(EditAction::class);
+    expect($actions)->toHaveCount(4);
+    expect($actions[0])->toBeInstanceOf(Action::class);
+    expect($actions[0]->getName())->toBe('markComplete');
+    expect($actions[1])->toBeInstanceOf(ViewAction::class);
+    expect($actions[2])->toBeInstanceOf(EditAction::class);
+    expect($actions[3])->toBeInstanceOf(DeleteAction::class);
+    expect($actions[3]->isConfirmationRequired())->toBeTrue();
 });
 
 it('mounts ListTasks end-to-end and renders a Pending task row', function () {

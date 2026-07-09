@@ -143,12 +143,19 @@ class TaskResource extends Resource
             ->defaultSort('due_at', 'asc')
             ->filters([])
             ->recordActions([
+                static::completeAction()
+                    ->button()
+                    ->label(__('laravel-crm-filament::labels.actions.mark_complete')),
                 Actions\ViewAction::make()
                     ->button()
                     ->hiddenLabel(),
                 Actions\EditAction::make()
                     ->button()
                     ->hiddenLabel(),
+                Actions\DeleteAction::make()
+                    ->button()
+                    ->hiddenLabel()
+                    ->requiresConfirmation(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
@@ -169,6 +176,24 @@ class TaskResource extends Resource
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function completeAction(): Actions\Action
+    {
+        return Actions\Action::make('markComplete')
+            ->label(__('laravel-crm-filament::labels.actions.mark_complete'))
+            ->icon('heroicon-o-check')
+            ->color('success')
+            ->requiresConfirmation()
+            ->visible(fn (?Task $record): bool => $record !== null && $record->completed_at === null)
+            ->action(function (Task $record): void {
+                $record->update(['completed_at' => now()]);
+
+                Notification::make()
+                    ->title(__('laravel-crm-filament::labels.actions.mark_complete'))
+                    ->success()
+                    ->send();
+            });
     }
 
     public static function getPages(): array
