@@ -1,6 +1,5 @@
 <?php
 
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use VentureDrake\LaravelCrm\Models\Organization;
@@ -137,27 +136,6 @@ it('Custom fields section is hidden when the record has no grouped FieldValues',
     expect($closure)->toBeInstanceOf(Closure::class);
     expect($closure(new $model))->toBeTrue();
     expect($closure(null))->toBeTrue();
-})->with('poResourceModelPage');
-
-it('overrides content() locally on the View page with a 2-col Grid', function (string $resource, string $model, string $page): void {
-    $declaringClass = (new ReflectionMethod($page, 'content'))->getDeclaringClass()->getName();
-    expect($declaringClass)->toBe($page);
-
-    $src = file_get_contents((new ReflectionClass($page))->getFileName());
-    expect($src)->toContain("Grid::make(['default' => 1, 'lg' => 2])");
-    expect($src)->toContain('getInfolistContentComponent()');
-    expect($src)->toContain('getRelationManagersContentComponent()');
-})->with('poResourceModelPage');
-
-it('content() Schema root contains a Grid with two columnSpan lg-1 children', function (string $resource, string $model, string $page): void {
-    $instance = (new ReflectionClass($page))->newInstanceWithoutConstructor();
-    $instance->record = new $model;
-    $schema = Schema::make($instance);
-    $instance->content($schema);
-
-    $components = $schema->getComponents(withHidden: true);
-    expect($components)->toHaveCount(1);
-    expect($components[0])->toBeInstanceOf(Grid::class);
 })->with('poResourceModelPage');
 
 it('uses the shared HasCrmCustomFieldEntries trait on both Resources', function (string $resource): void {

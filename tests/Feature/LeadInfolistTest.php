@@ -1,6 +1,7 @@
 <?php
 
 use Filament\Infolists\Components\TextEntry;
+use Filament\Resources\Pages\ViewRecord;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -219,18 +220,13 @@ it('Lead Qualification section exposes a nested Section keyed by FieldGroup name
 // AC (4): ViewLead::content() Grid with two child columns (lg 2 + lg 1)
 // ────────────────────────────────────────────────────────────────────────
 
-it('ViewLead::content produces a top-level Grid with two columns: infolist (lg 2) + relation managers (lg 1)', function () {
-    $components = leadInfolistViewLeadChildren();
-
-    expect($components)->toHaveCount(1);
-    expect($components[0])->toBeInstanceOf(Grid::class);
-
-    $grid = $components[0];
-    $children = $grid->getChildComponents();
-
-    expect($children)->toHaveCount(2);
-    expect($children[0]->getColumnSpan())->toBe(['lg' => 1]);
-    expect($children[1]->getColumnSpan())->toBe(['lg' => 1]);
+it('ViewLead uses Filament default content() layout (vertical stack)', function () {
+    // Reverted the 2-col Grid layout from US-004 of the lead show-page series
+    // because nesting getRelationManagersContentComponent() in a Grid columnSpan
+    // broke the Livewire tab-switching. ViewLead now falls back to Filament's
+    // default vertical stack (infolist top, RM tabs strip below).
+    $method = new ReflectionMethod(ViewLead::class, 'content');
+    expect($method->getDeclaringClass()->getName())->toBe(ViewRecord::class);
 });
 
 // ────────────────────────────────────────────────────────────────────────

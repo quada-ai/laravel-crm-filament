@@ -4,8 +4,6 @@ namespace VentureDrake\LaravelCrmFilament\Resources\People\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
@@ -39,16 +37,12 @@ class ViewPerson extends ViewRecord
         ];
 
         return $schema->components([
-            Grid::make(['default' => 1, 'lg' => 2])->schema([
-                Group::make([
-                    $this->getInfolistContentComponent(),
-                    Livewire::make(RelatedPeopleRelationManager::class, $ownerData)
-                        ->key('related-people-' . $this->getRecord()->getKey()),
-                    Livewire::make(RelatedOrganizationsRelationManager::class, $ownerData)
-                        ->key('related-organizations-' . $this->getRecord()->getKey()),
-                ])->columnSpan(['lg' => 1]),
-                $this->getRelationManagersContentComponent()->columnSpan(['lg' => 1]),
-            ]),
+            $this->getInfolistContentComponent(),
+            Livewire::make(RelatedPeopleRelationManager::class, $ownerData)
+                ->key('related-people-' . $this->getRecord()->getKey()),
+            Livewire::make(RelatedOrganizationsRelationManager::class, $ownerData)
+                ->key('related-organizations-' . $this->getRecord()->getKey()),
+            $this->getRelationManagersContentComponent(),
         ]);
     }
 }

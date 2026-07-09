@@ -4,8 +4,6 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Deals\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
@@ -37,16 +35,6 @@ class ViewDeal extends ViewRecord
                 ->hiddenLabel()
                 ->icon('heroicon-m-trash'),
         ];
-    }
-
-    public function content(Schema $schema): Schema
-    {
-        return $schema->components([
-            Grid::make(['default' => 1, 'lg' => 2])->schema([
-                $this->getInfolistContentComponent()->columnSpan(['lg' => 1]),
-                $this->getRelationManagersContentComponent()->columnSpan(['lg' => 1]),
-            ]),
-        ]);
     }
 
     public function getSubheading(): string | Htmlable | null

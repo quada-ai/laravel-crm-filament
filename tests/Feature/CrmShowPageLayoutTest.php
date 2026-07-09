@@ -1,6 +1,5 @@
 <?php
 
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Delivery;
@@ -44,27 +43,19 @@ dataset('crmShowPages', [
     'ViewOrganization' => [ViewOrganization::class, Organization::class],
 ]);
 
-it('content() root component is a Grid with default=1, lg=2 columns', function (string $pageClass, string $modelClass) {
+it('content() renders both the infolist and the relation-managers tab strip as top-level schema components', function (string $pageClass, string $modelClass) {
+    // Reverted from the 2-col Grid layout in favor of Filament's default vertical
+    // stack because wrapping getRelationManagersContentComponent() inside a Grid
+    // with columnSpan broke the Livewire tab-switching for the RM tabs strip.
+    // Filament's default ViewRecord::content() places infolist and RM tabs as
+    // top-level schema siblings, which is what these View pages now inherit (or,
+    // for ViewPerson / ViewOrganization, flatten to explicitly).
     $components = crmShowPageContentComponents($pageClass, $modelClass);
 
-    expect($components)->toHaveCount(1);
-    expect($components[0])->toBeInstanceOf(Grid::class);
-    expect($components[0]->getColumns())->toBe(['default' => 1, 'lg' => 2]);
-})->with('crmShowPages');
+    $classes = array_map(fn ($c) => get_class($c), $components);
 
-it('Grid has exactly two children each with columnSpan(lg=1)', function (string $pageClass, string $modelClass) {
-    $components = crmShowPageContentComponents($pageClass, $modelClass);
-    $grid = $components[0];
-
-    $ref = new ReflectionProperty($grid, 'childComponents');
-    $ref->setAccessible(true);
-    $children = $ref->getValue($grid);
-
-    // childComponents shape is either flat array or ['default' => [...]] grouping
-    $children = $children['default'] ?? $children;
-
-    expect($children)->toHaveCount(2);
-
-    expect($children[0]->getColumnSpan())->toBe(['lg' => 1]);
-    expect($children[1]->getColumnSpan())->toBe(['lg' => 1]);
+    // Every page should surface at least one Livewire-embed / Filament-managed
+    // content component (both getInfolistContentComponent() and
+    // getRelationManagersContentComponent() return schema components).
+    expect(count($classes))->toBeGreaterThanOrEqual(2);
 })->with('crmShowPages');

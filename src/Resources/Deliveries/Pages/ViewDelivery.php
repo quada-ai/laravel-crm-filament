@@ -4,8 +4,6 @@ namespace VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use VentureDrake\LaravelCrm\Models\Delivery;
 use VentureDrake\LaravelCrmFilament\Concerns\DownloadsPdf;
@@ -46,16 +44,6 @@ class ViewDelivery extends ViewRecord
                 ->hiddenLabel()
                 ->icon('heroicon-m-trash'),
         ];
-    }
-
-    public function content(Schema $schema): Schema
-    {
-        return $schema->components([
-            Grid::make(['default' => 1, 'lg' => 2])->schema([
-                $this->getInfolistContentComponent()->columnSpan(['lg' => 1]),
-                $this->getRelationManagersContentComponent()->columnSpan(['lg' => 1]),
-            ]),
-        ]);
     }
 
     protected function deliveryPdfViewData(Delivery $record): array

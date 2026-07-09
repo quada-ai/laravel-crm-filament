@@ -1,6 +1,5 @@
 <?php
 
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Concerns\HasSchemas;
 use Filament\Schemas\Schema;
@@ -59,27 +58,6 @@ it('infolist source uses PersonResource::getUrl and OrganizationResource::getUrl
 
     expect($src)->toContain("PersonResource::getUrl('view'");
     expect($src)->toContain("OrganizationResource::getUrl('view'");
-})->with('ipdResourceModelPage');
-
-it('overrides content() locally on the View page with a 2-col Grid', function (string $resource, string $model, string $page): void {
-    $declaringClass = (new ReflectionMethod($page, 'content'))->getDeclaringClass()->getName();
-    expect($declaringClass)->toBe($page);
-
-    $src = file_get_contents((new ReflectionClass($page))->getFileName());
-    expect($src)->toContain("Grid::make(['default' => 1, 'lg' => 2])");
-    expect($src)->toContain('getInfolistContentComponent()');
-    expect($src)->toContain('getRelationManagersContentComponent()');
-})->with('ipdResourceModelPage');
-
-it('content() Schema root contains a Grid with two columnSpan lg-1 children', function (string $resource, string $model, string $page): void {
-    $instance = (new ReflectionClass($page))->newInstanceWithoutConstructor();
-    $instance->record = new $model;
-    $schema = Schema::make($instance);
-    $instance->content($schema);
-
-    $components = $schema->getComponents(withHidden: true);
-    expect($components)->toHaveCount(1);
-    expect($components[0])->toBeInstanceOf(Grid::class);
 })->with('ipdResourceModelPage');
 
 it('Invoice / PurchaseOrder infolists merge ungrouped custom field entries into Details', function (string $resource): void {
