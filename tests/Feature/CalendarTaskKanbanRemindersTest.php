@@ -3,6 +3,11 @@
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Filament\Resources\Pages\Page as ResourcePage;
+use Illuminate\Support\Str;
+use VentureDrake\LaravelCrm\Models\Call;
+use VentureDrake\LaravelCrm\Models\Lunch;
+use VentureDrake\LaravelCrm\Models\Meeting;
+use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Pages\CalendarPage;
 use VentureDrake\LaravelCrmFilament\Pages\Reminders;
@@ -30,6 +35,65 @@ it('logs an activity entry from CalendarPage::moveEvent', function () {
     $source = file_get_contents((new ReflectionClass(CalendarPage::class))->getFileName());
     expect($source)->toContain('Activity::create');
     expect($source)->toContain('timelineable_type');
+});
+
+it('exposes getEventsForRange with two required string parameters', function () {
+    $reflection = new ReflectionMethod(CalendarPage::class, 'getEventsForRange');
+    expect($reflection->isPublic())->toBeTrue();
+    expect($reflection->getNumberOfRequiredParameters())->toBe(2);
+
+    $params = $reflection->getParameters();
+    expect((string) $params[0]->getType())->toBe('string');
+    expect((string) $params[1]->getType())->toBe('string');
+});
+
+it('returns FullCalendar-shaped events from getEventsForRange for a wide window', function () {
+    $page = new CalendarPage;
+    $page->typeFilters = ['task' => true, 'call' => true, 'meeting' => true, 'lunch' => true];
+    $page->ownerFilter = null;
+
+    $now = now();
+    Task::create([
+        'external_id' => Str::uuid()->toString(),
+        'name' => 'wide-window-task',
+        'due_at' => $now->copy()->addDays(3),
+    ]);
+    Call::create([
+        'external_id' => Str::uuid()->toString(),
+        'name' => 'wide-window-call',
+        'start_at' => $now->copy()->addDays(4),
+    ]);
+    Meeting::create([
+        'external_id' => Str::uuid()->toString(),
+        'name' => 'wide-window-meeting',
+        'start_at' => $now->copy()->addDays(5),
+        'meetingable_type' => 'placeholder',
+        'meetingable_id' => 1,
+    ]);
+    Lunch::create([
+        'external_id' => Str::uuid()->toString(),
+        'name' => 'wide-window-lunch',
+        'start_at' => $now->copy()->addDays(6),
+        'lunchable_type' => 'placeholder',
+        'lunchable_id' => 1,
+    ]);
+
+    $start = $now->copy()->subYear()->toIso8601String();
+    $end = $now->copy()->addYear()->toIso8601String();
+
+    $events = $page->getEventsForRange($start, $end);
+
+    // Four rows in a wide (now ± 1 year) window → four events.
+    expect($events)->toHaveCount(4);
+
+    foreach ($events as $event) {
+        expect($event)->toHaveKey('id');
+        expect($event)->toHaveKey('title');
+        expect($event)->toHaveKey('start');
+        expect($event)->toHaveKey('extendedProps');
+        expect($event['extendedProps'])->toHaveKey('type');
+        expect($event)->toHaveKey('backgroundColor');
+    }
 });
 
 it('declares the TaskKanban as a sub-resource page of TaskResource', function () {
