@@ -65,6 +65,10 @@ it('uses external_id for record routing', function (string $resource): void {
     expect($resource::getRecordRouteKeyName())->toBe('external_id');
 })->with('standaloneActivityResources');
 
+it('is hidden from the sidebar via shouldRegisterNavigation returning false', function (string $resource): void {
+    expect($resource::shouldRegisterNavigation())->toBeFalse();
+})->with('standaloneActivityResources');
+
 dataset('crmFilesRmParents', [
     'Lead' => [LeadResource::class],
     'Deal' => [DealResource::class],
