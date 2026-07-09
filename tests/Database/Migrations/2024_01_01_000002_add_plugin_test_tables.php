@@ -381,6 +381,18 @@ return new class extends Migration
             });
         }
 
+        if (! Schema::hasTable($prefix . 'chat_visitor_page_views')) {
+            Schema::create($prefix . 'chat_visitor_page_views', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->unsignedBigInteger('team_id')->index()->nullable();
+                $table->unsignedBigInteger('chat_visitor_id')->index();
+                $table->string('url', 2048);
+                $table->string('title', 512)->nullable();
+                $table->timestamp('viewed_at')->useCurrent();
+                $table->index(['chat_visitor_id', 'viewed_at']);
+            });
+        }
+
         if (! Schema::hasTable($prefix . 'chat_messages')) {
             Schema::create($prefix . 'chat_messages', function (Blueprint $table) {
                 $table->bigIncrements('id');

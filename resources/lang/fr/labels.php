@@ -315,6 +315,9 @@ return [
         'status_open' => 'Ouverte',
         'status_pending' => 'Répondue (en attente du visiteur)',
         'status_closed' => 'Fermée',
+        'type_a_message' => 'Tapez un message',
+        'no_pages_viewed' => 'Aucune page consultée',
+        'page_history' => 'Historique des pages',
     ],
 
     'file' => [

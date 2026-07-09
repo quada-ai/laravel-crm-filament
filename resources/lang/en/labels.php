@@ -321,6 +321,9 @@ return [
         'status_open' => 'Open',
         'status_pending' => 'Replied (waiting on visitor)',
         'status_closed' => 'Closed',
+        'type_a_message' => 'Type a message',
+        'no_pages_viewed' => 'No pages viewed yet',
+        'page_history' => 'Page history',
     ],
 
     // File / upload
