@@ -121,8 +121,7 @@ class TaskResource extends Resource
                     ->label(__('laravel-crm-filament::labels.fields.description'))
                     ->limit(60)
                     ->tooltip(fn (Task $record): ?string => $record->description)
-                    ->toggleable()
-                    ->wrap(),
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('due_at')
                     ->since()

@@ -60,7 +60,7 @@ it('status column source declares the Completed/Pending state closure and color 
     expect($block)->toContain("'Pending' => 'warning',");
 });
 
-it('description column source uses tooltip and wrap modifiers', function () {
+it('description column source uses tooltip modifier and does NOT wrap', function () {
     $source = file_get_contents(__DIR__ . '/../../src/Resources/Tasks/TaskResource.php');
 
     $start = strpos($source, "TextColumn::make('description')");
@@ -68,7 +68,7 @@ it('description column source uses tooltip and wrap modifiers', function () {
     $block = substr($source, $start, $end - $start);
 
     expect($block)->toContain('->tooltip(');
-    expect($block)->toContain('->wrap()');
+    expect($block)->not->toContain('->wrap()');
 });
 
 it('created_at column source uses since() for relative time rendering', function () {

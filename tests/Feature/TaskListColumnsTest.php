@@ -104,15 +104,22 @@ it('renders name with searchable + sortable + limit(60)', function () {
     expect($source)->toContain('->limit(60)');
 });
 
-it('renders description with limit + tooltip closure + toggleable + wrap', function () {
+it('renders description with limit + tooltip closure + toggleable (no wrap — single-line)', function () {
     $cols = taskTableColumns();
 
     expect($cols['description'])->toBeInstanceOf(TextColumn::class);
     expect($cols['description']->isToggleable())->toBeTrue();
 
     $source = file_get_contents(__DIR__ . '/../../src/Resources/Tasks/TaskResource.php');
+    // Scope wrap-absence assertion to the description column block only so
+    // an unrelated column's ->wrap() (if ever added) doesn't cause a false
+    // negative here.
+    $start = strpos($source, "TextColumn::make('description')");
+    $end = strpos($source, "TextColumn::make('due_at')", $start);
+    $block = substr($source, $start, $end - $start);
+
     expect($source)->toContain("TextColumn::make('description')");
-    expect($source)->toContain('->wrap()');
+    expect($block)->not->toContain('->wrap()');
     expect($source)->toContain('->tooltip(fn (Task $record): ?string => $record->description)');
 });
 
