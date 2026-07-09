@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
@@ -94,33 +95,49 @@ class TaskResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\IconColumn::make('completed_at')
-                    ->label(__('laravel-crm-filament::labels.money.done'))
-                    ->boolean()
-                    ->getStateUsing(fn (Task $record): bool => $record->completed_at !== null),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('status')
+                    ->label(__('laravel-crm-filament::labels.fields.status'))
+                    ->state(fn (Task $record): string => $record->completed_at ? 'Completed' : 'Pending')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Completed' => 'success',
+                        'Pending' => 'warning',
+                        default => 'gray',
+                    })
+                    ->sortable(query: fn (Builder $query, string $direction): Builder => $query->orderBy('completed_at', $direction)),
 
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
                     ->limit(60),
 
+                Tables\Columns\TextColumn::make('description')
+                    ->label(__('laravel-crm-filament::labels.fields.description'))
+                    ->limit(60)
+                    ->tooltip(fn (Task $record): ?string => $record->description)
+                    ->toggleable()
+                    ->wrap(),
+
                 Tables\Columns\TextColumn::make('due_at')
-                    ->dateTime()
+                    ->since()
+                    ->tooltip(fn (Task $record): ?string => optional($record->due_at)->format('M d, Y H:i'))
                     ->sortable()
                     ->placeholder('—'),
 
-                Tables\Columns\TextColumn::make('assignedToUser.name')
-                    ->label(__('laravel-crm-filament::labels.fields.assigned'))
-                    ->toggleable(),
-
                 Tables\Columns\TextColumn::make('ownerUser.name')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
-                    ->toggleable(),
+                    ->toggleable()
+                    ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
 
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('assignedToUser.name')
+                    ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
+                    ->toggleable()
+                    ->placeholder('—'),
             ])
             ->defaultSort('due_at', 'asc')
             ->filters([])
