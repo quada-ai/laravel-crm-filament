@@ -1,13 +1,4 @@
 <x-filament-panels::page>
-    @php
-        // Fetch a broad default window so FullCalendar has data on initial mount.
-        // A follow-up story wires FullCalendar's events() callback to call getEventsForRange
-        // with the currently-visible range.
-        $rangeStart = now()->subMonths(2)->startOfMonth()->toIso8601String();
-        $rangeEnd = now()->addMonths(2)->endOfMonth()->toIso8601String();
-        $events = $this->getEventsForRange($rangeStart, $rangeEnd);
-    @endphp
-
     <style>
         .crm-calendar-toolbar {
             display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
@@ -69,7 +60,6 @@
         wire:ignore
         x-data="{
             calendar: null,
-            events: @js($events),
             mountFullCalendar() {
                 const host = this.$refs.host;
                 if (!host) return;
@@ -81,7 +71,9 @@
                         right: 'dayGridMonth,timeGridWeek',
                     },
                     editable: true,
-                    events: this.events,
+                    events: (info, success, failure) => {
+                        $wire.getEventsForRange(info.startStr, info.endStr).then(success).catch(failure);
+                    },
                     eventDrop: (info) => {
                         const props = info.event.extendedProps || {};
                         const externalId = props.externalId;
@@ -91,6 +83,7 @@
                     },
                 });
                 this.calendar.render();
+                Livewire.on('calendar-refetch', () => this.calendar?.refetchEvents());
             },
             loadFullCalendar() {
                 if (typeof window.FullCalendar !== 'undefined') {
@@ -110,17 +103,5 @@
         x-init="loadFullCalendar()"
     >
         <div class="crm-calendar-host" x-ref="host"></div>
-
-        <div
-            wire:key="calendar-events-bridge"
-            x-effect="
-                const next = @js($events);
-                if (calendar) {
-                    calendar.removeAllEvents();
-                    next.forEach(e => calendar.addEvent(e));
-                }
-            "
-            style="display:none;"
-        ></div>
     </div>
 </x-filament-panels::page>
