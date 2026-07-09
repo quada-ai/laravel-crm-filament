@@ -42,6 +42,16 @@ class CalendarPage extends Page
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
     }
 
+    public function updatedOwnerFilter(): void
+    {
+        $this->dispatch('calendar-refetch');
+    }
+
+    public function updatedTypeFilters(): void
+    {
+        $this->dispatch('calendar-refetch');
+    }
+
     public function getOwners(): Collection
     {
         $userClass = config('auth.providers.users.model');
