@@ -1,41 +1,85 @@
 <x-filament-panels::page>
     @include('laravel-crm-filament::partials.crm-card-styles')
 
+    @once
+        <style>
+            .crm-activity-feed .crm-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                border-radius: 0.5rem;
+                padding: 0.375rem 0.875rem;
+                font-size: 0.875rem;
+                font-weight: 500;
+                line-height: 1.25rem;
+                cursor: pointer;
+                border: 1px solid rgb(209 213 219);
+                background: #fff;
+                color: rgb(55 65 81);
+                transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+            }
+            .crm-activity-feed .crm-btn:hover {
+                background: rgb(243 244 246);
+            }
+            .crm-activity-feed .crm-btn.is-active {
+                background: #05b3a9;
+                color: #fff;
+                border-color: #05b3a9;
+            }
+            .crm-activity-feed .crm-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+            }
+            .crm-activity-feed .crm-timeline {
+                margin-top: 0.5rem;
+            }
+            html.dark .crm-activity-feed .crm-btn {
+                background: rgb(31 41 55);
+                color: rgb(229 231 235);
+                border-color: rgb(75 85 99);
+            }
+            html.dark .crm-activity-feed .crm-btn:hover {
+                background: rgb(55 65 81);
+            }
+            html.dark .crm-activity-feed .crm-btn.is-active {
+                background: #05b3a9;
+                color: #fff;
+                border-color: #05b3a9;
+            }
+        </style>
+    @endonce
+
     @php
         $activities = $this->getActivities();
         $tabs = ['all', 'notes', 'tasks', 'calls', 'meetings', 'lunches', 'files'];
-        $scopeBase = 'inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition';
-        $scopeActive = 'bg-primary-600 text-white';
-        $scopeInactive = 'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:ring-white/10';
-        $tabBase = 'inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium transition';
-        $tabActive = 'bg-primary-600 text-white';
-        $tabInactive = 'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:ring-white/10';
     @endphp
 
     <div class="crm-activity-feed" data-testid="crm-activity-feed">
-        <div class="crm-activity-scope flex flex-wrap gap-2 mb-4" data-testid="crm-activity-scope">
+        <div class="crm-row crm-activity-scope" data-testid="crm-activity-scope">
             <button
                 type="button"
                 wire:click="setScope('mine')"
-                class="{{ $scopeBase }} {{ $scope === 'mine' ? $scopeActive : $scopeInactive }}"
+                class="crm-btn @if ($scope === 'mine') is-active @endif"
             >
                 {{ __('laravel-crm-filament::labels.sales.my_activity') }}
             </button>
             <button
                 type="button"
                 wire:click="setScope('all')"
-                class="{{ $scopeBase }} {{ $scope === 'all' ? $scopeActive : $scopeInactive }}"
+                class="crm-btn @if ($scope === 'all') is-active @endif"
             >
                 {{ __('laravel-crm-filament::labels.sales.all_activity') }}
             </button>
         </div>
 
-        <div class="crm-activity-tabs flex flex-wrap gap-2 mb-4" data-testid="crm-activity-tabs">
+        <div class="crm-row crm-activity-tabs" data-testid="crm-activity-tabs">
             @foreach ($tabs as $t)
                 <button
                     type="button"
                     wire:click="setTab('{{ $t }}')"
-                    class="{{ $tabBase }} {{ $tab === $t ? $tabActive : $tabInactive }}"
+                    class="crm-btn @if ($tab === $t) is-active @endif"
                     data-tab="{{ $t }}"
                 >
                     {{ ucfirst($t) }}
@@ -51,7 +95,7 @@
             @endforelse
         </div>
 
-        <div class="mt-4">
+        <div style="margin-top: 1rem;">
             {{ $activities->links() }}
         </div>
     </div>
