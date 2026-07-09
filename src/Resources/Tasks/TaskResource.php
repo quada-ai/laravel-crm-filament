@@ -85,7 +85,7 @@ class TaskResource extends Resource
             $components[] = $customFields;
         }
 
-        return $schema->components($components);
+        return $schema->components($components)->columns(1);
     }
 
     public static function table(Table $table): Table
