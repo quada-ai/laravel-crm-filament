@@ -142,7 +142,7 @@ class ChatConversationResource extends Resource
                 static::convertToLeadAction()
                     ->button()
                     ->label(__('laravel-crm-filament::labels.actions.convert_to_lead')),
-                static::closeAction()->button(),
+                static::closeAction()->button()->hiddenLabel(),
                 Actions\DeleteAction::make()
                     ->button()
                     ->hiddenLabel()
