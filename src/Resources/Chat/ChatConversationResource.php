@@ -170,7 +170,7 @@ class ChatConversationResource extends Resource
                     Actions\BulkAction::make('close')
                         ->label(__('laravel-crm-filament::labels.actions.bulk_close'))
                         ->icon('heroicon-o-x-mark')
-                        ->color('danger')
+                        ->color('warning')
                         ->requiresConfirmation()
                         ->action(function (Collection $records): void {
                             $service = app(ChatService::class);
@@ -242,7 +242,7 @@ class ChatConversationResource extends Resource
         return Action::make('close')
             ->label(__('laravel-crm-filament::labels.actions.close'))
             ->icon('heroicon-o-x-mark')
-            ->color('danger')
+            ->color('warning')
             ->requiresConfirmation()
             ->visible(fn (?ChatConversation $record): bool => $record !== null && $record->status !== 'closed')
             ->action(function (ChatConversation $record): void {
