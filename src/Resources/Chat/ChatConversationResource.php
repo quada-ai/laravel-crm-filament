@@ -63,7 +63,7 @@ class ChatConversationResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'Chats';
+        return 'Chat';
     }
 
     public static function getPluralModelLabel(): string
