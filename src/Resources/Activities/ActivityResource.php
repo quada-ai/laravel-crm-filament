@@ -29,7 +29,7 @@ class ActivityResource extends Resource
 
     protected static ?string $model = Activity::class;
 
-    protected static ?string $slug = 'activities';
+    protected static ?string $slug = 'activity-log';
 
     protected static ?string $recordTitleAttribute = 'description';
 
