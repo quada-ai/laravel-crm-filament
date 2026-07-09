@@ -72,7 +72,7 @@ class TaskResource extends Resource
                 ->label(__('laravel-crm-filament::labels.money.due_at')),
 
             Forms\Components\Select::make('user_owner_id')
-                ->label(__('laravel-crm-filament::labels.fields.owner'))
+                ->label(__('laravel-crm-filament::labels.fields.created_by'))
                 ->relationship('ownerUser', 'name')
                 ->searchable()
                 ->preload(),
