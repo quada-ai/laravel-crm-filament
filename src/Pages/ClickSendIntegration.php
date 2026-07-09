@@ -35,6 +35,11 @@ class ClickSendIntegration extends Page implements HasForms
 
     protected static ?int $navigationSort = 115;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     protected string $view = 'filament-panels::pages.page';
 
     public const KEYS = [
