@@ -532,6 +532,7 @@ return [
         'users' => 'Users',
         'crm' => 'CRM',
         'crm_access' => 'CRM access',
+        'crm_role' => 'CRM Role',
         'has_crm_access' => 'Has CRM access',
         'hours_before' => 'Hours before',
         'attribute' => 'Attribute',

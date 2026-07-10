@@ -55,20 +55,22 @@ class ViewRole extends ViewRecord
                         ]),
                     Section::make(__('laravel-crm-filament::labels.fields.permissions'))
                         ->schema([
-                            TextEntry::make('permissions.name')
+                            TextEntry::make('permissions')
                                 ->hiddenLabel()
                                 ->badge()
                                 ->color('gray')
+                                ->getStateUsing(fn ($record) => $record->permissions()->pluck('name')->all())
                                 ->placeholder(__('laravel-crm-filament::labels.misc.none')),
                         ]),
                 ])->columnSpan(['lg' => 1]),
                 // Right column: Users
                 Section::make(__('laravel-crm-filament::labels.fields.users'))
                     ->schema([
-                        TextEntry::make('users.name')
+                        TextEntry::make('users')
                             ->hiddenLabel()
                             ->icon('heroicon-o-user')
                             ->listWithLineBreaks()
+                            ->getStateUsing(fn ($record) => $record->users()->pluck('name')->all())
                             ->placeholder(__('laravel-crm-filament::labels.misc.none')),
                     ])
                     ->columnSpan(['lg' => 1]),

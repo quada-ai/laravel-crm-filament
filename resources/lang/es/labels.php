@@ -485,6 +485,7 @@ return [
         'users' => 'Usuarios',
         'crm' => 'CRM',
         'crm_access' => 'Acceso al CRM',
+        'crm_role' => 'Rol CRM',
         'has_crm_access' => 'Tiene acceso al CRM',
         'hours_before' => 'Horas antes',
         'attribute' => 'Atributo',
