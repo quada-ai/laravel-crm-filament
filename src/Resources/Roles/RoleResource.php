@@ -6,7 +6,6 @@ use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -34,15 +33,9 @@ class RoleResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Grid::make(2)->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('guard_name')
-                    ->default('web')
-                    ->required()
-                    ->maxLength(255),
-            ]),
+            Forms\Components\TextInput::make('name')
+                ->required()
+                ->maxLength(255),
             Forms\Components\TextInput::make('description')
                 ->maxLength(255),
             Forms\Components\CheckboxList::make('permissions')

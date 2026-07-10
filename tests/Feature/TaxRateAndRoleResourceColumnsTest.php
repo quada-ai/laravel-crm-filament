@@ -42,22 +42,29 @@ it('TaxRateResource table registers products_count as a TextColumn', function ()
     expect($columns['products_count'])->toBeInstanceOf(TextColumn::class);
 });
 
-it('RoleResource form source has description TextInput after the name/guard_name Grid', function () {
+it('RoleResource form source has description TextInput between name and permissions', function () {
+    // The guard_name form field was removed (Spatie's Role model defaults
+    // guard_name to config('auth.defaults.guard') at construction), which
+    // also removed the Grid::make(2) wrapper that previously paired name
+    // with guard_name. name is now a full-width top-level TextInput.
     $source = file_get_contents((new ReflectionClass(RoleResource::class))->getFileName());
 
     expect($source)
         ->toContain("TextInput::make('description')")
         ->and($source)->toContain('->maxLength(255)');
 
-    $gridPos = strpos($source, 'Grid::make(2)->schema([');
+    $namePos = strpos($source, "TextInput::make('name')");
     $descriptionPos = strpos($source, "TextInput::make('description')");
     $permissionsPos = strpos($source, "CheckboxList::make('permissions')");
 
-    expect($gridPos)->not->toBeFalse();
+    expect($namePos)->not->toBeFalse();
     expect($descriptionPos)->not->toBeFalse();
     expect($permissionsPos)->not->toBeFalse();
-    expect($descriptionPos)->toBeGreaterThan($gridPos);
+    expect($descriptionPos)->toBeGreaterThan($namePos);
     expect($descriptionPos)->toBeLessThan($permissionsPos);
+
+    // Guard the removal explicitly so future regressions surface fast.
+    expect($source)->not->toContain("TextInput::make('guard_name')");
 });
 
 it('RoleResource table source has description TextColumn with limit(60) after the guard_name column', function () {
