@@ -59,7 +59,7 @@ class ViewRole extends ViewRecord
                                 ->hiddenLabel()
                                 ->badge()
                                 ->color('gray')
-                                ->getStateUsing(fn ($record) => $record->permissions()->pluck('name')->all())
+                                ->getStateUsing(fn ($record) => $record?->permissions()->pluck('name')->all() ?? [])
                                 ->placeholder(__('laravel-crm-filament::labels.misc.none')),
                         ]),
                 ])->columnSpan(['lg' => 1]),
@@ -70,7 +70,7 @@ class ViewRole extends ViewRecord
                             ->hiddenLabel()
                             ->icon('heroicon-o-user')
                             ->listWithLineBreaks()
-                            ->getStateUsing(fn ($record) => $record->users()->pluck('name')->all())
+                            ->getStateUsing(fn ($record) => $record?->users()->pluck('name')->all() ?? [])
                             ->placeholder(__('laravel-crm-filament::labels.misc.none')),
                     ])
                     ->columnSpan(['lg' => 1]),
