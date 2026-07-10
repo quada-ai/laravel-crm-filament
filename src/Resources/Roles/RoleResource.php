@@ -75,7 +75,11 @@ class RoleResource extends Resource
                     ->label(__('laravel-crm-filament::labels.misc.crm')),
             ])
             ->recordActions([
+                Actions\ViewAction::make()->slideOver(),
                 Actions\EditAction::make()
+                    ->visible(fn ($record) => ! in_array($record->name, ['Owner', 'Admin'], true)),
+                Actions\DeleteAction::make()
+                    ->requiresConfirmation()
                     ->visible(fn ($record) => ! in_array($record->name, ['Owner', 'Admin'], true)),
             ])
             ->toolbarActions([
