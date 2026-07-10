@@ -68,6 +68,11 @@ class RoleResource extends Resource
                     ->counts('permissions')
                     ->label(__('laravel-crm-filament::labels.fields.permissions'))
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
             ])
             ->defaultSort('name')
             ->filters([
@@ -75,10 +80,17 @@ class RoleResource extends Resource
                     ->label(__('laravel-crm-filament::labels.misc.crm')),
             ])
             ->recordActions([
-                Actions\ViewAction::make()->slideOver(),
+                Actions\ViewAction::make()
+                    ->button()
+                    ->hiddenLabel()
+                    ->slideOver(),
                 Actions\EditAction::make()
+                    ->button()
+                    ->hiddenLabel()
                     ->visible(fn ($record) => ! in_array($record->name, ['Owner', 'Admin'], true)),
                 Actions\DeleteAction::make()
+                    ->button()
+                    ->hiddenLabel()
                     ->requiresConfirmation()
                     ->visible(fn ($record) => ! in_array($record->name, ['Owner', 'Admin'], true)),
             ])
