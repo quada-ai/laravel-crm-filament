@@ -15,6 +15,7 @@ use Spatie\Permission\Models\Role;
 use VentureDrake\LaravelCrmFilament\Resources\Roles\Pages\CreateRole;
 use VentureDrake\LaravelCrmFilament\Resources\Roles\Pages\EditRole;
 use VentureDrake\LaravelCrmFilament\Resources\Roles\Pages\ListRoles;
+use VentureDrake\LaravelCrmFilament\Resources\Roles\Pages\ViewRole;
 
 class RoleResource extends Resource
 {
@@ -82,8 +83,7 @@ class RoleResource extends Resource
             ->recordActions([
                 Actions\ViewAction::make()
                     ->button()
-                    ->hiddenLabel()
-                    ->slideOver(),
+                    ->hiddenLabel(),
                 Actions\EditAction::make()
                     ->button()
                     ->hiddenLabel()
@@ -109,11 +109,21 @@ class RoleResource extends Resource
         return ! in_array($record->name, ['Owner', 'Admin'], true);
     }
 
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_roles'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListRoles::route('/'),
             'create' => CreateRole::route('/create'),
+            'view' => ViewRole::route('/{record}'),
             'edit' => EditRole::route('/{record}/edit'),
         ];
     }

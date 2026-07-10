@@ -182,6 +182,7 @@ return [
 
     // Sales / pipeline
     'sales' => [
+        'role' => 'Role',
         'leads' => 'Leads',
         'lead_source' => 'Lead source',
         'lead_status' => 'Lead status',
@@ -424,6 +425,7 @@ return [
 
     // Actions
     'actions' => [
+        'back_to_roles' => 'Back to roles',
         'save' => 'Save',
         'add_line_item' => 'Add line item',
         'save_sync_settings' => 'Save sync settings',
@@ -523,6 +525,7 @@ return [
 
     // Misc / settings
     'misc' => [
+        'none' => 'None',
         'unallocated' => 'Unallocated',
         'no_teams' => 'No teams',
         'no_users' => 'No users',

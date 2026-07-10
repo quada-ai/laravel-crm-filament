@@ -179,6 +179,7 @@ return [
     ],
 
     'sales' => [
+        'role' => 'Rol',
         'leads' => 'Prospectos',
         'lead_source' => 'Fuente del prospecto',
         'lead_status' => 'Estado del prospecto',
@@ -379,6 +380,7 @@ return [
     ],
 
     'actions' => [
+        'back_to_roles' => 'Volver a roles',
         'save' => 'Guardar',
         'add_line_item' => 'Añadir línea',
         'save_sync_settings' => 'Guardar ajustes de sincronización',
@@ -476,6 +478,7 @@ return [
     ],
 
     'misc' => [
+        'none' => 'Ninguno',
         'unallocated' => 'Sin asignar',
         'no_teams' => 'Sin equipos',
         'no_users' => 'Sin usuarios',
