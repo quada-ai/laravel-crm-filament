@@ -53,13 +53,20 @@ class RoleResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('guard_name')->toggleable(),
                 Tables\Columns\TextColumn::make('description')
                     ->limit(60)
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('users_count')
+                    ->counts('users')
+                    ->label(__('laravel-crm-filament::labels.fields.users'))
+                    ->numeric()
+                    ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('permissions_count')
                     ->counts('permissions')
                     ->label(__('laravel-crm-filament::labels.fields.permissions'))
+                    ->numeric()
+                    ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('laravel-crm-filament::labels.fields.created'))

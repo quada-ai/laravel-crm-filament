@@ -67,22 +67,35 @@ it('RoleResource form source has description TextInput between name and permissi
     expect($source)->not->toContain("TextInput::make('guard_name')");
 });
 
-it('RoleResource table source has description TextColumn with limit(60) after the guard_name column', function () {
+it('RoleResource table source has description + users_count + permissions_count columns in order', function () {
+    // The guard_name TABLE column was removed alongside the guard_name form
+    // field (Spatie auto-fills guard_name from the default guard config, so
+    // showing it in the table was pointless in a single-guard setup). A new
+    // users_count column reads Role::users()->count() so admins can see how
+    // many users hold each role at a glance.
     $source = file_get_contents((new ReflectionClass(RoleResource::class))->getFileName());
 
     expect($source)
         ->toContain("TextColumn::make('description')")
-        ->and($source)->toContain('->limit(60)');
+        ->and($source)->toContain('->limit(60)')
+        ->and($source)->toContain("TextColumn::make('users_count')")
+        ->and($source)->toContain("->counts('users')");
 
-    $guardPos = strpos($source, "TextColumn::make('guard_name')");
+    $namePos = strpos($source, "TextColumn::make('name')");
     $descPos = strpos($source, "TextColumn::make('description')");
+    $usersPos = strpos($source, "TextColumn::make('users_count')");
     $permsPos = strpos($source, "TextColumn::make('permissions_count')");
 
-    expect($guardPos)->not->toBeFalse();
+    expect($namePos)->not->toBeFalse();
     expect($descPos)->not->toBeFalse();
+    expect($usersPos)->not->toBeFalse();
     expect($permsPos)->not->toBeFalse();
-    expect($descPos)->toBeGreaterThan($guardPos);
-    expect($descPos)->toBeLessThan($permsPos);
+    expect($descPos)->toBeGreaterThan($namePos);
+    expect($usersPos)->toBeGreaterThan($descPos);
+    expect($permsPos)->toBeGreaterThan($usersPos);
+
+    // Regression guard: guard_name column is gone.
+    expect($source)->not->toContain("TextColumn::make('guard_name')");
 });
 
 it('RoleResource source registers a crm_role TernaryFilter', function () {
