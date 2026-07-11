@@ -82,6 +82,25 @@ it('exposes the sections.pipeline_stages translation key in en/fr/es', function 
     }
 });
 
-it('top-level Pipeline Stages page (PipelineStageResource) remains untouched and still routes', function () {
+it('top-level Pipeline Stages page (PipelineStageResource) is now redesigned but the RM contract is unaffected', function () {
+    // Sanity check that the top-level resource class still exists.
     expect(class_exists(PipelineStageResource::class))->toBeTrue();
+
+    // The redesign of the top-level page (2 columns, no Create button, View + Edit
+    // row actions with button()->hiddenLabel()) is intentional and lives in the
+    // PipelineStageResourceRedesignTest regression gate. This test simply confirms
+    // that the redesign shape is in place and no longer contradicts the RM's own
+    // contract (columns / actions / defaultSort / reorderable).
+    $source = file_get_contents((new ReflectionClass(PipelineStageResource::class))->getFileName());
+
+    // Top-level page now shows exactly the 2 AC-named table columns from the redesign
+    // (not the 4 the RM exposes). The RM's own 4-column contract stays intact.
+    expect($source)->toContain("TextColumn::make('pipeline.name')");
+
+    // Top-level list page ListPipelineStages had its Create button removed in US-003
+    // of the PipelineStage view page series — the redesign explicitly does NOT
+    // register a top-level CreateAction. The RM continues to own CreateAction inside
+    // the parent Pipeline show page.
+    $listPath = dirname((new ReflectionClass(PipelineStageResource::class))->getFileName()) . '/Pages/ListPipelineStages.php';
+    expect(file_get_contents($listPath))->not->toContain('CreateAction::make()');
 });

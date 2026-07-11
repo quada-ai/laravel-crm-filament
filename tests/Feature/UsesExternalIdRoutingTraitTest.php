@@ -22,6 +22,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 use VentureDrake\LaravelCrmFilament\Resources\Pipelines\PipelineResource;
 use VentureDrake\LaravelCrmFilament\Resources\PipelineStageProbabilities\PipelineStageProbabilityResource;
+use VentureDrake\LaravelCrmFilament\Resources\PipelineStages\PipelineStageResource;
 use VentureDrake\LaravelCrmFilament\Resources\Products\ProductResource;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
@@ -43,6 +44,7 @@ $traitResources = [
     'ChatWidgetResource' => ChatWidgetResource::class,
     'ChatConversationResource' => ChatConversationResource::class,
     'PipelineResource' => PipelineResource::class,
+    'PipelineStageResource' => PipelineStageResource::class,
 ];
 
 $traitDataset = [];
