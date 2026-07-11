@@ -229,6 +229,7 @@ return [
         'views_over_time' => 'Views over time',
         'my_activity' => 'My activity',
         'all_activity' => 'All activity',
+        'attached_to' => 'Attached to',
     ],
 
     // Money / orders / lines
@@ -513,6 +514,7 @@ return [
         'add_status' => 'Add status',
         'public_view' => 'Public view',
         'submit_feature' => 'Submit feature',
+        'back_to_pipelines' => 'Back to pipelines',
     ],
 
     // CSV import

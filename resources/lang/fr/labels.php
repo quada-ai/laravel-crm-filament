@@ -226,6 +226,7 @@ return [
         'views_over_time' => 'Vues au fil du temps',
         'my_activity' => 'Mon activité',
         'all_activity' => 'Toute l\'activité',
+        'attached_to' => 'Rattaché à',
     ],
 
     'money' => [
@@ -468,6 +469,7 @@ return [
         'add_status' => 'Ajouter un statut',
         'public_view' => 'Vue publique',
         'submit_feature' => 'Soumettre une fonctionnalité',
+        'back_to_pipelines' => 'Retour aux pipelines',
     ],
 
     'import' => [

@@ -226,6 +226,7 @@ return [
         'views_over_time' => 'Vistas a lo largo del tiempo',
         'my_activity' => 'Mi actividad',
         'all_activity' => 'Toda la actividad',
+        'attached_to' => 'Asignado a',
     ],
 
     'money' => [
@@ -468,6 +469,7 @@ return [
         'add_status' => 'Añadir estado',
         'public_view' => 'Vista pública',
         'submit_feature' => 'Enviar característica',
+        'back_to_pipelines' => 'Volver a pipelines',
     ],
 
     'import' => [
