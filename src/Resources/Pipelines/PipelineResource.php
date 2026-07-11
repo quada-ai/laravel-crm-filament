@@ -78,13 +78,23 @@ class PipelineResource extends Resource
             ])
             ->defaultSort('name')
             ->recordActions([
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()->button()->hiddenLabel(),
+                Actions\EditAction::make()->button()->hiddenLabel(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_pipelines'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
     }
 
     public static function getPages(): array
