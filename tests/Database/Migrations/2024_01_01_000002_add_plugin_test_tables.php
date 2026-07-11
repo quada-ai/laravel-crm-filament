@@ -101,6 +101,16 @@ return new class extends Migration
             });
         }
 
+        // US-004: pipeline_stage_probabilities uses SoftDeletes on its model but the test-schema CREATE above
+        // doesn't ship deleted_at. Add it idempotently so relation queries (e.g. from a PipelineStage's
+        // belongsTo) don't hit "no such column: deleted_at" on the softDeletes global scope.
+        if (Schema::hasTable($prefix . 'pipeline_stage_probabilities')
+            && ! Schema::hasColumn($prefix . 'pipeline_stage_probabilities', 'deleted_at')) {
+            Schema::table($prefix . 'pipeline_stage_probabilities', function (Blueprint $table) {
+                $table->softDeletes();
+            });
+        }
+
         // US-004: pipeline_stages column patches (description / color / pipeline_stage_probability_id)
         if (Schema::hasTable($prefix . 'pipeline_stages')) {
             Schema::table($prefix . 'pipeline_stages', function (Blueprint $table) use ($prefix) {
