@@ -100,21 +100,23 @@ it('ViewPipelineStage::getTitle() returns "Pipeline stage: {name}" using sales.p
     expect($page->getTitle())->toBe($expected);
 });
 
-it('ViewPipelineStage::getHeaderActions() returns [backToIndex, EditAction with pencil icon] and NO Delete', function (): void {
+it('ViewPipelineStage::getHeaderActions() returns [backToIndex, EditAction with pencil icon, DeleteAction with trash icon]', function (): void {
     $page = (new ReflectionClass(ViewPipelineStage::class))->newInstanceWithoutConstructor();
 
     $method = new ReflectionMethod(ViewPipelineStage::class, 'getHeaderActions');
     $method->setAccessible(true);
     $actions = $method->invoke($page);
 
-    expect($actions)->toHaveCount(2)
+    expect($actions)->toHaveCount(3)
         ->and($actions[0])->toBeInstanceOf(Actions\Action::class)
         ->and($actions[0]->getName())->toBe('backToIndex')
         ->and($actions[1])->toBeInstanceOf(Actions\EditAction::class)
-        ->and($actions[1]->getIcon())->toBe('heroicon-m-pencil-square');
+        ->and($actions[1]->getIcon())->toBe('heroicon-m-pencil-square')
+        ->and($actions[2])->toBeInstanceOf(Actions\DeleteAction::class)
+        ->and($actions[2]->getIcon())->toBe('heroicon-m-trash');
 
     $names = array_map(fn ($a) => $a->getName(), $actions);
-    expect($names)->not->toContain('delete');
+    expect($names)->toContain('delete');
 });
 
 it('ViewPipelineStage::content() root is a Grid(default=1, lg=2) with exactly two Sections at columnSpan lg=1', function (): void {

@@ -1,6 +1,7 @@
 <?php
 
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
@@ -30,21 +31,23 @@ it('getTitle() returns "Pipeline stage: {name}" using the sales.pipeline_stage l
     expect($page->getTitle())->toBe($expected);
 });
 
-it('getHeaderActions() returns backToIndex + Edit pill and NO Delete action', function (): void {
+it('getHeaderActions() returns backToIndex + Edit pill + Delete pill', function (): void {
     $page = (new ReflectionClass(ViewPipelineStage::class))->newInstanceWithoutConstructor();
 
     $method = new ReflectionMethod(ViewPipelineStage::class, 'getHeaderActions');
     $method->setAccessible(true);
     $actions = $method->invoke($page);
 
-    expect($actions)->toHaveCount(2);
+    expect($actions)->toHaveCount(3);
     expect($actions[0])->toBeInstanceOf(Action::class);
     expect($actions[0]->getName())->toBe('backToIndex');
     expect($actions[1])->toBeInstanceOf(EditAction::class);
     expect($actions[1]->getIcon())->toBe('heroicon-m-pencil-square');
+    expect($actions[2])->toBeInstanceOf(DeleteAction::class);
+    expect($actions[2]->getIcon())->toBe('heroicon-m-trash');
 
     $names = array_map(fn ($a) => $a->getName(), $actions);
-    expect($names)->not->toContain('delete');
+    expect($names)->toContain('delete');
 });
 
 it('content() root component is a Grid with default=1, lg=2 columns and two Sections with columnSpan lg=1', function (): void {
