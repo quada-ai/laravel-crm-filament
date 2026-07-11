@@ -21,6 +21,7 @@ use VentureDrake\LaravelCrmFilament\RelationManagers\PipelineStagesRelationManag
 use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\CreatePipeline;
 use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\EditPipeline;
 use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\ListPipelines;
+use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\ViewPipeline;
 
 class PipelineResource extends Resource
 {
@@ -102,6 +103,7 @@ class PipelineResource extends Resource
         return [
             'index' => ListPipelines::route('/'),
             'create' => CreatePipeline::route('/create'),
+            'view' => ViewPipeline::route('/{record}'),
             'edit' => EditPipeline::route('/{record}/edit'),
         ];
     }
