@@ -470,6 +470,7 @@ return [
         'public_view' => 'Vista pública',
         'submit_feature' => 'Enviar característica',
         'back_to_pipelines' => 'Volver a pipelines',
+        'back_to_pipeline_stages' => 'Volver a etapas de pipeline',
     ],
 
     'import' => [

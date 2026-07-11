@@ -515,6 +515,7 @@ return [
         'public_view' => 'Public view',
         'submit_feature' => 'Submit feature',
         'back_to_pipelines' => 'Back to pipelines',
+        'back_to_pipeline_stages' => 'Back to pipeline stages',
     ],
 
     // CSV import
