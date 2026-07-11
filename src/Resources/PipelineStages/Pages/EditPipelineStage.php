@@ -24,14 +24,17 @@ class EditPipelineStage extends EditRecord
                 Forms\Components\TextInput::make('order')
                     ->numeric()
                     ->minValue(0)
-                    ->default(0),
-                Forms\Components\ColorPicker::make('color'),
+                    ->default(0)
+                    ->hidden(),
+                Forms\Components\ColorPicker::make('color')
+                    ->hidden(),
             ]),
             Forms\Components\Select::make('pipeline_stage_probability_id')
                 ->label(__('laravel-crm-filament::labels.sales.probability'))
                 ->options(fn () => PipelineStageProbability::query()->orderBy('percent')->get()->mapWithKeys(fn ($p) => [$p->id => $p->name . ' (' . $p->percent . '%)']))
                 ->searchable()
-                ->preload(),
+                ->preload()
+                ->hidden(),
             Forms\Components\Textarea::make('description')
                 ->rows(2)
                 ->columnSpanFull(),

@@ -55,12 +55,14 @@ class ViewPipelineStage extends ViewRecord
                             ->state($record?->name),
                         TextEntry::make('order')
                             ->label(__('laravel-crm-filament::labels.fields.order'))
-                            ->state($record?->order),
+                            ->state($record?->order)
+                            ->hidden(),
                         TextEntry::make('color')
                             ->label(__('laravel-crm-filament::labels.fields.color'))
                             ->badge()
                             ->state($colorHex)
-                            ->color($colorHex),
+                            ->color($colorHex)
+                            ->hidden(),
                         TextEntry::make('description')
                             ->label(__('laravel-crm-filament::labels.fields.description'))
                             ->state($record?->description)
@@ -68,7 +70,8 @@ class ViewPipelineStage extends ViewRecord
                         TextEntry::make('pipeline_stage_probability_id')
                             ->label(__('laravel-crm-filament::labels.sales.probability'))
                             ->state($probabilityState)
-                            ->placeholder(__('laravel-crm-filament::labels.misc.none')),
+                            ->placeholder(__('laravel-crm-filament::labels.misc.none'))
+                            ->hidden(),
                     ])
                     ->columnSpan(['lg' => 1]),
                 Section::make(__('laravel-crm-filament::labels.sales.attached_to'))
