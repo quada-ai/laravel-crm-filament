@@ -35,15 +35,18 @@ class PipelineStagesRelationManager extends RelationManager
             Forms\Components\TextInput::make('order')
                 ->numeric()
                 ->minValue(0)
-                ->default(0),
+                ->default(0)
+                ->hidden(),
 
-            Forms\Components\ColorPicker::make('color'),
+            Forms\Components\ColorPicker::make('color')
+                ->hidden(),
 
             Forms\Components\Select::make('pipeline_stage_probability_id')
                 ->label(__('laravel-crm-filament::labels.sales.probability'))
                 ->relationship('pipelineStageProbability', 'name')
                 ->searchable()
-                ->preload(),
+                ->preload()
+                ->hidden(),
 
             Forms\Components\Textarea::make('description')
                 ->rows(2)
@@ -55,12 +58,13 @@ class PipelineStagesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('order')->sortable(),
+                Tables\Columns\TextColumn::make('order')->sortable()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\ColorColumn::make('color'),
+                Tables\Columns\ColorColumn::make('color')->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('pipelineStageProbability.percent')
                     ->label(__('laravel-crm-filament::labels.sales.probability'))
-                    ->suffix('%'),
+                    ->suffix('%')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('order', 'asc')
             ->reorderable('order')
