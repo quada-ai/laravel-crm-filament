@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrm\Models\Quote;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\RelationManagers\PipelineStagesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\CreatePipeline;
 use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\EditPipeline;
@@ -25,6 +26,8 @@ use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\ViewPipeline;
 
 class PipelineResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = Pipeline::class;
 
     protected static ?string $slug = 'pipelines';
@@ -36,11 +39,6 @@ class PipelineResource extends Resource
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 30;
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
-    }
 
     public static function form(Schema $schema): Schema
     {
