@@ -13,12 +13,16 @@ use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Models\PipelineStageProbability;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\PipelineStages\Pages\CreatePipelineStage;
 use VentureDrake\LaravelCrmFilament\Resources\PipelineStages\Pages\EditPipelineStage;
 use VentureDrake\LaravelCrmFilament\Resources\PipelineStages\Pages\ListPipelineStages;
+use VentureDrake\LaravelCrmFilament\Resources\PipelineStages\Pages\ViewPipelineStage;
 
 class PipelineStageResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = PipelineStage::class;
 
     protected static ?string $slug = 'pipeline-stages';
@@ -30,11 +34,6 @@ class PipelineStageResource extends Resource
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 40;
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
-    }
 
     public static function form(Schema $schema): Schema
     {
@@ -71,16 +70,15 @@ class PipelineStageResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('pipeline.name')
-                    ->label(__('laravel-crm-filament::labels.sales.pipeline'))
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('order')->sortable(),
-                Tables\Columns\ColorColumn::make('color')->toggleable(),
+                Tables\Columns\TextColumn::make('pipeline.name')
+                    ->label(__('laravel-crm-filament::labels.sales.attached_to'))
+                    ->sortable(),
             ])
-            ->defaultSort('order')
+            ->defaultSort('name')
             ->recordActions([
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()->button()->hiddenLabel(),
+                Actions\EditAction::make()->button()->hiddenLabel(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
@@ -89,11 +87,21 @@ class PipelineStageResource extends Resource
             ]);
     }
 
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_pipeline_stages'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListPipelineStages::route('/'),
             'create' => CreatePipelineStage::route('/create'),
+            'view' => ViewPipelineStage::route('/{record}'),
             'edit' => EditPipelineStage::route('/{record}/edit'),
         ];
     }
