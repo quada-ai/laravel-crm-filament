@@ -10,12 +10,16 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\ProductCategory;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\ProductCategories\Pages\CreateProductCategory;
 use VentureDrake\LaravelCrmFilament\Resources\ProductCategories\Pages\EditProductCategory;
 use VentureDrake\LaravelCrmFilament\Resources\ProductCategories\Pages\ListProductCategories;
+use VentureDrake\LaravelCrmFilament\Resources\ProductCategories\Pages\ViewProductCategory;
 
 class ProductCategoryResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = ProductCategory::class;
 
     protected static ?string $slug = 'product-categories';
@@ -27,11 +31,6 @@ class ProductCategoryResource extends Resource
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 50;
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
-    }
 
     public static function form(Schema $schema): Schema
     {
@@ -58,7 +57,8 @@ class ProductCategoryResource extends Resource
             ])
             ->defaultSort('name')
             ->recordActions([
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()->button()->hiddenLabel(),
+                Actions\EditAction::make()->button()->hiddenLabel(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
@@ -67,11 +67,21 @@ class ProductCategoryResource extends Resource
             ]);
     }
 
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_product_categories'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListProductCategories::route('/'),
             'create' => CreateProductCategory::route('/create'),
+            'view' => ViewProductCategory::route('/{record}'),
             'edit' => EditProductCategory::route('/{record}/edit'),
         ];
     }
