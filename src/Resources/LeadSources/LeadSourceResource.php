@@ -10,12 +10,15 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\LeadSource;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\LeadSources\Pages\CreateLeadSource;
 use VentureDrake\LaravelCrmFilament\Resources\LeadSources\Pages\EditLeadSource;
 use VentureDrake\LaravelCrmFilament\Resources\LeadSources\Pages\ListLeadSources;
 
 class LeadSourceResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = LeadSource::class;
 
     protected static ?string $slug = 'lead-sources';
@@ -27,11 +30,6 @@ class LeadSourceResource extends Resource
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 80;
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
-    }
 
     public static function form(Schema $schema): Schema
     {
@@ -58,13 +56,24 @@ class LeadSourceResource extends Resource
             ])
             ->defaultSort('name')
             ->recordActions([
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()->button()->hiddenLabel(),
+                Actions\EditAction::make()->button()->hiddenLabel(),
+                Actions\DeleteAction::make()->button()->hiddenLabel()->requiresConfirmation(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_lead_sources'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
     }
 
     public static function getPages(): array

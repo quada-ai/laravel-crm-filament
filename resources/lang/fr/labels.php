@@ -472,6 +472,7 @@ return [
         'submit_feature' => 'Soumettre une fonctionnalité',
         'back_to_pipelines' => 'Retour aux pipelines',
         'back_to_pipeline_stages' => 'Retour aux étapes de pipeline',
+        'back_to_lead_sources' => 'Retour aux sources de prospects',
         'back_to_product_categories' => 'Retour aux catégories de produits',
     ],
 
