@@ -278,6 +278,7 @@ return [
         'finish_at' => 'Finish at',
         'revenue' => 'Revenue',
         'price' => 'Price',
+        'product_category' => 'Product category',
     ],
 
     // Campaigns / messaging
@@ -516,6 +517,7 @@ return [
         'submit_feature' => 'Submit feature',
         'back_to_pipelines' => 'Back to pipelines',
         'back_to_pipeline_stages' => 'Back to pipeline stages',
+        'back_to_product_categories' => 'Back to product categories',
     ],
 
     // CSV import

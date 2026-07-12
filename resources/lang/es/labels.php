@@ -274,6 +274,7 @@ return [
         'finish_at' => 'Finaliza el',
         'revenue' => 'Ingresos',
         'price' => 'Precio',
+        'product_category' => 'Categoría de producto',
     ],
 
     'campaign' => [
@@ -471,6 +472,7 @@ return [
         'submit_feature' => 'Enviar característica',
         'back_to_pipelines' => 'Volver a pipelines',
         'back_to_pipeline_stages' => 'Volver a etapas de pipeline',
+        'back_to_product_categories' => 'Volver a categorías de productos',
     ],
 
     'import' => [
