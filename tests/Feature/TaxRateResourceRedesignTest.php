@@ -3,6 +3,12 @@
 declare(strict_types=1);
 
 use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Livewire;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use VentureDrake\LaravelCrm\Models\TaxRate;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\CreateTaxRate;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\EditTaxRate;
@@ -127,6 +133,58 @@ it('en/fr/es label files declare actions.back_to_tax_rates with non-empty values
         expect($labels['actions']['back_to_tax_rates'] ?? null)->toBeString()
             ->and($labels['actions']['back_to_tax_rates'])->not->toBe('');
     }
+});
+
+it('ViewTaxRate extends ViewRecord and binds to TaxRateResource', function (): void {
+    expect(is_subclass_of(ViewTaxRate::class, ViewRecord::class))->toBeTrue();
+
+    $ref = new ReflectionClass(ViewTaxRate::class);
+    $resourceProp = $ref->getProperty('resource');
+    expect($resourceProp->getDefaultValue())->toBe(TaxRateResource::class);
+});
+
+it('ViewTaxRate::content() root is a Grid(default=1, lg=2) with a Section on the left and a Livewire embed on the right (no Section wrapper)', function (): void {
+    $page = (new ReflectionClass(ViewTaxRate::class))->newInstanceWithoutConstructor();
+    $page->record = new TaxRate(['name' => 'Standard', 'rate' => 10]);
+
+    $schema = Schema::make($page);
+    $result = $page->content($schema);
+    $components = $result->getComponents(withHidden: true);
+
+    expect($components)->toHaveCount(1)
+        ->and($components[0])->toBeInstanceOf(Grid::class)
+        ->and($components[0]->getColumns())->toBe(['default' => 1, 'lg' => 2]);
+
+    $ref = new ReflectionProperty(Grid::class, 'childComponents');
+    $ref->setAccessible(true);
+    $children = $ref->getValue($components[0]);
+    $childList = array_values($children['default'] ?? $children);
+
+    expect($childList)->toHaveCount(2)
+        ->and($childList[0])->toBeInstanceOf(Section::class)
+        ->and($childList[0]->getColumnSpan())->toBe(['lg' => 1])
+        // AC: right column is a direct Livewire embed, NOT wrapped in a Section
+        // (avoids the double-panel bug documented across ViewLeadSource + the
+        // ProductCategory follow-up polish).
+        ->and($childList[1])->toBeInstanceOf(Livewire::class)
+        ->and($childList[1])->not->toBeInstanceOf(Section::class)
+        ->and($childList[1]->getColumnSpan())->toBe(['lg' => 1]);
+});
+
+it('ViewTaxRate::getHeaderActions() returns three pills [backToIndex, Edit pencil, Delete trash] with correct icons', function (): void {
+    $page = (new ReflectionClass(ViewTaxRate::class))->newInstanceWithoutConstructor();
+
+    $method = new ReflectionMethod(ViewTaxRate::class, 'getHeaderActions');
+    $method->setAccessible(true);
+    $actions = $method->invoke($page);
+
+    expect($actions)->toHaveCount(3)
+        ->and($actions[0])->toBeInstanceOf(Actions\Action::class)
+        ->and($actions[0]->getName())->toBe('backToIndex')
+        ->and($actions[1])->toBeInstanceOf(Actions\EditAction::class)
+        ->and($actions[1]->getIcon())->toBe('heroicon-m-pencil-square')
+        ->and($actions[2])->toBeInstanceOf(Actions\DeleteAction::class)
+        ->and($actions[2]->getIcon())->toBe('heroicon-m-trash');
 });
 
 it('TaxRateResource is NOT registered in the UsesExternalIdRoutingTraitTest dataset', function (): void {
