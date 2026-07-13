@@ -53,7 +53,11 @@ class LabelResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\ColorColumn::make('hex')->label(__('laravel-crm-filament::labels.fields.color')),
+                Tables\Columns\TextColumn::make('hex')
+                    ->label(__('laravel-crm-filament::labels.fields.color'))
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): ?string => $state ? '#' . ltrim($state, '#') : null)
+                    ->color(fn ($record): string => '#' . ltrim($record->hex ?? '6b7280', '#')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('laravel-crm-filament::labels.fields.created'))
                     ->since()
