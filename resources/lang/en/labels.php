@@ -230,6 +230,10 @@ return [
         'my_activity' => 'My activity',
         'all_activity' => 'All activity',
         'attached_to' => 'Attached to',
+        'label' => 'Label',
+        'deals' => 'Deals',
+        'people' => 'People',
+        'organizations' => 'Organizations',
     ],
 
     // Money / orders / lines
@@ -423,6 +427,7 @@ return [
         'document_defaults' => 'Document defaults',
         'localisation' => 'Localisation',
         'pipeline_stages' => 'Pipeline stages',
+        'usage' => 'Usage',
     ],
 
     // Actions

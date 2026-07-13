@@ -227,6 +227,10 @@ return [
         'my_activity' => 'Mi actividad',
         'all_activity' => 'Toda la actividad',
         'attached_to' => 'Asignado a',
+        'label' => 'Etiqueta',
+        'deals' => 'Negocios',
+        'people' => 'Personas',
+        'organizations' => 'Organizaciones',
     ],
 
     'money' => [
@@ -379,6 +383,7 @@ return [
         'document_defaults' => 'Valores predeterminados de documento',
         'localisation' => 'Localización',
         'pipeline_stages' => 'Etapas del pipeline',
+        'usage' => 'Uso',
     ],
 
     'actions' => [

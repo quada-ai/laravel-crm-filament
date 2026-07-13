@@ -15,6 +15,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\CreateLabel;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\EditLabel;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\ListLabels;
+use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\ViewLabel;
 
 class LabelResource extends Resource
 {
@@ -81,6 +82,7 @@ class LabelResource extends Resource
         return [
             'index' => ListLabels::route('/'),
             'create' => CreateLabel::route('/create'),
+            'view' => ViewLabel::route('/{record}'),
             'edit' => EditLabel::route('/{record}/edit'),
         ];
     }

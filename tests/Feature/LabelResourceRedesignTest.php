@@ -79,15 +79,16 @@ it('preserves form components, table columns, defaultSort, and bulk delete actio
         ->and($src)->toContain('Actions\\DeleteBulkAction::make()');
 });
 
-it('getPages() exposes index / create / edit (no view page)', function (): void {
+it('getPages() exposes index / create / view / edit (view added by US-005)', function (): void {
     $pages = LabelResource::getPages();
 
-    expect(array_keys($pages))->toBe(['index', 'create', 'edit']);
+    expect(array_keys($pages))->toBe(['index', 'create', 'view', 'edit']);
 
     $src = file_get_contents((new ReflectionClass(LabelResource::class))->getFileName());
 
     expect($src)->toContain("'index' => " . class_basename(ListLabels::class) . "::route('/')")
         ->and($src)->toContain("'create' => " . class_basename(CreateLabel::class) . "::route('/create')")
+        ->and($src)->toContain("'view' => ViewLabel::route('/{record}')")
         ->and($src)->toContain("'edit' => " . class_basename(EditLabel::class) . "::route('/{record}/edit')");
 });
 
