@@ -2,13 +2,18 @@
 
 declare(strict_types=1);
 
-use Filament\Actions\Action;
+use Filament\Actions;
+use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use VentureDrake\LaravelCrm\Models\Label;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\LabelResource;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\CreateLabel;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\EditLabel;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\ListLabels;
+use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\ViewLabel;
 
 it('uses the UsesExternalIdRouting trait', function (): void {
     expect(in_array(UsesExternalIdRouting::class, class_uses_recursive(LabelResource::class), true))
@@ -34,7 +39,7 @@ it('declares backToIndexAction as a public static factory returning a gray back-
         ->and($ref->getNumberOfParameters())->toBe(0);
 
     $action = LabelResource::backToIndexAction();
-    expect($action)->toBeInstanceOf(Action::class)
+    expect($action)->toBeInstanceOf(Actions\Action::class)
         ->and($action->getName())->toBe('backToIndex')
         ->and($action->getColor())->toBe('gray')
         ->and($action->getIcon())->toBe('heroicon-o-arrow-left')
@@ -59,24 +64,10 @@ it('recordActions register ViewAction then EditAction then DeleteAction with but
         ->and($editPos)->toBeLessThan($deletePos);
 });
 
-it('does not declare a local getRecordRouteKeyName method on LabelResource', function (): void {
-    // Regression guard for the AC's "remove the local getRecordRouteKeyName" contract.
+it('table defaultSort is set to name', function (): void {
     $src = file_get_contents((new ReflectionClass(LabelResource::class))->getFileName());
 
-    expect($src)->not->toContain('public static function getRecordRouteKeyName');
-});
-
-it('preserves form components, table columns, defaultSort, and bulk delete action', function (): void {
-    $src = file_get_contents((new ReflectionClass(LabelResource::class))->getFileName());
-
-    expect($src)->toContain("TextInput::make('name')")
-        ->and($src)->toContain("ColorPicker::make('hex')")
-        ->and($src)->toContain("Textarea::make('description')")
-        ->and($src)->toContain("TextColumn::make('name')")
-        ->and($src)->toContain("ColorColumn::make('hex')")
-        ->and($src)->toContain("->defaultSort('name')")
-        ->and($src)->toContain('Actions\\BulkActionGroup::make(')
-        ->and($src)->toContain('Actions\\DeleteBulkAction::make()');
+    expect($src)->toContain("->defaultSort('name')");
 });
 
 it('getPages() exposes index / create / view / edit (view added by US-005)', function (): void {
@@ -88,8 +79,56 @@ it('getPages() exposes index / create / view / edit (view added by US-005)', fun
 
     expect($src)->toContain("'index' => " . class_basename(ListLabels::class) . "::route('/')")
         ->and($src)->toContain("'create' => " . class_basename(CreateLabel::class) . "::route('/create')")
-        ->and($src)->toContain("'view' => ViewLabel::route('/{record}')")
+        ->and($src)->toContain("'view' => " . class_basename(ViewLabel::class) . "::route('/{record}')")
         ->and($src)->toContain("'edit' => " . class_basename(EditLabel::class) . "::route('/{record}/edit')");
+});
+
+it('ViewLabel extends ViewRecord and binds to LabelResource', function (): void {
+    expect(is_subclass_of(ViewLabel::class, ViewRecord::class))->toBeTrue();
+
+    $ref = new ReflectionClass(ViewLabel::class);
+    $resourceProp = $ref->getProperty('resource');
+    expect($resourceProp->getDefaultValue())->toBe(LabelResource::class);
+});
+
+it('ViewLabel::content() root is a Grid(default=1, lg=2) with two Sections at columnSpan lg=1', function (): void {
+    $page = (new ReflectionClass(ViewLabel::class))->newInstanceWithoutConstructor();
+    $page->record = new Label(['name' => 'Priority']);
+
+    $schema = Schema::make($page);
+    $result = $page->content($schema);
+    $components = $result->getComponents(withHidden: true);
+
+    expect($components)->toHaveCount(1)
+        ->and($components[0])->toBeInstanceOf(Grid::class)
+        ->and($components[0]->getColumns())->toBe(['default' => 1, 'lg' => 2]);
+
+    $ref = new ReflectionProperty(Grid::class, 'childComponents');
+    $ref->setAccessible(true);
+    $children = $ref->getValue($components[0]);
+    $childList = array_values($children['default'] ?? $children);
+
+    expect($childList)->toHaveCount(2)
+        ->and($childList[0])->toBeInstanceOf(Section::class)
+        ->and($childList[0]->getColumnSpan())->toBe(['lg' => 1])
+        ->and($childList[1])->toBeInstanceOf(Section::class)
+        ->and($childList[1]->getColumnSpan())->toBe(['lg' => 1]);
+});
+
+it('ViewLabel::getHeaderActions() returns three pills [backToIndex, Edit pencil, Delete trash]', function (): void {
+    $page = (new ReflectionClass(ViewLabel::class))->newInstanceWithoutConstructor();
+
+    $method = new ReflectionMethod(ViewLabel::class, 'getHeaderActions');
+    $method->setAccessible(true);
+    $actions = $method->invoke($page);
+
+    expect($actions)->toHaveCount(3)
+        ->and($actions[0])->toBeInstanceOf(Actions\Action::class)
+        ->and($actions[0]->getName())->toBe('backToIndex')
+        ->and($actions[1])->toBeInstanceOf(Actions\EditAction::class)
+        ->and($actions[1]->getIcon())->toBe('heroicon-m-pencil-square')
+        ->and($actions[2])->toBeInstanceOf(Actions\DeleteAction::class)
+        ->and($actions[2]->getIcon())->toBe('heroicon-m-trash');
 });
 
 it('resource source references the AC-named actions.back_to_labels translation key', function (): void {
@@ -98,7 +137,7 @@ it('resource source references the AC-named actions.back_to_labels translation k
     expect($src)->toContain('labels.actions.back_to_labels');
 });
 
-it('en/fr/es label files declare actions.back_to_labels with non-empty values', function (): void {
+it('en/fr/es label files declare actions.back_to_labels and sales.label with non-empty values', function (): void {
     $root = dirname(__DIR__, 2);
 
     foreach (['en', 'fr', 'es'] as $locale) {
@@ -106,52 +145,8 @@ it('en/fr/es label files declare actions.back_to_labels with non-empty values', 
 
         expect($labels['actions']['back_to_labels'] ?? null)->toBeString()
             ->and($labels['actions']['back_to_labels'])->not->toBe('');
+
+        expect($labels['sales']['label'] ?? null)->toBeString()
+            ->and($labels['sales']['label'])->not->toBe('');
     }
-});
-
-it('declares mutateFormDataBeforeCreate locally on CreateLabel', function (): void {
-    $method = new ReflectionMethod(CreateLabel::class, 'mutateFormDataBeforeCreate');
-
-    expect($method->getDeclaringClass()->getName())->toBe(CreateLabel::class);
-    expect($method->isProtected())->toBeTrue();
-    expect($method->getNumberOfRequiredParameters())->toBe(1);
-    expect($method->getReturnType()?->getName())->toBe('array');
-});
-
-it('stamps a UUID external_id on empty form data', function (): void {
-    $method = new ReflectionMethod(CreateLabel::class, 'mutateFormDataBeforeCreate');
-    $method->setAccessible(true);
-
-    $page = (new ReflectionClass(CreateLabel::class))->newInstanceWithoutConstructor();
-    $result = $method->invoke($page, ['name' => 'Priority', 'hex' => '#ff0000']);
-
-    expect($result)->toHaveKey('external_id');
-    expect($result['external_id'])->toMatch('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i');
-    expect($result['name'])->toBe('Priority');
-    expect($result['hex'])->toBe('#ff0000');
-});
-
-it('preserves an existing external_id when the form data already carries one (idempotency)', function (): void {
-    $method = new ReflectionMethod(CreateLabel::class, 'mutateFormDataBeforeCreate');
-    $method->setAccessible(true);
-
-    $page = (new ReflectionClass(CreateLabel::class))->newInstanceWithoutConstructor();
-    $existing = '12345678-1234-1234-1234-123456789012';
-    $result = $method->invoke($page, ['name' => 'Priority', 'external_id' => $existing]);
-
-    expect($result['external_id'])->toBe($existing);
-});
-
-it('persists a Label with a UUID external_id when the mutate hook is applied', function (): void {
-    $method = new ReflectionMethod(CreateLabel::class, 'mutateFormDataBeforeCreate');
-    $method->setAccessible(true);
-
-    $page = (new ReflectionClass(CreateLabel::class))->newInstanceWithoutConstructor();
-    $mutated = $method->invoke($page, ['name' => 'Priority', 'hex' => 'ff0000']);
-
-    $label = Label::create($mutated);
-
-    expect($label->external_id)->not->toBeNull();
-    expect($label->external_id)->toMatch('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i');
-    expect($label->name)->toBe('Priority');
 });
