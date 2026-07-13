@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
+use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Label;
@@ -58,7 +59,7 @@ class LabelResource extends Resource
                     ->badge()
                     ->formatStateUsing(fn (?string $state): ?string => $state ? '#' . ltrim($state, '#') : null)
                     ->color(fn ($record): array | string => $record->hex
-                        ? \Filament\Support\Colors\Color::hex('#' . ltrim($record->hex, '#'))
+                        ? Color::hex('#' . ltrim($record->hex, '#'))
                         : 'gray'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('laravel-crm-filament::labels.fields.created'))
