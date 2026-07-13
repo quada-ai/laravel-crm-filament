@@ -81,15 +81,16 @@ it('preserves table columns, defaultSort, and bulk delete action', function (): 
         ->and($src)->toContain('Actions\\DeleteBulkAction::make()');
 });
 
-it('getPages() still exposes index / create / edit (no view page)', function (): void {
+it('getPages() exposes index / create / view / edit', function (): void {
     $pages = LeadSourceResource::getPages();
 
-    expect(array_keys($pages))->toBe(['index', 'create', 'edit']);
+    expect(array_keys($pages))->toBe(['index', 'create', 'view', 'edit']);
 
     $src = file_get_contents((new ReflectionClass(LeadSourceResource::class))->getFileName());
 
     expect($src)->toContain("'index' => " . class_basename(ListLeadSources::class) . "::route('/')")
         ->and($src)->toContain("'create' => " . class_basename(CreateLeadSource::class) . "::route('/create')")
+        ->and($src)->toContain("'view' => ViewLeadSource::route('/{record}')")
         ->and($src)->toContain("'edit' => " . class_basename(EditLeadSource::class) . "::route('/{record}/edit')");
 });
 

@@ -14,6 +14,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\LeadSources\Pages\CreateLeadSource;
 use VentureDrake\LaravelCrmFilament\Resources\LeadSources\Pages\EditLeadSource;
 use VentureDrake\LaravelCrmFilament\Resources\LeadSources\Pages\ListLeadSources;
+use VentureDrake\LaravelCrmFilament\Resources\LeadSources\Pages\ViewLeadSource;
 
 class LeadSourceResource extends Resource
 {
@@ -81,6 +82,7 @@ class LeadSourceResource extends Resource
         return [
             'index' => ListLeadSources::route('/'),
             'create' => CreateLeadSource::route('/create'),
+            'view' => ViewLeadSource::route('/{record}'),
             'edit' => EditLeadSource::route('/{record}/edit'),
         ];
     }
