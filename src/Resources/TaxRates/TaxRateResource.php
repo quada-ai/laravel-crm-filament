@@ -14,6 +14,7 @@ use VentureDrake\LaravelCrm\Models\TaxRate;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\CreateTaxRate;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\EditTaxRate;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\ListTaxRates;
+use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\ViewTaxRate;
 
 class TaxRateResource extends Resource
 {
@@ -92,6 +93,7 @@ class TaxRateResource extends Resource
         return [
             'index' => ListTaxRates::route('/'),
             'create' => CreateTaxRate::route('/create'),
+            'view' => ViewTaxRate::route('/{record}'),
             'edit' => EditTaxRate::route('/{record}/edit'),
         ];
     }

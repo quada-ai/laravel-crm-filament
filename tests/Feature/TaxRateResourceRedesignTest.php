@@ -7,6 +7,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\CreateTaxRate;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\EditTaxRate;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\ListTaxRates;
+use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\ViewTaxRate;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\TaxRateResource;
 
 /*
@@ -98,15 +99,16 @@ it('preserves the form, table columns, defaultSort, and toolbarActions unchanged
         ->and($src)->toContain('Actions\\DeleteBulkAction::make()');
 });
 
-it('getPages() still exposes only index / create / edit (no view page)', function (): void {
+it('getPages() exposes index / create / view / edit (view added by US-008)', function (): void {
     $pages = TaxRateResource::getPages();
 
-    expect(array_keys($pages))->toBe(['index', 'create', 'edit']);
+    expect(array_keys($pages))->toBe(['index', 'create', 'view', 'edit']);
 
     $src = file_get_contents((new ReflectionClass(TaxRateResource::class))->getFileName());
 
     expect($src)->toContain("'index' => " . class_basename(ListTaxRates::class) . "::route('/')")
         ->and($src)->toContain("'create' => " . class_basename(CreateTaxRate::class) . "::route('/create')")
+        ->and($src)->toContain("'view' => " . class_basename(ViewTaxRate::class) . "::route('/{record}')")
         ->and($src)->toContain("'edit' => " . class_basename(EditTaxRate::class) . "::route('/{record}/edit')");
 });
 
