@@ -480,6 +480,7 @@ return [
         'back_to_lead_sources' => 'Volver a fuentes de clientes potenciales',
         'back_to_labels' => 'Volver a etiquetas',
         'back_to_product_categories' => 'Volver a categorías de productos',
+        'back_to_tax_rates' => 'Volver a tasas de impuesto',
     ],
 
     'import' => [

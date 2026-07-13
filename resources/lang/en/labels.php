@@ -525,6 +525,7 @@ return [
         'back_to_lead_sources' => 'Back to lead sources',
         'back_to_labels' => 'Back to labels',
         'back_to_product_categories' => 'Back to product categories',
+        'back_to_tax_rates' => 'Back to tax rates',
     ],
 
     // CSV import
