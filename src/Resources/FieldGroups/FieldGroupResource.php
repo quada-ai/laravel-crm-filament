@@ -6,17 +6,20 @@ use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\FieldGroup;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\FieldGroups\Pages\CreateFieldGroup;
 use VentureDrake\LaravelCrmFilament\Resources\FieldGroups\Pages\EditFieldGroup;
 use VentureDrake\LaravelCrmFilament\Resources\FieldGroups\Pages\ListFieldGroups;
+use VentureDrake\LaravelCrmFilament\Resources\FieldGroups\Pages\ViewFieldGroup;
 
 class FieldGroupResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = FieldGroup::class;
 
     protected static ?string $slug = 'field-groups';
@@ -31,21 +34,12 @@ class FieldGroupResource extends Resource
 
     protected static ?string $navigationLabel = 'Custom Field Groups';
 
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
-    }
-
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Grid::make(2)->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('handle')
-                    ->maxLength(255),
-            ]),
+            Forms\Components\TextInput::make('name')
+                ->required()
+                ->maxLength(255),
         ]);
     }
 
@@ -54,17 +48,32 @@ class FieldGroupResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('handle')->toggleable(),
+                Tables\Columns\IconColumn::make('system')
+                    ->label(__('laravel-crm-filament::labels.fields.system'))
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('fields_count')
                     ->counts('fields')
                     ->label(__('laravel-crm-filament::labels.fields.fields'))
                     ->toggleable(),
             ])
-            ->defaultSort('name')
-            ->recordActions([Actions\EditAction::make()])
+            ->defaultSort('created_at', 'desc')
+            ->recordActions([
+                Actions\ViewAction::make()->button()->hiddenLabel(),
+                Actions\EditAction::make()->button()->hiddenLabel(),
+                Actions\DeleteAction::make()->button()->hiddenLabel()->requiresConfirmation(),
+            ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
             ]);
+    }
+
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_field_groups'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
     }
 
     public static function getPages(): array
@@ -72,6 +81,7 @@ class FieldGroupResource extends Resource
         return [
             'index' => ListFieldGroups::route('/'),
             'create' => CreateFieldGroup::route('/create'),
+            'view' => ViewFieldGroup::route('/{record}'),
             'edit' => EditFieldGroup::route('/{record}/edit'),
         ];
     }
