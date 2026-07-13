@@ -54,6 +54,10 @@ return [
         'color' => 'Color',
         'active' => 'Activo',
         'system' => 'Sistema',
+        'handle' => 'Handle',
+        'required' => 'Requerido',
+        'default' => 'Predeterminado',
+        'attached_to' => 'Asignado a',
         'verified' => 'Verificado',
         'primary' => 'Principal',
         'roles' => 'Roles',
@@ -481,6 +485,8 @@ return [
         'back_to_labels' => 'Volver a etiquetas',
         'back_to_product_categories' => 'Volver a categorías de productos',
         'back_to_tax_rates' => 'Volver a tasas de impuesto',
+        'back_to_field_groups' => 'Volver a grupos de campos',
+        'back_to_fields' => 'Volver a campos',
     ],
 
     'import' => [

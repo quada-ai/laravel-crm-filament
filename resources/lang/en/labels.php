@@ -55,6 +55,10 @@ return [
         'color' => 'Color',
         'active' => 'Active',
         'system' => 'System',
+        'handle' => 'Handle',
+        'required' => 'Required',
+        'default' => 'Default',
+        'attached_to' => 'Attached to',
         'verified' => 'Verified',
         'primary' => 'Primary',
         'roles' => 'Roles',
@@ -526,6 +530,8 @@ return [
         'back_to_labels' => 'Back to labels',
         'back_to_product_categories' => 'Back to product categories',
         'back_to_tax_rates' => 'Back to tax rates',
+        'back_to_field_groups' => 'Back to field groups',
+        'back_to_fields' => 'Back to fields',
     ],
 
     // CSV import
