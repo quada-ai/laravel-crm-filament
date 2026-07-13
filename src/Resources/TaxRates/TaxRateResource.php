@@ -43,10 +43,11 @@ class TaxRateResource extends Resource
                     ->suffix('%'),
                 Forms\Components\TextInput::make('tax_type')
                     ->label(__('laravel-crm-filament::labels.fields.type'))
-                    ->placeholder('GST / VAT / Sales tax')
                     ->maxLength(50),
             ]),
-            Forms\Components\Toggle::make('default')->label(__('laravel-crm-filament::labels.money.default_tax_rate')),
+            Forms\Components\Toggle::make('default')
+                ->label(__('laravel-crm-filament::labels.money.default_tax_rate'))
+                ->columnSpanFull(),
             Forms\Components\Textarea::make('description')
                 ->rows(2)
                 ->columnSpanFull(),
@@ -59,14 +60,24 @@ class TaxRateResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('rate')->suffix('%')->sortable(),
-                Tables\Columns\TextColumn::make('tax_type')->label(__('laravel-crm-filament::labels.fields.type'))->toggleable(),
                 Tables\Columns\IconColumn::make('default')->boolean(),
+                Tables\Columns\TextColumn::make('tax_type')->label(__('laravel-crm-filament::labels.fields.type'))->toggleable(),
                 Tables\Columns\TextColumn::make('products_count')
                     ->counts('products')
                     ->label(__('laravel-crm-filament::labels.sales.products'))
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('laravel-crm-filament::labels.fields.updated'))
+                    ->since()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('name')
+            ->defaultSort('created_at', 'desc')
             ->recordActions([
                 Actions\ViewAction::make()->button()->hiddenLabel(),
                 Actions\EditAction::make()->button()->hiddenLabel(),

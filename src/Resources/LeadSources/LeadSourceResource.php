@@ -49,11 +49,20 @@ class LeadSourceResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('description')->limit(60)->toggleable(),
                 Tables\Columns\TextColumn::make('leads_count')
                     ->label(__('laravel-crm-filament::labels.sales.leads'))
                     ->counts('leads')
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('laravel-crm-filament::labels.fields.updated'))
+                    ->since()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('name')
             ->recordActions([

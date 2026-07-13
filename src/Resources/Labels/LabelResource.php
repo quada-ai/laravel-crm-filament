@@ -54,8 +54,18 @@ class LabelResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\ColorColumn::make('hex')->label(__('laravel-crm-filament::labels.fields.color')),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('laravel-crm-filament::labels.fields.created'))
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('laravel-crm-filament::labels.fields.updated'))
+                    ->since()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('name')
+            ->defaultSort('created_at', 'desc')
             ->recordActions([
                 Actions\ViewAction::make()->button()->hiddenLabel(),
                 Actions\EditAction::make()->button()->hiddenLabel(),

@@ -100,7 +100,7 @@ it('preserves the form, table columns, defaultSort, and toolbarActions unchanged
         ->and($src)->toContain("->counts('products')");
 
     // Preserved sort + bulk actions.
-    expect($src)->toContain("->defaultSort('name')")
+    expect($src)->toContain("->defaultSort('created_at', 'desc')")
         ->and($src)->toContain('Actions\\BulkActionGroup::make(')
         ->and($src)->toContain('Actions\\DeleteBulkAction::make()');
 });

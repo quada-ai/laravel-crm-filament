@@ -64,10 +64,10 @@ it('recordActions register ViewAction then EditAction then DeleteAction with but
         ->and($editPos)->toBeLessThan($deletePos);
 });
 
-it('table defaultSort is set to name', function (): void {
+it('table defaultSort is set to created_at desc', function (): void {
     $src = file_get_contents((new ReflectionClass(LabelResource::class))->getFileName());
 
-    expect($src)->toContain("->defaultSort('name')");
+    expect($src)->toContain("->defaultSort('created_at', 'desc')");
 });
 
 it('getPages() exposes index / create / view / edit (view added by US-005)', function (): void {

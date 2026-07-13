@@ -82,7 +82,6 @@ it('preserves table columns, defaultSort, and bulk delete action', function (): 
     $src = file_get_contents((new ReflectionClass(LeadSourceResource::class))->getFileName());
 
     expect($src)->toContain("TextColumn::make('name')")
-        ->and($src)->toContain("TextColumn::make('description')")
         ->and($src)->toContain("TextColumn::make('leads_count')")
         ->and($src)->toContain("->counts('leads')")
         ->and($src)->toContain("->defaultSort('name')")
