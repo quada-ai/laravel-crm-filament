@@ -11,12 +11,15 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Label;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\CreateLabel;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\EditLabel;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\ListLabels;
 
 class LabelResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = Label::class;
 
     protected static ?string $slug = 'labels';
@@ -28,11 +31,6 @@ class LabelResource extends Resource
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 70;
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
-    }
 
     public static function form(Schema $schema): Schema
     {
@@ -58,13 +56,24 @@ class LabelResource extends Resource
             ])
             ->defaultSort('name')
             ->recordActions([
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()->button()->hiddenLabel(),
+                Actions\EditAction::make()->button()->hiddenLabel(),
+                Actions\DeleteAction::make()->button()->hiddenLabel()->requiresConfirmation(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
                     Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_labels'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
     }
 
     public static function getPages(): array

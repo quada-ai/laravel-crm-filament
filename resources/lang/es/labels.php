@@ -473,6 +473,7 @@ return [
         'back_to_pipelines' => 'Volver a pipelines',
         'back_to_pipeline_stages' => 'Volver a etapas de pipeline',
         'back_to_lead_sources' => 'Volver a fuentes de clientes potenciales',
+        'back_to_labels' => 'Volver a etiquetas',
         'back_to_product_categories' => 'Volver a categorías de productos',
     ],
 
