@@ -23,6 +23,30 @@ return new class extends Migration
             });
         }
 
+        if (Schema::hasTable($prefix . 'fields') && ! Schema::hasColumn($prefix . 'fields', 'handle')) {
+            Schema::table($prefix . 'fields', function (Blueprint $table) {
+                $table->string('handle')->nullable();
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'fields') && ! Schema::hasColumn($prefix . 'fields', 'required')) {
+            Schema::table($prefix . 'fields', function (Blueprint $table) {
+                $table->boolean('required')->default(false);
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'field_groups') && ! Schema::hasColumn($prefix . 'field_groups', 'system')) {
+            Schema::table($prefix . 'field_groups', function (Blueprint $table) {
+                $table->boolean('system')->default(false);
+            });
+        }
+
+        if (Schema::hasTable($prefix . 'field_groups') && ! Schema::hasColumn($prefix . 'field_groups', 'handle')) {
+            Schema::table($prefix . 'field_groups', function (Blueprint $table) {
+                $table->string('handle')->nullable();
+            });
+        }
+
         // US-006: roles table patches (description / crm_role) for RoleResource parity with core
         if (Schema::hasTable('roles')) {
             Schema::table('roles', function (Blueprint $table) {
