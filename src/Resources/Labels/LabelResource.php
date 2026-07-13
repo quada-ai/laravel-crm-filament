@@ -57,9 +57,9 @@ class LabelResource extends Resource
                     ->label(__('laravel-crm-filament::labels.fields.color'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): ?string => $state ? '#' . ltrim($state, '#') : null)
-                    ->extraAttributes(fn ($record): array => $record->hex
-                        ? ['style' => 'background-color: #' . ltrim($record->hex, '#') . '; color: #ffffff; border-color: transparent;']
-                        : []),
+                    ->color(fn ($record): array | string => $record->hex
+                        ? \Filament\Support\Colors\Color::hex('#' . ltrim($record->hex, '#'))
+                        : 'gray'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('laravel-crm-filament::labels.fields.created'))
                     ->since()
