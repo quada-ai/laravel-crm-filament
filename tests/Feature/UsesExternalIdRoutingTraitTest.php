@@ -14,6 +14,8 @@ use VentureDrake\LaravelCrmFilament\Resources\ChatWidgets\ChatWidgetResource;
 use VentureDrake\LaravelCrmFilament\Resources\Customers\CustomerResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deals\DealResource;
 use VentureDrake\LaravelCrmFilament\Resources\Deliveries\DeliveryResource;
+use VentureDrake\LaravelCrmFilament\Resources\FieldGroups\FieldGroupResource;
+use VentureDrake\LaravelCrmFilament\Resources\Fields\FieldResource;
 use VentureDrake\LaravelCrmFilament\Resources\Invoices\InvoiceResource;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\LabelResource;
 use VentureDrake\LaravelCrmFilament\Resources\Leads\LeadResource;
@@ -51,6 +53,8 @@ $traitResources = [
     'PipelineStageResource' => PipelineStageResource::class,
     'ProductCategoryResource' => ProductCategoryResource::class,
     'LabelResource' => LabelResource::class,
+    'FieldResource' => FieldResource::class,
+    'FieldGroupResource' => FieldGroupResource::class,
 ];
 
 $traitDataset = [];
