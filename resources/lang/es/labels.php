@@ -319,6 +319,8 @@ return [
         'visitor' => 'Visitante',
         'public_key' => 'Clave pública',
         'allowed_origins' => 'Orígenes permitidos',
+        'welcome_message' => 'Mensaje de bienvenida',
+        'position' => 'Posición',
         'thread' => 'Conversación',
         'reply_form_heading' => 'Responder',
         'agent' => 'Agente',

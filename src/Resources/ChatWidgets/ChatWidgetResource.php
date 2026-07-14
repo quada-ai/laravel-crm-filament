@@ -6,7 +6,6 @@ use BackedEnum;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -36,10 +35,23 @@ class ChatWidgetResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Grid::make(2)->schema([
-                Forms\Components\TextInput::make('name')->required()->maxLength(255),
-                Forms\Components\Toggle::make('is_active')->label(__('laravel-crm-filament::labels.fields.active'))->default(true),
-            ]),
+            Forms\Components\TextInput::make('name')->required()->maxLength(255),
+            Forms\Components\TextInput::make('welcome_message')
+                ->label(__('laravel-crm-filament::labels.chat.welcome_message'))
+                ->maxLength(255),
+            Forms\Components\ColorPicker::make('color')
+                ->label(__('laravel-crm-filament::labels.fields.color'))
+                ->default('#2563eb'),
+            Forms\Components\Select::make('position')
+                ->label(__('laravel-crm-filament::labels.chat.position'))
+                ->options([
+                    'bottom-right' => 'Bottom right',
+                    'bottom-left' => 'Bottom left',
+                ])
+                ->default('bottom-right'),
+            Forms\Components\Toggle::make('is_active')
+                ->label(__('laravel-crm-filament::labels.fields.active'))
+                ->default(true),
             Forms\Components\TagsInput::make('allowed_origins')
                 ->label(__('laravel-crm-filament::labels.chat.allowed_origins'))
                 ->placeholder('https://example.com')

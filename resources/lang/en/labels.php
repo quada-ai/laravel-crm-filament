@@ -325,6 +325,8 @@ return [
         'visitor' => 'Visitor',
         'public_key' => 'Public key',
         'allowed_origins' => 'Allowed origins',
+        'welcome_message' => 'Welcome message',
+        'position' => 'Position',
         'thread' => 'Conversation',
         'reply_form_heading' => 'Reply',
         'agent' => 'Agent',
