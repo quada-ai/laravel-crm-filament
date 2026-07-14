@@ -532,6 +532,7 @@ return [
         'back_to_tax_rates' => 'Back to tax rates',
         'back_to_field_groups' => 'Back to field groups',
         'back_to_fields' => 'Back to fields',
+        'back_to_chat_widgets' => 'Back to chat widgets',
     ],
 
     // CSV import

@@ -487,6 +487,7 @@ return [
         'back_to_tax_rates' => 'Volver a tasas de impuesto',
         'back_to_field_groups' => 'Volver a grupos de campos',
         'back_to_fields' => 'Volver a campos',
+        'back_to_chat_widgets' => 'Volver a widgets de chat',
     ],
 
     'import' => [
