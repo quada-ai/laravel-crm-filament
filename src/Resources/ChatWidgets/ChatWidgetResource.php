@@ -66,8 +66,9 @@ class ChatWidgetResource extends Resource
             ])
             ->defaultSort('name')
             ->recordActions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
+                Actions\ViewAction::make()->button()->hiddenLabel(),
+                Actions\EditAction::make()->button()->hiddenLabel(),
+                Actions\DeleteAction::make()->button()->hiddenLabel()->requiresConfirmation(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
