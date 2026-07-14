@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -49,6 +50,16 @@ class ClickSendIntegration extends Page implements HasForms
     ];
 
     public array $data = [];
+
+    public function getSubNavigation(): array
+    {
+        return Integrations::integrationTabs();
+    }
+
+    public static function getSubNavigationPosition(): SubNavigationPosition
+    {
+        return SubNavigationPosition::Top;
+    }
 
     public function mount(): void
     {
