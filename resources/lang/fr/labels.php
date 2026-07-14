@@ -515,6 +515,11 @@ return [
         'private' => 'Privé',
     ],
 
+    // Integrations page — per-integration descriptions surfaced on the Settings page
+    'integrations' => [
+        'xero_description' => 'Connectez-vous à la comptabilité Xero pour synchroniser les contacts, produits, devis et générer des factures.',
+    ],
+
     'xero' => [
         'contacts' => 'Contacts Xero',
         'items' => 'Articles Xero',

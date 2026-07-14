@@ -356,6 +356,11 @@ return [
         'changes' => 'Changes',
     ],
 
+    // Integrations page — per-integration descriptions surfaced on the Settings page
+    'integrations' => [
+        'xero_description' => 'Connect to xero accounting to sync contacts, products, quotes & generate invoices.',
+    ],
+
     // Xero integration mirrors (XeroContact / XeroItem / XeroInvoice / XeroPurchaseOrder)
     'xero' => [
         'contacts' => 'Xero contacts',
