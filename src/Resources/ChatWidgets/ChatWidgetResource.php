@@ -53,12 +53,12 @@ class ChatWidgetResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\IconColumn::make('is_active')->label(__('laravel-crm-filament::labels.fields.active'))->boolean(),
                 Tables\Columns\TextColumn::make('public_key')
                     ->label(__('laravel-crm-filament::labels.chat.public_key'))
                     ->copyable()
                     ->limit(20)
                     ->toggleable(),
+                Tables\Columns\IconColumn::make('is_active')->label(__('laravel-crm-filament::labels.fields.active'))->boolean(),
                 Tables\Columns\TextColumn::make('conversations_count')
                     ->counts('conversations')
                     ->label(__('laravel-crm-filament::labels.chat.conversations'))
