@@ -163,13 +163,9 @@ class EmailCampaignResource extends Resource
                     ]),
             ])
             ->recordActions([
-                Actions\ViewAction::make()
-                    ->button()
-                    ->hiddenLabel(),
-                Actions\EditAction::make()
-                    ->visible(fn ($record) => $record->isEditable())
-                    ->button()
-                    ->hiddenLabel(),
+                Actions\ViewAction::make()->button()->hiddenLabel(),
+                Actions\EditAction::make()->visible(fn ($record) => $record->isEditable())->button()->hiddenLabel(),
+                Actions\DeleteAction::make()->button()->hiddenLabel()->requiresConfirmation(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
