@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Models\EmailCampaignRecipient;
 use VentureDrake\LaravelCrm\Models\EmailTemplate;
@@ -109,8 +110,22 @@ class EmailCampaignResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
-                Tables\Columns\TextColumn::make('subject')->limit(60)->toggleable(),
+                Tables\Columns\TextColumn::make('campaign_id')
+                    ->label(__('laravel-crm-filament::labels.fields.number'))
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->sortable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query
+                            ->where('name', 'like', "%{$search}%")
+                            ->orWhere('subject', 'like', "%{$search}%")
+                            ->orWhere('campaign_id', 'like', "%{$search}%");
+                    }),
+                Tables\Columns\TextColumn::make('subject')
+                    ->limit(60)
+                    ->tooltip(fn ($record) => $record->subject)
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -122,10 +137,18 @@ class EmailCampaignResource extends Resource
                         'failed' => 'danger',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('total_recipients')->label(__('laravel-crm-filament::labels.campaign.recipients'))->numeric()->toggleable(),
-                Tables\Columns\TextColumn::make('unique_opens_count')->label(__('laravel-crm-filament::labels.campaign.opens'))->numeric()->toggleable(),
-                Tables\Columns\TextColumn::make('scheduled_at')->dateTime()->toggleable(),
-                Tables\Columns\TextColumn::make('sent_at')->dateTime()->toggleable(),
+                Tables\Columns\TextColumn::make('total_recipients')
+                    ->label(__('laravel-crm-filament::labels.campaign.recipients'))
+                    ->numeric()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('scheduled_at')
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('sent_at')
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
