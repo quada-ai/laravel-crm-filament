@@ -68,6 +68,7 @@ use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsPipelineValueChart;
 use VentureDrake\LaravelCrmFilament\Widgets\DealStatusDoughnutChart;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsValueStat;
+use VentureDrake\LaravelCrmFilament\Widgets\EmailCampaignStatsWidget;
 use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
 use VentureDrake\LaravelCrmFilament\Widgets\LeadsVsDealsChart;
 use VentureDrake\LaravelCrmFilament\Widgets\MonthlyRevenueChart;
@@ -414,6 +415,10 @@ class LaravelCrmPlugin implements Plugin
         if ($this->isModuleEnabled('email-marketing')) {
             $widgets[] = CampaignPerformanceChart::class;
         }
+
+        // Registered unconditionally so it's footer-available on the EmailCampaign
+        // show page regardless of the email-marketing module toggle.
+        $widgets[] = EmailCampaignStatsWidget::class;
 
         $panel->widgets($widgets);
     }
