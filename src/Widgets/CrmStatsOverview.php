@@ -6,29 +6,105 @@ use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use VentureDrake\LaravelCrm\Models\Deal;
 use VentureDrake\LaravelCrm\Models\Lead;
-use VentureDrake\LaravelCrm\Models\Task;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 class CrmStatsOverview extends StatsOverviewWidget
 {
-    protected ?string $heading = 'Pipeline overview';
+    protected ?string $heading = null;
+
+    public function getHeading(): ?string
+    {
+        return __('laravel-crm-filament::labels.dashboard.heading_sales')
+            . ' ' . __('laravel-crm-filament::labels.dashboard.heading_period_suffix', [
+                'period' => __('laravel-crm-filament::labels.sales.last_30_days'),
+            ]);
+    }
+
+    protected function getColumns(): int
+    {
+        return 3;
+    }
 
     protected function getStats(): array
     {
-        return [
-            Stat::make('Open leads', (string) Lead::query()->whereNull('converted_at')->count())
-                ->description('Leads not yet converted')
-                ->color('primary'),
+        $stats = [];
+        $windowStart = now()->subDays(30)->startOfDay();
+        $windowEnd = now();
 
-            Stat::make('Open deals', (string) Deal::query()->whereNull('closed_at')->count())
-                ->description('Deals in progress')
-                ->color('success'),
+        if ($this->moduleEnabled('leads')) {
+            $newLeads = Lead::query()
+                ->whereBetween('created_at', [$windowStart, $windowEnd])
+                ->count();
 
-            Stat::make('Tasks due today', (string) Task::query()
-                ->whereNull('completed_at')
-                ->whereDate('due_at', today())
-                ->count())
-                ->description('Activity for today')
-                ->color('warning'),
-        ];
+            $converted = Lead::query()
+                ->whereBetween('created_at', [$windowStart, $windowEnd])
+                ->whereNotNull('converted_at')
+                ->count();
+
+            $rate = $newLeads > 0 ? (int) round(($converted / $newLeads) * 100) : 0;
+
+            $stats[] = Stat::make(
+                __('laravel-crm-filament::labels.dashboard.new_leads'),
+                (string) $newLeads,
+            )->description(__('laravel-crm-filament::labels.dashboard.convert_rate', ['rate' => $rate]))
+                ->color('primary');
+        }
+
+        if ($this->moduleEnabled('deals')) {
+            $pipelineValueCents = (int) Deal::query()
+                ->whereNull('closed_at')
+                ->sum('amount');
+            $openDealsCount = Deal::query()->whereNull('closed_at')->count();
+
+            $stats[] = Stat::make(
+                __('laravel-crm-filament::labels.dashboard.pipeline_value'),
+                $this->formatMoney($pipelineValueCents),
+            )->description(__('laravel-crm-filament::labels.dashboard.open_deals_count', ['count' => $openDealsCount]))
+                ->color('warning');
+
+            $wonCount = Deal::query()
+                ->where('closed_status', 'won')
+                ->whereBetween('closed_at', [$windowStart, $windowEnd])
+                ->count();
+
+            $wonValueCents = (int) Deal::query()
+                ->where('closed_status', 'won')
+                ->whereBetween('closed_at', [$windowStart, $windowEnd])
+                ->sum('amount');
+
+            $stats[] = Stat::make(
+                __('laravel-crm-filament::labels.dashboard.deals_won'),
+                (string) $wonCount,
+            )->description($this->formatMoney($wonValueCents))
+                ->color('success');
+        }
+
+        return $stats;
+    }
+
+    protected function moduleEnabled(string $module): bool
+    {
+        try {
+            return LaravelCrmPlugin::get()->isModuleEnabled($module);
+        } catch (\Throwable $e) {
+            return in_array($module, (array) config('laravel-crm.modules', []), true);
+        }
+    }
+
+    protected function formatMoney(int $cents): string
+    {
+        $currency = config('laravel-crm.default_currency', 'USD');
+        $amount = $cents / 100;
+
+        if (function_exists('money')) {
+            try {
+                return (string) money($amount, $currency);
+            } catch (\Throwable $e) {
+                // Fall through to number_format below when money helper throws
+                // (e.g. in test environments without full currency data).
+            }
+        }
+
+        return number_format($amount, 2) . ' ' . $currency;
     }
 }

@@ -35,8 +35,6 @@ it('table widgets declare a heading static property', function () {
 it('stats widgets declare a non-empty heading', function () {
     foreach ([CrmStatsOverview::class, DealsValueStat::class] as $widget) {
         $instance = new $widget;
-        $heading = (new ReflectionClass($widget))->getProperty('heading');
-        $heading->setAccessible(true);
-        expect($heading->getValue($instance))->toBeString()->not->toBeEmpty();
+        expect($instance->getHeading())->toBeString()->not->toBeEmpty();
     }
 });
