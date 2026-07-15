@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Services\EmailCampaignService;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
+use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
 class EditEmailCampaign extends EditRecord
 {
@@ -16,6 +17,7 @@ class EditEmailCampaign extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            EmailCampaignResource::backToIndexAction(),
             Actions\ViewAction::make()
                 ->button()
                 ->hiddenLabel()
@@ -30,7 +32,7 @@ class EditEmailCampaign extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var EmailCampaign $record */
-        app(EmailCampaignService::class)->update($data, $record);
+        app(EmailCampaignService::class)->update(FormPayload::wrap($data)->toArray(), $record);
 
         return $record->refresh();
     }

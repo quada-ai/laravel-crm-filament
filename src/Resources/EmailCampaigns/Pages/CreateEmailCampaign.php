@@ -6,6 +6,7 @@ use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Services\EmailCampaignService;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
+use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
 class CreateEmailCampaign extends CreateRecord
 {
@@ -13,6 +14,6 @@ class CreateEmailCampaign extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        return app(EmailCampaignService::class)->create($data);
+        return app(EmailCampaignService::class)->create(FormPayload::wrap($data)->toArray());
     }
 }
