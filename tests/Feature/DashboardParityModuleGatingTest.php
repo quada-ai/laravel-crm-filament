@@ -38,6 +38,20 @@ function parityGatingWithPanel(array $modules, callable $fn)
     }
 }
 
+/**
+ * Normalise Dashboard::getWidgets() output — chart widgets are wrapped in
+ * Widget::make(['columnSpan' => 1]) which returns a WidgetConfiguration
+ * object. Flatten both shapes to a plain array of class-string values so
+ * ->toContain(Class::class) and ->toBe([...]) assertions read cleanly.
+ */
+function parityGatingWidgetClasses(array $widgets): array
+{
+    return array_map(
+        fn ($entry) => is_string($entry) ? $entry : $entry->widget,
+        $widgets,
+    );
+}
+
 // ----------------------------------------------------------------------------
 // Per-module dataset — each row lists (module key, gated widget FQCNs).
 // ----------------------------------------------------------------------------
@@ -69,6 +83,8 @@ it('gated widgets are absent from Dashboard::getWidgets() when the module is dis
 
     $widgets = parityGatingWithPanel($enabled, fn () => (new Dashboard)->getWidgets());
 
+    $widgets = parityGatingWidgetClasses($widgets);
+
     foreach ($gatedWidgets as $widgetClass) {
         expect($widgets)->not->toContain($widgetClass);
     }
@@ -86,6 +102,8 @@ it('gated widgets are present in Dashboard::getWidgets() when the module is enab
 
     $widgets = parityGatingWithPanel($enabled, fn () => (new Dashboard)->getWidgets());
 
+    $widgets = parityGatingWidgetClasses($widgets);
+
     foreach ($gatedWidgets as $widgetClass) {
         expect($widgets)->toContain($widgetClass);
     }
@@ -100,6 +118,7 @@ it('CrmStatsOverview drops when BOTH leads AND deals are disabled', function () 
         'leads' => false, 'deals' => false,
         'quotes' => true, 'orders' => true, 'invoices' => true, 'email-marketing' => true,
     ], fn () => (new Dashboard)->getWidgets());
+    $widgets = parityGatingWidgetClasses($widgets);
 
     expect($widgets)->not->toContain(CrmStatsOverview::class);
 });
@@ -109,12 +128,15 @@ it('CrmStatsOverview stays present when either leads OR deals is enabled', funct
         'leads' => true, 'deals' => false,
         'quotes' => false, 'orders' => false, 'invoices' => false, 'email-marketing' => false,
     ], fn () => (new Dashboard)->getWidgets());
+    $widgetsLeadsOnly = parityGatingWidgetClasses($widgetsLeadsOnly);
     expect($widgetsLeadsOnly)->toContain(CrmStatsOverview::class);
 
     $widgetsDealsOnly = parityGatingWithPanel([
         'leads' => false, 'deals' => true,
         'quotes' => false, 'orders' => false, 'invoices' => false, 'email-marketing' => false,
     ], fn () => (new Dashboard)->getWidgets());
+
+    $widgetsDealsOnly = parityGatingWidgetClasses($widgetsDealsOnly);
     expect($widgetsDealsOnly)->toContain(CrmStatsOverview::class);
 });
 
@@ -123,6 +145,7 @@ it('LeadsVsDealsChart drops when BOTH leads AND deals are disabled', function ()
         'leads' => false, 'deals' => false,
         'quotes' => true, 'orders' => true, 'invoices' => true,
     ], fn () => (new Dashboard)->getWidgets());
+    $widgets = parityGatingWidgetClasses($widgets);
 
     expect($widgets)->not->toContain(LeadsVsDealsChart::class);
 });
@@ -131,11 +154,14 @@ it('LeadsVsDealsChart stays present when either leads OR deals is enabled', func
     $widgetsLeadsOnly = parityGatingWithPanel([
         'leads' => true, 'deals' => false,
     ], fn () => (new Dashboard)->getWidgets());
+    $widgetsLeadsOnly = parityGatingWidgetClasses($widgetsLeadsOnly);
     expect($widgetsLeadsOnly)->toContain(LeadsVsDealsChart::class);
 
     $widgetsDealsOnly = parityGatingWithPanel([
         'leads' => false, 'deals' => true,
     ], fn () => (new Dashboard)->getWidgets());
+
+    $widgetsDealsOnly = parityGatingWidgetClasses($widgetsDealsOnly);
     expect($widgetsDealsOnly)->toContain(LeadsVsDealsChart::class);
 });
 
@@ -144,6 +170,7 @@ it('DealsValueStat drops when quotes AND orders AND invoices are ALL disabled', 
         'leads' => true, 'deals' => true,
         'quotes' => false, 'orders' => false, 'invoices' => false,
     ], fn () => (new Dashboard)->getWidgets());
+    $widgets = parityGatingWidgetClasses($widgets);
 
     expect($widgets)->not->toContain(DealsValueStat::class);
 });
@@ -157,6 +184,8 @@ it('DealsValueStat stays present when any of quotes/orders/invoices is enabled',
         $modules[$onModule] = true;
 
         $widgets = parityGatingWithPanel($modules, fn () => (new Dashboard)->getWidgets());
+
+        $widgets = parityGatingWidgetClasses($widgets);
         expect($widgets)->toContain(DealsValueStat::class);
     }
 });
@@ -166,6 +195,7 @@ it('MonthlyRevenueChart drops when BOTH invoices AND orders are disabled', funct
         'leads' => true, 'deals' => true,
         'quotes' => true, 'orders' => false, 'invoices' => false,
     ], fn () => (new Dashboard)->getWidgets());
+    $widgets = parityGatingWidgetClasses($widgets);
 
     expect($widgets)->not->toContain(MonthlyRevenueChart::class);
 });
@@ -174,11 +204,14 @@ it('MonthlyRevenueChart stays present when either invoices OR orders is enabled'
     $invoicesOnly = parityGatingWithPanel([
         'invoices' => true, 'orders' => false,
     ], fn () => (new Dashboard)->getWidgets());
+    $invoicesOnly = parityGatingWidgetClasses($invoicesOnly);
     expect($invoicesOnly)->toContain(MonthlyRevenueChart::class);
 
     $ordersOnly = parityGatingWithPanel([
         'invoices' => false, 'orders' => true,
     ], fn () => (new Dashboard)->getWidgets());
+
+    $ordersOnly = parityGatingWidgetClasses($ordersOnly);
     expect($ordersOnly)->toContain(MonthlyRevenueChart::class);
 });
 
@@ -191,6 +224,7 @@ it('ContactsStatsOverview, TasksDueTodayList, RecentActivityList are ungated', f
         'leads' => false, 'deals' => false, 'quotes' => false, 'orders' => false,
         'invoices' => false, 'email-marketing' => false,
     ], fn () => (new Dashboard)->getWidgets());
+    $everythingOff = parityGatingWidgetClasses($everythingOff);
 
     expect($everythingOff)->toContain(ContactsStatsOverview::class)
         ->toContain(TasksDueTodayList::class)
