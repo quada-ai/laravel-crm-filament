@@ -14,7 +14,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
-use VentureDrake\LaravelCrm\Models\EmailCampaignRecipient;
 use VentureDrake\LaravelCrm\Models\EmailTemplate;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
@@ -76,32 +75,45 @@ class EmailCampaignResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('Performance')->heading(__('laravel-crm-filament::labels.sections.performance'))
-                ->key('campaign_performance')
-                ->description('Engagement metrics for this campaign')
-                ->columns(3)
+            Section::make('Details')->heading(__('laravel-crm-filament::labels.sections.details'))
+                ->key('campaign_details')
+                ->columns(2)
                 ->schema([
-                    TextEntry::make('sent_count_state')
-                        ->label(__('laravel-crm-filament::labels.campaign.sent'))
-                        ->state(fn (EmailCampaign $record) => EmailCampaignRecipient::where('email_campaign_id', $record->id)->where('status', 'sent')->count())
-                        ->numeric(),
-                    TextEntry::make('failed_count_state')
-                        ->label(__('laravel-crm-filament::labels.campaign.failed'))
-                        ->state(fn (EmailCampaign $record) => EmailCampaignRecipient::where('email_campaign_id', $record->id)->whereIn('status', ['failed', 'bounced'])->count())
-                        ->numeric(),
-                    TextEntry::make('skipped_count_state')
-                        ->label(__('laravel-crm-filament::labels.campaign.skipped'))
-                        ->state(fn (EmailCampaign $record) => EmailCampaignRecipient::where('email_campaign_id', $record->id)->where('status', 'skipped')->count())
-                        ->numeric(),
-                    TextEntry::make('open_rate')
-                        ->label(__('laravel-crm-filament::labels.campaign.open_rate'))
-                        ->state(fn (EmailCampaign $record): string => $record->openRate() . '%'),
-                    TextEntry::make('click_rate')
-                        ->label(__('laravel-crm-filament::labels.campaign.click_rate'))
-                        ->state(fn (EmailCampaign $record): string => $record->clickRate() . '%'),
-                    TextEntry::make('unsubscribe_rate')
-                        ->label(__('laravel-crm-filament::labels.campaign.unsubscribe_rate'))
-                        ->state(fn (EmailCampaign $record): string => $record->unsubscribeRate() . '%'),
+                    TextEntry::make('name')
+                        ->label(__('laravel-crm-filament::labels.fields.name')),
+                    TextEntry::make('campaign_id')
+                        ->label(__('laravel-crm-filament::labels.fields.number')),
+                    TextEntry::make('subject')
+                        ->label(__('laravel-crm-filament::labels.fields.subject'))
+                        ->columnSpanFull(),
+                    TextEntry::make('preview_text')
+                        ->columnSpanFull(),
+                    TextEntry::make('status')
+                        ->label(__('laravel-crm-filament::labels.fields.status'))
+                        ->badge(),
+                    TextEntry::make('scheduled_at')
+                        ->label(__('laravel-crm-filament::labels.campaign.schedule_for'))
+                        ->state(function (EmailCampaign $record): ?string {
+                            if (! $record->scheduled_at) {
+                                return null;
+                            }
+
+                            $formatted = $record->scheduled_at->format('M j, Y g:i A');
+
+                            return $record->timezone
+                                ? $formatted . ' (' . $record->timezone . ')'
+                                : $formatted;
+                        })
+                        ->placeholder('—'),
+                    TextEntry::make('sent_at')
+                        ->dateTime()
+                        ->placeholder('—'),
+                    TextEntry::make('template.name')
+                        ->label(__('laravel-crm-filament::labels.fields.template'))
+                        ->placeholder('—'),
+                    TextEntry::make('ownerUser.name')
+                        ->label(__('laravel-crm-filament::labels.fields.owner'))
+                        ->placeholder('—'),
                 ]),
         ]);
     }

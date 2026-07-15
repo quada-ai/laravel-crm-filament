@@ -1,5 +1,7 @@
 <?php
 
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Panel;
 use Filament\Tables\Table;
 use Filament\Widgets\ChartWidget;
@@ -14,6 +16,7 @@ use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\RelationManagers\Reci
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 use VentureDrake\LaravelCrmFilament\Widgets\CampaignPerformanceChart;
 use VentureDrake\LaravelCrmFilament\Widgets\EmailCampaignSendsOverTimeChart;
+use VentureDrake\LaravelCrmFilament\Widgets\EmailCampaignStatsWidget;
 use VentureDrake\LaravelCrmFilament\Widgets\SmsCampaignSendsOverTimeChart;
 
 it('exposes the Send-now action concern on the Email campaign view page', function () {
@@ -44,7 +47,7 @@ it('registers the Send-now header action on each campaign view page', function (
         expect($names)->toContain($name);
     }
 })->with([
-    'EmailCampaign' => [ViewEmailCampaign::class, ['sendNow', 'preview', 'schedule', 'cancel']],
+    'EmailCampaign' => [ViewEmailCampaign::class, ['backToIndex', 'preview', 'sendNow', 'schedule', 'cancel', 'edit', 'delete']],
     'SmsCampaign' => [ViewSmsCampaign::class, ['sendNow', 'preview', 'schedule', 'cancel']],
 ]);
 
@@ -134,4 +137,84 @@ it('does not register CampaignPerformanceChart when email marketing is disabled'
 it('exposes both sends-over-time widgets as ChartWidget subclasses', function () {
     expect(is_subclass_of(EmailCampaignSendsOverTimeChart::class, ChartWidget::class))->toBeTrue();
     expect(is_subclass_of(SmsCampaignSendsOverTimeChart::class, ChartWidget::class))->toBeTrue();
+});
+
+it('registers EmailCampaignStatsWidget as a header widget on ViewEmailCampaign', function () {
+    $instance = (new ReflectionClass(ViewEmailCampaign::class))->newInstanceWithoutConstructor();
+    $method = new ReflectionMethod(ViewEmailCampaign::class, 'getHeaderWidgets');
+    $method->setAccessible(true);
+
+    $widgets = $method->invoke($instance);
+    expect($widgets)->toContain(EmailCampaignStatsWidget::class);
+});
+
+it('sets ViewEmailCampaign header widget columns to 4', function () {
+    $instance = (new ReflectionClass(ViewEmailCampaign::class))->newInstanceWithoutConstructor();
+    expect($instance->getHeaderWidgetsColumns())->toBe(4);
+});
+
+it('renders ViewEmailCampaign header actions in the expected [backToIndex, preview, sendNow, schedule, cancel, edit, delete] order', function () {
+    $instance = (new ReflectionClass(ViewEmailCampaign::class))->newInstanceWithoutConstructor();
+    $method = new ReflectionMethod(ViewEmailCampaign::class, 'getHeaderActions');
+    $method->setAccessible(true);
+    $actions = $method->invoke($instance);
+
+    $names = array_map(fn ($action) => $action->getName(), $actions);
+    expect($names)->toBe(['backToIndex', 'preview', 'sendNow', 'schedule', 'cancel', 'edit', 'delete']);
+});
+
+it('renders ViewEmailCampaign Edit action as an icon pill gated on isEditable() and Delete as an icon pill', function () {
+    $instance = (new ReflectionClass(ViewEmailCampaign::class))->newInstanceWithoutConstructor();
+    $method = new ReflectionMethod(ViewEmailCampaign::class, 'getHeaderActions');
+    $method->setAccessible(true);
+    $actions = $method->invoke($instance);
+
+    $byName = collect($actions)->keyBy(fn ($action) => $action->getName());
+
+    // Edit action shape
+    $edit = $byName['edit'];
+    expect($edit)->toBeInstanceOf(EditAction::class);
+    expect($edit->getIcon())->toBe('heroicon-m-pencil-square');
+
+    // Delete action shape
+    $delete = $byName['delete'];
+    expect($delete)->toBeInstanceOf(DeleteAction::class);
+    expect($delete->getIcon())->toBe('heroicon-m-trash');
+    expect($delete->isConfirmationRequired())->toBeTrue();
+});
+
+it('replaces the Performance infolist Section with a sections.details Section on EmailCampaignResource', function () {
+    $source = file_get_contents((new ReflectionClass(EmailCampaignResource::class))->getFileName());
+
+    // New Details section present
+    expect($source)->toContain("Section::make('Details')->heading(__('laravel-crm-filament::labels.sections.details'))");
+
+    // Pre-existing rate TextEntries dropped from EmailCampaignResource
+    expect($source)->not->toContain("TextEntry::make('open_rate')");
+    expect($source)->not->toContain("TextEntry::make('click_rate')");
+    expect($source)->not->toContain("TextEntry::make('unsubscribe_rate')");
+    expect($source)->not->toContain("TextEntry::make('sent_count_state')");
+    expect($source)->not->toContain("TextEntry::make('failed_count_state')");
+    expect($source)->not->toContain("TextEntry::make('skipped_count_state')");
+});
+
+it('renders the AC-named 9 TextEntries in the Details section on EmailCampaignResource', function () {
+    $source = file_get_contents((new ReflectionClass(EmailCampaignResource::class))->getFileName());
+
+    foreach ([
+        "TextEntry::make('name')",
+        "TextEntry::make('campaign_id')",
+        "TextEntry::make('subject')",
+        "TextEntry::make('preview_text')",
+        "TextEntry::make('status')",
+        "TextEntry::make('scheduled_at')",
+        "TextEntry::make('sent_at')",
+        "TextEntry::make('template.name')",
+        "TextEntry::make('ownerUser.name')",
+    ] as $entry) {
+        expect($source)->toContain($entry);
+    }
+
+    // scheduled_at renders WITH timezone via the state closure
+    expect($source)->toContain('$record->timezone');
 });

@@ -13,6 +13,7 @@ use VentureDrake\LaravelCrm\Services\EmailCampaignService;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\Concerns\HasEmailCampaignSendNowAction;
 use VentureDrake\LaravelCrmFilament\Widgets\EmailCampaignSendsOverTimeChart;
+use VentureDrake\LaravelCrmFilament\Widgets\EmailCampaignStatsWidget;
 use VentureDrake\LaravelCrmFilament\Widgets\EmailCampaignTopUrlsWidget;
 
 class ViewEmailCampaign extends ViewRecord
@@ -24,11 +25,7 @@ class ViewEmailCampaign extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()
-                ->visible(fn (EmailCampaign $record) => $record->isEditable())
-                ->button()
-                ->hiddenLabel()
-                ->icon('heroicon-m-pencil-square'),
+            EmailCampaignResource::backToIndexAction(),
             Actions\Action::make('preview')
                 ->label(__('laravel-crm-filament::labels.actions.preview'))
                 ->icon('heroicon-o-eye')
@@ -62,7 +59,29 @@ class ViewEmailCampaign extends ViewRecord
                     app(EmailCampaignService::class)->cancel($record);
                     Notification::make()->title('Campaign cancelled')->success()->send();
                 }),
+            Actions\EditAction::make()
+                ->visible(fn (EmailCampaign $record) => $record->isEditable())
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash')
+                ->requiresConfirmation(),
         ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            EmailCampaignStatsWidget::class,
+        ];
+    }
+
+    public function getHeaderWidgetsColumns(): int | array
+    {
+        return 4;
     }
 
     protected function getFooterWidgets(): array
