@@ -63,9 +63,13 @@ use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroInvoiceResource;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroItemResource;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroPurchaseOrderResource;
 use VentureDrake\LaravelCrmFilament\Widgets\CampaignPerformanceChart;
+use VentureDrake\LaravelCrmFilament\Widgets\ContactsStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
+use VentureDrake\LaravelCrmFilament\Widgets\DealsPipelineValueChart;
+use VentureDrake\LaravelCrmFilament\Widgets\DealStatusDoughnutChart;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsValueStat;
 use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
+use VentureDrake\LaravelCrmFilament\Widgets\LeadsVsDealsChart;
 use VentureDrake\LaravelCrmFilament\Widgets\MonthlyRevenueChart;
 use VentureDrake\LaravelCrmFilament\Widgets\RecentActivityList;
 use VentureDrake\LaravelCrmFilament\Widgets\TasksDueTodayList;
@@ -390,10 +394,18 @@ class LaravelCrmPlugin implements Plugin
 
         $panel->pages($pages);
 
+        // Widgets are registered here so they are "footer-available" on any
+        // page (e.g. ViewRecord footers). The Dashboard page's getWidgets()
+        // decides which ones actually render on the dashboard, applying its
+        // own per-module gating for that layout.
         $widgets = [
             CrmStatsOverview::class,
             DealsValueStat::class,
+            ContactsStatsOverview::class,
             LeadsByStageChart::class,
+            LeadsVsDealsChart::class,
+            DealsPipelineValueChart::class,
+            DealStatusDoughnutChart::class,
             MonthlyRevenueChart::class,
             TasksDueTodayList::class,
             RecentActivityList::class,
