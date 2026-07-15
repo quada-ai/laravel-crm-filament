@@ -490,6 +490,7 @@ return [
         'back_to_field_groups' => 'Retour aux groupes de champs',
         'back_to_fields' => 'Retour aux champs',
         'back_to_chat_widgets' => 'Retour aux widgets de chat',
+        'back_to_email_campaigns' => 'Retour aux campagnes e-mail',
     ],
 
     'import' => [

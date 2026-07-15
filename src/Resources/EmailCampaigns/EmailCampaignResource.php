@@ -15,6 +15,7 @@ use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Models\EmailCampaignRecipient;
 use VentureDrake\LaravelCrm\Models\EmailTemplate;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\CreateEmailCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\EditEmailCampaign;
@@ -25,6 +26,8 @@ use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\RelationManagers\Re
 
 class EmailCampaignResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = EmailCampaign::class;
 
     protected static ?string $slug = 'email-campaigns';
@@ -38,11 +41,6 @@ class EmailCampaignResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Marketing';
-    }
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
     }
 
     public static function form(Schema $schema): Schema
