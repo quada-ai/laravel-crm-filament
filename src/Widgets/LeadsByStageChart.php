@@ -10,7 +10,7 @@ class LeadsByStageChart extends ChartWidget
 {
     protected ?string $heading = 'Leads by pipeline stage';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 1;
 
     protected function getData(): array
     {

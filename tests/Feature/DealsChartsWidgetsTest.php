@@ -21,7 +21,7 @@ it('DealsPipelineValueChart extends ChartWidget', function () {
 it('DealsPipelineValueChart declares full column span and horizontal bar shape', function () {
     $ref = new ReflectionProperty(DealsPipelineValueChart::class, 'columnSpan');
     $ref->setAccessible(true);
-    expect($ref->getValue(new DealsPipelineValueChart))->toBe('full');
+    expect($ref->getValue(new DealsPipelineValueChart))->toBe(1);
 
     $type = new ReflectionMethod(DealsPipelineValueChart::class, 'getType');
     $type->setAccessible(true);

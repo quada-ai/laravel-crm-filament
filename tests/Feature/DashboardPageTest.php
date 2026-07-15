@@ -40,20 +40,6 @@ function us008WithPanel(array $modules, callable $fn)
     }
 }
 
-/**
- * Normalise Dashboard::getWidgets() output — chart widgets are wrapped in
- * Widget::make(['columnSpan' => 1]) which returns a WidgetConfiguration
- * object. Flatten both shapes to a plain array of class-string values so
- * ->toContain(Class::class) and ->toBe([...]) assertions read cleanly.
- */
-function us008WidgetClasses(array $widgets): array
-{
-    return array_map(
-        fn ($entry) => is_string($entry) ? $entry : $entry->widget,
-        $widgets,
-    );
-}
-
 it('plugin Dashboard page extends the Filament Dashboard base', function () {
     expect(is_subclass_of(Dashboard::class, BaseDashboard::class))->toBeTrue();
 });
@@ -75,7 +61,6 @@ it('returns the full 11-widget layout in AC order when every gated module is ena
         'invoices' => true,
         'email-marketing' => true,
     ], fn () => (new Dashboard)->getWidgets());
-    $widgets = us008WidgetClasses($widgets);
 
     expect($widgets)->toBe([
         CrmStatsOverview::class,
@@ -101,7 +86,6 @@ it('surfaces only the ungated widgets when every module is disabled', function (
         'invoices' => false,
         'email-marketing' => false,
     ], fn () => (new Dashboard)->getWidgets());
-    $widgets = us008WidgetClasses($widgets);
 
     expect($widgets)->toBe([
         ContactsStatsOverview::class,
@@ -119,7 +103,6 @@ it('drops leads-gated widgets when the leads module is disabled', function () {
         'invoices' => true,
         'email-marketing' => true,
     ], fn () => (new Dashboard)->getWidgets());
-    $widgets = us008WidgetClasses($widgets);
 
     expect($widgets)->not->toContain(LeadsByStageChart::class);
     // CrmStatsOverview + LeadsVsDealsChart stay because deals=true satisfies their OR gate.
@@ -136,7 +119,6 @@ it('drops deals-gated widgets when the deals module is disabled', function () {
         'invoices' => true,
         'email-marketing' => true,
     ], fn () => (new Dashboard)->getWidgets());
-    $widgets = us008WidgetClasses($widgets);
 
     expect($widgets)->not->toContain(DealsPipelineValueChart::class);
     expect($widgets)->not->toContain(DealStatusDoughnutChart::class);
@@ -154,7 +136,6 @@ it('drops Revenue Trend when invoices AND orders are both disabled', function ()
         'invoices' => false,
         'email-marketing' => true,
     ], fn () => (new Dashboard)->getWidgets());
-    $widgets = us008WidgetClasses($widgets);
 
     expect($widgets)->not->toContain(MonthlyRevenueChart::class);
 });
@@ -164,14 +145,12 @@ it('surfaces Finance stats when any of quotes/orders/invoices is enabled', funct
     $widgetsQuotes = us008WithPanel([
         'quotes' => true, 'orders' => false, 'invoices' => false,
     ], fn () => (new Dashboard)->getWidgets());
-    $widgetsQuotes = us008WidgetClasses($widgetsQuotes);
     expect($widgetsQuotes)->toContain(DealsValueStat::class);
 
     // Fully disabled — the widget is absent.
     $widgetsNone = us008WithPanel([
         'quotes' => false, 'orders' => false, 'invoices' => false,
     ], fn () => (new Dashboard)->getWidgets());
-    $widgetsNone = us008WidgetClasses($widgetsNone);
     expect($widgetsNone)->not->toContain(DealsValueStat::class);
 });
 
@@ -181,7 +160,6 @@ it('ContactsStatsOverview, TasksDueTodayList and RecentActivityList are always p
         ['leads' => false, 'deals' => false, 'quotes' => false, 'orders' => false, 'invoices' => false, 'email-marketing' => false],
     ] as $modules) {
         $widgets = us008WithPanel($modules, fn () => (new Dashboard)->getWidgets());
-        $widgets = us008WidgetClasses($widgets);
 
         expect($widgets)->toContain(ContactsStatsOverview::class)
             ->toContain(TasksDueTodayList::class)
@@ -194,7 +172,6 @@ it('includes CampaignPerformanceChart last when email-marketing is enabled', fun
         ['email-marketing' => true, 'leads' => true, 'deals' => true],
         fn () => (new Dashboard)->getWidgets()
     );
-    $widgets = us008WidgetClasses($widgets);
 
     expect($widgets)->toContain(CampaignPerformanceChart::class);
     expect(end($widgets))->toBe(CampaignPerformanceChart::class);
@@ -205,7 +182,6 @@ it('omits CampaignPerformanceChart when email-marketing is disabled', function (
         ['email-marketing' => false, 'leads' => true, 'deals' => true],
         fn () => (new Dashboard)->getWidgets()
     );
-    $widgets = us008WidgetClasses($widgets);
 
     expect($widgets)->not->toContain(CampaignPerformanceChart::class);
 });

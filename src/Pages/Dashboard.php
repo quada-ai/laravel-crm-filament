@@ -29,11 +29,6 @@ class Dashboard extends BaseDashboard
      *
      * ContactsStatsOverview, TasksDueTodayList, RecentActivityList are ungated.
      *
-     * Charts land in 2-column rows on the dashboard by overriding columnSpan
-     * to 1 at the WidgetConfiguration level; the widget classes themselves
-     * keep columnSpan='full' so they still render full-width when reused as
-     * footer widgets on other pages (via LaravelCrmPlugin::register()).
-     *
      * @return array<class-string<Widget> | WidgetConfiguration>
      */
     public function getWidgets(): array
@@ -58,25 +53,25 @@ class Dashboard extends BaseDashboard
 
         // Revenue Trend charts paid invoices + orders together.
         if (static::moduleEnabled('invoices') || static::moduleEnabled('orders')) {
-            $widgets[] = MonthlyRevenueChart::make(['columnSpan' => 1]);
+            $widgets[] = MonthlyRevenueChart::class;
         }
 
         // Pipeline Value / Deal Status are deal-only.
         if (static::moduleEnabled('deals')) {
-            $widgets[] = DealsPipelineValueChart::make(['columnSpan' => 1]);
+            $widgets[] = DealsPipelineValueChart::class;
         }
 
         // Leads vs Deals needs at least one of the two modules.
         if (static::moduleEnabled('leads') || static::moduleEnabled('deals')) {
-            $widgets[] = LeadsVsDealsChart::make(['columnSpan' => 1]);
+            $widgets[] = LeadsVsDealsChart::class;
         }
 
         if (static::moduleEnabled('deals')) {
-            $widgets[] = DealStatusDoughnutChart::make(['columnSpan' => 1]);
+            $widgets[] = DealStatusDoughnutChart::class;
         }
 
         if (static::moduleEnabled('leads')) {
-            $widgets[] = LeadsByStageChart::make(['columnSpan' => 1]);
+            $widgets[] = LeadsByStageChart::class;
         }
 
         // Upcoming Tasks + Recent Activity — ungated per AC.
@@ -84,7 +79,7 @@ class Dashboard extends BaseDashboard
         $widgets[] = RecentActivityList::class;
 
         if (static::moduleEnabled('email-marketing')) {
-            $widgets[] = CampaignPerformanceChart::make(['columnSpan' => 1]);
+            $widgets[] = CampaignPerformanceChart::class;
         }
 
         return $widgets;

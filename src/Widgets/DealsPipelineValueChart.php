@@ -8,7 +8,7 @@ use VentureDrake\LaravelCrm\Models\PipelineStage;
 
 class DealsPipelineValueChart extends ChartWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 1;
 
     public function getHeading(): ?string
     {

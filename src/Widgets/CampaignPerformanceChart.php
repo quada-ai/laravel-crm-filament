@@ -9,7 +9,7 @@ class CampaignPerformanceChart extends ChartWidget
 {
     protected ?string $heading = 'Recent campaign performance';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 1;
 
     protected function getData(): array
     {

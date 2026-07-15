@@ -14,7 +14,7 @@ it('extends ChartWidget and uses HasChartRangeFilter', function () {
 it('declares full column span', function () {
     $ref = new ReflectionProperty(MonthlyRevenueChart::class, 'columnSpan');
     $ref->setAccessible(true);
-    expect($ref->getValue(new MonthlyRevenueChart))->toBe('full');
+    expect($ref->getValue(new MonthlyRevenueChart))->toBe(1);
 });
 
 it('returns a line chart type', function () {
