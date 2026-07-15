@@ -23,13 +23,16 @@ it('each dashboard widget extends the expected Filament widget base', function (
     expect(is_subclass_of($widget, $base))->toBeTrue();
 })->with('widgets');
 
-it('table widgets declare a heading static property', function () {
-    foreach ([TasksDueTodayList::class, RecentActivityList::class] as $widget) {
-        $reflection = new ReflectionClass($widget);
-        expect($reflection->getStaticPropertyValue('heading'))
-            ->toBeString()
-            ->not->toBeEmpty();
-    }
+it('table widgets declare a non-empty heading', function () {
+    $recent = new ReflectionClass(RecentActivityList::class);
+    expect($recent->getStaticPropertyValue('heading'))
+        ->toBeString()
+        ->not->toBeEmpty();
+
+    $tasks = new TasksDueTodayList;
+    expect($tasks->getHeading())
+        ->toBe(__('laravel-crm-filament::labels.dashboard.upcoming_tasks'))
+        ->not->toBeEmpty();
 });
 
 it('stats widgets declare a non-empty heading', function () {
