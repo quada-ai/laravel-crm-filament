@@ -4,7 +4,9 @@ namespace VentureDrake\LaravelCrmFilament\Widgets;
 
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Livewire\Livewire;
 use VentureDrake\LaravelCrm\Models\SmsCampaign;
+use VentureDrake\LaravelCrmFilament\Pages\Dashboard;
 
 class SmsCampaignStatsWidget extends StatsOverviewWidget
 {
@@ -49,5 +51,19 @@ class SmsCampaignStatsWidget extends StatsOverviewWidget
             Stat::make(__('laravel-crm-filament::labels.campaign.unsubscribed'), $unsubscribes)
                 ->description($campaign ? $campaign->unsubscribeRate() . '% ' . __('laravel-crm-filament::labels.campaign.unsubscribe_rate') : '—'),
         ];
+    }
+
+    public static function canView(): bool
+    {
+        // Hidden from the plugin Dashboard — matches core /crm/dashboard
+        // which doesn't surface campaign performance/stats widgets. Still
+        // usable as a getHeaderWidgets() entry on ViewEmailCampaign /
+        // ViewSmsCampaign show pages (the check is scoped to Dashboard).
+        $component = Livewire::current();
+        if ($component instanceof Dashboard) {
+            return false;
+        }
+
+        return true;
     }
 }
