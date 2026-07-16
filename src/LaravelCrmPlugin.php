@@ -347,10 +347,8 @@ class LaravelCrmPlugin implements Plugin
 
         // Branding overrides: prefer plugin setters, fall back to laravel-crm settings.
         $settings = app()->bound('laravel-crm.settings') ? app('laravel-crm.settings') : null;
-        $brandName = $this->brand ?? ($settings?->get('organization_name'));
-        if ($brandName) {
-            $panel->brandName($brandName);
-        }
+        $brandName = $this->brand ?? ($settings?->get('organization_name')) ?? 'Laravel Filament CRM';
+        $panel->brandName($brandName);
         $logo = $this->brandLogo ?? ($settings?->get('logo_file'));
         if ($logo) {
             $panel->brandLogo($logo);
