@@ -77,6 +77,7 @@ class EmailCampaignResource extends Resource
         return $schema->components([
             Section::make('Details')->heading(__('laravel-crm-filament::labels.sections.details'))
                 ->key('campaign_details')
+                ->columnSpanFull()
                 ->columns(2)
                 ->schema([
                     TextEntry::make('name')
