@@ -36,6 +36,19 @@ class UserResource extends Resource
 
     protected static ?int $navigationSort = 50;
 
+    public static function getNavigationBadge(): ?string
+    {
+        $model = static::getModel();
+        $count = $model::query()->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'gray';
+    }
+
     public static function getModel(): string
     {
         // Defer to host's configured user model so this works even when

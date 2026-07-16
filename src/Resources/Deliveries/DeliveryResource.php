@@ -62,6 +62,18 @@ class DeliveryResource extends Resource
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
     }
 
+    public static function getNavigationBadge(): ?string
+    {
+        $count = Delivery::query()->whereNull('delivered_on')->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function form(Schema $schema): Schema
     {
         $components = [
