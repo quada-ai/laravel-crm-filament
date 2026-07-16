@@ -112,26 +112,14 @@ it('exposes the CampaignPerformanceChart as a ChartWidget subclass', function ()
     expect(is_subclass_of(CampaignPerformanceChart::class, ChartWidget::class))->toBeTrue();
 });
 
-it('registers CampaignPerformanceChart on the plugin panel when email marketing is enabled', function () {
-    $plugin = LaravelCrmPlugin::make()
-        ->modules(['email-marketing' => true]);
+it('never registers CampaignPerformanceChart on the plugin panel — it was removed from the Dashboard to match core /crm/dashboard, and staying unregistered guarantees Filament::getWidgets() can never surface it there', function () {
+    foreach ([true, false] as $emailMarketing) {
+        $plugin = LaravelCrmPlugin::make()->modules(['email-marketing' => $emailMarketing]);
+        $panel = Panel::make()->id('test-panel-' . uniqid());
+        $plugin->register($panel);
 
-    $panel = Panel::make()->id('test-panel-' . uniqid());
-    $plugin->register($panel);
-
-    $widgets = $panel->getWidgets();
-    expect($widgets)->toContain(CampaignPerformanceChart::class);
-});
-
-it('does not register CampaignPerformanceChart when email marketing is disabled', function () {
-    $plugin = LaravelCrmPlugin::make()
-        ->modules(['email-marketing' => false]);
-
-    $panel = Panel::make()->id('test-panel-disabled-' . uniqid());
-    $plugin->register($panel);
-
-    $widgets = $panel->getWidgets();
-    expect($widgets)->not->toContain(CampaignPerformanceChart::class);
+        expect($panel->getWidgets())->not->toContain(CampaignPerformanceChart::class);
+    }
 });
 
 it('exposes both sends-over-time widgets as ChartWidget subclasses', function () {
