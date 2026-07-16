@@ -3,9 +3,7 @@
 namespace VentureDrake\LaravelCrmFilament\Widgets;
 
 use Filament\Widgets\ChartWidget;
-use Livewire\Livewire;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
-use VentureDrake\LaravelCrmFilament\Pages\Dashboard;
 
 class CampaignPerformanceChart extends ChartWidget
 {
@@ -43,19 +41,5 @@ class CampaignPerformanceChart extends ChartWidget
     protected function getType(): string
     {
         return 'bar';
-    }
-
-    public static function canView(): bool
-    {
-        // Hidden from the plugin Dashboard — matches core /crm/dashboard
-        // which doesn't surface campaign performance/stats widgets. Still
-        // usable as a getHeaderWidgets() entry on ViewEmailCampaign /
-        // ViewSmsCampaign show pages (the check is scoped to Dashboard).
-        $component = Livewire::current();
-        if ($component instanceof Dashboard) {
-            return false;
-        }
-
-        return true;
     }
 }

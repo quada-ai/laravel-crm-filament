@@ -115,30 +115,10 @@ it('lives under the VentureDrake\\LaravelCrmFilament\\Widgets namespace', functi
     expect($ref->getNamespaceName())->toBe('VentureDrake\\LaravelCrmFilament\\Widgets');
 });
 
-it('is registered unconditionally in LaravelCrmPlugin::register() alongside existing email-campaign widgets', function () {
-    $source = file_get_contents((new ReflectionClass(LaravelCrmPlugin::class))->getFileName());
+it('is NOT registered on the panel — referenced directly by ViewEmailCampaign::getHeaderWidgets() so it never surfaces on the Dashboard via Filament::getWidgets()', function () {
+    $plugin = LaravelCrmPlugin::make();
+    $panel = \Filament\Panel::make()->id('email-stats-not-registered-' . uniqid());
+    $plugin->register($panel);
 
-    // Import present
-    expect($source)->toContain('use VentureDrake\\LaravelCrmFilament\\Widgets\\EmailCampaignStatsWidget;');
-
-    // Registration present in $widgets array
-    expect($source)->toContain('$widgets[] = EmailCampaignStatsWidget::class;');
-
-    // Not gated behind a module isModuleEnabled(...) check: locate the
-    // registration and verify no `isModuleEnabled` string is on the
-    // preceding line.
-    $registration = '$widgets[] = EmailCampaignStatsWidget::class;';
-    $regPos = strpos($source, $registration);
-    expect($regPos)->not->toBeFalse();
-
-    // Walk back up to the previous open-brace line and check no
-    // `isModuleEnabled` clause wraps this widget registration.
-    $before = substr($source, 0, $regPos);
-    $lastConditional = strrpos($before, "if (\$this->isModuleEnabled('email-marketing'))");
-    if ($lastConditional !== false) {
-        // Ensure the last email-marketing conditional's closing brace
-        // came BEFORE our registration (i.e., we're outside the block).
-        $braceAfterConditional = strpos($before, "        }\n", $lastConditional);
-        expect($braceAfterConditional)->not->toBeFalse();
-    }
+    expect($panel->getWidgets())->not->toContain(EmailCampaignStatsWidget::class);
 });

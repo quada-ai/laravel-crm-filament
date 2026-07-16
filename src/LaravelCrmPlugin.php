@@ -62,18 +62,15 @@ use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroContactResource;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroInvoiceResource;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroItemResource;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\XeroPurchaseOrderResource;
-use VentureDrake\LaravelCrmFilament\Widgets\CampaignPerformanceChart;
 use VentureDrake\LaravelCrmFilament\Widgets\ContactsStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsPipelineValueChart;
 use VentureDrake\LaravelCrmFilament\Widgets\DealStatusDoughnutChart;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsValueStat;
-use VentureDrake\LaravelCrmFilament\Widgets\EmailCampaignStatsWidget;
 use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
 use VentureDrake\LaravelCrmFilament\Widgets\LeadsVsDealsChart;
 use VentureDrake\LaravelCrmFilament\Widgets\MonthlyRevenueChart;
 use VentureDrake\LaravelCrmFilament\Widgets\RecentActivityList;
-use VentureDrake\LaravelCrmFilament\Widgets\SmsCampaignStatsWidget;
 use VentureDrake\LaravelCrmFilament\Widgets\TasksDueTodayList;
 
 class LaravelCrmPlugin implements Plugin
@@ -412,15 +409,6 @@ class LaravelCrmPlugin implements Plugin
             TasksDueTodayList::class,
             RecentActivityList::class,
         ];
-
-        if ($this->isModuleEnabled('email-marketing')) {
-            $widgets[] = CampaignPerformanceChart::class;
-        }
-
-        // Registered unconditionally so it's footer-available on the EmailCampaign
-        // show page regardless of the email-marketing module toggle.
-        $widgets[] = EmailCampaignStatsWidget::class;
-        $widgets[] = SmsCampaignStatsWidget::class;
 
         $panel->widgets($widgets);
     }
