@@ -64,7 +64,10 @@ class EmailCampaignResource extends Resource
                     }),
             ]),
             Forms\Components\TextInput::make('subject')->maxLength(255)->columnSpanFull(),
-            Forms\Components\TextInput::make('preview_text')->maxLength(255)->columnSpanFull(),
+            Forms\Components\TextInput::make('preview_text')
+                ->maxLength(255)
+                ->helperText('Appears after the subject line in the inbox.')
+                ->columnSpanFull(),
             Forms\Components\RichEditor::make('body')->required()->columnSpanFull(),
             Forms\Components\DateTimePicker::make('scheduled_at')
                 ->label(__('laravel-crm-filament::labels.campaign.schedule_for'))
