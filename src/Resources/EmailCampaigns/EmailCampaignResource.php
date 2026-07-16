@@ -218,17 +218,17 @@ class EmailCampaignResource extends Resource
 
         $hint = 'Click to copy. Insert into the subject or body and they will be replaced when the email is sent.';
 
-        $out = '<div class="text-xs text-gray-600 dark:text-gray-400 mb-3">' . e($hint) . '</div>';
-        $out .= '<div class="flex flex-col gap-2">';
+        $out = '<div style="font-size:0.75rem;color:#6b7280;margin-bottom:0.75rem;">' . e($hint) . '</div>';
+        $out .= '<div style="display:flex;flex-direction:column;gap:0.5rem;">';
         foreach ($tokens as $key => $description) {
             $token = '{' . $key . '}';
             $out .= '<button type="button" '
                 . 'x-data="{ copied: false }" '
                 . 'x-on:click="navigator.clipboard.writeText(\'' . e($token) . '\').then(() => { copied = true; setTimeout(() => copied = false, 1500); })" '
                 . 'title="' . e($description) . '" '
-                . 'class="inline-flex items-center justify-start px-2 py-1 rounded font-mono text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 text-left">'
+                . 'style="display:block;width:100%;text-align:left;padding:0.25rem 0.5rem;border-radius:0.25rem;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:0.75rem;background:#f3f4f6;color:#1f2937;border:1px solid #e5e7eb;cursor:pointer;">'
                 . '<span x-show="!copied">' . e($token) . '</span>'
-                . '<span x-show="copied" x-cloak class="text-primary-600">' . e($token) . ' \u{2713}</span>'
+                . '<span x-show="copied" x-cloak style="color:#05b3a9;">' . e($token) . ' &#10003;</span>'
                 . '</button>';
         }
         $out .= '</div>';
