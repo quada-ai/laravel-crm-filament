@@ -12,11 +12,13 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\SmsCampaign;
 use VentureDrake\LaravelCrm\Models\SmsCampaignRecipient;
 use VentureDrake\LaravelCrm\Models\SmsTemplate;
 use VentureDrake\LaravelCrm\Services\ClickSendService;
 use VentureDrake\LaravelCrm\Sms\SmsCampaignMessage;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\CreateSmsCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\EditSmsCampaign;
@@ -27,6 +29,8 @@ use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\RelationManagers\Reci
 
 class SmsCampaignResource extends Resource
 {
+    use UsesExternalIdRouting;
+
     protected static ?string $model = SmsCampaign::class;
 
     protected static ?string $slug = 'sms-campaigns';
@@ -40,11 +44,6 @@ class SmsCampaignResource extends Resource
     public static function getNavigationGroup(): ?string
     {
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Marketing';
-    }
-
-    public static function getRecordRouteKeyName(): ?string
-    {
-        return 'external_id';
     }
 
     public static function form(Schema $schema): Schema
@@ -124,7 +123,21 @@ class SmsCampaignResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('campaign_id')
+                    ->label(__('laravel-crm-filament::labels.fields.number'))
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->sortable()
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query
+                            ->where('name', 'like', "%{$search}%")
+                            ->orWhere('body', 'like', "%{$search}%")
+                            ->orWhere('campaign_id', 'like', "%{$search}%");
+                    }),
+                Tables\Columns\TextColumn::make('from')
+                    ->label(__('laravel-crm-filament::labels.campaign.from'))
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -136,11 +149,18 @@ class SmsCampaignResource extends Resource
                         'failed' => 'danger',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('total_recipients')->label(__('laravel-crm-filament::labels.campaign.recipients'))->numeric()->toggleable(),
-                Tables\Columns\TextColumn::make('delivered_count')->label(__('laravel-crm-filament::labels.money.delivered'))->numeric()->toggleable(),
-                Tables\Columns\TextColumn::make('failed_count')->label(__('laravel-crm-filament::labels.campaign.failed'))->numeric()->toggleable(),
-                Tables\Columns\TextColumn::make('scheduled_at')->dateTime()->toggleable(),
-                Tables\Columns\TextColumn::make('sent_at')->dateTime()->toggleable(),
+                Tables\Columns\TextColumn::make('total_recipients')
+                    ->label(__('laravel-crm-filament::labels.campaign.recipients'))
+                    ->numeric()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('scheduled_at')
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('sent_at')
+                    ->since()
+                    ->sortable()
+                    ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -155,12 +175,9 @@ class SmsCampaignResource extends Resource
                     ]),
             ])
             ->recordActions([
-                Actions\ViewAction::make()
-                    ->button()
-                    ->hiddenLabel(),
-                Actions\EditAction::make()->visible(fn ($record) => $record->isEditable())
-                    ->button()
-                    ->hiddenLabel(),
+                Actions\ViewAction::make()->button()->hiddenLabel(),
+                Actions\EditAction::make()->visible(fn ($record) => $record->isEditable())->button()->hiddenLabel(),
+                Actions\DeleteAction::make()->button()->hiddenLabel()->requiresConfirmation(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([Actions\DeleteBulkAction::make()]),
@@ -173,6 +190,15 @@ class SmsCampaignResource extends Resource
             RecipientsRelationManager::class,
             ClicksRelationManager::class,
         ];
+    }
+
+    public static function backToIndexAction(): Actions\Action
+    {
+        return Actions\Action::make('backToIndex')
+            ->label(__('laravel-crm-filament::labels.actions.back_to_sms_campaigns'))
+            ->icon('heroicon-o-arrow-left')
+            ->color('gray')
+            ->url(static::getUrl('index'));
     }
 
     public static function getPages(): array
