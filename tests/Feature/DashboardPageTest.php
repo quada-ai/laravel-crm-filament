@@ -52,7 +52,7 @@ it('registers the plugin Dashboard page on a fresh panel', function () {
     expect($panel->getPages())->toContain(Dashboard::class);
 });
 
-it('returns the full 11-widget layout in AC order when every gated module is enabled', function () {
+it('returns the 9-widget layout matching the core /crm/dashboard when every gated module is enabled', function () {
     $widgets = us008WithPanel([
         'leads' => true,
         'deals' => true,
@@ -62,6 +62,8 @@ it('returns the full 11-widget layout in AC order when every gated module is ena
         'email-marketing' => true,
     ], fn () => (new Dashboard)->getWidgets());
 
+    // Matches core `laravel-crm` /crm/dashboard 1:1. LeadsByStageChart +
+    // CampaignPerformanceChart are intentionally omitted — not in core.
     expect($widgets)->toBe([
         CrmStatsOverview::class,
         DealsValueStat::class,
@@ -70,11 +72,11 @@ it('returns the full 11-widget layout in AC order when every gated module is ena
         DealsPipelineValueChart::class,
         LeadsVsDealsChart::class,
         DealStatusDoughnutChart::class,
-        LeadsByStageChart::class,
         TasksDueTodayList::class,
         RecentActivityList::class,
-        CampaignPerformanceChart::class,
-    ]);
+    ])
+        ->and($widgets)->not->toContain(LeadsByStageChart::class)
+        ->and($widgets)->not->toContain(CampaignPerformanceChart::class);
 });
 
 it('surfaces only the ungated widgets when every module is disabled', function () {
@@ -104,6 +106,7 @@ it('drops leads-gated widgets when the leads module is disabled', function () {
         'email-marketing' => true,
     ], fn () => (new Dashboard)->getWidgets());
 
+    // LeadsByStageChart is now unconditionally absent — dropped to match core /crm/dashboard.
     expect($widgets)->not->toContain(LeadsByStageChart::class);
     // CrmStatsOverview + LeadsVsDealsChart stay because deals=true satisfies their OR gate.
     expect($widgets)->toContain(CrmStatsOverview::class);
@@ -167,23 +170,20 @@ it('ContactsStatsOverview, TasksDueTodayList and RecentActivityList are always p
     }
 });
 
-it('includes CampaignPerformanceChart last when email-marketing is enabled', function () {
-    $widgets = us008WithPanel(
+it('omits CampaignPerformanceChart unconditionally (not part of core /crm/dashboard)', function () {
+    // Enabled email-marketing must NOT surface the chart.
+    $widgetsEnabled = us008WithPanel(
         ['email-marketing' => true, 'leads' => true, 'deals' => true],
         fn () => (new Dashboard)->getWidgets()
     );
+    expect($widgetsEnabled)->not->toContain(CampaignPerformanceChart::class);
 
-    expect($widgets)->toContain(CampaignPerformanceChart::class);
-    expect(end($widgets))->toBe(CampaignPerformanceChart::class);
-});
-
-it('omits CampaignPerformanceChart when email-marketing is disabled', function () {
-    $widgets = us008WithPanel(
+    // Disabled email-marketing likewise absent — regression guard.
+    $widgetsDisabled = us008WithPanel(
         ['email-marketing' => false, 'leads' => true, 'deals' => true],
         fn () => (new Dashboard)->getWidgets()
     );
-
-    expect($widgets)->not->toContain(CampaignPerformanceChart::class);
+    expect($widgetsDisabled)->not->toContain(CampaignPerformanceChart::class);
 });
 
 it('LaravelCrmPlugin::register() adds the four new widget FQCNs to the panel widget list', function () {

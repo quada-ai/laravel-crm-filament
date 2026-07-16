@@ -50,6 +50,18 @@ class ProductResource extends Resource
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Catalog';
     }
 
+    public static function getNavigationBadge(): ?string
+    {
+        $count = Product::query()->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'gray';
+    }
+
     public static function form(Schema $schema): Schema
     {
         $components = [

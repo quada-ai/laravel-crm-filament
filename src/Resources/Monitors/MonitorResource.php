@@ -45,6 +45,18 @@ class MonitorResource extends Resource
         return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Monitoring';
     }
 
+    public static function getNavigationBadge(): ?string
+    {
+        $count = Monitor::query()->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'primary';
+    }
+
     public static function isEnabled(): bool
     {
         return LaravelCrmPlugin::get()->isModuleEnabled('monitoring');

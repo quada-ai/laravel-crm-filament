@@ -50,9 +50,10 @@ function parityGatingWithPanel(array $modules, callable $fn)
 // the standalone tests below.
 
 dataset('parity_module_gates', [
-    'leads' => ['leads', [LeadsByStageChart::class]],
+    // Only 'deals' remains as a strictly-single-module-gated dashboard entry.
+    // LeadsByStageChart + CampaignPerformanceChart were removed to match core /crm/dashboard
+    // (regression guards below assert they stay absent regardless of module state).
     'deals' => ['deals', [DealsPipelineValueChart::class, DealStatusDoughnutChart::class]],
-    'email-marketing' => ['email-marketing', [CampaignPerformanceChart::class]],
 ]);
 
 // ----------------------------------------------------------------------------
@@ -90,6 +91,30 @@ it('gated widgets are present in Dashboard::getWidgets() when the module is enab
         expect($widgets)->toContain($widgetClass);
     }
 })->with('parity_module_gates');
+
+// ----------------------------------------------------------------------------
+// Regression guards — widgets removed to match core /crm/dashboard.
+// ----------------------------------------------------------------------------
+
+it('LeadsByStageChart is never present on the Dashboard (removed to match core /crm/dashboard)', function () {
+    foreach ([
+        ['leads' => true, 'deals' => true, 'quotes' => true, 'orders' => true, 'invoices' => true, 'email-marketing' => true],
+        ['leads' => false, 'deals' => false, 'quotes' => false, 'orders' => false, 'invoices' => false, 'email-marketing' => false],
+    ] as $modules) {
+        $widgets = parityGatingWithPanel($modules, fn () => (new Dashboard)->getWidgets());
+        expect($widgets)->not->toContain(LeadsByStageChart::class);
+    }
+});
+
+it('CampaignPerformanceChart is never present on the Dashboard (removed to match core /crm/dashboard)', function () {
+    foreach ([
+        ['leads' => true, 'deals' => true, 'quotes' => true, 'orders' => true, 'invoices' => true, 'email-marketing' => true],
+        ['leads' => false, 'deals' => false, 'quotes' => false, 'orders' => false, 'invoices' => false, 'email-marketing' => false],
+    ] as $modules) {
+        $widgets = parityGatingWithPanel($modules, fn () => (new Dashboard)->getWidgets());
+        expect($widgets)->not->toContain(CampaignPerformanceChart::class);
+    }
+});
 
 // ----------------------------------------------------------------------------
 // OR-gated widgets: assert both halves of the OR gate matter.

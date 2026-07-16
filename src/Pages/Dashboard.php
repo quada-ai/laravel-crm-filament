@@ -7,13 +7,11 @@ use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Widgets\Widget;
 use Filament\Widgets\WidgetConfiguration;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
-use VentureDrake\LaravelCrmFilament\Widgets\CampaignPerformanceChart;
 use VentureDrake\LaravelCrmFilament\Widgets\ContactsStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\CrmStatsOverview;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsPipelineValueChart;
 use VentureDrake\LaravelCrmFilament\Widgets\DealStatusDoughnutChart;
 use VentureDrake\LaravelCrmFilament\Widgets\DealsValueStat;
-use VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart;
 use VentureDrake\LaravelCrmFilament\Widgets\LeadsVsDealsChart;
 use VentureDrake\LaravelCrmFilament\Widgets\MonthlyRevenueChart;
 use VentureDrake\LaravelCrmFilament\Widgets\RecentActivityList;
@@ -22,10 +20,14 @@ use VentureDrake\LaravelCrmFilament\Widgets\TasksDueTodayList;
 class Dashboard extends BaseDashboard
 {
     /**
-     * Layout order per plan:
+     * Layout mirrors the core `laravel-crm` package's /crm/dashboard exactly:
      *   Sales stats → Finance stats → Contacts stat → Revenue Trend →
-     *   Pipeline Value → Leads vs Deals → Deal Status → Leads by Stage →
-     *   Upcoming Tasks → Recent Activity → Campaign Performance.
+     *   Pipeline Value → Leads vs Deals → Deal Status →
+     *   Upcoming Tasks → Recent Activity.
+     *
+     * Widgets not present in core (LeadsByStageChart, CampaignPerformanceChart)
+     * are intentionally omitted so the Filament dashboard stays feature-parity with
+     * the Livewire dashboard.
      *
      * ContactsStatsOverview, TasksDueTodayList, RecentActivityList are ungated.
      *
@@ -70,17 +72,9 @@ class Dashboard extends BaseDashboard
             $widgets[] = DealStatusDoughnutChart::class;
         }
 
-        if (static::moduleEnabled('leads')) {
-            $widgets[] = LeadsByStageChart::class;
-        }
-
         // Upcoming Tasks + Recent Activity — ungated per AC.
         $widgets[] = TasksDueTodayList::class;
         $widgets[] = RecentActivityList::class;
-
-        if (static::moduleEnabled('email-marketing')) {
-            $widgets[] = CampaignPerformanceChart::class;
-        }
 
         return $widgets;
     }
