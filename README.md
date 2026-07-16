@@ -1,5 +1,9 @@
 # Laravel CRM — Filament Panel Plugin
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/venturedrake/laravel-crm-filament.svg?style=flat-square)](https://packagist.org/packages/venturedrake/laravel-crm-filament)
+[![Total Downloads](https://img.shields.io/packagist/dt/venturedrake/laravel-crm-filament.svg?style=flat-square)](https://packagist.org/packages/venturedrake/laravel-crm-filament)
+[![License](https://img.shields.io/packagist/l/venturedrake/laravel-crm-filament.svg?style=flat-square)](LICENSE.md)
+
 A native Filament v5 panel plugin for [`venturedrake/laravel-crm`](https://github.com/venturedrake/laravel-crm). Wraps the existing CRM domain layer (models, services, observers, policies, encryption, audit) in Filament Resources, Clusters, Pages, and Widgets so the same database can be administered via Filament alongside (or instead of) the legacy `/crm` MaryUI/Livewire interface.
 
 ## Requirements
@@ -250,7 +254,21 @@ Nothing about the Filament panel disables the Livewire UI; if you want to run on
 ./vendor/bin/pest --no-coverage
 ```
 
-The Pest test suite covers routing, model binding, cluster wiring, RelationManager attachment, custom-fields trait integration, plugin module gating, branding setters, role protection, localization key parity, and structural assertions for every phase's resources/actions/widgets. As of v1.0a the suite is 227 tests.
+The Pest test suite covers routing, model binding, cluster wiring, RelationManager attachment, custom-fields trait integration, plugin module gating, branding setters, role protection, localization key parity, and structural assertions for every phase's resources/actions/widgets. As of v1.0.0 the suite is 227 tests.
+
+## Contributing
+
+Pull requests are welcome. Before opening a PR, please make sure the test suite and code style checks pass locally:
+
+```bash
+./vendor/bin/pest --no-coverage
+./vendor/bin/pint
+```
+
+## Support
+
+- Bug reports and feature requests: <https://github.com/venturedrake/laravel-crm-filament/issues>
+- Core CRM package (models, services, migrations): <https://github.com/venturedrake/laravel-crm>
 
 ## License
 
