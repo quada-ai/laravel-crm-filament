@@ -82,9 +82,36 @@ class EmailCampaignResource extends Resource
                         ->columnSpan(['default' => 1, 'lg' => 1])
                         ->content(new HtmlString(static::placeholdersPanelHtml())),
                 ]),
-            Forms\Components\DateTimePicker::make('scheduled_at')
-                ->label(__('laravel-crm-filament::labels.campaign.schedule_for'))
-                ->helperText('Leave blank to keep as draft; use the Schedule action after saving.'),
+            Section::make('Send')
+                ->heading('Send')
+                ->columns(2)
+                ->columnSpanFull()
+                ->schema([
+                    Forms\Components\Radio::make('send_mode')
+                        ->label('Send')
+                        ->options([
+                            'send_now' => 'Send now',
+                            'schedule_send' => 'Schedule send',
+                        ])
+                        ->default('send_now')
+                        ->dehydrated(false)
+                        ->live()
+                        ->afterStateHydrated(function (Forms\Components\Radio $component, $state, ?EmailCampaign $record): void {
+                            if ($state !== null) {
+                                return;
+                            }
+                            $component->state($record && $record->scheduled_at ? 'schedule_send' : 'send_now');
+                        })
+                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                            if ($state === 'send_now') {
+                                $set('scheduled_at', null);
+                            }
+                        }),
+                    Forms\Components\DateTimePicker::make('scheduled_at')
+                        ->label(__('laravel-crm-filament::labels.campaign.schedule_for'))
+                        ->visible(fn (Forms\Get $get): bool => $get('send_mode') === 'schedule_send')
+                        ->required(fn (Forms\Get $get): bool => $get('send_mode') === 'schedule_send'),
+                ]),
         ]);
     }
 
