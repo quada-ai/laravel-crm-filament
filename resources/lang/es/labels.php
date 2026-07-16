@@ -287,6 +287,7 @@ return [
 
     'campaign' => [
         'recipients' => 'Destinatarios',
+        'delivered' => 'Entregados',
         'send_at' => 'Enviar el',
         'sent' => 'Enviado',
         'failed' => 'Fallido',
@@ -491,6 +492,7 @@ return [
         'back_to_fields' => 'Volver a campos',
         'back_to_chat_widgets' => 'Volver a widgets de chat',
         'back_to_email_campaigns' => 'Volver a campañas de correo',
+        'back_to_sms_campaigns' => 'Volver a campañas SMS',
     ],
 
     'import' => [

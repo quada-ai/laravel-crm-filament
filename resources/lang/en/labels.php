@@ -292,6 +292,7 @@ return [
     // Campaigns / messaging
     'campaign' => [
         'recipients' => 'Recipients',
+        'delivered' => 'Delivered',
         'send_at' => 'Send at',
         'sent' => 'Sent',
         'failed' => 'Failed',
@@ -541,6 +542,7 @@ return [
         'back_to_fields' => 'Back to fields',
         'back_to_chat_widgets' => 'Back to chat widgets',
         'back_to_email_campaigns' => 'Back to email campaigns',
+        'back_to_sms_campaigns' => 'Back to SMS campaigns',
     ],
 
     // CSV import
