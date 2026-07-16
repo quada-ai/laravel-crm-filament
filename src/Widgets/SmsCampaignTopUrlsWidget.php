@@ -39,6 +39,11 @@ class SmsCampaignTopUrlsWidget extends TableWidget
                     ->sortable(),
             ])
             ->defaultSort('clicks_count', 'desc')
+            // The aggregated query groups by original_url; Filament's default
+            // secondary sort on the model primary key (id) breaks under MySQL's
+            // only_full_group_by mode. Disable it here — clicks_count desc is
+            // already deterministic for our purposes.
+            ->defaultKeySort(false)
             ->paginated([5, 10, 25])
             ->emptyStateHeading('No URL clicks yet');
     }
