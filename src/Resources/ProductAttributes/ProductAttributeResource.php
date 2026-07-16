@@ -9,6 +9,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Schema as DbSchema;
 use VentureDrake\LaravelCrm\Models\ProductAttribute;
 use VentureDrake\LaravelCrmFilament\Resources\ProductAttributes\Pages\CreateProductAttribute;
 use VentureDrake\LaravelCrmFilament\Resources\ProductAttributes\Pages\EditProductAttribute;
@@ -70,5 +71,18 @@ class ProductAttributeResource extends Resource
             'create' => CreateProductAttribute::route('/create'),
             'edit' => EditProductAttribute::route('/{record}/edit'),
         ];
+    }
+
+    public static function canGloballySearch(): bool
+    {
+        // Core `laravel-crm` doesn't ship a `crm_product_attributes` migration;
+        // if the host hasn't created the table, Filament's global search would
+        // otherwise 500 on a POST to /livewire when searching. Return false
+        // when the table is missing so this resource is silently skipped.
+        if (! DbSchema::hasTable((string) config('laravel-crm.db_table_prefix', 'crm_') . 'product_attributes')) {
+            return false;
+        }
+
+        return parent::canGloballySearch();
     }
 }
