@@ -8,11 +8,13 @@ use Filament\Forms;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Models\EmailTemplate;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
@@ -68,7 +70,18 @@ class EmailCampaignResource extends Resource
                 ->maxLength(255)
                 ->helperText('Appears after the subject line in the inbox.')
                 ->columnSpanFull(),
-            Forms\Components\RichEditor::make('body')->required()->columnSpanFull(),
+            Grid::make(['default' => 1, 'lg' => 4])
+                ->columnSpanFull()
+                ->schema([
+                    Forms\Components\RichEditor::make('body')
+                        ->required()
+                        ->columnSpan(['default' => 1, 'lg' => 3])
+                        ->extraInputAttributes(['style' => 'min-height: 480px']),
+                    Placeholder::make('available_placeholders')
+                        ->label('Available placeholders')
+                        ->columnSpan(['default' => 1, 'lg' => 1])
+                        ->content(new HtmlString(static::placeholdersPanelHtml())),
+                ]),
             Forms\Components\DateTimePicker::make('scheduled_at')
                 ->label(__('laravel-crm-filament::labels.campaign.schedule_for'))
                 ->helperText('Leave blank to keep as draft; use the Schedule action after saving.'),
@@ -191,6 +204,36 @@ class EmailCampaignResource extends Resource
             RecipientsRelationManager::class,
             ClicksRelationManager::class,
         ];
+    }
+
+    protected static function placeholdersPanelHtml(): string
+    {
+        $tokens = [
+            'first_name' => 'Recipient first name',
+            'last_name' => 'Recipient last name',
+            'full_name' => 'Recipient full name',
+            'email' => 'Recipient email address',
+            'company_name' => 'Your company name',
+        ];
+
+        $hint = 'Click to copy. Insert into the subject or body and they will be replaced when the email is sent.';
+
+        $out = '<div class="text-xs text-gray-600 dark:text-gray-400 mb-3">' . e($hint) . '</div>';
+        $out .= '<div class="flex flex-col gap-2">';
+        foreach ($tokens as $key => $description) {
+            $token = '{' . $key . '}';
+            $out .= '<button type="button" '
+                . 'x-data="{ copied: false }" '
+                . 'x-on:click="navigator.clipboard.writeText(\'' . e($token) . '\').then(() => { copied = true; setTimeout(() => copied = false, 1500); })" '
+                . 'title="' . e($description) . '" '
+                . 'class="inline-flex items-center justify-start px-2 py-1 rounded font-mono text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 text-left">'
+                . '<span x-show="!copied">' . e($token) . '</span>'
+                . '<span x-show="copied" x-cloak class="text-primary-600">' . e($token) . ' \u{2713}</span>'
+                . '</button>';
+        }
+        $out .= '</div>';
+
+        return $out;
     }
 
     public static function backToIndexAction(): Actions\Action
