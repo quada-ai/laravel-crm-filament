@@ -13,6 +13,7 @@ use VentureDrake\LaravelCrm\Sms\SmsCampaignMessage;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\Concerns\HasSmsCampaignSendNowAction;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 use VentureDrake\LaravelCrmFilament\Widgets\SmsCampaignSendsOverTimeChart;
+use VentureDrake\LaravelCrmFilament\Widgets\SmsCampaignStatsWidget;
 use VentureDrake\LaravelCrmFilament\Widgets\SmsCampaignTopUrlsWidget;
 
 class ViewSmsCampaign extends ViewRecord
@@ -24,11 +25,7 @@ class ViewSmsCampaign extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()
-                ->visible(fn (SmsCampaign $record) => $record->isEditable())
-                ->button()
-                ->hiddenLabel()
-                ->icon('heroicon-m-pencil-square'),
+            SmsCampaignResource::backToIndexAction(),
             Actions\Action::make('preview')
                 ->label(__('laravel-crm-filament::labels.actions.preview'))
                 ->icon('heroicon-o-eye')
@@ -70,7 +67,29 @@ class ViewSmsCampaign extends ViewRecord
                     app(SmsCampaignService::class)->cancel($record);
                     Notification::make()->title('Campaign cancelled')->success()->send();
                 }),
+            Actions\EditAction::make()
+                ->visible(fn (SmsCampaign $record) => $record->isEditable())
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-pencil-square'),
+            Actions\DeleteAction::make()
+                ->button()
+                ->hiddenLabel()
+                ->icon('heroicon-m-trash')
+                ->requiresConfirmation(),
         ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            SmsCampaignStatsWidget::class,
+        ];
+    }
+
+    public function getHeaderWidgetsColumns(): int | array
+    {
+        return 4;
     }
 
     protected function getFooterWidgets(): array

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\SmsCampaign;
 use VentureDrake\LaravelCrm\Services\SmsCampaignService;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
+use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
 class EditSmsCampaign extends EditRecord
 {
@@ -16,6 +17,7 @@ class EditSmsCampaign extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            SmsCampaignResource::backToIndexAction(),
             Actions\ViewAction::make()
                 ->button()
                 ->hiddenLabel()
@@ -30,7 +32,7 @@ class EditSmsCampaign extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var SmsCampaign $record */
-        app(SmsCampaignService::class)->update($data, $record);
+        app(SmsCampaignService::class)->update(FormPayload::wrap($data)->toArray(), $record);
 
         return $record->refresh();
     }
