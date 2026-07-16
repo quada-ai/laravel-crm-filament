@@ -70,7 +70,7 @@ it('content() root component is a Grid with default=1, lg=2 columns and two Sect
     expect($childList)->toHaveCount(2);
     expect($childList[0])->toBeInstanceOf(Section::class);
     expect($childList[0]->getColumnSpan())->toBe(['lg' => 1]);
-    expect($childList[1])->toBeInstanceOf(Section::class);
+    expect($childList[1])->toBeInstanceOf(Livewire::class);
     expect($childList[1]->getColumnSpan())->toBe(['lg' => 1]);
 });
 
@@ -128,20 +128,14 @@ it('right Section embeds ProductCategoryProductsRelationManager via Livewire::ma
     $ref = new ReflectionProperty(Grid::class, 'childComponents');
     $ref->setAccessible(true);
     $gridChildren = array_values(($ref->getValue($grid))['default'] ?? $ref->getValue($grid));
-    $rightSection = $gridChildren[1];
+    $rightChild = $gridChildren[1];
 
-    $secRef = new ReflectionProperty(Section::class, 'childComponents');
-    $secRef->setAccessible(true);
-    $rightChildren = array_values(($secRef->getValue($rightSection))['default'] ?? $secRef->getValue($rightSection));
-
-    expect($rightChildren)->toHaveCount(1);
-    expect($rightChildren[0])->toBeInstanceOf(Livewire::class);
+    expect($rightChild)->toBeInstanceOf(Livewire::class);
 });
 
 it('sections use the AC-named translation keys (sections.details / sales.products / money.product_category / actions.back_to_product_categories)', function (): void {
     $src = file_get_contents((new ReflectionClass(ViewProductCategory::class))->getFileName());
     expect($src)->toContain('labels.sections.details');
-    expect($src)->toContain('labels.sales.products');
     expect($src)->toContain('labels.money.product_category');
 });
 

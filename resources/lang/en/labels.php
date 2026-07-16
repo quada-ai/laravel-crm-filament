@@ -233,6 +233,8 @@ return [
         'views_over_time' => 'Views over time',
         'my_activity' => 'My activity',
         'all_activity' => 'All activity',
+        'products' => 'Products',
+        'fields' => 'Fields',
         'attached_to' => 'Attached to',
         'label' => 'Label',
         'deals' => 'Deals',
@@ -360,6 +362,9 @@ return [
     // Integrations page — per-integration descriptions surfaced on the Settings page
     'integrations' => [
         'xero_description' => 'Connect to xero accounting to sync contacts, products, quotes & generate invoices.',
+        'clicksend_description' => 'Connect ClickSend to send SMS marketing campaigns from the CRM.',
+        'clicksend_signup_prefix' => 'Don\'t have a ClickSend account? Sign up at',
+        'clicksend_sender_id_hint' => 'Phone number or alphanumeric sender ID. Leave blank to use the global default.',
     ],
 
     // Xero integration mirrors (XeroContact / XeroItem / XeroInvoice / XeroPurchaseOrder)
@@ -417,7 +422,7 @@ return [
         'performance' => 'Performance',
         'column_mapping' => 'Column mapping',
         'xero' => 'Xero',
-        'clicksend' => 'ClickSend (SMS)',
+        'clicksend' => 'ClickSend',
         'avatar' => 'Avatar',
         'account' => 'Account',
         'notification_preferences' => 'Notification preferences',
@@ -448,6 +453,7 @@ return [
         'save' => 'Save',
         'add_line_item' => 'Add line item',
         'save_sync_settings' => 'Save sync settings',
+        'save_changes' => 'Save changes',
         'cancel' => 'Cancel',
         'close' => 'Close',
         'close_conversation' => 'Close conversation',

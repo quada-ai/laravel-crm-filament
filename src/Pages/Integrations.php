@@ -8,8 +8,11 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Navigation\NavigationItem;
 use Filament\Notifications\Notification;
+use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -27,9 +30,43 @@ class Integrations extends Page implements HasForms
 
     protected static ?int $navigationSort = 110;
 
-    protected string $view = 'filament-panels::pages.page';
+    protected string $view = 'laravel-crm-filament::integrations';
 
     public array $data = [];
+
+    /**
+     * Returns the shared sub-navigation tabs for the Integrations cluster.
+     * Xero (this Integrations page) is always present; ClickSend only appears
+     * when the `sms-marketing` module is enabled.
+     *
+     * @return array<int, NavigationItem>
+     */
+    public static function integrationTabs(): array
+    {
+        $tabs = [
+            NavigationItem::make(__('laravel-crm-filament::labels.sections.xero'))
+                ->url(static::getUrl())
+                ->isActiveWhen(fn (): bool => request()->routeIs('filament.*.pages.integrations')),
+        ];
+
+        if (in_array('sms-marketing', (array) config('laravel-crm.modules', []), true)) {
+            $tabs[] = NavigationItem::make(__('laravel-crm-filament::labels.sections.clicksend'))
+                ->url(ClickSendIntegration::getUrl())
+                ->isActiveWhen(fn (): bool => request()->routeIs('filament.*.pages.clicksend'));
+        }
+
+        return $tabs;
+    }
+
+    public function getSubNavigation(): array
+    {
+        return static::integrationTabs();
+    }
+
+    public static function getSubNavigationPosition(): SubNavigationPosition
+    {
+        return SubNavigationPosition::Top;
+    }
 
     public const KEYS = [
         'xero_contacts' => 'Sync contacts to Xero',
@@ -48,16 +85,30 @@ class Integrations extends Page implements HasForms
 
     public function form(Schema $schema): Schema
     {
+        $connected = $this->xeroIsConnected();
+
         return $schema
             ->statePath('data')
             ->components([
                 Section::make('Xero')->heading(__('laravel-crm-filament::labels.sections.xero'))
-                    ->description($this->xeroStatusLine())
+                    ->description(__('laravel-crm-filament::labels.integrations.xero_description'))
                     ->schema([
                         Toggle::make('xero_contacts')->label(static::KEYS['xero_contacts']),
                         Toggle::make('xero_products')->label(static::KEYS['xero_products']),
                         Toggle::make('xero_invoices')->label(static::KEYS['xero_invoices']),
-                    ]),
+                    ])
+                    ->visible($connected),
+                Section::make('XeroConnect')->heading(__('laravel-crm-filament::labels.sections.xero'))
+                    ->description(__('laravel-crm-filament::labels.integrations.xero_description'))
+                    ->schema([
+                        Actions::make([
+                            Action::make('connectXeroCta')
+                                ->label(__('laravel-crm-filament::labels.actions.connect_xero'))
+                                ->outlined()
+                                ->url(fn () => route('laravel-crm.integrations.xero.connect')),
+                        ])->fullWidth(),
+                    ])
+                    ->visible(! $connected),
             ]);
     }
 
@@ -81,12 +132,6 @@ class Integrations extends Page implements HasForms
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('connectXero')
-                ->label(__('laravel-crm-filament::labels.actions.connect_xero'))
-                ->icon('heroicon-o-link')
-                ->color('primary')
-                ->url(fn () => route('laravel-crm.integrations.xero.connect'))
-                ->visible(fn () => ! $this->xeroIsConnected()),
             Action::make('disconnectXero')
                 ->label(__('laravel-crm-filament::labels.actions.disconnect_xero'))
                 ->icon('heroicon-o-link-slash')
@@ -94,11 +139,12 @@ class Integrations extends Page implements HasForms
                 ->requiresConfirmation()
                 ->url(fn () => route('laravel-crm.integrations.xero.disconnect'))
                 ->visible(fn () => $this->xeroIsConnected()),
-            Action::make('manageClickSend')
-                ->label(__('laravel-crm-filament::labels.actions.manage_clicksend'))
-                ->icon('heroicon-o-chat-bubble-bottom-center-text')
-                ->url(fn () => ClickSendIntegration::getUrl()),
         ];
+    }
+
+    public function xeroIsConnectedForView(): bool
+    {
+        return $this->xeroIsConnected();
     }
 
     protected function xeroIsConnected(): bool
@@ -113,6 +159,10 @@ class Integrations extends Page implements HasForms
 
     protected function getFormActions(): array
     {
+        if (! $this->xeroIsConnected()) {
+            return [];
+        }
+
         return [
             Action::make('save')->label(__('laravel-crm-filament::labels.actions.save_sync_settings'))->submit('save'),
         ];

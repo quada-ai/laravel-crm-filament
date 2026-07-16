@@ -230,6 +230,8 @@ return [
         'views_over_time' => 'Vistas a lo largo del tiempo',
         'my_activity' => 'Mi actividad',
         'all_activity' => 'Toda la actividad',
+        'products' => 'Productos',
+        'fields' => 'Campos',
         'attached_to' => 'Asignado a',
         'label' => 'Etiqueta',
         'deals' => 'Negocios',
@@ -368,7 +370,7 @@ return [
         'performance' => 'Rendimiento',
         'column_mapping' => 'Mapeo de columnas',
         'xero' => 'Xero',
-        'clicksend' => 'ClickSend (SMS)',
+        'clicksend' => 'ClickSend',
         'avatar' => 'Avatar',
         'account' => 'Cuenta',
         'notification_preferences' => 'Preferencias de notificación',
@@ -398,6 +400,7 @@ return [
         'save' => 'Guardar',
         'add_line_item' => 'Añadir línea',
         'save_sync_settings' => 'Guardar ajustes de sincronización',
+        'save_changes' => 'Guardar cambios',
         'cancel' => 'Cancelar',
         'close' => 'Cerrar',
         'close_conversation' => 'Cerrar conversación',
@@ -521,6 +524,9 @@ return [
     // Integrations page — per-integration descriptions surfaced on the Settings page
     'integrations' => [
         'xero_description' => 'Conéctate a la contabilidad Xero para sincronizar contactos, productos, presupuestos y generar facturas.',
+        'clicksend_description' => 'Conecta ClickSend para enviar campañas de SMS desde el CRM.',
+        'clicksend_signup_prefix' => '¿No tienes una cuenta de ClickSend? Regístrate en',
+        'clicksend_sender_id_hint' => 'Número de teléfono o identificador alfanumérico. Déjalo en blanco para usar el valor predeterminado global.',
     ],
 
     'xero' => [

@@ -4,15 +4,17 @@ namespace VentureDrake\LaravelCrmFilament\Pages;
 
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Enums\SubNavigationPosition;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrm\Services\ClickSendService;
 
 /**
@@ -20,7 +22,8 @@ use VentureDrake\LaravelCrm\Services\ClickSendService;
  * credentials (`clicksend_username`, `clicksend_api_key`,
  * `clicksend_default_from`) via SettingService so the values are
  * shared with the existing Livewire UI, and exposes a "Send test SMS"
- * header action that round-trips through ClickSendService::sendSms().
+ * inline action (only visible once credentials are configured) that
+ * round-trips through ClickSendService::sendSms().
  */
 class ClickSendIntegration extends Page implements HasForms
 {
@@ -30,7 +33,7 @@ class ClickSendIntegration extends Page implements HasForms
 
     protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
-    protected static ?string $title = 'ClickSend (SMS)';
+    protected static ?string $title = 'ClickSend';
 
     protected static ?string $slug = 'clicksend';
 
@@ -41,7 +44,7 @@ class ClickSendIntegration extends Page implements HasForms
         return false;
     }
 
-    protected string $view = 'filament-panels::pages.page';
+    protected string $view = 'laravel-crm-filament::clicksend';
 
     public const KEYS = [
         'clicksend_username' => 'ClickSend username',
@@ -72,129 +75,124 @@ class ClickSendIntegration extends Page implements HasForms
 
     public function form(Schema $schema): Schema
     {
+        $signupHtml = new HtmlString(
+            '<div style="display: flex; align-items: center; gap: 0.75rem;'
+            . ' background-color: #38bdf8; color: #0f172a;'
+            . ' padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.875rem;">'
+            . '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"'
+            . ' stroke-width="2" style="width: 1.25rem; height: 1.25rem; flex-shrink: 0;">'
+            . '<path stroke-linecap="round" stroke-linejoin="round"'
+            . ' d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />'
+            . '</svg>'
+            . '<span>' . e(__('laravel-crm-filament::labels.integrations.clicksend_signup_prefix')) . ' '
+            . '<a href="https://clicksend.com/?u=47224" target="_blank" rel="noopener"'
+            . ' style="text-decoration: underline; color: inherit;">clicksend.com</a>'
+            . '</span></div>'
+        );
+
         return $schema
             ->statePath('data')
             ->components([
-                Section::make('ClickSend (SMS)')
+                Section::make('ClickSend')
                     ->heading(__('laravel-crm-filament::labels.sections.clicksend'))
-                    ->description($this->statusLine())
+                    ->description(__('laravel-crm-filament::labels.integrations.clicksend_description'))
                     ->schema([
-                        Grid::make(2)->schema([
-                            TextInput::make('clicksend_username')
-                                ->label(__('laravel-crm-filament::labels.fields.clicksend_username'))
-                                ->maxLength(255),
-                            TextInput::make('clicksend_api_key')
-                                ->label(__('laravel-crm-filament::labels.fields.clicksend_api_key'))
-                                ->password()
-                                ->revealable()
-                                ->maxLength(255),
-                            TextInput::make('clicksend_default_from')
-                                ->label(__('laravel-crm-filament::labels.fields.clicksend_default_from'))
-                                ->maxLength(32),
-                        ]),
+                        Placeholder::make('clicksend_signup_banner')
+                            ->hiddenLabel()
+                            ->content($signupHtml),
+                        TextInput::make('clicksend_username')
+                            ->label(__('laravel-crm-filament::labels.fields.clicksend_username'))
+                            ->maxLength(255),
+                        TextInput::make('clicksend_api_key')
+                            ->label(__('laravel-crm-filament::labels.fields.clicksend_api_key'))
+                            ->password()
+                            ->revealable()
+                            ->maxLength(255),
+                        TextInput::make('clicksend_default_from')
+                            ->label(__('laravel-crm-filament::labels.fields.clicksend_default_from'))
+                            ->helperText(__('laravel-crm-filament::labels.integrations.clicksend_sender_id_hint'))
+                            ->maxLength(32),
+                        Actions::make([
+                            Action::make('sendTestSms')
+                                ->label(__('laravel-crm-filament::labels.actions.send_test_sms'))
+                                ->icon('heroicon-o-paper-airplane')
+                                ->color('primary')
+                                ->outlined()
+                                ->schema([
+                                    TextInput::make('to')
+                                        ->label(__('laravel-crm-filament::labels.fields.phone_number'))
+                                        ->required()
+                                        ->helperText('Use E.164 format, e.g. +15551234567'),
+                                    TextInput::make('body')
+                                        ->label(__('laravel-crm-filament::labels.fields.message'))
+                                        ->required()
+                                        ->maxLength(160)
+                                        ->default('Test SMS from laravel-crm-filament.'),
+                                ])
+                                ->action(function (array $data): void {
+                                    $service = app(ClickSendService::class);
+                                    $service->refresh();
+
+                                    if (! $service->isConfigured()) {
+                                        Notification::make()
+                                            ->title('ClickSend not configured')
+                                            ->body('Save your ClickSend credentials before sending a test SMS.')
+                                            ->danger()
+                                            ->send();
+
+                                        return;
+                                    }
+
+                                    try {
+                                        $result = $service->sendSms(
+                                            (string) $data['to'],
+                                            (string) $data['body'],
+                                            $service->defaultFrom(),
+                                            'filament-test-sms',
+                                        );
+                                    } catch (\Throwable $e) {
+                                        Notification::make()
+                                            ->title('Test SMS failed')
+                                            ->body($e->getMessage())
+                                            ->danger()
+                                            ->send();
+
+                                        return;
+                                    }
+
+                                    if ($result['ok'] ?? false) {
+                                        Notification::make()
+                                            ->title('Test SMS sent')
+                                            ->body('Message ID: ' . ($result['message_id'] ?? 'n/a'))
+                                            ->success()
+                                            ->send();
+
+                                        return;
+                                    }
+
+                                    Notification::make()
+                                        ->title('Test SMS failed')
+                                        ->body($result['error'] ?? 'ClickSend rejected the message.')
+                                        ->danger()
+                                        ->send();
+                                }),
+                        ])->visible(fn (): bool => $this->clickSendIsConfigured()),
                     ]),
             ]);
     }
 
-    protected function statusLine(): string
-    {
-        $cs = app(ClickSendService::class);
-        if (! $cs->isConfigured()) {
-            return 'ClickSend credentials not configured.';
-        }
-
-        try {
-            $check = $cs->verifyCredentials();
-        } catch (\Throwable $e) {
-            return 'ClickSend credentials configured but verification failed: ' . $e->getMessage();
-        }
-        if (! ($check['ok'] ?? false)) {
-            return 'ClickSend credentials configured but verification failed: ' . ($check['error'] ?? 'unknown error');
-        }
-        $balance = $check['balance'] ?? null;
-
-        return 'ClickSend connected. Balance: ' . ($balance !== null ? $balance : 'unknown') . '.';
-    }
-
     protected function getHeaderActions(): array
     {
-        return [
-            Action::make('save')
-                ->label(__('laravel-crm-filament::labels.actions.save'))
-                ->icon('heroicon-o-check')
-                ->action('save'),
-            Action::make('sendTestSms')
-                ->label(__('laravel-crm-filament::labels.actions.send_test_sms'))
-                ->icon('heroicon-o-paper-airplane')
-                ->color('primary')
-                ->schema([
-                    TextInput::make('to')
-                        ->label(__('laravel-crm-filament::labels.fields.phone_number'))
-                        ->required()
-                        ->helperText('Use E.164 format, e.g. +15551234567'),
-                    TextInput::make('body')
-                        ->label(__('laravel-crm-filament::labels.fields.message'))
-                        ->required()
-                        ->maxLength(160)
-                        ->default('Test SMS from laravel-crm-filament.'),
-                ])
-                ->action(function (array $data): void {
-                    $service = app(ClickSendService::class);
-                    $service->refresh();
-
-                    if (! $service->isConfigured()) {
-                        Notification::make()
-                            ->title('ClickSend not configured')
-                            ->body('Save your ClickSend credentials before sending a test SMS.')
-                            ->danger()
-                            ->send();
-
-                        return;
-                    }
-
-                    try {
-                        $result = $service->sendSms(
-                            (string) $data['to'],
-                            (string) $data['body'],
-                            $service->defaultFrom(),
-                            'filament-test-sms',
-                        );
-                    } catch (\Throwable $e) {
-                        Notification::make()
-                            ->title('Test SMS failed')
-                            ->body($e->getMessage())
-                            ->danger()
-                            ->send();
-
-                        return;
-                    }
-
-                    if ($result['ok'] ?? false) {
-                        Notification::make()
-                            ->title('Test SMS sent')
-                            ->body('Message ID: ' . ($result['message_id'] ?? 'n/a'))
-                            ->success()
-                            ->send();
-
-                        return;
-                    }
-
-                    Notification::make()
-                        ->title('Test SMS failed')
-                        ->body($result['error'] ?? 'ClickSend rejected the message.')
-                        ->danger()
-                        ->send();
-                }),
-        ];
+        return [];
     }
 
-    protected function getFormActions(): array
+    public function clickSendIsConfigured(): bool
     {
-        return [
-            Action::make('saveForm')
-                ->label(__('laravel-crm-filament::labels.actions.save'))
-                ->submit('save'),
-        ];
+        try {
+            return app(ClickSendService::class)->isConfigured();
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     public function save(): void

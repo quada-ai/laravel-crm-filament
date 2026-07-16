@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use VentureDrake\LaravelCrm\Models\ProductCategory;
@@ -103,7 +104,7 @@ it('ViewProductCategory::content() root is a Grid(default=1, lg=2) with two Sect
     expect($childList)->toHaveCount(2)
         ->and($childList[0])->toBeInstanceOf(Section::class)
         ->and($childList[0]->getColumnSpan())->toBe(['lg' => 1])
-        ->and($childList[1])->toBeInstanceOf(Section::class)
+        ->and($childList[1])->toBeInstanceOf(Livewire::class)
         ->and($childList[1]->getColumnSpan())->toBe(['lg' => 1]);
 });
 

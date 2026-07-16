@@ -58,14 +58,11 @@ class ViewProductCategory extends ViewRecord
                             ->columnSpanFull(),
                     ])
                     ->columnSpan(['lg' => 1]),
-                Section::make(__('laravel-crm-filament::labels.sales.products'))
-                    ->schema([
-                        Livewire::make(ProductCategoryProductsRelationManager::class, [
-                            'ownerRecord' => $record,
-                            'pageClass' => static::class,
-                        ])
-                            ->key('product-category-products-' . $record->getKey()),
-                    ])
+                Livewire::make(ProductCategoryProductsRelationManager::class, [
+                    'ownerRecord' => $record,
+                    'pageClass' => static::class,
+                ])
+                    ->key('product-category-products-' . $record->getKey())
                     ->columnSpan(['lg' => 1]),
             ]),
         ]);

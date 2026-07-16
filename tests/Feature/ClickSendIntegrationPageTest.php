@@ -72,21 +72,24 @@ it('persists field values via SettingService when save() is invoked', function (
     expect($settings->get('clicksend_username'))->toBe('unit-tester');
 });
 
-it('exposes a sendTestSms header action that routes through ClickSendService', function () {
-    $page = new ClickSendIntegration;
+it('exposes a sendTestSms inline action inside the form (gated on isConfigured) that routes through ClickSendService', function () {
+    // sendTestSms was moved out of getHeaderActions() into the form schema —
+    // it now renders as a Schemas\Components\Actions button inside the ClickSend
+    // section, only visible when ClickSendService::isConfigured() returns true.
+    $source = file_get_contents((new ReflectionClass(ClickSendIntegration::class))->getFileName());
 
-    // Reach into the protected getHeaderActions() through reflection.
+    // Header actions no longer include sendTestSms.
+    $page = new ClickSendIntegration;
     $method = new ReflectionMethod(ClickSendIntegration::class, 'getHeaderActions');
     $method->setAccessible(true);
-    $actions = $method->invoke($page);
+    $names = array_map(fn ($a) => $a->getName(), $method->invoke($page));
+    expect($names)->not->toContain('sendTestSms');
 
-    $names = array_map(fn ($a) => $a->getName(), $actions);
-    expect($names)->toContain('sendTestSms');
-
-    $sendTest = collect($actions)->first(fn (Action $a) => $a->getName() === 'sendTestSms');
-    expect($sendTest)->not->toBeNull();
-    // Modal form must collect the destination number + message body.
-    $source = file_get_contents((new ReflectionClass(ClickSendIntegration::class))->getFileName());
+    // The action is defined inline in form() via Actions::make with a visibility gate.
+    expect($source)->toContain('Actions::make([');
+    expect($source)->toContain("Action::make('sendTestSms')");
+    expect($source)->toContain('clickSendIsConfigured()');
+    // Modal form still collects the destination number + message body.
     expect($source)->toContain("TextInput::make('to')");
     expect($source)->toContain("TextInput::make('body')");
     expect($source)->toContain('ClickSendService');
@@ -137,10 +140,13 @@ it('removes the ClickSend section from the legacy Integrations page', function (
     expect($source)->not->toContain('use VentureDrake\\LaravelCrm\\Services\\ClickSendService;');
 });
 
-it('links the legacy Integrations page to the new ClickSend page', function () {
+it('links the legacy Integrations page to the new ClickSend page via sub-navigation tabs', function () {
     $source = file_get_contents((new ReflectionClass(Integrations::class))->getFileName());
+    // ClickSend is reachable via Integrations::integrationTabs() (sub-navigation),
+    // NOT via the pre-parity `manageClickSend` header action which was dropped
+    // per the sub-navigation series AC.
     expect($source)->toContain('ClickSendIntegration::getUrl()');
-    expect($source)->toContain('manageClickSend');
+    expect($source)->toContain('integrationTabs');
 });
 
 it('lives under the top-level Pages directory', function () {

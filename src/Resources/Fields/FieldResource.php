@@ -75,35 +75,32 @@ class FieldResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Grid::make(2)->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
+            Forms\Components\TextInput::make('name')
+                ->required()
+                ->maxLength(255)
+                ->columnSpanFull(),
+
+            Grid::make(3)->schema([
                 Forms\Components\Select::make('type')
                     ->options(self::TYPES)
                     ->required()
                     ->live(),
-            ]),
-
-            Forms\Components\Select::make('field_group_id')
-                ->label(__('laravel-crm-filament::labels.fields.group'))
-                ->options(fn () => FieldGroup::query()->orderBy('name')->pluck('name', 'id'))
-                ->searchable()
-                ->columnSpanFull(),
-
-            Grid::make(2)->schema([
+                Forms\Components\Select::make('field_group_id')
+                    ->label(__('laravel-crm-filament::labels.fields.group'))
+                    ->options(fn () => FieldGroup::query()->orderBy('name')->pluck('name', 'id'))
+                    ->searchable(),
                 Forms\Components\TextInput::make('default')->maxLength(255),
-                Forms\Components\Toggle::make('required'),
-            ]),
+            ])->columnSpanFull(),
+
+            Forms\Components\Toggle::make('required')->columnSpanFull(),
 
             Forms\Components\Repeater::make('options')
                 ->label(__('laravel-crm-filament::labels.fields.options'))
                 ->schema([
                     Forms\Components\TextInput::make('label')->required(),
-                    Forms\Components\TextInput::make('value'),
                     Forms\Components\TextInput::make('order')->numeric()->default(0),
                 ])
-                ->columns(3)
+                ->columns(2)
                 ->defaultItems(0)
                 ->addActionLabel('Add option')
                 ->visible(fn (Get $get) => in_array($get('type'), ['select', 'select_multiple', 'radio', 'checkbox_multiple'], true))

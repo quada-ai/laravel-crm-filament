@@ -59,6 +59,7 @@ class ProductCategoryResource extends Resource
             ->recordActions([
                 Actions\ViewAction::make()->button()->hiddenLabel(),
                 Actions\EditAction::make()->button()->hiddenLabel(),
+                Actions\DeleteAction::make()->button()->hiddenLabel()->requiresConfirmation(),
             ])
             ->toolbarActions([
                 Actions\BulkActionGroup::make([
