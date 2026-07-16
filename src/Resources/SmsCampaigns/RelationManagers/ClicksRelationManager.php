@@ -59,9 +59,16 @@ class ClicksRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('recipient')
                     ->label(__('laravel-crm-filament::labels.campaign.recipients'))
-                    ->relationship('recipient', 'phone', fn ($query, $livewire) => $query
-                        ->where('sms_campaign_id', $livewire->getOwnerRecord()->getKey()))
-                    ->searchable()
+                    // NB: `phone` on SmsCampaignRecipient is a belongsTo relation (via phone_id
+                    // FK to crm_phones), NOT a column. Filament's SelectFilter->relationship()
+                    // requires a real column on the related table for its SELECT. Use `phone_id`
+                    // (the real FK column) as the label column and derive the display via
+                    // getOptionLabelFromRecordUsing so the dropdown still shows the actual
+                    // phone number pulled through the phone relation.
+                    ->relationship('recipient', 'phone_id', fn ($query, $livewire) => $query
+                        ->where('sms_campaign_id', $livewire->getOwnerRecord()->getKey())
+                        ->with('phone'))
+                    ->getOptionLabelFromRecordUsing(fn ($record): string => $record->phone?->number ?? '—')
                     ->preload(),
                 Tables\Filters\Filter::make('original_url')
                     ->label(__('laravel-crm-filament::labels.campaign.url'))
