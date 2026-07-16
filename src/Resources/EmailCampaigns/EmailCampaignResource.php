@@ -56,7 +56,7 @@ class EmailCampaignResource extends Resource
                     ->searchable()
                     ->preload()
                     ->live()
-                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                    ->afterStateUpdated(function ($state, $set) {
                         $template = EmailTemplate::find($state);
                         if ($template) {
                             $set('subject', $template->subject);
@@ -102,15 +102,15 @@ class EmailCampaignResource extends Resource
                             }
                             $component->state($record && $record->scheduled_at ? 'schedule_send' : 'send_now');
                         })
-                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                        ->afterStateUpdated(function ($state, $set): void {
                             if ($state === 'send_now') {
                                 $set('scheduled_at', null);
                             }
                         }),
                     Forms\Components\DateTimePicker::make('scheduled_at')
                         ->label(__('laravel-crm-filament::labels.campaign.schedule_for'))
-                        ->visible(fn (Forms\Get $get): bool => $get('send_mode') === 'schedule_send')
-                        ->required(fn (Forms\Get $get): bool => $get('send_mode') === 'schedule_send'),
+                        ->visible(fn ($get): bool => $get('send_mode') === 'schedule_send')
+                        ->required(fn ($get): bool => $get('send_mode') === 'schedule_send'),
                 ]),
         ]);
     }
