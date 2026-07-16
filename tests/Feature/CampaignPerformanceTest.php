@@ -48,7 +48,7 @@ it('registers the Send-now header action on each campaign view page', function (
     }
 })->with([
     'EmailCampaign' => [ViewEmailCampaign::class, ['backToIndex', 'preview', 'sendNow', 'schedule', 'cancel', 'edit', 'delete']],
-    'SmsCampaign' => [ViewSmsCampaign::class, ['sendNow', 'preview', 'schedule', 'cancel']],
+    'SmsCampaign' => [ViewSmsCampaign::class, ['backToIndex', 'preview', 'sendNow', 'schedule', 'cancel', 'edit', 'delete']],
 ]);
 
 it('makes the Send-now action require confirmation', function (string $page, string $factory) {

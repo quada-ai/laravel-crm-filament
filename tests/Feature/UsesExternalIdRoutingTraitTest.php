@@ -31,6 +31,7 @@ use VentureDrake\LaravelCrmFilament\Resources\ProductCategories\ProductCategoryR
 use VentureDrake\LaravelCrmFilament\Resources\Products\ProductResource;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
+use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\SmsCampaignResource;
 
 $traitResources = [
     'LeadResource' => LeadResource::class,
@@ -55,6 +56,7 @@ $traitResources = [
     'LabelResource' => LabelResource::class,
     'FieldResource' => FieldResource::class,
     'FieldGroupResource' => FieldGroupResource::class,
+    'SmsCampaignResource' => SmsCampaignResource::class,
 ];
 
 $traitDataset = [];
