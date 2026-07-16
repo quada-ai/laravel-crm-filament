@@ -112,9 +112,6 @@ class EmailCampaignResource extends Resource
                     TextEntry::make('template.name')
                         ->label(__('laravel-crm-filament::labels.fields.template'))
                         ->placeholder('—'),
-                    TextEntry::make('ownerUser.name')
-                        ->label(__('laravel-crm-filament::labels.fields.owner'))
-                        ->placeholder('—'),
                 ]),
         ]);
     }

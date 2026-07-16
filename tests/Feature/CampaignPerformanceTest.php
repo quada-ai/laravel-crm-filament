@@ -198,7 +198,7 @@ it('replaces the Performance infolist Section with a sections.details Section on
     expect($source)->not->toContain("TextEntry::make('skipped_count_state')");
 });
 
-it('renders the AC-named 9 TextEntries in the Details section on EmailCampaignResource', function () {
+it('renders the AC-named 8 TextEntries in the Details section on EmailCampaignResource', function () {
     $source = file_get_contents((new ReflectionClass(EmailCampaignResource::class))->getFileName());
 
     foreach ([
@@ -210,7 +210,6 @@ it('renders the AC-named 9 TextEntries in the Details section on EmailCampaignRe
         "TextEntry::make('scheduled_at')",
         "TextEntry::make('sent_at')",
         "TextEntry::make('template.name')",
-        "TextEntry::make('ownerUser.name')",
     ] as $entry) {
         expect($source)->toContain($entry);
     }

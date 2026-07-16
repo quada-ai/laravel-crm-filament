@@ -207,13 +207,13 @@ it('registers EmailCampaignStatsWidget as a header widget on ViewEmailCampaign w
     expect($page->getHeaderWidgetsColumns())->toBe(4);
 });
 
-it('EmailCampaignResource::infolist() declares a Details section with the 9 AC-named TextEntries and the old 6 rate TextEntries are absent', function (): void {
+it('EmailCampaignResource::infolist() declares a Details section with the 8 AC-named TextEntries and the old 6 rate TextEntries are absent', function (): void {
     $src = file_get_contents((new ReflectionClass(EmailCampaignResource::class))->getFileName());
 
     // Details section heading routed through the labels namespace
     expect($src)->toContain("Section::make('Details')->heading(__('laravel-crm-filament::labels.sections.details'))");
 
-    // 9 AC-named TextEntries all present
+    // 8 AC-named TextEntries all present
     foreach ([
         "TextEntry::make('name')",
         "TextEntry::make('campaign_id')",
@@ -223,7 +223,6 @@ it('EmailCampaignResource::infolist() declares a Details section with the 9 AC-n
         "TextEntry::make('scheduled_at')",
         "TextEntry::make('sent_at')",
         "TextEntry::make('template.name')",
-        "TextEntry::make('ownerUser.name')",
     ] as $entry) {
         expect($src)->toContain($entry);
     }
