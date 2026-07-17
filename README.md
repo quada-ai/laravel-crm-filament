@@ -20,7 +20,43 @@ composer require venturedrake/laravel-crm-filament
 php artisan laravelcrm:filament-install
 ```
 
-The install command publishes `app/Providers/Filament/CrmPanelProvider.php` (panel at `/admin`) and registers it in `bootstrap/providers.php`.
+The install command inspects the host app for existing Filament panels and drives an interactive prompt:
+
+- **No panels detected** → publishes a standalone CRM panel automatically.
+- **Only the plugin's own `crm` panel already installed** → re-runs the standalone publish (use `--force` to overwrite).
+- **One or more other panels detected** → asks whether to publish a standalone `/crm` panel or inject the plugin into an existing panel.
+
+### Branch A — standalone `/crm` panel
+
+Publishes `app/Providers/Filament/CrmPanelProvider.php` (id `crm`, path `/crm`) and registers it in `bootstrap/providers.php`. This is the default when no other panels exist.
+
+Because the core CRM ships a Livewire UI that also lives at `/crm`, the command then prompts:
+
+> Add `LARAVEL_CRM_USER_INTERFACE=false` to your `.env` now (disables the legacy `/crm` Livewire UI so the Filament CRM panel can take over `/crm`)?
+
+Answer **yes** to have the command append the line for you. Answer **no** to keep both UIs — you'll need to either set `LARAVEL_CRM_USER_INTERFACE=false` manually later or change the panel path in the published `CrmPanelProvider`. If the config is already `false` (via env or config edit), the prompt is skipped.
+
+### Branch B — inject into an existing panel
+
+Adds `->plugin(LaravelCrmPlugin::make())` (plus the matching `use` import) directly to the target panel's PanelProvider file. Nothing is published — the plugin becomes part of the host's existing panel.
+
+Before injecting, the command builds a slug map from the target panel's registered resources and the plugin's own resources. If any slugs collide, the injection is aborted with a table of colliding slugs; re-run with `--mode=crm` (standalone panel) or resolve the collision in your host app. Pass `--force` to inject anyway.
+
+### Scripting the install (CI / provisioning)
+
+The prompts can be bypassed with flags:
+
+| Flag | Effect |
+|---|---|
+| `--mode=crm` | Force Branch A (standalone `/crm` panel), no interactive choice |
+| `--mode=inject --panel=<id>` | Force Branch B injection into panel `<id>` |
+| `--force` | Overwrite an existing `CrmPanelProvider.php` (Branch A) or bypass slug-collision detection (Branch B) |
+
+Example — non-interactive injection into an existing `admin` panel:
+
+```bash
+php artisan laravelcrm:filament-install --mode=inject --panel=admin --force
+```
 
 Add `Filament\Models\Contracts\FilamentUser` to `App\Models\User` and implement `canAccessPanel()`:
 
@@ -130,33 +166,35 @@ Importers route through the core CRM services (`PersonService`, `OrganizationSer
 
 **Main panel resources** (gated on `config('laravel-crm.modules')`):
 
+Paths below assume the default `/crm` mount from the published `CrmPanelProvider`; adjust if you've changed `->path(...)` or injected the plugin into a differently-mounted host panel.
+
 | Resource | Slug | Module gate |
 |---|---|---|
-| Lead | `/admin/leads` | `leads` |
-| Deal | `/admin/deals` | `deals` |
-| Quote | `/admin/quotes` | `quotes` |
-| Order | `/admin/orders` | `orders` |
-| Invoice | `/admin/invoices` | `invoices` |
-| Purchase Order | `/admin/purchase-orders` | `purchase-orders` |
-| Delivery | `/admin/deliveries` | `deliveries` |
-| Email Campaign | `/admin/email-campaigns` | `email-marketing` |
-| SMS Campaign | `/admin/sms-campaigns` | `sms-marketing` |
-| Chat | `/admin/chat` | `chat` |
-| Customer | `/admin/customers` | `customers` |
-| Person | `/admin/people` | always |
-| Organization | `/admin/organizations` | always |
-| Task | `/admin/tasks` | always |
-| Product | `/admin/products` | always |
-| Notes / Calls / Meetings / Lunches / Files / Activities | `/admin/{slug}` | always (read-only global views) |
+| Lead | `/crm/leads` | `leads` |
+| Deal | `/crm/deals` | `deals` |
+| Quote | `/crm/quotes` | `quotes` |
+| Order | `/crm/orders` | `orders` |
+| Invoice | `/crm/invoices` | `invoices` |
+| Purchase Order | `/crm/purchase-orders` | `purchase-orders` |
+| Delivery | `/crm/deliveries` | `deliveries` |
+| Email Campaign | `/crm/email-campaigns` | `email-marketing` |
+| SMS Campaign | `/crm/sms-campaigns` | `sms-marketing` |
+| Chat | `/crm/chat` | `chat` |
+| Customer | `/crm/customers` | `customers` |
+| Person | `/crm/people` | always |
+| Organization | `/crm/organizations` | always |
+| Task | `/crm/tasks` | always |
+| Product | `/crm/products` | always |
+| Notes / Calls / Meetings / Lunches / Files / Activities | `/crm/{slug}` | always (read-only global views) |
 
 **Standalone pages**:
 
-- `/admin/calendar` — month/week grid for tasks + calls + meetings + lunches.
-- `/admin/leads/kanban`, `/admin/deals/kanban`, `/admin/quotes/kanban`, `/admin/tasks/kanban`.
+- `/crm/calendar` — month/week grid for tasks + calls + meetings + lunches.
+- `/crm/leads/kanban`, `/crm/deals/kanban`, `/crm/quotes/kanban`, `/crm/tasks/kanban`.
 
 **Dashboard widgets**: open leads / open deals / tasks due today + open-leads-by-stage chart + recent activity list + (when email-marketing is enabled) CampaignPerformanceChart.
 
-**Settings cluster** at `/admin/settings`:
+**Settings cluster** at `/crm/settings`:
 
 - Pipelines, Pipeline Stages, Pipeline Stage Probabilities, Lead Statuses, Lead Sources, Labels, Tax Rates, Product Categories, Product Attributes.
 - Contact Types, Address Types, Organization Types, Industries, Timezones.
@@ -189,7 +227,7 @@ Models with the core's `HasCrmFields` trait (Lead, Deal, Quote, Order, Invoice, 
 - Loading `FieldValue` rows on edit.
 - Saving `FieldValue` rows on create / update via `updateOrCreate`.
 
-Define fields via the Settings cluster (`/admin/settings/fields`).
+Define fields via the Settings cluster (`/crm/settings/fields`).
 
 ## Localization
 
@@ -225,28 +263,27 @@ Auth::user() && app()->setLocale(Auth::user()->locale ?? config('app.locale'));
 
 ## Migrating from the `/crm` Livewire UI
 
-The plugin doesn't touch the core CRM's `/crm` Livewire UI — both UIs run side-by-side against the same database. This is the recommended path during a transition:
+The Filament panel and the core CRM's Livewire UI both target the same database. Because the Filament panel now defaults to `/crm` (matching the Livewire UI's route prefix), the install command asks up front whether to append `LARAVEL_CRM_USER_INTERFACE=false` to `.env` — the Livewire UI's kill switch. Pick the path that matches your rollout:
 
-1. **Install the plugin alongside** the existing UI. There is no schema migration required; the plugin reads and writes the same `crm_*` tables as the Livewire UI.
-2. **Verify access control still works.** The Filament panel uses the same `HasCrmAccess` trait and the same Spatie roles/permissions seeded by `php artisan laravelcrm:permissions`. A user who can see `/crm` can see `/admin`; a user who can edit a Lead in the Livewire UI can edit the same Lead in Filament.
-3. **Pilot with a single team / role.** Give a subset of users `canAccessPanel()` returning `true` so they land on `/admin`. Leave everyone else on `/crm`.
-4. **Side-by-side data parity.** All writes from either UI go through the same observers (`Observers/`), services (`Services/`), and audit listeners. Records created in `/admin` show up in `/crm` and vice-versa on next page load. Encrypted columns continue to be transparently encrypted/decrypted via `HasEncryptableFields`.
-5. **When ready, decommission the Livewire UI.** Either set `Route::prefix(config('laravel-crm.route_prefix'))` to a no-op, or remove the `LaravelCrmServiceProvider`'s route loading in the host app's `bootstrap/providers.php`. The plugin will continue to work standalone.
+- **Full cutover.** Accept the install prompt so `LARAVEL_CRM_USER_INTERFACE=false` is written to `.env`. The Filament panel serves `/crm`; the Livewire UI stops mounting its routes. This is the simplest path once you're confident the Filament panel covers everything you need.
+- **Side-by-side during transition.** Decline the install prompt and change the published `CrmPanelProvider`'s `->path('crm')` to a distinct path (e.g. `->path('crm-next')`). Both UIs then run against the same database until you're ready to flip the switch.
+
+Regardless of which path you pick, no schema migration is required — the plugin reads and writes the same `crm_*` tables. Access control routes through the same `HasCrmAccess` trait and the same Spatie roles/permissions seeded by `php artisan laravelcrm:permissions`, so a user who can see the Livewire UI can see the Filament panel (subject to `canAccessPanel()`). All writes from either UI go through the same observers (`Observers/`), services (`Services/`), and audit listeners; encrypted columns continue to be transparently encrypted/decrypted via `HasEncryptableFields`.
 
 ### Differences hosts should know about
 
-| Behaviour | Livewire UI (`/crm`) | Filament panel (`/admin`) |
+Paths in this table assume the default `/crm` Filament mount with the Livewire UI kill switch enabled.
+
+| Behaviour | Livewire UI (before) | Filament panel |
 |---|---|---|
 | Routing key | mixed `id` / `external_id` | always `external_id` for entity resources, integer `id` for lookup tables that lack `external_id` |
 | Branding source | `laravel-crm.settings` (org name + logo) | `LaravelCrmPlugin::brand()` / `brandLogo()` or fallback to the same settings |
 | Custom fields | Livewire `HasCrmFields` partial | `Concerns\HasCrmCustomFields` trait via `static::crmCustomFieldsSection(...)` |
-| Files | per-model uploads | unified `FilesRelationManager` + read-only `/admin/files` global view |
-| Activities | per-entity timeline | per-entity timeline **plus** global `/admin/activities` |
-| Calendar | none | `/admin/calendar` aggregating tasks/calls/meetings/lunches |
-| Reminders | global config | per-user `/admin/settings/reminders` |
-| Updates | `laravelcrm:update` artisan only | `/admin/settings/updates` UI |
-
-Nothing about the Filament panel disables the Livewire UI; if you want to run only Filament, remove the host-app routes or middleware that expose `/crm` after you have confirmed parity.
+| Files | per-model uploads | unified `FilesRelationManager` + read-only `/crm/files` global view |
+| Activities | per-entity timeline | per-entity timeline **plus** global `/crm/activities` |
+| Calendar | none | `/crm/calendar` aggregating tasks/calls/meetings/lunches |
+| Reminders | global config | per-user `/crm/settings/reminders` |
+| Updates | `laravelcrm:update` artisan only | `/crm/settings/updates` UI |
 
 ## Testing
 
