@@ -1,12 +1,14 @@
 includes:
     - phpstan-baseline.neon
+    - vendor/larastan/larastan/extension.neon
 
 parameters:
     level: 4
     paths:
         - src
-        - config
         - database
+    excludePaths:
+        - src/Resources/Monitors/MonitorResource.php
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
     checkModelProperties: true

@@ -5,6 +5,12 @@ All notable changes to `laravel-crm-filament` will be documented in this file.
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Widened Filament constraints so the plugin now supports **Filament v4 alongside Filament v5** (`filament/filament`, `filament/forms`, `filament/tables` accept `^4.0 | ^5.0`). Existing v5 installs are unaffected; hosts on Filament v4 can install without upgrading.
+
 ## [1.0.0] - 2026-07-16
 
 ### Added
@@ -66,7 +72,7 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 
 - PHP `^8.2`
 - Laravel `^11.0 | ^12.0 | ^13.0` (`illuminate/contracts`)
-- Filament `^5.0` (`filament/filament`, `filament/forms`, `filament/tables`)
+- Filament `^4.0 | ^5.0` (`filament/filament`, `filament/forms`, `filament/tables`)
 - `venturedrake/laravel-crm` `^2.0`
 
 [1.0.0]: https://github.com/venturedrake/laravel-crm-filament/releases/tag/v1.0.0

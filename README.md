@@ -4,13 +4,13 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/venturedrake/laravel-crm-filament.svg?style=flat-square)](https://packagist.org/packages/venturedrake/laravel-crm-filament)
 [![License](https://img.shields.io/packagist/l/venturedrake/laravel-crm-filament.svg?style=flat-square)](LICENSE.md)
 
-A native Filament v5 panel plugin for [`venturedrake/laravel-crm`](https://github.com/venturedrake/laravel-crm). Wraps the existing CRM domain layer (models, services, observers, policies, encryption, audit) in Filament Resources, Clusters, Pages, and Widgets so the same database can be administered via Filament alongside (or instead of) the legacy `/crm` MaryUI/Livewire interface.
+A native Filament v4 & v5 panel plugin for [`venturedrake/laravel-crm`](https://github.com/venturedrake/laravel-crm). Wraps the existing CRM domain layer (models, services, observers, policies, encryption, audit) in Filament Resources, Clusters, Pages, and Widgets so the same database can be administered via Filament alongside (or instead of) the legacy `/crm` MaryUI/Livewire interface.
 
 ## Requirements
 
 - PHP `^8.2`
 - Laravel `^11.0 | ^12.0 | ^13.0`
-- Filament `^5.0`
+- Filament `^4.0 | ^5.0`
 - `venturedrake/laravel-crm` `^2.0`
 
 ## Installation
