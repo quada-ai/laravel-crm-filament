@@ -8,11 +8,24 @@ use Illuminate\Filesystem\Filesystem;
 class InstallCommand extends Command
 {
     protected $signature = 'laravelcrm:filament-install
+        {--mode= : Install mode: crm (standalone panel) or inject (into an existing panel).}
+        {--panel= : Target panel id when using --mode=inject.}
         {--force : Overwrite an existing CrmPanelProvider.}';
 
     protected $description = 'Install the Laravel CRM Filament panel (publishes CrmPanelProvider at app/Providers/Filament/CrmPanelProvider.php).';
 
     public function handle(Filesystem $files): int
+    {
+        $mode = $this->option('mode');
+
+        if ($mode === 'inject') {
+            return $this->installInjectMode($files, $this->option('panel'));
+        }
+
+        return $this->installCrmMode($files);
+    }
+
+    private function installCrmMode(Filesystem $files): int
     {
         $stub = __DIR__ . '/../../stubs/CrmPanelProvider.php.stub';
         $target = app_path('Providers/Filament/CrmPanelProvider.php');
@@ -42,6 +55,13 @@ class InstallCommand extends Command
         $this->line('  2. Visit /admin to view your panel.');
 
         return self::SUCCESS;
+    }
+
+    private function installInjectMode(Filesystem $files, ?string $panelId): int
+    {
+        $this->error('Inject mode is not implemented yet.');
+
+        return self::FAILURE;
     }
 
     protected function registerProvider(Filesystem $files): void
