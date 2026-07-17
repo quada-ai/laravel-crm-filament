@@ -8,6 +8,7 @@ use Filament\PanelRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Throwable;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 class InstallCommand extends Command
 {
@@ -210,6 +211,68 @@ class InstallCommand extends Command
         $this->error('Inject mode is not implemented yet.');
 
         return self::FAILURE;
+    }
+
+    /**
+     * Compare the plugin's would-be resource list against a target panel's resources
+     * and return one descriptor per colliding `getSlug()`. Panel id/path collisions are
+     * intentionally NOT surfaced here — this only covers resource-slug conflicts.
+     *
+     * @return array<int, array{slug: string, existing: class-string, plugin: class-string}>
+     */
+    private function detectConflicts(Panel $target): array
+    {
+        $pluginResources = LaravelCrmPlugin::make()->getResources();
+
+        $existingBySlug = [];
+        foreach ($target->getResources() as $existing) {
+            $existingBySlug[$existing::getSlug()] = $existing;
+        }
+
+        $conflicts = [];
+        foreach ($pluginResources as $pluginResource) {
+            $slug = $pluginResource::getSlug();
+
+            if (! isset($existingBySlug[$slug])) {
+                continue;
+            }
+
+            $existing = $existingBySlug[$slug];
+
+            // A resource class registered on both sides isn't really a collision;
+            // only flag when two distinct classes claim the same slug.
+            if ($existing === $pluginResource) {
+                continue;
+            }
+
+            $conflicts[] = [
+                'slug' => $slug,
+                'existing' => $existing,
+                'plugin' => $pluginResource,
+            ];
+        }
+
+        return $conflicts;
+    }
+
+    /**
+     * @param  array<int, array{slug: string, existing: class-string, plugin: class-string}>  $conflicts
+     */
+    private function renderConflictTable(array $conflicts): void
+    {
+        $this->table(
+            ['Slug', 'Existing resource', 'Plugin resource'],
+            array_map(
+                static fn (array $conflict): array => [
+                    $conflict['slug'],
+                    $conflict['existing'],
+                    $conflict['plugin'],
+                ],
+                $conflicts
+            )
+        );
+
+        $this->line('Re-run with `--mode=crm` to publish a standalone /crm panel instead of injecting.');
     }
 
     protected function registerProvider(Filesystem $files): void
