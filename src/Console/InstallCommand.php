@@ -2,17 +2,140 @@
 
 namespace VentureDrake\LaravelCrmFilament\Console;
 
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\PanelRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use ReflectionClass;
+use Throwable;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 class InstallCommand extends Command
 {
     protected $signature = 'laravelcrm:filament-install
+        {--mode= : Install mode: crm (standalone panel) or inject (into an existing panel).}
+        {--panel= : Target panel id when using --mode=inject.}
         {--force : Overwrite an existing CrmPanelProvider.}';
 
     protected $description = 'Install the Laravel CRM Filament panel (publishes CrmPanelProvider at app/Providers/Filament/CrmPanelProvider.php).';
 
     public function handle(Filesystem $files): int
+    {
+        $mode = $this->option('mode');
+        $panelId = $this->option('panel');
+
+        if ($mode === null) {
+            [$mode, $panelId] = $this->resolveModeAndPanel($panelId);
+        } elseif ($mode === 'inject' && $panelId === null) {
+            $panelId = $this->promptForTargetPanel();
+        }
+
+        if ($mode === 'inject') {
+            return $this->installInjectMode($files, $panelId);
+        }
+
+        return $this->installCrmMode($files);
+    }
+
+    /**
+     * @return array{0: string, 1: ?string}
+     */
+    private function resolveModeAndPanel(?string $panelId): array
+    {
+        $panels = $this->detectPanels();
+
+        if ($panels === []) {
+            return ['crm', $panelId];
+        }
+
+        $isCrmOnly = count($panels) === 1 && $panels[0]['id'] === 'crm';
+
+        if ($isCrmOnly) {
+            return ['crm', $panelId];
+        }
+
+        $this->line('Detected Filament panels:');
+        $this->table(
+            ['ID', 'Path', 'Resources', 'Provider'],
+            array_map(
+                static fn (array $panel): array => [
+                    $panel['id'],
+                    $panel['path'],
+                    (string) $panel['resources'],
+                    $panel['provider'] ?? '(unknown)',
+                ],
+                $panels
+            )
+        );
+
+        $mode = $this->choice(
+            'How would you like to install the CRM?',
+            ['crm', 'inject'],
+            'crm'
+        );
+
+        if ($mode === 'inject' && $panelId === null) {
+            $panelId = $this->promptForTargetPanel($panels);
+        }
+
+        return [$mode, $panelId];
+    }
+
+    /**
+     * @param  array<int, array{id: string, path: string, resources: int, provider: ?string}>|null  $panels
+     */
+    private function promptForTargetPanel(?array $panels = null): ?string
+    {
+        $panels ??= $this->detectPanels();
+        $targets = array_values(array_filter($panels, static fn (array $p): bool => $p['id'] !== 'crm'));
+
+        if ($targets === []) {
+            $this->error('No non-CRM Filament panels detected to inject into.');
+
+            return null;
+        }
+
+        $options = array_column($targets, 'id');
+
+        return $this->choice(
+            'Which panel should the CRM be injected into?',
+            $options,
+            $options[0]
+        );
+    }
+
+    /**
+     * @return array<int, array{id: string, path: string, resources: int, provider: ?string}>
+     */
+    private function detectPanels(): array
+    {
+        $registry = app(PanelRegistry::class);
+
+        $providerByPanelId = [];
+        foreach (app()->getProviders(PanelProvider::class) as $provider) {
+            try {
+                $panel = $provider->panel(Panel::make());
+                $providerByPanelId[$panel->getId()] = get_class($provider);
+            } catch (Throwable) {
+                // Skip providers that can't be probed outside their normal registration path.
+            }
+        }
+
+        $descriptors = [];
+        foreach ($registry->all() as $panel) {
+            $descriptors[] = [
+                'id' => $panel->getId(),
+                'path' => $panel->getPath(),
+                'resources' => count($panel->getResources()),
+                'provider' => $providerByPanelId[$panel->getId()] ?? null,
+            ];
+        }
+
+        return $descriptors;
+    }
+
+    private function installCrmMode(Filesystem $files): int
     {
         $stub = __DIR__ . '/../../stubs/CrmPanelProvider.php.stub';
         $target = app_path('Providers/Filament/CrmPanelProvider.php');
@@ -35,13 +158,282 @@ class InstallCommand extends Command
 
         $this->registerProvider($files);
 
+        $this->maybeDisableLegacyCrmUi($files);
+
         $this->newLine();
         $this->line('Next steps:');
         $this->line('  1. Add the FilamentUser interface + canAccessPanel() to App\Models\User');
         $this->line('     (or rely on the HasCrmAccess trait once it implements FilamentUser).');
-        $this->line('  2. Visit /admin to view your panel.');
+        $this->line('  2. Visit /crm to view your panel.');
 
         return self::SUCCESS;
+    }
+
+    private function maybeDisableLegacyCrmUi(Filesystem $files): void
+    {
+        if (! config('laravel-crm.user_interface', true)) {
+            return;
+        }
+
+        $envLine = 'LARAVEL_CRM_USER_INTERFACE=false';
+        $confirmed = $this->confirm(
+            'Add LARAVEL_CRM_USER_INTERFACE=false to your .env now (disables the legacy /crm Livewire UI so the Filament CRM panel can take over /crm)?'
+        );
+
+        if (! $confirmed) {
+            $this->line("Add this line to your .env manually: {$envLine}");
+
+            return;
+        }
+
+        $envPath = base_path('.env');
+
+        if (! $files->exists($envPath)) {
+            $this->warn('.env file not found; add this line manually: ' . $envLine);
+
+            return;
+        }
+
+        $contents = $files->get($envPath);
+
+        if (preg_match('/^\s*LARAVEL_CRM_USER_INTERFACE\s*=/m', $contents) === 1) {
+            $this->line('LARAVEL_CRM_USER_INTERFACE is already set in .env; leaving as-is.');
+
+            return;
+        }
+
+        $suffix = (str_ends_with($contents, "\n") || $contents === '') ? '' : "\n";
+        $files->put($envPath, $contents . $suffix . $envLine . "\n");
+        $this->info('Appended LARAVEL_CRM_USER_INTERFACE=false to .env.');
+    }
+
+    private function installInjectMode(Filesystem $files, ?string $panelId): int
+    {
+        if ($panelId === null || $panelId === '') {
+            $this->error('Target panel id is required for inject mode. Pass --panel=<id>.');
+
+            return self::FAILURE;
+        }
+
+        $panel = app(PanelRegistry::class)->get($panelId);
+
+        if ($panel === null) {
+            $this->error("Panel '{$panelId}' was not found in the registry.");
+
+            return self::FAILURE;
+        }
+
+        $providerClass = $this->resolveProviderClassForPanel($panelId);
+
+        if ($providerClass === null) {
+            $this->error("Could not locate a PanelProvider class for panel '{$panelId}'.");
+
+            return self::FAILURE;
+        }
+
+        $providerFile = (new ReflectionClass($providerClass))->getFileName();
+
+        if ($providerFile === false || ! $files->exists($providerFile)) {
+            $this->error("Could not locate the source file for {$providerClass}.");
+
+            return self::FAILURE;
+        }
+
+        $conflicts = $this->detectConflicts($panel);
+
+        if ($conflicts !== [] && ! $this->option('force')) {
+            $this->error("Resource slug conflicts detected on panel '{$panelId}'. File was not modified.");
+            $this->renderConflictTable($conflicts);
+
+            return self::FAILURE;
+        }
+
+        $contents = $files->get($providerFile);
+        $original = $contents;
+
+        if (! str_contains($contents, 'LaravelCrmPlugin::make()')) {
+            $injected = $this->injectPluginCall($contents);
+
+            if ($injected === null) {
+                $this->warn("Could not auto-inject LaravelCrmPlugin into {$providerFile}; add this call to the returned \$panel chain manually:");
+                $this->line('    ->plugin(\\VentureDrake\\LaravelCrmFilament\\LaravelCrmPlugin::make())');
+
+                return self::SUCCESS;
+            }
+
+            $contents = $injected;
+        } else {
+            $this->line("LaravelCrmPlugin::make() is already present in {$providerFile}; skipping plugin insertion.");
+        }
+
+        $contents = $this->addLaravelCrmPluginImport($contents);
+
+        if ($contents !== $original) {
+            $files->put($providerFile, $contents);
+            $this->info("Injected LaravelCrmPlugin into {$providerFile}.");
+        }
+
+        $panelPath = $panel->getPath();
+        $this->newLine();
+        $this->info("Plugin registered on the `{$panelId}` panel. Visit /{$panelPath} to view.");
+
+        return self::SUCCESS;
+    }
+
+    private function resolveProviderClassForPanel(string $panelId): ?string
+    {
+        foreach (app()->getProviders(PanelProvider::class) as $provider) {
+            try {
+                $panel = $provider->panel(Panel::make());
+            } catch (Throwable) {
+                continue;
+            }
+
+            if ($panel->getId() === $panelId) {
+                return get_class($provider);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Regex-insert `->plugin(LaravelCrmPlugin::make())` before the terminating `;`
+     * of a `return $panel->...;` chain. Returns null if no safe anchor is found.
+     */
+    private function injectPluginCall(string $contents): ?string
+    {
+        // Match `return $panel` followed by chain content that does not contain
+        // a `;` immediately followed by whitespace then `}` — i.e. stop at the
+        // first `;` that closes off the panel() method body.
+        $pattern = '/(\breturn\s+\$panel\b(?:(?!;\s*\}).)*);(\s*\})/s';
+
+        $updated = preg_replace_callback(
+            $pattern,
+            static function (array $m): string {
+                $chain = $m[1];
+
+                // Detect the indent used by the last chain call so the injected
+                // line matches the surrounding style.
+                $indent = '            ';
+                if (preg_match_all('/\n([ \t]+)->/', $chain, $indentMatches) > 0) {
+                    $last = end($indentMatches[1]);
+                    if (is_string($last)) {
+                        $indent = $last;
+                    }
+                }
+
+                return $chain . "\n" . $indent . '->plugin(LaravelCrmPlugin::make());' . $m[2];
+            },
+            $contents,
+            1,
+            $count
+        );
+
+        if ($updated === null || $count === 0) {
+            return null;
+        }
+
+        return $updated;
+    }
+
+    private function addLaravelCrmPluginImport(string $contents): string
+    {
+        $useStatement = 'use VentureDrake\\LaravelCrmFilament\\LaravelCrmPlugin;';
+
+        if (str_contains($contents, $useStatement)) {
+            return $contents;
+        }
+
+        // Insert after the last existing `use` statement in the file header.
+        $updated = preg_replace_callback(
+            '/^((?:use [^;]+;\r?\n)+)/m',
+            static fn (array $m): string => $m[1] . $useStatement . "\n",
+            $contents,
+            1,
+            $count
+        );
+
+        if ($updated !== null && $count === 1) {
+            return $updated;
+        }
+
+        // Fall back to inserting after the namespace declaration.
+        $updated = preg_replace(
+            '/^(namespace [^;]+;\r?\n)/m',
+            "$1\n{$useStatement}\n",
+            $contents,
+            1,
+            $count
+        );
+
+        if ($updated !== null && $count === 1) {
+            return $updated;
+        }
+
+        return $contents;
+    }
+
+    /**
+     * Compare the plugin's would-be resource list against a target panel's resources
+     * and return one descriptor per colliding `getSlug()`. Panel id/path collisions are
+     * intentionally NOT surfaced here — this only covers resource-slug conflicts.
+     *
+     * @return array<int, array{slug: string, existing: class-string, plugin: class-string}>
+     */
+    private function detectConflicts(Panel $target): array
+    {
+        $pluginResources = LaravelCrmPlugin::make()->getResources();
+
+        $existingBySlug = [];
+        foreach ($target->getResources() as $existing) {
+            $existingBySlug[$existing::getSlug()] = $existing;
+        }
+
+        $conflicts = [];
+        foreach ($pluginResources as $pluginResource) {
+            $slug = $pluginResource::getSlug();
+
+            if (! isset($existingBySlug[$slug])) {
+                continue;
+            }
+
+            $existing = $existingBySlug[$slug];
+
+            // A resource class registered on both sides isn't really a collision;
+            // only flag when two distinct classes claim the same slug.
+            if ($existing === $pluginResource) {
+                continue;
+            }
+
+            $conflicts[] = [
+                'slug' => $slug,
+                'existing' => $existing,
+                'plugin' => $pluginResource,
+            ];
+        }
+
+        return $conflicts;
+    }
+
+    /**
+     * @param  array<int, array{slug: string, existing: class-string, plugin: class-string}>  $conflicts
+     */
+    private function renderConflictTable(array $conflicts): void
+    {
+        $this->table(
+            ['Slug', 'Existing resource', 'Plugin resource'],
+            array_map(
+                static fn (array $conflict): array => [
+                    $conflict['slug'],
+                    $conflict['existing'],
+                    $conflict['plugin'],
+                ],
+                $conflicts
+            )
+        );
+
+        $this->line('Re-run with `--mode=crm` to publish a standalone /crm panel instead of injecting.');
     }
 
     protected function registerProvider(Filesystem $files): void

@@ -234,7 +234,16 @@ class LaravelCrmPlugin implements Plugin
         return $this->brand;
     }
 
-    public function register(Panel $panel): void
+    /**
+     * The full list of Filament resource classes this plugin would register on a panel,
+     * honouring the same `config('laravel-crm.modules')` gating that `register()` applies.
+     *
+     * Extracted so callers (e.g. install-time conflict detection) can enumerate the
+     * plugin's resources without actually mutating a panel.
+     *
+     * @return array<int, class-string>
+     */
+    public function getResources(): array
     {
         // Contact + activity entities are always available (no module flag in core).
         $resources = [
@@ -318,12 +327,15 @@ class LaravelCrmPlugin implements Plugin
         $resources[] = FieldResource::class;
         $resources[] = RoleResource::class;
         $resources[] = UserResource::class;
+
         if ($this->isModuleEnabled('email-marketing')) {
             $resources[] = EmailTemplateResource::class;
         }
+
         if ($this->isModuleEnabled('sms-marketing')) {
             $resources[] = SmsTemplateResource::class;
         }
+
         if ($this->isModuleEnabled('chat')) {
             $resources[] = ChatWidgetResource::class;
         }
@@ -344,6 +356,13 @@ class LaravelCrmPlugin implements Plugin
         if ($this->isModuleEnabled('monitoring')) {
             $resources[] = MonitorResource::class;
         }
+
+        return $resources;
+    }
+
+    public function register(Panel $panel): void
+    {
+        $resources = $this->getResources();
 
         // Branding overrides: prefer plugin setters, fall back to laravel-crm settings.
         $settings = app()->bound('laravel-crm.settings') ? app('laravel-crm.settings') : null;

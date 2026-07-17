@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning 2.0.0](https://semver.org/spec/
 ### Changed
 
 - Widened Filament constraints so the plugin now supports **Filament v4 alongside Filament v5** (`filament/filament`, `filament/forms`, `filament/tables` accept `^4.0 | ^5.0`). Existing v5 installs are unaffected; hosts on Filament v4 can install without upgrading.
+- **Interactive install** — `php artisan laravelcrm:filament-install` now detects existing Filament panels and offers two install modes: publish a standalone `/crm` panel (Branch A) or inject the plugin into an existing panel (Branch B). Flags `--mode=crm|inject`, `--panel=<id>`, and `--force` bypass the prompts for CI. Branch A offers to append `LARAVEL_CRM_USER_INTERFACE=false` to `.env` so the Filament panel can take over `/crm` from the legacy CRM Livewire UI; Branch B aborts on resource-slug collisions between the host's panel and the plugin unless `--force` is passed.
+- **`CrmPanelProvider` stub retemplated** — the published `CrmPanelProvider` now mounts at `/crm` (was `/admin`) and drops the `->discoverResources()` / `->discoverPages()` / `->discoverWidgets()` block, since the plugin registers everything via `LaravelCrmPlugin::register()`.
 
 ## [1.0.0] - 2026-07-16
 
