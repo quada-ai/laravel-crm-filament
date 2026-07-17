@@ -2,8 +2,12 @@
 
 namespace VentureDrake\LaravelCrmFilament\Console;
 
+use Filament\Panel;
+use Filament\PanelProvider;
+use Filament\PanelRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Throwable;
 
 class InstallCommand extends Command
 {
@@ -17,12 +21,116 @@ class InstallCommand extends Command
     public function handle(Filesystem $files): int
     {
         $mode = $this->option('mode');
+        $panelId = $this->option('panel');
+
+        if ($mode === null) {
+            [$mode, $panelId] = $this->resolveModeAndPanel($panelId);
+        } elseif ($mode === 'inject' && $panelId === null) {
+            $panelId = $this->promptForTargetPanel();
+        }
 
         if ($mode === 'inject') {
-            return $this->installInjectMode($files, $this->option('panel'));
+            return $this->installInjectMode($files, $panelId);
         }
 
         return $this->installCrmMode($files);
+    }
+
+    /**
+     * @return array{0: string, 1: ?string}
+     */
+    private function resolveModeAndPanel(?string $panelId): array
+    {
+        $panels = $this->detectPanels();
+
+        if ($panels === []) {
+            return ['crm', $panelId];
+        }
+
+        $isCrmOnly = count($panels) === 1 && $panels[0]['id'] === 'crm';
+
+        if ($isCrmOnly) {
+            return ['crm', $panelId];
+        }
+
+        $this->line('Detected Filament panels:');
+        $this->table(
+            ['ID', 'Path', 'Resources', 'Provider'],
+            array_map(
+                static fn (array $panel): array => [
+                    $panel['id'],
+                    $panel['path'],
+                    (string) $panel['resources'],
+                    $panel['provider'] ?? '(unknown)',
+                ],
+                $panels
+            )
+        );
+
+        $mode = $this->choice(
+            'How would you like to install the CRM?',
+            ['crm', 'inject'],
+            'crm'
+        );
+
+        if ($mode === 'inject' && $panelId === null) {
+            $panelId = $this->promptForTargetPanel($panels);
+        }
+
+        return [$mode, $panelId];
+    }
+
+    /**
+     * @param  array<int, array{id: string, path: string, resources: int, provider: ?string}>|null  $panels
+     */
+    private function promptForTargetPanel(?array $panels = null): ?string
+    {
+        $panels ??= $this->detectPanels();
+        $targets = array_values(array_filter($panels, static fn (array $p): bool => $p['id'] !== 'crm'));
+
+        if ($targets === []) {
+            $this->error('No non-CRM Filament panels detected to inject into.');
+
+            return null;
+        }
+
+        $options = array_column($targets, 'id');
+
+        return $this->choice(
+            'Which panel should the CRM be injected into?',
+            $options,
+            $options[0]
+        );
+    }
+
+    /**
+     * @return array<int, array{id: string, path: string, resources: int, provider: ?string}>
+     */
+    private function detectPanels(): array
+    {
+        $registry = app(PanelRegistry::class);
+
+        $providerByPanelId = [];
+        foreach (app()->getProviders(PanelProvider::class) as $provider) {
+            try {
+                $panel = $provider->panel(Panel::make());
+                $providerByPanelId[$panel->getId()] = get_class($provider);
+            } catch (Throwable) {
+                // Skip providers that can't be probed outside their normal registration path.
+            }
+        }
+
+        $descriptors = [];
+        foreach ($registry->all() as $panel) {
+            $descriptors[] = [
+                'id' => $panel->getId(),
+                'path' => $panel->getPath(),
+                'resources' => count($panel->getResources()),
+                'provider' => $providerByPanelId[$panel->getId()] ?? null,
+            ];
+        }
+
+        return $descriptors;
     }
 
     private function installCrmMode(Filesystem $files): int
