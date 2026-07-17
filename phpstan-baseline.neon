@@ -1,18 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Method VentureDrake\\LaravelCrmFilament\\Console\\InstallCommand\:\:detectConflicts\(\) is unused\.$#'
-			identifier: method.unused
-			count: 1
-			path: src/Console/InstallCommand.php
-
-		-
-			message: '#^Method VentureDrake\\LaravelCrmFilament\\Console\\InstallCommand\:\:renderConflictTable\(\) is unused\.$#'
-			identifier: method.unused
-			count: 1
-			path: src/Console/InstallCommand.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable&Illuminate\\Database\\Eloquent\\Model\:\:\$email\.$#'
 			identifier: property.notFound
 			count: 2

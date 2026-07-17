@@ -7,6 +7,7 @@ use Filament\PanelProvider;
 use Filament\PanelRegistry;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use ReflectionClass;
 use Throwable;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
@@ -208,9 +209,169 @@ class InstallCommand extends Command
 
     private function installInjectMode(Filesystem $files, ?string $panelId): int
     {
-        $this->error('Inject mode is not implemented yet.');
+        if ($panelId === null || $panelId === '') {
+            $this->error('Target panel id is required for inject mode. Pass --panel=<id>.');
 
-        return self::FAILURE;
+            return self::FAILURE;
+        }
+
+        $panel = app(PanelRegistry::class)->get($panelId);
+
+        if ($panel === null) {
+            $this->error("Panel '{$panelId}' was not found in the registry.");
+
+            return self::FAILURE;
+        }
+
+        $providerClass = $this->resolveProviderClassForPanel($panelId);
+
+        if ($providerClass === null) {
+            $this->error("Could not locate a PanelProvider class for panel '{$panelId}'.");
+
+            return self::FAILURE;
+        }
+
+        $providerFile = (new ReflectionClass($providerClass))->getFileName();
+
+        if ($providerFile === false || ! $files->exists($providerFile)) {
+            $this->error("Could not locate the source file for {$providerClass}.");
+
+            return self::FAILURE;
+        }
+
+        $conflicts = $this->detectConflicts($panel);
+
+        if ($conflicts !== [] && ! $this->option('force')) {
+            $this->error("Resource slug conflicts detected on panel '{$panelId}'. File was not modified.");
+            $this->renderConflictTable($conflicts);
+
+            return self::FAILURE;
+        }
+
+        $contents = $files->get($providerFile);
+        $original = $contents;
+
+        if (! str_contains($contents, 'LaravelCrmPlugin::make()')) {
+            $injected = $this->injectPluginCall($contents);
+
+            if ($injected === null) {
+                $this->warn("Could not auto-inject LaravelCrmPlugin into {$providerFile}; add this call to the returned \$panel chain manually:");
+                $this->line('    ->plugin(\\VentureDrake\\LaravelCrmFilament\\LaravelCrmPlugin::make())');
+
+                return self::SUCCESS;
+            }
+
+            $contents = $injected;
+        } else {
+            $this->line("LaravelCrmPlugin::make() is already present in {$providerFile}; skipping plugin insertion.");
+        }
+
+        $contents = $this->addLaravelCrmPluginImport($contents);
+
+        if ($contents !== $original) {
+            $files->put($providerFile, $contents);
+            $this->info("Injected LaravelCrmPlugin into {$providerFile}.");
+        }
+
+        $panelPath = $panel->getPath();
+        $this->newLine();
+        $this->info("Plugin registered on the `{$panelId}` panel. Visit /{$panelPath} to view.");
+
+        return self::SUCCESS;
+    }
+
+    private function resolveProviderClassForPanel(string $panelId): ?string
+    {
+        foreach (app()->getProviders(PanelProvider::class) as $provider) {
+            try {
+                $panel = $provider->panel(Panel::make());
+            } catch (Throwable) {
+                continue;
+            }
+
+            if ($panel->getId() === $panelId) {
+                return get_class($provider);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Regex-insert `->plugin(LaravelCrmPlugin::make())` before the terminating `;`
+     * of a `return $panel->...;` chain. Returns null if no safe anchor is found.
+     */
+    private function injectPluginCall(string $contents): ?string
+    {
+        // Match `return $panel` followed by chain content that does not contain
+        // a `;` immediately followed by whitespace then `}` — i.e. stop at the
+        // first `;` that closes off the panel() method body.
+        $pattern = '/(\breturn\s+\$panel\b(?:(?!;\s*\}).)*);(\s*\})/s';
+
+        $updated = preg_replace_callback(
+            $pattern,
+            static function (array $m): string {
+                $chain = $m[1];
+
+                // Detect the indent used by the last chain call so the injected
+                // line matches the surrounding style.
+                $indent = '            ';
+                if (preg_match_all('/\n([ \t]+)->/', $chain, $indentMatches) > 0) {
+                    $last = end($indentMatches[1]);
+                    if (is_string($last)) {
+                        $indent = $last;
+                    }
+                }
+
+                return $chain . "\n" . $indent . '->plugin(LaravelCrmPlugin::make());' . $m[2];
+            },
+            $contents,
+            1,
+            $count
+        );
+
+        if ($updated === null || $count === 0) {
+            return null;
+        }
+
+        return $updated;
+    }
+
+    private function addLaravelCrmPluginImport(string $contents): string
+    {
+        $useStatement = 'use VentureDrake\\LaravelCrmFilament\\LaravelCrmPlugin;';
+
+        if (str_contains($contents, $useStatement)) {
+            return $contents;
+        }
+
+        // Insert after the last existing `use` statement in the file header.
+        $updated = preg_replace_callback(
+            '/^((?:use [^;]+;\r?\n)+)/m',
+            static fn (array $m): string => $m[1] . $useStatement . "\n",
+            $contents,
+            1,
+            $count
+        );
+
+        if ($updated !== null && $count === 1) {
+            return $updated;
+        }
+
+        // Fall back to inserting after the namespace declaration.
+        $updated = preg_replace(
+            '/^(namespace [^;]+;\r?\n)/m',
+            "$1\n{$useStatement}\n",
+            $contents,
+            1,
+            $count
+        );
+
+        if ($updated !== null && $count === 1) {
+            return $updated;
+        }
+
+        return $contents;
     }
 
     /**
