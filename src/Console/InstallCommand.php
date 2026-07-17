@@ -156,13 +156,53 @@ class InstallCommand extends Command
 
         $this->registerProvider($files);
 
+        $this->maybeDisableLegacyCrmUi($files);
+
         $this->newLine();
         $this->line('Next steps:');
         $this->line('  1. Add the FilamentUser interface + canAccessPanel() to App\Models\User');
         $this->line('     (or rely on the HasCrmAccess trait once it implements FilamentUser).');
-        $this->line('  2. Visit /admin to view your panel.');
+        $this->line('  2. Visit /crm to view your panel.');
 
         return self::SUCCESS;
+    }
+
+    private function maybeDisableLegacyCrmUi(Filesystem $files): void
+    {
+        if (! config('laravel-crm.user_interface', true)) {
+            return;
+        }
+
+        $envLine = 'LARAVEL_CRM_USER_INTERFACE=false';
+        $confirmed = $this->confirm(
+            'Add LARAVEL_CRM_USER_INTERFACE=false to your .env now (disables the legacy /crm Livewire UI so the Filament CRM panel can take over /crm)?'
+        );
+
+        if (! $confirmed) {
+            $this->line("Add this line to your .env manually: {$envLine}");
+
+            return;
+        }
+
+        $envPath = base_path('.env');
+
+        if (! $files->exists($envPath)) {
+            $this->warn('.env file not found; add this line manually: ' . $envLine);
+
+            return;
+        }
+
+        $contents = $files->get($envPath);
+
+        if (preg_match('/^\s*LARAVEL_CRM_USER_INTERFACE\s*=/m', $contents) === 1) {
+            $this->line('LARAVEL_CRM_USER_INTERFACE is already set in .env; leaving as-is.');
+
+            return;
+        }
+
+        $suffix = (str_ends_with($contents, "\n") || $contents === '') ? '' : "\n";
+        $files->put($envPath, $contents . $suffix . $envLine . "\n");
+        $this->info('Appended LARAVEL_CRM_USER_INTERFACE=false to .env.');
     }
 
     private function installInjectMode(Filesystem $files, ?string $panelId): int
