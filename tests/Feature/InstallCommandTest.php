@@ -55,7 +55,7 @@ it('publishes CrmPanelProvider and registers it in bootstrap/providers.php on --
         "<?php\n\nreturn [\n    App\\Providers\\AppServiceProvider::class,\n];\n"
     );
 
-    $this->artisan('laravelcrm:filament-install', ['--mode' => 'crm'])
+    $this->artisan('laravelcrm:filament-install', ['--mode' => 'crm', '--skip-crm-install' => true])
         ->expectsConfirmation(
             'Add LARAVEL_CRM_USER_INTERFACE=false to your .env now (disables the legacy /crm Livewire UI so the Filament CRM panel can take over /crm)?',
             'no'
@@ -108,6 +108,7 @@ PHP
     $this->artisan('laravelcrm:filament-install', [
         '--mode' => 'inject',
         '--panel' => $panelId,
+        '--skip-crm-install' => true,
     ])->assertSuccessful();
 
     $updated = File::get($providerFile);
@@ -173,6 +174,7 @@ PHP
     $this->artisan('laravelcrm:filament-install', [
         '--mode' => 'inject',
         '--panel' => $panelId,
+        '--skip-crm-install' => true,
     ])
         ->expectsOutputToContain('users')
         ->expectsOutputToContain('--mode=crm')
@@ -222,12 +224,52 @@ PHP
     $this->artisan('laravelcrm:filament-install', [
         '--mode' => 'inject',
         '--panel' => $panelId,
+        '--skip-crm-install' => true,
     ])
         ->expectsOutputToContain('Could not auto-inject')
         ->expectsOutputToContain('LaravelCrmPlugin::make()')
         ->assertExitCode(0);
 
     expect(md5(File::get($providerFile)))->toBe($beforeHash);
+});
+
+it('skips the laravel-crm install check when config/laravel-crm.php is already published', function () {
+    $temp = crmInstallMakeTempDir();
+    app()->setBasePath($temp);
+
+    File::ensureDirectoryExists($temp . '/config');
+    File::put($temp . '/config/laravel-crm.php', "<?php\n\nreturn [];\n");
+
+    File::ensureDirectoryExists($temp . '/bootstrap');
+    File::put($temp . '/bootstrap/providers.php', "<?php\n\nreturn [\n];\n");
+
+    // No expectsConfirmation for the CRM install prompt — the check should
+    // detect the published config and skip straight to the panel install.
+    $this->artisan('laravelcrm:filament-install', ['--mode' => 'crm'])
+        ->expectsConfirmation(
+            'Add LARAVEL_CRM_USER_INTERFACE=false to your .env now (disables the legacy /crm Livewire UI so the Filament CRM panel can take over /crm)?',
+            'no'
+        )
+        ->assertSuccessful();
+
+    expect(File::exists($temp . '/app/Providers/Filament/CrmPanelProvider.php'))->toBeTrue();
+});
+
+it('aborts with failure when laravel-crm is not installed and the user declines to install it', function () {
+    $temp = crmInstallMakeTempDir();
+    app()->setBasePath($temp);
+
+    File::ensureDirectoryExists($temp . '/bootstrap');
+    File::put($temp . '/bootstrap/providers.php', "<?php\n\nreturn [\n];\n");
+
+    // No published config → the command should prompt to run laravelcrm:install.
+    $this->artisan('laravelcrm:filament-install', ['--mode' => 'crm'])
+        ->expectsConfirmation('Run `php artisan laravelcrm:install` now?', 'no')
+        ->expectsOutputToContain('Aborting')
+        ->assertFailed();
+
+    // Nothing should have been published because the command bailed early.
+    expect(File::exists($temp . '/app/Providers/Filament/CrmPanelProvider.php'))->toBeFalse();
 });
 
 it('does not prompt or mutate .env on --mode=crm when LARAVEL_CRM_USER_INTERFACE is already false', function () {
@@ -245,7 +287,7 @@ it('does not prompt or mutate .env on --mode=crm when LARAVEL_CRM_USER_INTERFACE
 
     // No expectsConfirmation() — if the command tries to prompt, Testbench
     // fails the test with "unexpected question".
-    $this->artisan('laravelcrm:filament-install', ['--mode' => 'crm'])
+    $this->artisan('laravelcrm:filament-install', ['--mode' => 'crm', '--skip-crm-install' => true])
         ->assertSuccessful();
 
     expect(File::get($temp . '/.env'))->toBe($envBefore);

@@ -20,7 +20,9 @@ composer require venturedrake/laravel-crm-filament
 php artisan laravelcrm:filament-install
 ```
 
-The install command inspects the host app for existing Filament panels and drives an interactive prompt:
+The install command first checks whether `venturedrake/laravel-crm` itself has been installed (by looking for `config/laravel-crm.php`). If it hasn't, you'll be asked whether to run `php artisan laravelcrm:install` first — say yes and the underlying CRM package's config, migrations, seed data, and owner user will be set up before the Filament panel is wired up. Pass `--skip-crm-install` to bypass this check.
+
+Once the CRM package is confirmed installed, the command inspects the host app for existing Filament panels and drives an interactive prompt:
 
 - **No panels detected** → publishes a standalone CRM panel automatically.
 - **Only the plugin's own `crm` panel already installed** → re-runs the standalone publish (use `--force` to overwrite).
@@ -51,6 +53,7 @@ The prompts can be bypassed with flags:
 | `--mode=crm` | Force Branch A (standalone `/crm` panel), no interactive choice |
 | `--mode=inject --panel=<id>` | Force Branch B injection into panel `<id>` |
 | `--force` | Overwrite an existing `CrmPanelProvider.php` (Branch A) or bypass slug-collision detection (Branch B) |
+| `--skip-crm-install` | Skip the `venturedrake/laravel-crm` install check (assume it has already been installed) |
 
 Example — non-interactive injection into an existing `admin` panel:
 

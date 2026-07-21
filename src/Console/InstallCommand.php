@@ -16,12 +16,17 @@ class InstallCommand extends Command
     protected $signature = 'laravelcrm:filament-install
         {--mode= : Install mode: crm (standalone panel) or inject (into an existing panel).}
         {--panel= : Target panel id when using --mode=inject.}
-        {--force : Overwrite an existing CrmPanelProvider.}';
+        {--force : Overwrite an existing CrmPanelProvider.}
+        {--skip-crm-install : Skip the venturedrake/laravel-crm install check (assume it is already installed).}';
 
     protected $description = 'Install the Laravel CRM Filament panel (publishes CrmPanelProvider at app/Providers/Filament/CrmPanelProvider.php).';
 
     public function handle(Filesystem $files): int
     {
+        if (! $this->ensureLaravelCrmInstalled()) {
+            return self::FAILURE;
+        }
+
         $mode = $this->option('mode');
         $panelId = $this->option('panel');
 
@@ -36,6 +41,43 @@ class InstallCommand extends Command
         }
 
         return $this->installCrmMode($files);
+    }
+
+    private function ensureLaravelCrmInstalled(): bool
+    {
+        if ($this->option('skip-crm-install')) {
+            return true;
+        }
+
+        if ($this->laravelCrmIsInstalled()) {
+            return true;
+        }
+
+        $this->warn('The venturedrake/laravel-crm package does not appear to be installed yet.');
+        $this->line('The Filament panel needs the CRM package config, migrations, and seed data in place before it can run.');
+
+        $confirmed = $this->confirm('Run `php artisan laravelcrm:install` now?', true);
+
+        if (! $confirmed) {
+            $this->error('Aborting. Run `php artisan laravelcrm:install` manually, then re-run this command.');
+
+            return false;
+        }
+
+        $exitCode = $this->call('laravelcrm:install');
+
+        if ($exitCode !== 0) {
+            $this->error('`laravelcrm:install` exited with a non-zero status. Fix the reported issue and re-run this command.');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function laravelCrmIsInstalled(): bool
+    {
+        return file_exists(config_path('laravel-crm.php'));
     }
 
     /**
