@@ -1,7 +1,7 @@
 # Laravel CRM — Filament Plugin
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/venturedrake/laravel-crm-filament.svg?style=flat-square)](https://packagist.org/packages/venturedrake/laravel-crm-filament)
-[![License](https://img.shields.io/packagist/l/venturedrake/laravel-crm-filament.svg?style=flat-square)](LICENSE.md)
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![Total Downloads](https://img.shields.io/packagist/dt/venturedrake/laravel-crm-filament.svg?style=flat-square)](https://packagist.org/packages/venturedrake/laravel-crm-filament)
 
 A native Filament plugin for [`venturedrake/laravel-crm`](https://github.com/venturedrake/laravel-crm). Wraps the existing CRM domain layer (models, services, observers, policies, encryption, audit) in Filament Resources, Clusters, Pages, and Widgets so the same database can be administered via Filament alongside (or instead of) the legacy `/crm` MaryUI/Livewire interface.
