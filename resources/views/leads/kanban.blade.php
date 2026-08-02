@@ -119,7 +119,7 @@
                                             class="crm-kanban-btn crm-kanban-btn-primary"
                                             title="Convert to deal">Convert</button>
                                 </div>
-                                <a href="{{ route('filament.crm.resources.leads.edit', ['record' => $lead->external_id]) }}"
+                                <a href="{{ $this::getResource()::getUrl('edit', ['record' => $lead->external_id]) }}"
                                    class="crm-kanban-card-link">
                                     <div class="crm-kanban-card-id">{{ $lead->lead_id }}</div>
                                     <div class="crm-kanban-card-title">{{ $lead->title }}</div>
@@ -136,9 +136,6 @@
             @empty
                 <div class="crm-kanban-empty">
                     No pipeline stages configured for Leads.
-                    <a style="color:#05b3a9;" href="{{ route('filament.crm.settings.resources.pipelines.index') }}">
-                        Configure pipelines
-                    </a>.
                 </div>
             @endforelse
         </div>

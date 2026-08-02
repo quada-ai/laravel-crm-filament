@@ -92,7 +92,7 @@
                     <div data-call-column data-status="{{ $status }}" class="crm-call-list">
                         @foreach ($calls as $call)
                             <div data-call-id="{{ $call->external_id }}" class="crm-call-card">
-                                <a href="{{ route('filament.crm.resources.calls.view', ['record' => $call->external_id]) }}"
+                                <a href="{{ $this::getResource()::getUrl('view', ['record' => $call->external_id]) }}"
                                    class="crm-call-card-link">
                                     <div class="crm-call-card-title">{{ $call->name }}</div>
                                     @if ($call->start_at)

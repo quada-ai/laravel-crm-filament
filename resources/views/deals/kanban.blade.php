@@ -89,7 +89,7 @@
                                     <button type="button" wire:click.stop="markLost('{{ $deal->external_id }}')"
                                             class="crm-kanban-btn crm-kanban-btn-danger" title="Mark lost">Lost</button>
                                 </div>
-                                <a href="{{ route('filament.crm.resources.deals.edit', ['record' => $deal->external_id]) }}"
+                                <a href="{{ $this::getResource()::getUrl('edit', ['record' => $deal->external_id]) }}"
                                    class="crm-kanban-card-link">
                                     <div class="crm-kanban-card-id">{{ $deal->deal_id }}</div>
                                     <div class="crm-kanban-card-title">{{ $deal->title }}</div>

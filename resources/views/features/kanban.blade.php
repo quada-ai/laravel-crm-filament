@@ -100,7 +100,7 @@
                     <div data-kanban-column data-status-id="{{ $status->id }}" class="crm-kanban-list">
                         @foreach ($statusFeatures as $feature)
                             <div data-feature-id="{{ $feature->external_id }}" class="crm-kanban-card">
-                                <a href="{{ route('filament.crm.resources.features.edit', ['record' => $feature->external_id]) }}"
+                                <a href="{{ $this::getResource()::getUrl('edit', ['record' => $feature->external_id]) }}"
                                    class="crm-kanban-card-link">
                                     <div class="crm-kanban-card-id">{{ $feature->feature_id }}</div>
                                     <div class="crm-kanban-card-title">{{ $feature->title }}</div>
@@ -117,9 +117,6 @@
             @empty
                 <div class="crm-kanban-empty">
                     No feature statuses configured.
-                    <a style="color:#05b3a9;" href="{{ route('filament.crm.settings.resources.feature-statuses.index') }}">
-                        Configure feature statuses
-                    </a>.
                 </div>
             @endforelse
         </div>

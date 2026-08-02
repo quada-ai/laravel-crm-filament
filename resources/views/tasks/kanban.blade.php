@@ -94,7 +94,7 @@
                     <div data-task-column data-status="{{ $status }}" class="crm-task-list">
                         @foreach ($tasks as $task)
                             <div data-task-id="{{ $task->external_id }}" class="crm-task-card">
-                                <a href="{{ route('filament.crm.resources.tasks.edit', ['record' => $task->external_id]) }}"
+                                <a href="{{ $this::getResource()::getUrl('edit', ['record' => $task->external_id]) }}"
                                    class="crm-task-card-link">
                                     <div class="crm-task-card-title">{{ $task->name }}</div>
                                     @if ($task->due_at)

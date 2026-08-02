@@ -89,7 +89,7 @@
                                     <button type="button" wire:click.stop="markRejected('{{ $quote->external_id }}')"
                                             class="crm-kanban-btn crm-kanban-btn-danger" title="Mark rejected">Reject</button>
                                 </div>
-                                <a href="{{ route('filament.crm.resources.quotes.edit', ['record' => $quote->external_id]) }}"
+                                <a href="{{ $this::getResource()::getUrl('edit', ['record' => $quote->external_id]) }}"
                                    class="crm-kanban-card-link">
                                     <div class="crm-kanban-card-id">{{ $quote->quote_id }}</div>
                                     <div class="crm-kanban-card-title">{{ $quote->title }}</div>
