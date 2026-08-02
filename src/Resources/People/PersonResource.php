@@ -38,12 +38,8 @@ use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ListPeople;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ViewPerson;
 
-use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
-use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
-use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+
 use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
-use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
-use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 class PersonResource extends Resource
 {
@@ -153,11 +149,11 @@ class PersonResource extends Resource
 
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('laravel-crm-filament::labels.fields.email'))
-                    ->state(fn ($record) => $record?->getPrimaryEmail()?->address),
+                    ->state(fn($record) => $record?->getPrimaryEmail()?->address),
 
                 Tables\Columns\TextColumn::make('phone')
                     ->label(__('laravel-crm-filament::labels.fields.phone'))
-                    ->state(fn ($record) => $record?->getPrimaryPhone()?->number),
+                    ->state(fn($record) => $record?->getPrimaryPhone()?->number),
 
                 Tables\Columns\TextColumn::make('open_deals_count')
                     ->label(__('laravel-crm-filament::labels.fields.open_deals'))
@@ -176,7 +172,7 @@ class PersonResource extends Resource
 
                 Tables\Columns\TextColumn::make('next_activity')
                     ->label(__('laravel-crm-filament::labels.fields.next_activity'))
-                    ->state(fn ($record) => $record?->tasks()
+                    ->state(fn($record) => $record?->tasks()
                         ->whereNull('completed_at')
                         ->where('due_at', '>=', now())
                         ->orderBy('due_at')
@@ -196,14 +192,14 @@ class PersonResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->modifyQueryUsing(function (Builder $query) use ($encrypted) {
                 $query->withCount([
-                    'deals as open_deals_count' => fn ($q) => $q->whereNull('closed_at'),
-                    'deals as lost_deals_count' => fn ($q) => $q->where('closed_status', 'lost'),
-                    'deals as won_deals_count' => fn ($q) => $q->where('closed_status', 'won'),
+                    'deals as open_deals_count' => fn($q) => $q->whereNull('closed_at'),
+                    'deals as lost_deals_count' => fn($q) => $q->where('closed_status', 'lost'),
+                    'deals as won_deals_count' => fn($q) => $q->where('closed_status', 'won'),
                 ]);
 
                 if ($encrypted) {
                     $accessor = HasEncryptedSearch::modifyQuery(
-                        fn ($r) => trim(($r->first_name ?? '') . ' ' . ($r->last_name ?? ''))
+                        fn($r) => trim(($r->first_name ?? '') . ' ' . ($r->last_name ?? ''))
                     );
                     $accessor($query);
                 }
@@ -225,11 +221,11 @@ class PersonResource extends Resource
                 Actions\BulkActionGroup::make([
                     ExportsCsv::action(
                         columns: [
-                            'First name' => fn ($r) => $r->first_name,
-                            'Last name' => fn ($r) => $r->last_name,
-                            'Organization' => fn ($r) => optional($r->organization)->name,
-                            'Owner' => fn ($r) => optional($r->ownerUser)->name,
-                            'Created' => fn ($r) => $r->created_at,
+                            'First name' => fn($r) => $r->first_name,
+                            'Last name' => fn($r) => $r->last_name,
+                            'Organization' => fn($r) => optional($r->organization)->name,
+                            'Owner' => fn($r) => optional($r->ownerUser)->name,
+                            'Created' => fn($r) => $r->created_at,
                         ],
                         filename: 'people',
                     ),
@@ -242,20 +238,20 @@ class PersonResource extends Resource
     {
         return $schema->components([
             Section::make(__('laravel-crm-filament::labels.sections.identity'))
-                ->schema(fn (?Person $record) => array_merge(
+                ->schema(fn(?Person $record) => array_merge(
                     static::personDetailEntries($record),
                     $record ? static::crmCustomFieldEntries($record, false) : [],
                 )),
 
             Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
-                ->schema(fn (?Person $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
+                ->schema(fn(?Person $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
                 ->hidden(function ($record): bool {
                     if (! $record instanceof Person) {
                         return true;
                     }
 
                     return ! $record->fields()
-                        ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
+                        ->whereHas('field', fn($q) => $q->whereNotNull('field_group_id'))
                         ->exists();
                 }),
         ])->columns(1);
@@ -278,7 +274,7 @@ class PersonResource extends Resource
 
             TextEntry::make('gender')
                 ->label(__('laravel-crm-filament::labels.fields.gender'))
-                ->formatStateUsing(fn ($state) => $state ? ucfirst((string) $state) : null),
+                ->formatStateUsing(fn($state) => $state ? ucfirst((string) $state) : null),
 
             TextEntry::make('birthday')
                 ->label(__('laravel-crm-filament::labels.fields.birthday')),
@@ -402,7 +398,7 @@ class PersonResource extends Resource
 
     protected static function crmEncryptedSearchAccessor(): \Closure
     {
-        return fn ($r) => trim((($r->first_name ?? '') . ' ' . ($r->middle_name ?? '') . ' ' . ($r->last_name ?? '') . ' ' . ($r->maiden_name ?? '')));
+        return fn($r) => trim((($r->first_name ?? '') . ' ' . ($r->middle_name ?? '') . ' ' . ($r->last_name ?? '') . ' ' . ($r->maiden_name ?? '')));
     }
 
     public static function getRecordTitle(?Model $record): string | Htmlable | null
