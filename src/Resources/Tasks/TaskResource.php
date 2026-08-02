@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Collection;
 use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\CreateTask;
@@ -24,13 +25,6 @@ use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\EditTask;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\ListTasks;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\TaskKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\ViewTask;
-
-use VentureDrake\LaravelCrm\Models\Task;
-use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
-use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
-use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
-use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
-use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 class TaskResource extends Resource
 {

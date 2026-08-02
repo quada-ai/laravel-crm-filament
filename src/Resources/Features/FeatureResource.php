@@ -20,6 +20,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\AuditsRelationManager;
@@ -37,12 +38,6 @@ use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\EditFeature;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\FeatureKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\ListFeatures;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\ViewFeature;
-
-use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
-use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
-use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
-use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
-use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 class FeatureResource extends Resource
 {

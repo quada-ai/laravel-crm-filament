@@ -34,6 +34,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
@@ -50,13 +51,6 @@ use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\CreatePurchas
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\EditPurchaseOrder;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\ListPurchaseOrders;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\ViewPurchaseOrder;
-
-use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
-use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
-use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
-use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
-use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
-use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 class PurchaseOrderResource extends Resource
 {

@@ -38,6 +38,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
 use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Models\InvoicePayment;
@@ -55,13 +56,6 @@ use VentureDrake\LaravelCrmFilament\Resources\Invoices\Pages\ViewInvoice;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
-
-use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
-use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
-use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
-use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
-use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
-use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 class InvoiceResource extends Resource
 {

@@ -25,6 +25,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
 use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
@@ -41,13 +42,6 @@ use VentureDrake\LaravelCrmFilament\Resources\Deliveries\Pages\ViewDelivery;
 use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
-
-use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
-use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
-use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
-use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
-use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
-use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 
 class DeliveryResource extends Resource
 {

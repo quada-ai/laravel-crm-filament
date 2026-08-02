@@ -24,6 +24,7 @@ use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
 use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\CrmActivitiesRelationManager;
@@ -37,9 +38,6 @@ use VentureDrake\LaravelCrmFilament\Resources\People\Pages\CreatePerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ListPeople;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ViewPerson;
-
-
-use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 
 class PersonResource extends Resource
 {
