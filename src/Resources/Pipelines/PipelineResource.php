@@ -35,6 +35,8 @@ class PipelineResource extends Resource
 
     protected static ?string $model = Pipeline::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'pipelines';
 
     protected static ?string $recordTitleAttribute = 'name';

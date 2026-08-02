@@ -25,6 +25,8 @@ class ProductAttributeResource extends Resource
 
     protected static ?string $model = ProductAttribute::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'product-attributes';
 
     protected static ?string $recordTitleAttribute = 'name';

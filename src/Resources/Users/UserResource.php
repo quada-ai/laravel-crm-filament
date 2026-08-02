@@ -34,6 +34,8 @@ class UserResource extends Resource
 
     protected static ?string $slug = 'users';
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-users';

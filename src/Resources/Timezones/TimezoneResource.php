@@ -25,6 +25,8 @@ class TimezoneResource extends Resource
 
     protected static ?string $model = Timezone::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'timezones';
 
     protected static ?string $recordTitleAttribute = 'name';

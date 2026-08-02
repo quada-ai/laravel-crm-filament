@@ -24,6 +24,8 @@ class OrganizationTypeResource extends Resource
 
     protected static ?string $model = OrganizationType::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'organization-types';
 
     protected static ?string $recordTitleAttribute = 'name';

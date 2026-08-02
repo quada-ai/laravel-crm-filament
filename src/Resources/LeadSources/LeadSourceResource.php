@@ -27,6 +27,8 @@ class LeadSourceResource extends Resource
 
     protected static ?string $model = LeadSource::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'lead-sources';
 
     protected static ?string $recordTitleAttribute = 'name';

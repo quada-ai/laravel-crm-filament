@@ -27,6 +27,8 @@ class ProductCategoryResource extends Resource
 
     protected static ?string $model = ProductCategory::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'product-categories';
 
     protected static ?string $recordTitleAttribute = 'name';

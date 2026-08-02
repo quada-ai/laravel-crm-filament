@@ -24,6 +24,8 @@ class ContactTypeResource extends Resource
 
     protected static ?string $model = ContactType::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'contact-types';
 
     protected static ?string $recordTitleAttribute = 'name';

@@ -24,6 +24,8 @@ class AddressTypeResource extends Resource
 
     protected static ?string $model = AddressType::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'address-types';
 
     protected static ?string $recordTitleAttribute = 'name';

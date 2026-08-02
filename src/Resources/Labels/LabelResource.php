@@ -29,6 +29,8 @@ class LabelResource extends Resource
 
     protected static ?string $model = Label::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'labels';
 
     protected static ?string $recordTitleAttribute = 'name';

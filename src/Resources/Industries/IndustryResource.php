@@ -24,6 +24,8 @@ class IndustryResource extends Resource
 
     protected static ?string $model = Industry::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'industries';
 
     protected static ?string $recordTitleAttribute = 'name';
