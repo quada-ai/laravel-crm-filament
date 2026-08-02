@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\Note;
 use VentureDrake\LaravelCrmFilament\Concerns\StandaloneActivityResource;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Notes\Pages\ListNotes;
 use VentureDrake\LaravelCrmFilament\Resources\Notes\Pages\ViewNote;
@@ -20,6 +21,10 @@ use VentureDrake\LaravelCrmFilament\Support\ParentTypeOptions;
 class NoteResource extends Resource
 {
     use StandaloneActivityResource;
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'note';
+    protected static string $navigationGroupKey = 'activity';
 
     protected static ?string $model = Note::class;
 
@@ -30,11 +35,6 @@ class NoteResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-pencil-square';
 
     protected static ?int $navigationSort = 70;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
-    }
 
     public static function getRecordRouteKeyName(): ?string
     {

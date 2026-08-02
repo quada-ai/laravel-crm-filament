@@ -11,12 +11,18 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\XeroInvoice;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\Pages\ListXeroInvoices;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\Pages\ViewXeroInvoice;
 
 class XeroInvoiceResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'xero_invoice';
+    protected static string $navigationGroupKey = 'integrations';
+
     protected static ?string $model = XeroInvoice::class;
 
     protected static ?string $slug = 'xero-invoices';
@@ -26,11 +32,6 @@ class XeroInvoiceResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-document-currency-dollar';
 
     protected static ?int $navigationSort = 93;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Integrations';
-    }
 
     public static function getNavigationLabel(): string
     {

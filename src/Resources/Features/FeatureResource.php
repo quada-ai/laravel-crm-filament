@@ -38,13 +38,23 @@ use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\FeatureKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\ListFeatures;
 use VentureDrake\LaravelCrmFilament\Resources\Features\Pages\ViewFeature;
 
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+
 class FeatureResource extends Resource
 {
     use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use HasLabels;
     use HasPrimaryBulkActions;
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'feature';
+    protected static string $navigationGroupKey = 'roadmap';
 
     protected static ?string $model = Feature::class;
 
@@ -55,11 +65,6 @@ class FeatureResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-light-bulb';
 
     protected static ?int $navigationSort = 80;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Roadmap';
-    }
 
     public static function getNavigationBadge(): ?string
     {

@@ -11,12 +11,18 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Schema as DbSchema;
 use VentureDrake\LaravelCrm\Models\ProductAttribute;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\ProductAttributes\Pages\CreateProductAttribute;
 use VentureDrake\LaravelCrmFilament\Resources\ProductAttributes\Pages\EditProductAttribute;
 use VentureDrake\LaravelCrmFilament\Resources\ProductAttributes\Pages\ListProductAttributes;
 
 class ProductAttributeResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'product_attribute';
+    protected static string $navigationGroupKey = 'settings';
+
     protected static ?string $model = ProductAttribute::class;
 
     protected static ?string $slug = 'product-attributes';
@@ -24,8 +30,6 @@ class ProductAttributeResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-horizontal';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 55;
 

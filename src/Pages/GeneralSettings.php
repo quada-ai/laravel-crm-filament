@@ -46,15 +46,27 @@ class GeneralSettings extends Page implements HasForms
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-vertical';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
-
-    protected static ?string $title = 'General';
-
     protected static ?string $slug = 'general';
 
     protected static ?int $navigationSort = 10;
 
     protected string $view = 'laravel-crm-filament::general-settings';
+
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return __('laravel-crm-filament::labels.pages.general_settings.title');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('laravel-crm-filament::labels.pages.general_settings.navigation');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return \VentureDrake\LaravelCrmFilament\LaravelCrmPlugin::get()->getNavigationGroup()
+            ?? __('laravel-crm-filament::labels.navigation.groups.settings');
+    }
 
     /**
      * Scalar setting keys this page edits, with a friendly label for the form

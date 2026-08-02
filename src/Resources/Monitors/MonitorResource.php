@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Jobs\RunMonitorCheck;
 use VentureDrake\LaravelCrm\Models\Monitor;
 use VentureDrake\LaravelCrm\Models\MonitorCheck;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\RelationManagers\MonitorChecksRelationManager;
@@ -28,7 +29,11 @@ use VentureDrake\LaravelCrmFilament\Resources\Monitors\Pages\ViewMonitor;
 
 class MonitorResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'monitor';
+    protected static string $navigationGroupKey = 'monitoring';
 
     protected static ?string $model = Monitor::class;
 
@@ -39,11 +44,6 @@ class MonitorResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-signal';
 
     protected static ?int $navigationSort = 90;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Monitoring';
-    }
 
     public static function getNavigationBadge(): ?string
     {

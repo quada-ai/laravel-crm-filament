@@ -17,6 +17,7 @@ use VentureDrake\LaravelCrm\Models\Order;
 use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrm\Models\Quote;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\RelationManagers\PipelineStagesRelationManager;
 use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\CreatePipeline;
@@ -26,7 +27,11 @@ use VentureDrake\LaravelCrmFilament\Resources\Pipelines\Pages\ViewPipeline;
 
 class PipelineResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'pipeline';
+    protected static string $navigationGroupKey = 'settings';
 
     protected static ?string $model = Pipeline::class;
 
@@ -35,8 +40,6 @@ class PipelineResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-funnel';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 30;
 

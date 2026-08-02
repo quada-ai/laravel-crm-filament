@@ -618,4 +618,334 @@ return [
         'no_upcoming_tasks' => 'No upcoming tasks',
     ],
 
+    // Navigation groups
+    'navigation' => [
+        'groups' => [
+            'activity' => 'Activity',
+            'marketing' => 'Marketing',
+            'sales' => 'Sales',
+            'contacts' => 'Contacts',
+            'roadmap' => 'Roadmap',
+            'monitoring' => 'Monitoring',
+            'catalog' => 'Catalog',
+            'settings' => 'Settings',
+            'integrations' => 'Integrations',
+        ],
+    ],
+
+    // Resources navigation & model labels
+    'resources' => [
+        'activity' => [
+            'label' => 'Activity',
+            'plural' => 'Activities',
+            'navigation' => 'Activities',
+        ],
+        'address_type' => [
+            'label' => 'Address Type',
+            'plural' => 'Address Types',
+            'navigation' => 'Address Types',
+        ],
+        'call' => [
+            'label' => 'Call',
+            'plural' => 'Calls',
+            'navigation' => 'Calls',
+        ],
+        'chat_conversation' => [
+            'label' => 'Chat Conversation',
+            'plural' => 'Chat Conversations',
+            'navigation' => 'Conversations',
+        ],
+        'chat_widget' => [
+            'label' => 'Chat Widget',
+            'plural' => 'Chat Widgets',
+            'navigation' => 'Chat Widgets',
+        ],
+        'contact_type' => [
+            'label' => 'Contact Type',
+            'plural' => 'Contact Types',
+            'navigation' => 'Contact Types',
+        ],
+        'customer' => [
+            'label' => 'Customer',
+            'plural' => 'Customers',
+            'navigation' => 'Customers',
+        ],
+        'deal' => [
+            'label' => 'Deal',
+            'plural' => 'Deals',
+            'navigation' => 'Deals',
+        ],
+        'delivery' => [
+            'label' => 'Delivery',
+            'plural' => 'Deliveries',
+            'navigation' => 'Deliveries',
+        ],
+        'email_campaign' => [
+            'label' => 'Email Campaign',
+            'plural' => 'Email Campaigns',
+            'navigation' => 'Email Campaigns',
+        ],
+        'email_template' => [
+            'label' => 'Email Template',
+            'plural' => 'Email Templates',
+            'navigation' => 'Email Templates',
+        ],
+        'feature' => [
+            'label' => 'Feature',
+            'plural' => 'Features',
+            'navigation' => 'Roadmap',
+        ],
+        'feature_status' => [
+            'label' => 'Feature Status',
+            'plural' => 'Feature Statuses',
+            'navigation' => 'Feature Statuses',
+        ],
+        'field_group' => [
+            'label' => 'Field Group',
+            'plural' => 'Field Groups',
+            'navigation' => 'Field Groups',
+        ],
+        'field' => [
+            'label' => 'Field',
+            'plural' => 'Fields',
+            'navigation' => 'Fields',
+        ],
+        'file' => [
+            'label' => 'File',
+            'plural' => 'Files',
+            'navigation' => 'Files',
+        ],
+        'industry' => [
+            'label' => 'Industry',
+            'plural' => 'Industries',
+            'navigation' => 'Industries',
+        ],
+        'invoice' => [
+            'label' => 'Invoice',
+            'plural' => 'Invoices',
+            'navigation' => 'Invoices',
+        ],
+        'label' => [
+            'label' => 'Label',
+            'plural' => 'Labels',
+            'navigation' => 'Labels',
+        ],
+        'lead' => [
+            'label' => 'Lead',
+            'plural' => 'Leads',
+            'navigation' => 'Leads',
+        ],
+        'lead_source' => [
+            'label' => 'Lead Source',
+            'plural' => 'Lead Sources',
+            'navigation' => 'Lead Sources',
+        ],
+        'lead_status' => [
+            'label' => 'Lead Status',
+            'plural' => 'Lead Statuses',
+            'navigation' => 'Lead Statuses',
+        ],
+        'lunch' => [
+            'label' => 'Lunch',
+            'plural' => 'Lunches',
+            'navigation' => 'Lunches',
+        ],
+        'meeting' => [
+            'label' => 'Meeting',
+            'plural' => 'Meetings',
+            'navigation' => 'Meetings',
+        ],
+        'monitor' => [
+            'label' => 'Monitor',
+            'plural' => 'Monitors',
+            'navigation' => 'Uptime & SSL',
+        ],
+        'note' => [
+            'label' => 'Note',
+            'plural' => 'Notes',
+            'navigation' => 'Notes',
+        ],
+        'order' => [
+            'label' => 'Order',
+            'plural' => 'Orders',
+            'navigation' => 'Orders',
+        ],
+        'organization' => [
+            'label' => 'Organization',
+            'plural' => 'Organizations',
+            'navigation' => 'Organizations',
+        ],
+        'organization_type' => [
+            'label' => 'Organization Type',
+            'plural' => 'Organization Types',
+            'navigation' => 'Organization Types',
+        ],
+        'person' => [
+            'label' => 'Person',
+            'plural' => 'People',
+            'navigation' => 'People',
+        ],
+        'pipeline' => [
+            'label' => 'Pipeline',
+            'plural' => 'Pipelines',
+            'navigation' => 'Pipelines',
+        ],
+        'pipeline_stage' => [
+            'label' => 'Pipeline Stage',
+            'plural' => 'Pipeline Stages',
+            'navigation' => 'Pipeline Stages',
+        ],
+        'pipeline_stage_probability' => [
+            'label' => 'Pipeline Stage Probability',
+            'plural' => 'Pipeline Stage Probabilities',
+            'navigation' => 'Stage Probabilities',
+        ],
+        'product' => [
+            'label' => 'Product',
+            'plural' => 'Products',
+            'navigation' => 'Products',
+        ],
+        'product_attribute' => [
+            'label' => 'Product Attribute',
+            'plural' => 'Product Attributes',
+            'navigation' => 'Product Attributes',
+        ],
+        'product_category' => [
+            'label' => 'Product Category',
+            'plural' => 'Product Categories',
+            'navigation' => 'Product Categories',
+        ],
+        'purchase_order' => [
+            'label' => 'Purchase Order',
+            'plural' => 'Purchase Orders',
+            'navigation' => 'Purchase Orders',
+        ],
+        'quote' => [
+            'label' => 'Quote',
+            'plural' => 'Quotes',
+            'navigation' => 'Quotes',
+        ],
+        'role' => [
+            'label' => 'Role',
+            'plural' => 'Roles',
+            'navigation' => 'Roles',
+        ],
+        'sms_campaign' => [
+            'label' => 'SMS Campaign',
+            'plural' => 'SMS Campaigns',
+            'navigation' => 'SMS Campaigns',
+        ],
+        'sms_template' => [
+            'label' => 'SMS Template',
+            'plural' => 'SMS Templates',
+            'navigation' => 'SMS Templates',
+        ],
+        'task' => [
+            'label' => 'Task',
+            'plural' => 'Tasks',
+            'navigation' => 'Tasks',
+        ],
+        'tax_rate' => [
+            'label' => 'Tax Rate',
+            'plural' => 'Tax Rates',
+            'navigation' => 'Tax Rates',
+        ],
+        'team' => [
+            'label' => 'Team',
+            'plural' => 'Teams',
+            'navigation' => 'Teams',
+        ],
+        'timezone' => [
+            'label' => 'Timezone',
+            'plural' => 'Timezones',
+            'navigation' => 'Timezones',
+        ],
+        'user' => [
+            'label' => 'User',
+            'plural' => 'Users',
+            'navigation' => 'Users',
+        ],
+        'xero_contact' => [
+            'label' => 'Xero Contact',
+            'plural' => 'Xero Contacts',
+            'navigation' => 'Xero Contacts',
+        ],
+        'xero_invoice' => [
+            'label' => 'Xero Invoice',
+            'plural' => 'Xero Invoices',
+            'navigation' => 'Xero Invoices',
+        ],
+        'xero_item' => [
+            'label' => 'Xero Item',
+            'plural' => 'Xero Items',
+            'navigation' => 'Xero Items',
+        ],
+        'xero_purchase_order' => [
+            'label' => 'Xero Purchase Order',
+            'plural' => 'Xero Purchase Orders',
+            'navigation' => 'Xero Purchase Orders',
+        ],
+    ],
+
+    // Pages
+    'pages' => [
+        'activity_feed' => [
+            'title' => 'Activity',
+            'navigation' => 'Activity Feed',
+        ],
+        'calendar' => [
+            'title' => 'Calendar',
+            'navigation' => 'Calendar',
+        ],
+        'clicksend_integration' => [
+            'title' => 'ClickSend Integration',
+            'navigation' => 'ClickSend',
+        ],
+        'dashboard' => [
+            'title' => 'Dashboard',
+            'navigation' => 'Dashboard',
+        ],
+        'general_settings' => [
+            'title' => 'General Settings',
+            'navigation' => 'General Settings',
+        ],
+        'integrations' => [
+            'title' => 'Integrations',
+            'navigation' => 'Integrations',
+        ],
+        'reminders' => [
+            'title' => 'Reminders',
+            'navigation' => 'Reminders',
+        ],
+        'updates' => [
+            'title' => 'Updates',
+            'navigation' => 'Updates',
+        ],
+    ],
+
+    // Widgets
+    'widgets' => [
+        'crm_stats_overview' => 'CRM Stats Overview',
+        'deals_value_stat' => 'Deals Value',
+        'contacts_stats_overview' => 'Contacts Overview',
+        'leads_by_stage_chart' => 'Leads by Stage',
+        'leads_vs_deals_chart' => 'Leads vs Deals',
+        'deals_pipeline_value_chart' => 'Deals Pipeline Value',
+        'deal_status_doughnut_chart' => 'Deal Status Distribution',
+        'monthly_revenue_chart' => 'Monthly Revenue',
+        'tasks_due_today_list' => 'Tasks Due Today',
+        'recent_activity_list' => 'Recent Activity',
+        'campaign_performance_chart' => 'Campaign Performance',
+        'email_campaign_sends_over_time' => 'Sends Over Time',
+        'email_campaign_stats' => 'Campaign Statistics',
+        'email_campaign_top_urls' => 'Top Clicked Links',
+        'feature_activity_stats' => 'Feature Activity',
+        'feature_views_chart' => 'Views Over Time',
+        'feature_votes_chart' => 'Votes Over Time',
+        'monitor_response_time' => 'Response Time',
+        'monitor_stats' => 'Monitor Statistics',
+        'sms_campaign_sends_over_time' => 'Sends Over Time',
+        'sms_campaign_stats' => 'SMS Campaign Statistics',
+        'sms_campaign_top_urls' => 'Top Clicked Links',
+    ],
 ];

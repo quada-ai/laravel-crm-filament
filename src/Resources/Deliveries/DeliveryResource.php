@@ -42,12 +42,23 @@ use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+
 class DeliveryResource extends Resource
 {
     use HasCrmCustomFields;
     use HasLabels;
     use HasPrimaryBulkActions;
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'delivery';
+    protected static string $navigationGroupKey = 'sales';
 
     protected static ?string $model = Delivery::class;
 
@@ -56,11 +67,6 @@ class DeliveryResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-truck';
 
     protected static ?int $navigationSort = 54;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
-    }
 
     public static function getNavigationBadge(): ?string
     {

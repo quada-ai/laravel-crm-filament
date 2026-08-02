@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use VentureDrake\LaravelCrm\Models\File;
 use VentureDrake\LaravelCrmFilament\Concerns\StandaloneActivityResource;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Files\Pages\ListFiles;
 use VentureDrake\LaravelCrmFilament\Resources\Files\Pages\ViewFile;
@@ -21,6 +22,10 @@ use VentureDrake\LaravelCrmFilament\Support\ParentTypeOptions;
 class FileResource extends Resource
 {
     use StandaloneActivityResource;
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'file';
+    protected static string $navigationGroupKey = 'activity';
 
     protected static ?string $model = File::class;
 
@@ -31,11 +36,6 @@ class FileResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-paper-clip';
 
     protected static ?int $navigationSort = 74;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
-    }
 
     public static function getRecordRouteKeyName(): ?string
     {

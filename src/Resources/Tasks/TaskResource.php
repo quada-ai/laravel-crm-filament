@@ -25,11 +25,22 @@ use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\ListTasks;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\TaskKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Tasks\Pages\ViewTask;
 
+use VentureDrake\LaravelCrm\Models\Task;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
+use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+
 class TaskResource extends Resource
 {
     use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'task';
+    protected static string $navigationGroupKey = 'activity';
 
     protected static ?string $model = Task::class;
 
@@ -40,11 +51,6 @@ class TaskResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-check-circle';
 
     protected static ?int $navigationSort = 10;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
-    }
 
     public static function getNavigationBadge(): ?string
     {

@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\TaxRate;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\CreateTaxRate;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\EditTaxRate;
 use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\ListTaxRates;
@@ -18,6 +19,11 @@ use VentureDrake\LaravelCrmFilament\Resources\TaxRates\Pages\ViewTaxRate;
 
 class TaxRateResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'tax_rate';
+    protected static string $navigationGroupKey = 'settings';
+
     protected static ?string $model = TaxRate::class;
 
     protected static ?string $slug = 'tax-rates';
@@ -25,8 +31,6 @@ class TaxRateResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-percent-badge';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 60;
 

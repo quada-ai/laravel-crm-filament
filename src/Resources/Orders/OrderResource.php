@@ -51,6 +51,13 @@ use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\PurchaseOrderResour
 use VentureDrake\LaravelCrmFilament\Resources\Quotes\QuoteResource;
 use VentureDrake\LaravelCrmFilament\Support\FormPayload;
 
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+
 class OrderResource extends Resource
 {
     use HasCrmCustomFieldEntries;
@@ -58,7 +65,11 @@ class OrderResource extends Resource
     use HasLabels;
     use HasPrimaryBulkActions;
     use HasXeroSyncStateInfolist;
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'order';
+    protected static string $navigationGroupKey = 'sales';
 
     protected static ?string $model = Order::class;
 
@@ -69,11 +80,6 @@ class OrderResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?int $navigationSort = 51;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
-    }
 
     public static function getNavigationBadge(): ?string
     {

@@ -10,6 +10,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\FieldGroup;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\FieldGroups\Pages\CreateFieldGroup;
 use VentureDrake\LaravelCrmFilament\Resources\FieldGroups\Pages\EditFieldGroup;
@@ -18,7 +19,11 @@ use VentureDrake\LaravelCrmFilament\Resources\FieldGroups\Pages\ViewFieldGroup;
 
 class FieldGroupResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'field_group';
+    protected static string $navigationGroupKey = 'settings';
 
     protected static ?string $model = FieldGroup::class;
 
@@ -28,11 +33,7 @@ class FieldGroupResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
-
     protected static ?int $navigationSort = 100;
-
-    protected static ?string $navigationLabel = 'Custom Field Groups';
 
     public static function form(Schema $schema): Schema
     {

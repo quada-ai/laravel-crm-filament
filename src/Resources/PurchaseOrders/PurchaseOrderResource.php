@@ -51,6 +51,13 @@ use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\EditPurchaseO
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\ListPurchaseOrders;
 use VentureDrake\LaravelCrmFilament\Resources\PurchaseOrders\Pages\ViewPurchaseOrder;
 
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+
 class PurchaseOrderResource extends Resource
 {
     use HasCrmCustomFieldEntries;
@@ -58,7 +65,11 @@ class PurchaseOrderResource extends Resource
     use HasLabels;
     use HasPrimaryBulkActions;
     use HasXeroSyncStateInfolist;
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'purchase_order';
+    protected static string $navigationGroupKey = 'sales';
 
     protected static ?string $model = PurchaseOrder::class;
 
@@ -69,11 +80,6 @@ class PurchaseOrderResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     protected static ?int $navigationSort = 53;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
-    }
 
     public static function getNavigationBadge(): ?string
     {

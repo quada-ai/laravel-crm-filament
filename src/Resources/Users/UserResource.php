@@ -19,6 +19,7 @@ use Ramsey\Uuid\Uuid;
 use Spatie\Permission\Models\Role;
 use VentureDrake\LaravelCrm\Models\Team;
 use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\CreateUser;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\EditUser;
 use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\ListUsers;
@@ -26,13 +27,16 @@ use VentureDrake\LaravelCrmFilament\Resources\Users\Pages\ViewUser;
 
 class UserResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'user';
+    protected static string $navigationGroupKey = 'contacts';
+
     protected static ?string $slug = 'users';
 
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-users';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Contacts';
 
     protected static ?int $navigationSort = 50;
 

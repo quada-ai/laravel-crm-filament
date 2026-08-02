@@ -51,7 +51,11 @@ class LeadResource extends Resource
     use HasCrmCustomFields;
     use HasLabels;
     use HasPrimaryBulkActions;
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'lead';
+    protected static string $navigationGroupKey = 'sales';
 
     protected static ?string $model = Lead::class;
 
@@ -62,11 +66,6 @@ class LeadResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-funnel';
 
     protected static ?int $navigationSort = 10;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
-    }
 
     public static function getNavigationBadge(): ?string
     {

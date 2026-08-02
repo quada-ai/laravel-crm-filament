@@ -29,13 +29,25 @@ class Reminders extends Page implements HasForms
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-bell-alert';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
-
-    protected static ?string $title = 'Reminders';
-
     protected static ?string $slug = 'reminders';
 
     protected static ?int $navigationSort = 190;
+
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return __('laravel-crm-filament::labels.pages.reminders.title');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('laravel-crm-filament::labels.pages.reminders.navigation');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return \VentureDrake\LaravelCrmFilament\LaravelCrmPlugin::get()->getNavigationGroup()
+            ?? __('laravel-crm-filament::labels.navigation.groups.activity');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {

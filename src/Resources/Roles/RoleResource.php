@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\Roles\Pages\CreateRole;
 use VentureDrake\LaravelCrmFilament\Resources\Roles\Pages\EditRole;
 use VentureDrake\LaravelCrmFilament\Resources\Roles\Pages\ListRoles;
@@ -19,6 +20,11 @@ use VentureDrake\LaravelCrmFilament\Resources\Roles\Pages\ViewRole;
 
 class RoleResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'role';
+    protected static string $navigationGroupKey = 'settings';
+
     protected static ?string $model = Role::class;
 
     protected static ?string $slug = 'roles';
@@ -26,8 +32,6 @@ class RoleResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shield-check';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 20;
 

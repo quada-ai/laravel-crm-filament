@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrm\Models\EmailTemplate;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages\CreateEmailCampaign;
@@ -28,7 +29,11 @@ use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\RelationManagers\Re
 
 class EmailCampaignResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'email_campaign';
+    protected static string $navigationGroupKey = 'marketing';
 
     protected static ?string $model = EmailCampaign::class;
 
@@ -39,11 +44,6 @@ class EmailCampaignResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-megaphone';
 
     protected static ?int $navigationSort = 70;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Marketing';
-    }
 
     public static function form(Schema $schema): Schema
     {

@@ -31,13 +31,25 @@ class ClickSendIntegration extends Page implements HasForms
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
-
-    protected static ?string $title = 'ClickSend';
-
     protected static ?string $slug = 'clicksend';
 
     protected static ?int $navigationSort = 115;
+
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return __('laravel-crm-filament::labels.pages.clicksend_integration.title');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('laravel-crm-filament::labels.pages.clicksend_integration.navigation');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return LaravelCrmPlugin::get()->getNavigationGroup()
+            ?? __('laravel-crm-filament::labels.navigation.groups.settings');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {

@@ -11,12 +11,18 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\XeroItem;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\Pages\ListXeroItems;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\Pages\ViewXeroItem;
 
 class XeroItemResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'xero_item';
+    protected static string $navigationGroupKey = 'integrations';
+
     protected static ?string $model = XeroItem::class;
 
     protected static ?string $slug = 'xero-items';
@@ -26,11 +32,6 @@ class XeroItemResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-cube';
 
     protected static ?int $navigationSort = 92;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Integrations';
-    }
 
     public static function getNavigationLabel(): string
     {

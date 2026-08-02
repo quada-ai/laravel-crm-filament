@@ -17,8 +17,6 @@ class CalendarPage extends Page
 {
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static ?string $title = 'Calendar';
-
     protected static ?string $slug = 'calendar';
 
     protected static ?int $navigationSort = 30;
@@ -37,9 +35,20 @@ class CalendarPage extends Page
         'lunch' => true,
     ];
 
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return __('laravel-crm-filament::labels.pages.calendar.title');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('laravel-crm-filament::labels.pages.calendar.navigation');
+    }
+
     public static function getNavigationGroup(): ?string
     {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
+        return LaravelCrmPlugin::get()->getNavigationGroup()
+            ?? __('laravel-crm-filament::labels.navigation.groups.activity');
     }
 
     public function updatedOwnerFilter(): void

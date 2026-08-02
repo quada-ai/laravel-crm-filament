@@ -19,6 +19,15 @@ use VentureDrake\LaravelCrmFilament\Widgets\TasksDueTodayList;
 
 class Dashboard extends BaseDashboard
 {
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return __('laravel-crm-filament::labels.pages.dashboard.title');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('laravel-crm-filament::labels.pages.dashboard.navigation');
+    }
     /**
      * Layout mirrors the core `laravel-crm` package's /crm/dashboard exactly:
      *   Sales stats → Finance stats → Contacts stat → Revenue Trend →

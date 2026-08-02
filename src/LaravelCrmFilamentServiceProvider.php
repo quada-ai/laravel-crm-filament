@@ -32,6 +32,7 @@ use VentureDrake\LaravelCrm\Models\SmsCampaignClick;
 use VentureDrake\LaravelCrm\Models\SmsCampaignRecipient;
 use VentureDrake\LaravelCrm\Models\Team;
 use VentureDrake\LaravelCrmFilament\Console\InstallCommand;
+use VentureDrake\LaravelCrmFilament\Console\PublishCommand;
 use VentureDrake\LaravelCrmFilament\Models\Audit;
 
 class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
@@ -221,9 +222,39 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             );
         });
 
-        // Publish PanelProvider stub used by the install command.
+        // Register publishable tags for resources, pages, widgets, translations, views, stubs
         if ($this->app->runningInConsole()) {
             $files = new Filesystem;
+
+            if ($files->isDirectory(__DIR__ . '/Resources')) {
+                $this->publishes([
+                    __DIR__ . '/Resources' => app_path('Filament/Crm/Resources'),
+                ], 'laravel-crm-filament-resources');
+            }
+
+            if ($files->isDirectory(__DIR__ . '/Pages')) {
+                $this->publishes([
+                    __DIR__ . '/Pages' => app_path('Filament/Crm/Pages'),
+                ], 'laravel-crm-filament-pages');
+            }
+
+            if ($files->isDirectory(__DIR__ . '/Widgets')) {
+                $this->publishes([
+                    __DIR__ . '/Widgets' => app_path('Filament/Crm/Widgets'),
+                ], 'laravel-crm-filament-widgets');
+            }
+
+            if ($files->isDirectory(__DIR__ . '/../resources/lang')) {
+                $this->publishes([
+                    __DIR__ . '/../resources/lang' => $this->app->langPath('vendor/laravel-crm-filament'),
+                ], 'laravel-crm-filament-translations');
+            }
+
+            if ($files->isDirectory(__DIR__ . '/../resources/views')) {
+                $this->publishes([
+                    __DIR__ . '/../resources/views' => resource_path('views/vendor/laravel-crm-filament'),
+                ], 'laravel-crm-filament-views');
+            }
 
             if ($files->isDirectory(__DIR__ . '/../stubs')) {
                 foreach ($files->files(__DIR__ . '/../stubs') as $file) {
@@ -282,6 +313,7 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
     {
         return [
             InstallCommand::class,
+            PublishCommand::class,
         ];
     }
 }

@@ -56,6 +56,13 @@ use VentureDrake\LaravelCrmFilament\Resources\Orders\OrderResource;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\OrganizationResource;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\HasXeroSyncStateInfolist;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+
 class InvoiceResource extends Resource
 {
     use HasCrmCustomFieldEntries;
@@ -63,7 +70,11 @@ class InvoiceResource extends Resource
     use HasLabels;
     use HasPrimaryBulkActions;
     use HasXeroSyncStateInfolist;
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'invoice';
+    protected static string $navigationGroupKey = 'sales';
 
     protected static ?string $model = Invoice::class;
 
@@ -74,11 +85,6 @@ class InvoiceResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-document-currency-dollar';
 
     protected static ?int $navigationSort = 52;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Sales';
-    }
 
     public static function getNavigationBadge(): ?string
     {

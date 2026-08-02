@@ -11,12 +11,18 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\XeroPurchaseOrder;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\Pages\ListXeroPurchaseOrders;
 use VentureDrake\LaravelCrmFilament\Resources\Xero\Pages\ViewXeroPurchaseOrder;
 
 class XeroPurchaseOrderResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'xero_purchase_order';
+    protected static string $navigationGroupKey = 'integrations';
+
     protected static ?string $model = XeroPurchaseOrder::class;
 
     protected static ?string $slug = 'xero-purchase-orders';
@@ -26,11 +32,6 @@ class XeroPurchaseOrderResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     protected static ?int $navigationSort = 94;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Integrations';
-    }
 
     public static function getNavigationLabel(): string
     {

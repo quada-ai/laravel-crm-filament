@@ -27,13 +27,23 @@ use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\EditProduct;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\ListProducts;
 use VentureDrake\LaravelCrmFilament\Resources\Products\Pages\ViewProduct;
 
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\HasPrimaryBulkActions;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+
 class ProductResource extends Resource
 {
     use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use HasLabels;
     use HasPrimaryBulkActions;
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'product';
+    protected static string $navigationGroupKey = 'catalog';
 
     protected static ?string $model = Product::class;
 
@@ -44,11 +54,6 @@ class ProductResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-cube';
 
     protected static ?int $navigationSort = 55;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Catalog';
-    }
 
     public static function getNavigationBadge(): ?string
     {

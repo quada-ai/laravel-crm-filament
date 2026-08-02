@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\Team;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\CreateCrmTeam;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\EditCrmTeam;
 use VentureDrake\LaravelCrmFilament\Resources\Teams\Pages\ListCrmTeams;
@@ -22,6 +23,11 @@ use VentureDrake\LaravelCrmFilament\Resources\Teams\RelationManagers\TeamMembers
 
 class CrmTeamResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'team';
+    protected static string $navigationGroupKey = 'contacts';
+
     protected static ?string $model = Team::class;
 
     protected static ?string $slug = 'crm-teams';
@@ -29,8 +35,6 @@ class CrmTeamResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user-group';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Contacts';
 
     protected static ?int $navigationSort = 60;
 
@@ -44,11 +48,6 @@ class CrmTeamResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         return 'gray';
-    }
-
-    public static function getNavigationLabel(): string
-    {
-        return 'Teams';
     }
 
     public static function form(Schema $schema): Schema

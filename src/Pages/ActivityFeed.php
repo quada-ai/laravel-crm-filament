@@ -28,8 +28,6 @@ class ActivityFeed extends Page
 {
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-bolt';
 
-    protected static ?string $title = 'Activity';
-
     protected static ?string $slug = 'activities';
 
     protected static ?int $navigationSort = 40;
@@ -42,9 +40,20 @@ class ActivityFeed extends Page
     #[Url]
     public string $tab = 'all';
 
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return __('laravel-crm-filament::labels.pages.activity_feed.title');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('laravel-crm-filament::labels.pages.activity_feed.navigation');
+    }
+
     public static function getNavigationGroup(): ?string
     {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
+        return LaravelCrmPlugin::get()->getNavigationGroup()
+            ?? __('laravel-crm-filament::labels.navigation.groups.activity');
     }
 
     public function setScope(string $scope): void

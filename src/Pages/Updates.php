@@ -12,13 +12,25 @@ class Updates extends Page
 {
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
-
-    protected static ?string $title = 'Updates';
-
     protected static ?string $slug = 'updates';
 
     protected static ?int $navigationSort = 200;
+
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return __('laravel-crm-filament::labels.pages.updates.title');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('laravel-crm-filament::labels.pages.updates.navigation');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return \VentureDrake\LaravelCrmFilament\LaravelCrmPlugin::get()->getNavigationGroup()
+            ?? __('laravel-crm-filament::labels.navigation.groups.settings');
+    }
 
     protected string $view = 'laravel-crm-filament::clusters.settings.pages.updates';
 

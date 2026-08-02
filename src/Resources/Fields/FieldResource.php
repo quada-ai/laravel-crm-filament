@@ -24,6 +24,7 @@ use VentureDrake\LaravelCrm\Models\Product;
 use VentureDrake\LaravelCrm\Models\PurchaseOrder;
 use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrm\Models\Task;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\Fields\Pages\CreateField;
 use VentureDrake\LaravelCrmFilament\Resources\Fields\Pages\EditField;
@@ -32,6 +33,7 @@ use VentureDrake\LaravelCrmFilament\Resources\Fields\Pages\ViewField;
 
 class FieldResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
 
     public const TYPES = [
@@ -58,6 +60,9 @@ class FieldResource extends Resource
         Product::class => 'Product',
     ];
 
+    protected static string $resourceTranslationKey = 'field';
+    protected static string $navigationGroupKey = 'settings';
+
     protected static ?string $model = Field::class;
 
     protected static ?string $slug = 'fields';
@@ -66,11 +71,7 @@ class FieldResource extends Resource
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
-
     protected static ?int $navigationSort = 90;
-
-    protected static ?string $navigationLabel = 'Custom Fields';
 
     public static function form(Schema $schema): Schema
     {

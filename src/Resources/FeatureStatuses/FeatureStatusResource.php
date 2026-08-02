@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\FeatureStatus;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\CreateFeatureStatus;
 use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\EditFeatureStatus;
@@ -18,7 +19,11 @@ use VentureDrake\LaravelCrmFilament\Resources\FeatureStatuses\Pages\ListFeatureS
 
 class FeatureStatusResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'feature_status';
+    protected static string $navigationGroupKey = 'settings';
 
     protected static ?string $model = FeatureStatus::class;
 
@@ -27,8 +32,6 @@ class FeatureStatusResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-flag';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 88;
 

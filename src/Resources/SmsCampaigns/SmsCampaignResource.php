@@ -19,6 +19,7 @@ use VentureDrake\LaravelCrm\Models\SmsCampaign;
 use VentureDrake\LaravelCrm\Models\SmsTemplate;
 use VentureDrake\LaravelCrm\Services\ClickSendService;
 use VentureDrake\LaravelCrm\Sms\SmsCampaignMessage;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\Pages\CreateSmsCampaign;
@@ -30,7 +31,11 @@ use VentureDrake\LaravelCrmFilament\Resources\SmsCampaigns\RelationManagers\Reci
 
 class SmsCampaignResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'sms_campaign';
+    protected static string $navigationGroupKey = 'marketing';
 
     protected static ?string $model = SmsCampaign::class;
 
@@ -41,11 +46,6 @@ class SmsCampaignResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-device-phone-mobile';
 
     protected static ?int $navigationSort = 71;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Marketing';
-    }
 
     public static function form(Schema $schema): Schema
     {

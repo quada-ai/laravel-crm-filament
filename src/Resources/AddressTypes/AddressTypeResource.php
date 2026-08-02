@@ -10,12 +10,18 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\AddressType;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\AddressTypes\Pages\CreateAddressType;
 use VentureDrake\LaravelCrmFilament\Resources\AddressTypes\Pages\EditAddressType;
 use VentureDrake\LaravelCrmFilament\Resources\AddressTypes\Pages\ListAddressTypes;
 
 class AddressTypeResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'address_type';
+    protected static string $navigationGroupKey = 'settings';
+
     protected static ?string $model = AddressType::class;
 
     protected static ?string $slug = 'address-types';
@@ -23,8 +29,6 @@ class AddressTypeResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-map-pin';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 135;
 

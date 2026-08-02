@@ -11,12 +11,18 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Timezone;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\Timezones\Pages\CreateTimezone;
 use VentureDrake\LaravelCrmFilament\Resources\Timezones\Pages\EditTimezone;
 use VentureDrake\LaravelCrmFilament\Resources\Timezones\Pages\ListTimezones;
 
 class TimezoneResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'timezone';
+    protected static string $navigationGroupKey = 'settings';
+
     protected static ?string $model = Timezone::class;
 
     protected static ?string $slug = 'timezones';
@@ -24,8 +30,6 @@ class TimezoneResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-globe-alt';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 160;
 

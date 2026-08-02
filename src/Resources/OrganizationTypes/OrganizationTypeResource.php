@@ -10,12 +10,18 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\OrganizationType;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\OrganizationTypes\Pages\CreateOrganizationType;
 use VentureDrake\LaravelCrmFilament\Resources\OrganizationTypes\Pages\EditOrganizationType;
 use VentureDrake\LaravelCrmFilament\Resources\OrganizationTypes\Pages\ListOrganizationTypes;
 
 class OrganizationTypeResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'organization_type';
+    protected static string $navigationGroupKey = 'settings';
+
     protected static ?string $model = OrganizationType::class;
 
     protected static ?string $slug = 'organization-types';
@@ -23,8 +29,6 @@ class OrganizationTypeResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-briefcase';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 140;
 

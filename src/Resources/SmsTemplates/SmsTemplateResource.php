@@ -10,12 +10,18 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\SmsTemplate;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\SmsTemplates\Pages\CreateSmsTemplate;
 use VentureDrake\LaravelCrmFilament\Resources\SmsTemplates\Pages\EditSmsTemplate;
 use VentureDrake\LaravelCrmFilament\Resources\SmsTemplates\Pages\ListSmsTemplates;
 
 class SmsTemplateResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'sms_template';
+    protected static string $navigationGroupKey = 'settings';
+
     protected static ?string $model = SmsTemplate::class;
 
     protected static ?string $slug = 'sms-templates';
@@ -23,8 +29,6 @@ class SmsTemplateResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 180;
 

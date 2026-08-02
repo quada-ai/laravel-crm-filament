@@ -82,6 +82,15 @@ class LaravelCrmPlugin implements Plugin
      */
     protected ?array $modules = null;
 
+    /** @var array<int, class-string>|null */
+    protected ?array $customResources = null;
+
+    /** @var array<int, class-string>|null */
+    protected ?array $customPages = null;
+
+    /** @var array<int, class-string>|null */
+    protected ?array $customWidgets = null;
+
     protected bool $registerDashboard = true;
 
     protected ?string $navigationGroup = null;
@@ -213,6 +222,42 @@ class LaravelCrmPlugin implements Plugin
         return $this;
     }
 
+    /**
+     * Set or override resource classes registered on the panel.
+     *
+     * @param  array<int, class-string>  $resources
+     */
+    public function resources(array $resources): static
+    {
+        $this->customResources = $resources;
+
+        return $this;
+    }
+
+    /**
+     * Set or override page classes registered on the panel.
+     *
+     * @param  array<int, class-string>  $pages
+     */
+    public function pages(array $pages): static
+    {
+        $this->customPages = $pages;
+
+        return $this;
+    }
+
+    /**
+     * Set or override widget classes registered on the panel.
+     *
+     * @param  array<int, class-string>  $widgets
+     */
+    public function widgets(array $widgets): static
+    {
+        $this->customWidgets = $widgets;
+
+        return $this;
+    }
+
     public function isModuleEnabled(string $module): bool
     {
         if ($this->modules !== null && array_key_exists($module, $this->modules)) {
@@ -245,6 +290,10 @@ class LaravelCrmPlugin implements Plugin
      */
     public function getResources(): array
     {
+        if ($this->customResources !== null) {
+            return $this->customResources;
+        }
+
         // Contact + activity entities are always available (no module flag in core).
         $resources = [
             PersonResource::class,
@@ -384,17 +433,17 @@ class LaravelCrmPlugin implements Plugin
         // Pin the visible nav-group order end-to-end. Any groups not listed here
         // (e.g. Integrations from the Xero mirrors) render after the pinned sequence.
         $panel->navigationGroups([
-            'Activity',
-            'Marketing',
-            'Sales',
-            'Contacts',
-            'Roadmap',
-            'Monitoring',
-            'Catalog',
-            'Settings',
+            __('laravel-crm-filament::labels.navigation.groups.activity'),
+            __('laravel-crm-filament::labels.navigation.groups.marketing'),
+            __('laravel-crm-filament::labels.navigation.groups.sales'),
+            __('laravel-crm-filament::labels.navigation.groups.contacts'),
+            __('laravel-crm-filament::labels.navigation.groups.roadmap'),
+            __('laravel-crm-filament::labels.navigation.groups.monitoring'),
+            __('laravel-crm-filament::labels.navigation.groups.catalog'),
+            __('laravel-crm-filament::labels.navigation.groups.settings'),
         ]);
 
-        $pages = [
+        $pages = $this->customPages ?? [
             ActivityFeed::class,
             CalendarPage::class,
             GeneralSettings::class,
@@ -404,7 +453,7 @@ class LaravelCrmPlugin implements Plugin
             Updates::class,
         ];
 
-        if ($this->registerDashboard && ! $this->panelHasDashboard($panel)) {
+        if ($this->customPages === null && $this->registerDashboard && ! $this->panelHasDashboard($panel)) {
             $pages[] = Dashboard::class;
         }
 
@@ -414,7 +463,7 @@ class LaravelCrmPlugin implements Plugin
         // page (e.g. ViewRecord footers). The Dashboard page's getWidgets()
         // decides which ones actually render on the dashboard, applying its
         // own per-module gating for that layout.
-        $widgets = [
+        $widgets = $this->customWidgets ?? [
             CrmStatsOverview::class,
             DealsValueStat::class,
             ContactsStatsOverview::class,

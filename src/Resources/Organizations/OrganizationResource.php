@@ -39,13 +39,24 @@ use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\EditOrganizati
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\ListOrganizations;
 use VentureDrake\LaravelCrmFilament\Resources\Organizations\Pages\ViewOrganization;
 
+use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
+use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+
 class OrganizationResource extends Resource
 {
     use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use HasEncryptedGlobalSearch;
     use HasLabels;
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'organization';
+    protected static string $navigationGroupKey = 'contacts';
 
     protected static ?string $model = Organization::class;
 
@@ -56,11 +67,6 @@ class OrganizationResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-building-office';
 
     protected static ?int $navigationSort = 40;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Contacts';
-    }
 
     public static function getNavigationBadge(): ?string
     {

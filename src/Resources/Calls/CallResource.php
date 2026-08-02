@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\Call;
 use VentureDrake\LaravelCrmFilament\Concerns\StandaloneActivityResource;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Calls\Pages\CallKanban;
 use VentureDrake\LaravelCrmFilament\Resources\Calls\Pages\ListCalls;
@@ -21,6 +22,10 @@ use VentureDrake\LaravelCrmFilament\Support\ParentTypeOptions;
 class CallResource extends Resource
 {
     use StandaloneActivityResource;
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'call';
+    protected static string $navigationGroupKey = 'activity';
 
     protected static ?string $model = Call::class;
 
@@ -31,11 +36,6 @@ class CallResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-phone';
 
     protected static ?int $navigationSort = 71;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
-    }
 
     public static function getRecordRouteKeyName(): ?string
     {

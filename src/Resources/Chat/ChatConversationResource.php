@@ -16,6 +16,7 @@ use VentureDrake\LaravelCrm\Models\ChatConversation;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrm\Services\ChatService;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Chat\Pages\ListChatConversations;
@@ -23,7 +24,11 @@ use VentureDrake\LaravelCrmFilament\Resources\Chat\Pages\ViewChatConversation;
 
 class ChatConversationResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'chat_conversation';
+    protected static string $navigationGroupKey = 'marketing';
 
     protected static ?string $model = ChatConversation::class;
 
@@ -46,11 +51,6 @@ class ChatConversationResource extends Resource
         'closed' => 'Closed',
     ];
 
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
-    }
-
     public static function getNavigationBadge(): ?string
     {
         $count = ChatConversation::query()->where('status', 'open')->count();
@@ -61,21 +61,6 @@ class ChatConversationResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         return 'success';
-    }
-
-    public static function getNavigationLabel(): string
-    {
-        return 'Chat';
-    }
-
-    public static function getPluralModelLabel(): string
-    {
-        return 'Conversations';
-    }
-
-    public static function getModelLabel(): string
-    {
-        return 'Conversation';
     }
 
     public static function form(Schema $schema): Schema

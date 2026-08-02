@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\Lunch;
 use VentureDrake\LaravelCrmFilament\Concerns\StandaloneActivityResource;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Lunches\Pages\ListLunches;
 use VentureDrake\LaravelCrmFilament\Resources\Lunches\Pages\ViewLunch;
@@ -20,6 +21,10 @@ use VentureDrake\LaravelCrmFilament\Support\ParentTypeOptions;
 class LunchResource extends Resource
 {
     use StandaloneActivityResource;
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'lunch';
+    protected static string $navigationGroupKey = 'activity';
 
     protected static ?string $model = Lunch::class;
 
@@ -30,11 +35,6 @@ class LunchResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-cake';
 
     protected static ?int $navigationSort = 73;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
-    }
 
     public static function getRecordRouteKeyName(): ?string
     {

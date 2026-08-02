@@ -18,6 +18,7 @@ use VentureDrake\LaravelCrm\Models\Meeting;
 use VentureDrake\LaravelCrm\Models\Note;
 use VentureDrake\LaravelCrm\Models\Task;
 use VentureDrake\LaravelCrmFilament\Concerns\StandaloneActivityResource;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\Pages\ListActivities;
 use VentureDrake\LaravelCrmFilament\Resources\Activities\Pages\ViewActivity;
@@ -26,6 +27,10 @@ use VentureDrake\LaravelCrmFilament\Support\ParentTypeOptions;
 class ActivityResource extends Resource
 {
     use StandaloneActivityResource;
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'activity';
+    protected static string $navigationGroupKey = 'activity';
 
     protected static ?string $model = Activity::class;
 
@@ -36,11 +41,6 @@ class ActivityResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-bolt';
 
     protected static ?int $navigationSort = 75;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Activity';
-    }
 
     public static function getRecordRouteKeyName(): ?string
     {

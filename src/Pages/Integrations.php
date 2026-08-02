@@ -22,15 +22,27 @@ class Integrations extends Page implements HasForms
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-puzzle-piece';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
-
-    protected static ?string $title = 'Integrations';
-
     protected static ?string $slug = 'integrations';
 
     protected static ?int $navigationSort = 110;
 
     protected string $view = 'laravel-crm-filament::integrations';
+
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return __('laravel-crm-filament::labels.pages.integrations.title');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('laravel-crm-filament::labels.pages.integrations.navigation');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return \VentureDrake\LaravelCrmFilament\LaravelCrmPlugin::get()->getNavigationGroup()
+            ?? __('laravel-crm-filament::labels.navigation.groups.settings');
+    }
 
     public array $data = [];
 

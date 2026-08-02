@@ -12,6 +12,7 @@ use Filament\Support\Colors\Color;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Label;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\CreateLabel;
 use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\EditLabel;
@@ -20,7 +21,11 @@ use VentureDrake\LaravelCrmFilament\Resources\Labels\Pages\ViewLabel;
 
 class LabelResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'label';
+    protected static string $navigationGroupKey = 'settings';
 
     protected static ?string $model = Label::class;
 
@@ -29,8 +34,6 @@ class LabelResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-tag';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 70;
 

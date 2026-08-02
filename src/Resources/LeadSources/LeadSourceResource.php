@@ -10,6 +10,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\LeadSource;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\LeadSources\Pages\CreateLeadSource;
 use VentureDrake\LaravelCrmFilament\Resources\LeadSources\Pages\EditLeadSource;
@@ -18,7 +19,11 @@ use VentureDrake\LaravelCrmFilament\Resources\LeadSources\Pages\ViewLeadSource;
 
 class LeadSourceResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'lead_source';
+    protected static string $navigationGroupKey = 'settings';
 
     protected static ?string $model = LeadSource::class;
 
@@ -27,8 +32,6 @@ class LeadSourceResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-link';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 80;
 

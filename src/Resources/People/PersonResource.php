@@ -38,13 +38,24 @@ use VentureDrake\LaravelCrmFilament\Resources\People\Pages\EditPerson;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ListPeople;
 use VentureDrake\LaravelCrmFilament\Resources\People\Pages\ViewPerson;
 
+use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedGlobalSearch;
+use VentureDrake\LaravelCrmFilament\Concerns\HasEncryptedSearch;
+use VentureDrake\LaravelCrmFilament\Concerns\HasLabels;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
+use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
+use VentureDrake\LaravelCrmFilament\LaravelCrmPlugin;
+
 class PersonResource extends Resource
 {
     use HasCrmCustomFieldEntries;
     use HasCrmCustomFields;
     use HasEncryptedGlobalSearch;
     use HasLabels;
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'person';
+    protected static string $navigationGroupKey = 'contacts';
 
     protected static ?string $model = Person::class;
 
@@ -55,11 +66,6 @@ class PersonResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-user';
 
     protected static ?int $navigationSort = 30;
-
-    public static function getNavigationGroup(): ?string
-    {
-        return LaravelCrmPlugin::get()->getNavigationGroup() ?? 'Contacts';
-    }
 
     public static function getNavigationBadge(): ?string
     {

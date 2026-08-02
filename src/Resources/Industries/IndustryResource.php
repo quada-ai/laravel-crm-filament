@@ -10,12 +10,18 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Industry;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\Industries\Pages\CreateIndustry;
 use VentureDrake\LaravelCrmFilament\Resources\Industries\Pages\EditIndustry;
 use VentureDrake\LaravelCrmFilament\Resources\Industries\Pages\ListIndustries;
 
 class IndustryResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'industry';
+    protected static string $navigationGroupKey = 'settings';
+
     protected static ?string $model = Industry::class;
 
     protected static ?string $slug = 'industries';
@@ -23,8 +29,6 @@ class IndustryResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-building-library';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 150;
 

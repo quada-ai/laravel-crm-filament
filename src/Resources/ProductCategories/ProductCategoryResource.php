@@ -10,6 +10,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\ProductCategory;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\ProductCategories\Pages\CreateProductCategory;
 use VentureDrake\LaravelCrmFilament\Resources\ProductCategories\Pages\EditProductCategory;
@@ -18,7 +19,11 @@ use VentureDrake\LaravelCrmFilament\Resources\ProductCategories\Pages\ViewProduc
 
 class ProductCategoryResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'product_category';
+    protected static string $navigationGroupKey = 'settings';
 
     protected static ?string $model = ProductCategory::class;
 
@@ -27,8 +32,6 @@ class ProductCategoryResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 50;
 

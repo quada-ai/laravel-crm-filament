@@ -11,12 +11,18 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\EmailTemplate;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Resources\EmailTemplates\Pages\CreateEmailTemplate;
 use VentureDrake\LaravelCrmFilament\Resources\EmailTemplates\Pages\EditEmailTemplate;
 use VentureDrake\LaravelCrmFilament\Resources\EmailTemplates\Pages\ListEmailTemplates;
 
 class EmailTemplateResource extends Resource
 {
+    use TranslatableResource;
+
+    protected static string $resourceTranslationKey = 'email_template';
+    protected static string $navigationGroupKey = 'settings';
+
     protected static ?string $model = EmailTemplate::class;
 
     protected static ?string $slug = 'email-templates';
@@ -24,8 +30,6 @@ class EmailTemplateResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-envelope';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 170;
 

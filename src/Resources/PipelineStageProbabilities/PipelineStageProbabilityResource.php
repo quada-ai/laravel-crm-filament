@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\PipelineStageProbability;
+use VentureDrake\LaravelCrmFilament\Concerns\TranslatableResource;
 use VentureDrake\LaravelCrmFilament\Concerns\UsesExternalIdRouting;
 use VentureDrake\LaravelCrmFilament\Resources\PipelineStageProbabilities\Pages\CreatePipelineStageProbability;
 use VentureDrake\LaravelCrmFilament\Resources\PipelineStageProbabilities\Pages\EditPipelineStageProbability;
@@ -18,7 +19,11 @@ use VentureDrake\LaravelCrmFilament\Resources\PipelineStageProbabilities\Pages\L
 
 class PipelineStageProbabilityResource extends Resource
 {
+    use TranslatableResource;
     use UsesExternalIdRouting;
+
+    protected static string $resourceTranslationKey = 'pipeline_stage_probability';
+    protected static string $navigationGroupKey = 'settings';
 
     protected static ?string $model = PipelineStageProbability::class;
 
@@ -27,8 +32,6 @@ class PipelineStageProbabilityResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-chart-pie';
-
-    protected static string | \UnitEnum | null $navigationGroup = 'Settings';
 
     protected static ?int $navigationSort = 45;
 
