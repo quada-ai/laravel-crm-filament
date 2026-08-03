@@ -114,13 +114,17 @@ class LeadResource extends Resource
                 ->label(__('laravel-crm-filament::labels.sales.lead_source'))
                 ->options(fn () => LeadSource::query()->pluck('name', 'id'))
                 ->searchable()
-                ->preload(),
+                ->preload()
+                ->nullable()
+                ->default(fn () => LeadSource::query()->first()?->id),
 
             Forms\Components\Select::make('lead_status_id')
                 ->label(__('laravel-crm-filament::labels.sales.lead_status'))
                 ->options(fn () => LeadStatus::query()->orderBy('order')->pluck('name', 'id'))
                 ->searchable()
-                ->preload(),
+                ->preload()
+                ->nullable()
+                ->default(fn () => LeadStatus::query()->orderBy('order')->first()?->id),
 
             Forms\Components\Select::make('user_owner_id')
                 ->label(__('laravel-crm-filament::labels.fields.owner'))
