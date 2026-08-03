@@ -51,9 +51,9 @@ class RoleSeeder
     /** @var list<string> */
     public const ROLES = ['Owner', 'Admin', 'Manager', 'Employee'];
 
-    public static function seed(?string $guardName = null): void
+    public static function seed(?string $guardName = 'agent', bool $createRoles = true): void
     {
-        $guardName = $guardName ?? config('auth.defaults.guard', 'web');
+        $guardName = $guardName ?? 'agent';
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
@@ -75,17 +75,19 @@ class RoleSeeder
             Permission::findOrCreate($perm, $guardName);
         }
 
-        $allPerms = Permission::where('guard_name', $guardName)->get();
+        if ($createRoles) {
+            $allPerms = Permission::where('guard_name', $guardName)->get();
 
-        $owner = Role::findOrCreate('Owner', $guardName)->givePermissionTo($allPerms);
-        $admin = Role::findOrCreate('Admin', $guardName)->givePermissionTo($allPerms);
+            $owner = Role::findOrCreate('Owner', $guardName)->givePermissionTo($allPerms);
+            $admin = Role::findOrCreate('Admin', $guardName)->givePermissionTo($allPerms);
 
-        $managerAndEmployeePerms = Permission::where('guard_name', $guardName)
-            ->whereNotIn('name', ['create crm users', 'edit crm users', 'delete crm users'])
-            ->get();
+            $managerAndEmployeePerms = Permission::where('guard_name', $guardName)
+                ->whereNotIn('name', ['create crm users', 'edit crm users', 'delete crm users'])
+                ->get();
 
-        Role::findOrCreate('Manager', $guardName)->givePermissionTo($managerAndEmployeePerms);
-        Role::findOrCreate('Employee', $guardName)->givePermissionTo($managerAndEmployeePerms);
+            Role::findOrCreate('Manager', $guardName)->givePermissionTo($managerAndEmployeePerms);
+            Role::findOrCreate('Employee', $guardName)->givePermissionTo($managerAndEmployeePerms);
+        }
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
