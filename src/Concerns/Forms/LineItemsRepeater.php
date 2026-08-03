@@ -184,7 +184,7 @@ class LineItemsRepeater
         }
 
         if ($setting = app('laravel-crm.settings')->get('tax_rate')) {
-            return (float) $setting->value;
+            return is_object($setting) && isset($setting->value) ? (float) $setting->value : (float) $setting;
         }
 
         return 0.0;
