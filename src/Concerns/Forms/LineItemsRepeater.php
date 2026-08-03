@@ -80,7 +80,11 @@ class LineItemsRepeater
                         $product = Product::find($state);
                         if ($product && method_exists($product, 'getDefaultPrice')) {
                             $price = $product->getDefaultPrice();
-                            $set($priceField, $price ? $price->unit_price / 100 : 0);
+                            if ($price instanceof \Illuminate\Database\Eloquent\Builder) {
+                                $price = $price->first();
+                            }
+                            $unitPrice = is_object($price) && isset($price->unit_price) ? $price->unit_price : 0;
+                            $set($priceField, $unitPrice / 100);
                         }
                         self::recalcRow($get, $set, $priceField);
                         self::recalcFormTotals($get, $set);
@@ -183,8 +187,22 @@ class LineItemsRepeater
             return (float) $default->rate;
         }
 
-        if ($setting = app('laravel-crm.settings')->get('tax_rate')) {
-            return is_object($setting) && isset($setting->value) ? (float) $setting->value : (float) $setting;
+        try {
+            $settingService = app('laravel-crm.settings');
+            if (method_exists($settingService, 'get')) {
+                $setting = $settingService->get('tax_rate');
+                if (is_numeric($setting)) {
+                    return (float) $setting;
+                }
+                if ($setting instanceof \Illuminate\Database\Eloquent\Builder) {
+                    $setting = $setting->first();
+                }
+                if (is_object($setting) && isset($setting->value)) {
+                    return (float) $setting->value;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Ignore settings lookup failures
         }
 
         return 0.0;
