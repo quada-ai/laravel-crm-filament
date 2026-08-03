@@ -78,12 +78,17 @@ class LineItemsRepeater
                     ->live()
                     ->afterStateUpdated(function ($state, $get, $set) use ($priceField) {
                         $product = Product::find($state);
-                        if ($product && method_exists($product, 'getDefaultPrice')) {
-                            $price = $product->getDefaultPrice();
-                            if ($price instanceof \Illuminate\Database\Eloquent\Builder) {
+                        if ($product) {
+                            $price = null;
+                            if (method_exists($product, 'getDefaultPrice')) {
+                                $price = $product->getDefaultPrice();
+                            } elseif (method_exists($product, 'prices')) {
+                                $price = $product->prices()->first();
+                            }
+                            if ($price instanceof \Illuminate\Database\Eloquent\Builder || $price instanceof \Illuminate\Database\Eloquent\Relations\Relation) {
                                 $price = $price->first();
                             }
-                            $unitPrice = is_object($price) && isset($price->unit_price) ? $price->unit_price : 0;
+                            $unitPrice = is_object($price) && isset($price->unit_price) ? (float) $price->unit_price : 0;
                             $set($priceField, $unitPrice / 100);
                         }
                         self::recalcRow($get, $set, $priceField);
