@@ -79,16 +79,26 @@ class LineItemsRepeater
                     ->afterStateUpdated(function ($state, $get, $set) use ($priceField) {
                         $product = Product::find($state);
                         if ($product) {
-                            $price = null;
-                            if (method_exists($product, 'getDefaultPrice')) {
-                                $price = $product->getDefaultPrice();
-                            } elseif (method_exists($product, 'prices')) {
-                                $price = $product->prices()->first();
+                            // Bypass Product::getDefaultPrice() which crashes when
+                            // Setting::currency() returns null (Property [value] does
+                            // not exist on Eloquent builder). Replicate its logic safely.
+                            $currency = config('laravel-crm.default_currency', 'USD');
+                            try {
+                                $settingModel = \VentureDrake\LaravelCrm\Models\Setting::query()
+                                    ->where('name', 'currency')
+                                    ->first();
+                                if ($settingModel && $settingModel->value) {
+                                    $currency = $settingModel->value;
+                                }
+                            } catch (\Throwable $e) {
+                                // fall back to config default
                             }
-                            if ($price instanceof \Illuminate\Database\Eloquent\Builder || $price instanceof \Illuminate\Database\Eloquent\Relations\Relation) {
-                                $price = $price->first();
-                            }
-                            $unitPrice = is_object($price) && isset($price->unit_price) ? (float) $price->unit_price : 0;
+
+                            $price = $product->productPrices()
+                                ->where('currency', $currency)
+                                ->first();
+
+                            $unitPrice = $price && isset($price->unit_price) ? (float) $price->unit_price : 0;
                             $set($priceField, $unitPrice / 100);
                         }
                         self::recalcRow($get, $set, $priceField);
