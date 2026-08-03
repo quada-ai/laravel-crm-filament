@@ -174,8 +174,14 @@ class LineItemsRepeater
         if ($productId !== null) {
             $product = Product::find($productId);
 
-            if ($product && $product->taxRate) {
-                return (float) $product->taxRate->rate;
+            if ($product) {
+                $taxRate = $product->taxRate;
+                if ($taxRate instanceof \Illuminate\Database\Eloquent\Builder) {
+                    $taxRate = $taxRate->first();
+                }
+                if ($taxRate && isset($taxRate->rate)) {
+                    return (float) $taxRate->rate;
+                }
             }
 
             if ($product && $product->tax_rate) {
