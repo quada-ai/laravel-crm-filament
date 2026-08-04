@@ -164,10 +164,14 @@ class ProductResource extends Resource
 
                 Tables\Columns\TextColumn::make('price')
                     ->label(__('laravel-crm-filament::labels.money.price'))
-                    ->state(fn ($record) => optional($record->getDefaultPrice())->unit_price
-                        ? optional($record->getDefaultPrice())->unit_price / 100
-                        : null)
-                    ->money(fn ($record) => $record?->getDefaultPrice()?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                    ->state(function ($record) {
+                        $priceRecord = static::getDefaultPriceRecord($record);
+                        return $priceRecord?->unit_price ? $priceRecord->unit_price / 100 : null;
+                    })
+                    ->money(function ($record) {
+                        $priceRecord = static::getDefaultPriceRecord($record);
+                        return $priceRecord?->currency ?: config('laravel-crm.default_currency', 'USD');
+                    }),
 
                 Tables\Columns\TextColumn::make('taxRate.name')
                     ->label(__('laravel-crm-filament::labels.money.tax'))
@@ -292,5 +296,28 @@ class ProductResource extends Resource
             ->icon('heroicon-o-arrow-left')
             ->color('gray')
             ->url(static::getUrl('index'));
+    }
+
+    public static function getDefaultPriceRecord($record)
+    {
+        if (! $record) {
+            return null;
+        }
+
+        $currency = config('laravel-crm.default_currency', 'USD');
+        try {
+            $settingModel = \VentureDrake\LaravelCrm\Models\Setting::query()
+                ->where('name', 'currency')
+                ->first();
+            if ($settingModel && $settingModel->value) {
+                $currency = $settingModel->value;
+            }
+        } catch (\Throwable $e) {
+            // fall back to config default
+        }
+
+        return $record->productPrices()
+            ->where('currency', $currency)
+            ->first() ?? $record->productPrices()->first();
     }
 }
