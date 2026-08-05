@@ -20,6 +20,9 @@ class CreateQuote extends CreateRecord
         $organization = isset($data['organization_id']) ? Organization::find($data['organization_id']) : null;
 
         $record = app(QuoteService::class)->create(FormPayload::wrap($data), $person, $organization);
+        if (array_key_exists('labels', $data)) {
+            $record->labels()->sync($data['labels'] ?? []);
+        }
         QuoteResource::saveCrmCustomFields($data, $record);
 
         return $record;

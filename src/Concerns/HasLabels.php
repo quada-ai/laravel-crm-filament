@@ -27,6 +27,7 @@ trait HasLabels
             ->label(__('laravel-crm-filament::labels.fields.labels'))
             ->multiple()
             ->relationship('labels', 'name')
+            ->dehydrated(true)
             ->preload()
             ->searchable()
             ->createOptionForm([

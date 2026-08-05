@@ -69,6 +69,8 @@ class EditQuote extends EditRecord
             ])
             ->all();
 
+        $data['labels'] = $quote->labels()->pluck('crm_labels.id')->toArray();
+
         return QuoteResource::loadCrmCustomFieldsInto($data, $quote);
     }
 
@@ -89,6 +91,9 @@ class EditQuote extends EditRecord
             $organization,
             $record->client,
         );
+        if (array_key_exists('labels', $data)) {
+            $record->labels()->sync($data['labels'] ?? []);
+        }
         QuoteResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
