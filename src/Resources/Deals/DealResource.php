@@ -109,11 +109,11 @@ class DealResource extends Resource
                 ->options(fn () => \VentureDrake\LaravelCrm\Models\Pipeline::query()->where('model', Deal::class)->orWhereNull('model')->orderBy('name')->pluck('name', 'id'))
                 ->searchable()
                 ->live()
-                ->afterStateUpdated(fn (Forms\Set $set) => $set('pipeline_stage_id', null)),
+                ->afterStateUpdated(fn ($set) => $set('pipeline_stage_id', null)),
 
             Forms\Components\Select::make('pipeline_stage_id')
                 ->label(__('laravel-crm-filament::labels.sales.pipeline_stage'))
-                ->options(function (Forms\Get $get) {
+                ->options(function ($get) {
                     $pipelineId = $get('pipeline_id');
                     if ($pipelineId) {
                         return PipelineStage::query()->where('pipeline_id', $pipelineId)->orderBy('order')->pluck('name', 'id');

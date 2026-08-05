@@ -68,7 +68,10 @@ class DealKanban extends Page
         foreach ($deals as $deal) {
             $stageId = $deal->pipeline_stage_id ?: ($defaultStage?->id ?? 0);
             if ($stageId > 0) {
-                $grouped[$stageId][] = $deal;
+                if (! isset($grouped[$stageId])) {
+                    $grouped[$stageId] = collect();
+                }
+                $grouped[$stageId]->push($deal);
             }
         }
 

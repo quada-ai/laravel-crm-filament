@@ -67,7 +67,10 @@ class LeadKanban extends Page
         foreach ($leads as $lead) {
             $stageId = $lead->pipeline_stage_id ?: ($defaultStage?->id ?? 0);
             if ($stageId > 0) {
-                $grouped[$stageId][] = $lead;
+                if (! isset($grouped[$stageId])) {
+                    $grouped[$stageId] = collect();
+                }
+                $grouped[$stageId]->push($lead);
             }
         }
 
