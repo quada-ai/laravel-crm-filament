@@ -15,6 +15,9 @@ class CreateOrganization extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         $record = app(OrganizationService::class)->create(FormPayload::wrap($data));
+        if (isset($data['labels'])) {
+            $record->labels()->sync($data['labels']);
+        }
         OrganizationResource::saveCrmCustomFields($data, $record);
 
         return $record;

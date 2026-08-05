@@ -42,6 +42,7 @@ class EditDeal extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
+        $data['labels'] = $this->record->labels()->pluck('crm_labels.id')->toArray();
         $data = DealResource::loadCrmCustomFieldsInto($data, $this->record);
 
         // Reshape dealProducts into the repeater's expected row shape
@@ -69,6 +70,9 @@ class EditDeal extends EditRecord
         $organization = isset($data['organization_id']) ? Organization::find($data['organization_id']) : null;
 
         app(DealService::class)->update(FormPayload::wrap($data), $record, $person, $organization);
+        if (isset($data['labels'])) {
+            $record->labels()->sync($data['labels']);
+        }
         DealResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();

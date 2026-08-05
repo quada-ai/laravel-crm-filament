@@ -45,10 +45,12 @@ class LeadKanban extends Page
             ->where('model', Lead::class)
             ->pluck('id');
 
-        return PipelineStage::query()
-            ->whereIn('pipeline_id', $pipelineIds)
-            ->orderBy('order')
-            ->get();
+        $query = PipelineStage::query();
+        if ($pipelineIds->isNotEmpty()) {
+            $query->whereIn('pipeline_id', $pipelineIds);
+        }
+
+        return $query->orderBy('order')->get();
     }
 
     public function getLeadsByStage(): array
@@ -56,11 +58,20 @@ class LeadKanban extends Page
         $leads = Lead::query()
             ->whereNull('converted_at')
             ->when($this->ownerFilter, fn ($q) => $q->where('user_owner_id', $this->ownerFilter))
-            ->whereNotNull('pipeline_stage_id')
             ->orderByDesc('updated_at')
             ->get();
 
-        return $leads->groupBy('pipeline_stage_id')->all();
+        $defaultStage = $this->getStages()->first();
+
+        $grouped = [];
+        foreach ($leads as $lead) {
+            $stageId = $lead->pipeline_stage_id ?: ($defaultStage?->id ?? 0);
+            if ($stageId > 0) {
+                $grouped[$stageId][] = $lead;
+            }
+        }
+
+        return $grouped;
     }
 
     public function convertToDeal(string $externalId): void

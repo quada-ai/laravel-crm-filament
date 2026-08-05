@@ -40,6 +40,21 @@ class EditTask extends EditRecord
         app(TaskService::class)->update(FormPayload::wrap($data), $record);
         TaskResource::saveCrmCustomFields($data, $record);
 
+        try {
+            \VentureDrake\LaravelCrm\Models\Activity::create([
+                'external_id' => (string) \Illuminate\Support\Str::uuid(),
+                'recordable_type' => get_class($record),
+                'recordable_id' => $record->id,
+                'causeable_type' => auth()->user() ? get_class(auth()->user()) : null,
+                'causeable_id' => auth()->id(),
+                'timelineable_type' => get_class($record),
+                'timelineable_id' => $record->id,
+                'description' => 'Task updated',
+            ]);
+        } catch (\Throwable $e) {
+            // Ignore if activity creation fails
+        }
+
         return $record->refresh();
     }
 

@@ -104,9 +104,28 @@ class DealResource extends Resource
             Forms\Components\DatePicker::make('expected_close')
                 ->label(__('laravel-crm-filament::labels.sales.expected_close')),
 
+            Forms\Components\Select::make('pipeline_id')
+                ->label(__('laravel-crm-filament::labels.sales.pipeline'))
+                ->options(fn () => \VentureDrake\LaravelCrm\Models\Pipeline::query()->where('model', Deal::class)->orWhereNull('model')->orderBy('name')->pluck('name', 'id'))
+                ->searchable()
+                ->live()
+                ->afterStateUpdated(fn (Forms\Set $set) => $set('pipeline_stage_id', null)),
+
             Forms\Components\Select::make('pipeline_stage_id')
                 ->label(__('laravel-crm-filament::labels.sales.pipeline_stage'))
-                ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id'))
+                ->options(function (Forms\Get $get) {
+                    $pipelineId = $get('pipeline_id');
+                    if ($pipelineId) {
+                        return PipelineStage::query()->where('pipeline_id', $pipelineId)->orderBy('order')->pluck('name', 'id');
+                    }
+
+                    $defaultPipeline = \VentureDrake\LaravelCrm\Models\Pipeline::query()->where('model', Deal::class)->first()
+                        ?? \VentureDrake\LaravelCrm\Models\Pipeline::query()->orderBy('id')->first();
+
+                    return $defaultPipeline
+                        ? PipelineStage::query()->where('pipeline_id', $defaultPipeline->id)->orderBy('order')->pluck('name', 'id')
+                        : PipelineStage::query()->orderBy('order')->pluck('name', 'id');
+                })
                 ->searchable()
                 ->preload(),
 
@@ -186,6 +205,7 @@ class DealResource extends Resource
 
                 Tables\Columns\TextColumn::make('amount')
                     ->label(__('laravel-crm-filament::labels.money.value'))
+                    ->state(fn ($record) => $record?->amount !== null ? $record->amount / 100 : null)
                     ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
                     ->sortable(),
 

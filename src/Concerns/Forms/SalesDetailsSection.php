@@ -129,7 +129,14 @@ class SalesDetailsSection
         if ($opts['stage']) {
             $components[] = Forms\Components\Select::make('pipeline_stage_id')
                 ->label(__('laravel-crm-filament::labels.sales.pipeline_stage'))
-                ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id'))
+                ->options(function (Forms\Get $get) {
+                    $pipelineId = $get('pipeline_id');
+                    if ($pipelineId) {
+                        return PipelineStage::query()->where('pipeline_id', $pipelineId)->orderBy('order')->pluck('name', 'id');
+                    }
+
+                    return PipelineStage::query()->orderBy('order')->pluck('name', 'id');
+                })
                 ->searchable()
                 ->preload();
         }

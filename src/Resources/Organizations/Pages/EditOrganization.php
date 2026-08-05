@@ -53,6 +53,8 @@ class EditOrganization extends EditRecord
             'primary' => (bool) $a->primary,
         ])->values()->toArray();
 
+        $data['labels'] = $record->labels()->pluck('crm_labels.id')->toArray();
+
         return OrganizationResource::loadCrmCustomFieldsInto($data, $this->getRecord());
     }
 
@@ -60,6 +62,9 @@ class EditOrganization extends EditRecord
     {
         /** @var Organization $record */
         app(OrganizationService::class)->update($record, FormPayload::wrap($data));
+        if (isset($data['labels'])) {
+            $record->labels()->sync($data['labels']);
+        }
         OrganizationResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();

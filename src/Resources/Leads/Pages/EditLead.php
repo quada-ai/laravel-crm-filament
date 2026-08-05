@@ -33,6 +33,12 @@ class EditLead extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
+        $data['labels'] = $this->record->labels()->pluck('crm_labels.id')->toArray();
+
+        if (! is_null($data['amount'] ?? null)) {
+            $data['amount'] = $data['amount'] / 100;
+        }
+
         return LeadResource::loadCrmCustomFieldsInto($data, $this->record);
     }
 
@@ -43,6 +49,9 @@ class EditLead extends EditRecord
         $organization = isset($data['organization_id']) ? Organization::find($data['organization_id']) : null;
 
         app(LeadService::class)->update(FormPayload::wrap($data), $record, $person, $organization);
+        if (isset($data['labels'])) {
+            $record->labels()->sync($data['labels']);
+        }
         LeadResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();

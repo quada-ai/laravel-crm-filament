@@ -20,6 +20,9 @@ class CreateLead extends CreateRecord
         $organization = isset($data['organization_id']) ? Organization::find($data['organization_id']) : null;
 
         $record = app(LeadService::class)->create(FormPayload::wrap($data), $person, $organization);
+        if (isset($data['labels'])) {
+            $record->labels()->sync($data['labels']);
+        }
         LeadResource::saveCrmCustomFields($data, $record);
 
         return $record;

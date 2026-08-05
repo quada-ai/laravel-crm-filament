@@ -53,6 +53,8 @@ class EditPerson extends EditRecord
             'primary' => (bool) $a->primary,
         ])->values()->toArray();
 
+        $data['labels'] = $record->labels()->pluck('crm_labels.id')->toArray();
+
         return PersonResource::loadCrmCustomFieldsInto($data, $this->getRecord());
     }
 
@@ -60,6 +62,9 @@ class EditPerson extends EditRecord
     {
         /** @var Person $record */
         app(PersonService::class)->update($record, FormPayload::wrap($data));
+        if (isset($data['labels'])) {
+            $record->labels()->sync($data['labels']);
+        }
         PersonResource::saveCrmCustomFields($data, $record);
 
         return $record->refresh();
