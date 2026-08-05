@@ -320,7 +320,13 @@ class GeneralSettings extends Page implements HasForms
         $settings = app('laravel-crm.settings');
 
         foreach (static::KEYS as $key => $label) {
-            $settings->set($key, $data[$key] ?? null, $label);
+            $value = $data[$key] ?? '';
+            if (is_bool($value)) {
+                $value = $value ? '1' : '0';
+            } elseif ($value === null) {
+                $value = '';
+            }
+            $settings->set($key, (string) $value, $label);
         }
 
         $anchor = $this->resolveAnchor();
