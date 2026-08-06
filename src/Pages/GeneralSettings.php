@@ -396,11 +396,17 @@ class GeneralSettings extends Page implements HasForms
     protected function syncPhones(Setting $anchor, array $rows): void
     {
         $keptIds = [];
+        $validTypes = ['work', 'home', 'mobile', 'fax', 'other'];
         foreach ($rows as $row) {
             $id = $row['id'] ?? null;
+            $type = $row['type'] ?? 'work';
+            if (! in_array($type, $validTypes, true)) {
+                $type = 'work';
+            }
+
             $attrs = [
                 'number' => $row['number'] ?? null,
-                'type' => $row['type'] ?? null,
+                'type' => $type,
             ];
 
             if ($id && $phone = Phone::find($id)) {
@@ -427,11 +433,17 @@ class GeneralSettings extends Page implements HasForms
     protected function syncEmails(Setting $anchor, array $rows): void
     {
         $keptIds = [];
+        $validTypes = ['work', 'home', 'other'];
         foreach ($rows as $row) {
             $id = $row['id'] ?? null;
+            $type = $row['type'] ?? 'work';
+            if (! in_array($type, $validTypes, true)) {
+                $type = 'work';
+            }
+
             $attrs = [
                 'address' => $row['address'] ?? null,
-                'type' => $row['type'] ?? null,
+                'type' => $type,
             ];
 
             if ($id && $email = Email::find($id)) {
@@ -547,13 +559,6 @@ class GeneralSettings extends Page implements HasForms
 
     protected static function phoneTypeOptions(): array
     {
-        if (function_exists('VentureDrake\\LaravelCrm\\Http\\Helpers\\SelectOptions\\phoneTypes')) {
-            $opts = \VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\phoneTypes();
-            if (! empty($opts)) {
-                return $opts;
-            }
-        }
-
         return [
             'work' => 'Work',
             'home' => 'Home',
@@ -565,13 +570,6 @@ class GeneralSettings extends Page implements HasForms
 
     protected static function emailTypeOptions(): array
     {
-        if (function_exists('VentureDrake\\LaravelCrm\\Http\\Helpers\\SelectOptions\\emailTypes')) {
-            $opts = \VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\emailTypes();
-            if (! empty($opts)) {
-                return $opts;
-            }
-        }
-
         return [
             'work' => 'Work',
             'home' => 'Home',
