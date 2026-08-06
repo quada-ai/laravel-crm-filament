@@ -70,7 +70,8 @@ class TaskResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\DateTimePicker::make('due_at')
-                ->label(__('laravel-crm-filament::labels.money.due_at')),
+                ->label(__('laravel-crm-filament::labels.money.due_at'))
+                ->seconds(false),
 
             Forms\Components\Select::make('user_owner_id')
                 ->label(__('laravel-crm-filament::labels.fields.created_by'))
