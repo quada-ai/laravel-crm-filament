@@ -73,6 +73,18 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        // Fix core HasCrmFields.php:21 crash: when BelongsToTeamsScope is active,
+        // $fieldModel->field returns null because the related Field row belongs
+        // to a different team_id. Pre-load the relation without scopes so the
+        // cached Eloquent relation is used when core accesses $fieldModel->field.
+        \VentureDrake\LaravelCrm\Models\FieldModel::retrieved(function ($fieldModel) {
+            if (! $fieldModel->relationLoaded('field')) {
+                $field = \VentureDrake\LaravelCrm\Models\Field::withoutGlobalScopes()
+                    ->find($fieldModel->field_id);
+                $fieldModel->setRelation('field', $field);
+            }
+        });
+
         // Apply consistent gray styling to every EditAction across the panel,
         // so Edit pills match the gray Back-to-index pill.
         EditAction::configureUsing(fn (EditAction $action) => $action->color('gray'));
