@@ -166,7 +166,7 @@ class GeneralSettings extends Page implements HasForms
                         Grid::make(2)->schema([
                             Select::make('language')
                                 ->label(static::KEYS['language'])
-                                ->options(['english' => 'English'])
+                                ->options(['en' => 'English', 'ar' => 'العربية'])
                                 ->searchable(),
                             Select::make('country')
                                 ->label(static::KEYS['country'])
@@ -343,6 +343,7 @@ class GeneralSettings extends Page implements HasForms
         }
         if ($language = $settings->get('language')) {
             app()->setLocale($language);
+            session()->put('locale', $language);
         }
         if ($timezone = $settings->get('timezone')) {
             date_default_timezone_set($timezone);

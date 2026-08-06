@@ -23,9 +23,15 @@ class ApplyCrmGeneralSettings
             }
 
             // 2. Language / Localisation setting
-            $language = $settings->get('language');
-            if ($language) {
-                app()->setLocale($language);
+            // Respect the session locale set by the language switcher (filament-language-switch).
+            // Only fall back to the CRM database setting when no session locale exists.
+            if (session()->has('locale')) {
+                app()->setLocale(session()->get('locale'));
+            } else {
+                $language = $settings->get('language');
+                if ($language) {
+                    app()->setLocale($language);
+                }
             }
 
             // 3. Timezone setting
