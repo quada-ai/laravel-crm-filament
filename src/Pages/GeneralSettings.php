@@ -358,11 +358,6 @@ class GeneralSettings extends Page implements HasForms
             'laravel-crm.time_format' => $timeFormat,
         ]);
 
-        \Filament\Tables\Columns\TextColumn::defaultDateDisplayFormat($dateFormat);
-        \Filament\Tables\Columns\TextColumn::defaultDateTimeDisplayFormat($dateTimeFormat);
-        \Filament\Infolists\Components\TextEntry::defaultDateDisplayFormat($dateFormat);
-        \Filament\Infolists\Components\TextEntry::defaultDateTimeDisplayFormat($dateTimeFormat);
-
         Notification::make()
             ->title('Settings saved')
             ->success()

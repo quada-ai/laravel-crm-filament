@@ -5,8 +5,6 @@ namespace VentureDrake\LaravelCrmFilament\Http\Middleware;
 use Closure;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Tables\Columns\TextColumn;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -46,12 +44,6 @@ class ApplyCrmGeneralSettings
                 'laravel-crm.date_format' => $dateFormat,
                 'laravel-crm.time_format' => $timeFormat,
             ]);
-
-            TextColumn::defaultDateDisplayFormat($dateFormat);
-            TextColumn::defaultDateTimeDisplayFormat($dateTimeFormat);
-
-            TextEntry::defaultDateDisplayFormat($dateFormat);
-            TextEntry::defaultDateTimeDisplayFormat($dateTimeFormat);
 
             DatePicker::configureUsing(fn (DatePicker $component) => $component->displayFormat($dateFormat));
             DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->displayFormat($dateTimeFormat));
