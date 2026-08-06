@@ -17,6 +17,7 @@ class CreateDeal extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         $pipeline = \VentureDrake\LaravelCrmFilament\Support\DefaultPipeline::ensureFor(\VentureDrake\LaravelCrm\Models\Deal::class);
+        \VentureDrake\LaravelCrmFilament\Support\DefaultFieldGroup::ensureFor(\VentureDrake\LaravelCrm\Models\Deal::class);
         if (empty($data['pipeline_id'])) {
             $data['pipeline_id'] = $pipeline->id;
         }

@@ -48,10 +48,11 @@ class ApplyCrmGeneralSettings
             DatePicker::configureUsing(fn (DatePicker $component) => $component->displayFormat($dateFormat));
             DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->displayFormat($dateTimeFormat));
 
-            // 5. Guarantee default Pipeline and Stages exist in database
+            // 5. Guarantee default Pipeline, Stages, and FieldGroups exist in database
             try {
                 \VentureDrake\LaravelCrmFilament\Support\DefaultPipeline::ensureFor(\VentureDrake\LaravelCrm\Models\Deal::class);
                 \VentureDrake\LaravelCrmFilament\Support\DefaultPipeline::ensureFor(\VentureDrake\LaravelCrm\Models\Lead::class);
+                \VentureDrake\LaravelCrmFilament\Support\DefaultFieldGroup::ensureAll();
             } catch (\Throwable $e) {
                 // Ignore if DB not migrated yet
             }

@@ -17,6 +17,7 @@ class CreateLead extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         $pipeline = \VentureDrake\LaravelCrmFilament\Support\DefaultPipeline::ensureFor(\VentureDrake\LaravelCrm\Models\Lead::class);
+        \VentureDrake\LaravelCrmFilament\Support\DefaultFieldGroup::ensureFor(\VentureDrake\LaravelCrm\Models\Lead::class);
         if (empty($data['pipeline_id'])) {
             $data['pipeline_id'] = $pipeline->id;
         }
