@@ -430,6 +430,10 @@ class LaravelCrmPlugin implements Plugin
 
         $panel->resources($resources);
 
+        $panel->middleware([
+            \VentureDrake\LaravelCrmFilament\Http\Middleware\ApplyCrmGeneralSettings::class,
+        ]);
+
         // Pin the visible nav-group order end-to-end. Any groups not listed here
         // (e.g. Integrations from the Xero mirrors) render after the pinned sequence.
         $panel->navigationGroups([

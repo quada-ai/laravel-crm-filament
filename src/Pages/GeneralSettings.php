@@ -338,6 +338,17 @@ class GeneralSettings extends Page implements HasForms
             $settings->forgetCache();
         }
 
+        if ($currency = $settings->get('currency')) {
+            config(['laravel-crm.default_currency' => $currency]);
+        }
+        if ($language = $settings->get('language')) {
+            app()->setLocale($language);
+        }
+        if ($timezone = $settings->get('timezone')) {
+            date_default_timezone_set($timezone);
+            config(['app.timezone' => $timezone]);
+        }
+
         Notification::make()
             ->title('Settings saved')
             ->success()
