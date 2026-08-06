@@ -26,6 +26,11 @@ class CreateDeal extends CreateRecord
             $data['pipeline_stage_id'] = $stage?->id;
         }
 
+        if (empty($data['currency'])) {
+            $data['currency'] = app('laravel-crm.settings')->get('currency')
+                ?: config('laravel-crm.default_currency', 'USD');
+        }
+
         $person = isset($data['person_id']) ? Person::find($data['person_id']) : null;
         $organization = isset($data['organization_id']) ? Organization::find($data['organization_id']) : null;
 

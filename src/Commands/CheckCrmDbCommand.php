@@ -106,6 +106,7 @@ class CheckCrmDbCommand extends Command
                 'title' => 'Diagnostic Test Deal',
                 'pipeline_id' => $pipeline->id,
                 'pipeline_stage_id' => $stage?->id,
+                'currency' => app('laravel-crm.settings')->get('currency') ?: config('laravel-crm.default_currency', 'USD'),
             ];
 
             if (class_exists(\VentureDrake\LaravelCrm\Services\DealService::class)) {
