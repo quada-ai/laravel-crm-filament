@@ -349,6 +349,20 @@ class GeneralSettings extends Page implements HasForms
             config(['app.timezone' => $timezone]);
         }
 
+        $dateFormat = $settings->get('date_format') ?: config('laravel-crm.date_format', 'Y-m-d');
+        $timeFormat = $settings->get('time_format') ?: config('laravel-crm.time_format', 'H:i');
+        $dateTimeFormat = trim($dateFormat . ' ' . $timeFormat);
+
+        config([
+            'laravel-crm.date_format' => $dateFormat,
+            'laravel-crm.time_format' => $timeFormat,
+        ]);
+
+        \Filament\Tables\Columns\TextColumn::defaultDateDisplayFormat($dateFormat);
+        \Filament\Tables\Columns\TextColumn::defaultDateTimeDisplayFormat($dateTimeFormat);
+        \Filament\Infolists\Components\TextEntry::defaultDateDisplayFormat($dateFormat);
+        \Filament\Infolists\Components\TextEntry::defaultDateTimeDisplayFormat($dateTimeFormat);
+
         Notification::make()
             ->title('Settings saved')
             ->success()
