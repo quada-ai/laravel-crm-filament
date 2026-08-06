@@ -2,6 +2,7 @@
 
 namespace VentureDrake\LaravelCrmFilament\Support;
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
@@ -10,19 +11,42 @@ class DefaultPipeline
 {
     public static function ensureFor(string $modelClass): Pipeline
     {
-        $pipeline = Pipeline::where('model', $modelClass)->where('default', 1)->first()
-            ?? Pipeline::where('model', $modelClass)->first()
-            ?? Pipeline::whereNull('model')->where('default', 1)->first()
-            ?? Pipeline::whereNull('model')->first()
-            ?? Pipeline::first();
+        $table = (new Pipeline)->getTable();
+        $hasModelCol = Schema::hasColumn($table, 'model');
+        $hasDefaultCol = Schema::hasColumn($table, 'default');
+
+        $query = Pipeline::query();
+
+        if ($hasModelCol && $hasDefaultCol) {
+            $pipeline = (clone $query)->where('model', $modelClass)->where('default', 1)->first()
+                ?? (clone $query)->where('model', $modelClass)->first()
+                ?? (clone $query)->whereNull('model')->where('default', 1)->first()
+                ?? (clone $query)->whereNull('model')->first()
+                ?? (clone $query)->first();
+        } elseif ($hasModelCol) {
+            $pipeline = (clone $query)->where('model', $modelClass)->first()
+                ?? (clone $query)->whereNull('model')->first()
+                ?? (clone $query)->first();
+        } elseif ($hasDefaultCol) {
+            $pipeline = (clone $query)->where('default', 1)->first()
+                ?? (clone $query)->first();
+        } else {
+            $pipeline = (clone $query)->first();
+        }
 
         if (! $pipeline) {
-            $pipeline = Pipeline::create([
+            $data = [
                 'external_id' => (string) Str::uuid(),
                 'name' => 'Sales Pipeline',
-                'model' => $modelClass,
-                'default' => 1,
-            ]);
+            ];
+            if ($hasModelCol) {
+                $data['model'] = $modelClass;
+            }
+            if ($hasDefaultCol) {
+                $data['default'] = 1;
+            }
+
+            $pipeline = Pipeline::create($data);
 
             $stages = [
                 ['name' => 'Prospect', 'order' => 1],
@@ -40,7 +64,7 @@ class DefaultPipeline
                     'order' => $stage['order'],
                 ]);
             }
-        } elseif (! $pipeline->default) {
+        } elseif ($hasDefaultCol && ! $pipeline->default) {
             $pipeline->update(['default' => 1]);
         }
 

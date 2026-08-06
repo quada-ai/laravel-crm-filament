@@ -204,7 +204,7 @@ class LineItemsRepeater
             }
         }
 
-        if ($default = TaxRate::where('default', 1)->first()) {
+        if (\Illuminate\Support\Facades\Schema::hasColumn((new TaxRate)->getTable(), 'default') && $default = TaxRate::where('default', 1)->first()) {
             return (float) $default->rate;
         }
 
