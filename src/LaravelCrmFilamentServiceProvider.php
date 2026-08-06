@@ -314,6 +314,7 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
         return [
             InstallCommand::class,
             PublishCommand::class,
+            \VentureDrake\LaravelCrmFilament\Commands\CheckCrmDbCommand::class,
         ];
     }
 }
