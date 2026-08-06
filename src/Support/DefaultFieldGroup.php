@@ -13,23 +13,38 @@ class DefaultFieldGroup
         $table = (new FieldGroup)->getTable();
         $hasModelCol = Schema::hasColumn($table, 'model');
         $hasDefaultCol = Schema::hasColumn($table, 'default');
+        $hasSystemCol = Schema::hasColumn($table, 'system');
+        $hasHandleCol = Schema::hasColumn($table, 'handle');
 
         $query = FieldGroup::query();
 
-        if ($hasModelCol && $hasDefaultCol) {
+        if ($hasSystemCol && $hasModelCol) {
+            $group = (clone $query)->where('system', 1)->where('model', $modelClass)->first();
+        } else {
+            $group = null;
+        }
+
+        if (! $group && $hasSystemCol) {
+            $group = (clone $query)->where('system', 1)->first();
+        }
+
+        if (! $group && $hasHandleCol) {
+            $group = (clone $query)->where('handle', 'default')->first();
+        }
+
+        if (! $group && $hasModelCol && $hasDefaultCol) {
             $group = (clone $query)->where('model', $modelClass)->where('default', 1)->first()
                 ?? (clone $query)->where('model', $modelClass)->first()
                 ?? (clone $query)->whereNull('model')->where('default', 1)->first()
-                ?? (clone $query)->whereNull('model')->first()
-                ?? (clone $query)->first();
-        } elseif ($hasModelCol) {
+                ?? (clone $query)->whereNull('model')->first();
+        } elseif (! $group && $hasModelCol) {
             $group = (clone $query)->where('model', $modelClass)->first()
-                ?? (clone $query)->whereNull('model')->first()
-                ?? (clone $query)->first();
-        } elseif ($hasDefaultCol) {
-            $group = (clone $query)->where('default', 1)->first()
-                ?? (clone $query)->first();
-        } else {
+                ?? (clone $query)->whereNull('model')->first();
+        } elseif (! $group && $hasDefaultCol) {
+            $group = (clone $query)->where('default', 1)->first();
+        }
+
+        if (! $group) {
             $group = (clone $query)->first();
         }
 
@@ -44,8 +59,26 @@ class DefaultFieldGroup
             if ($hasDefaultCol) {
                 $data['default'] = 1;
             }
+            if ($hasSystemCol) {
+                $data['system'] = 1;
+            }
+            if ($hasHandleCol) {
+                $data['handle'] = 'default';
+            }
 
             $group = FieldGroup::create($data);
+        } else {
+            // Ensure existing group has system=1 or handle=default so core CRM HasCrmFields never gets null
+            $updates = [];
+            if ($hasSystemCol && empty($group->system)) {
+                $updates['system'] = 1;
+            }
+            if ($hasHandleCol && empty($group->handle)) {
+                $updates['handle'] = 'default';
+            }
+            if ($updates !== []) {
+                $group->update($updates);
+            }
         }
 
         return $group;
