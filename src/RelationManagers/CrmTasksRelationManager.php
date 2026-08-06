@@ -51,12 +51,12 @@ class CrmTasksRelationManager extends TasksRelationManager
                 Grid::make(2)->schema([
                     Forms\Components\Select::make('user_owner_id')
                         ->label(__('laravel-crm-filament::labels.fields.who_requested_the_task'))
-                        ->relationship('ownerUser', 'name')
+                        ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                         ->searchable()
                         ->preload(),
                     Forms\Components\Select::make('user_assigned_id')
                         ->label(__('laravel-crm-filament::labels.fields.who_is_responsible'))
-                        ->relationship('assignedToUser', 'name')
+                        ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                         ->searchable()
                         ->preload(),
                 ]),

@@ -4,10 +4,10 @@ namespace VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\Pages;
 
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
 use VentureDrake\LaravelCrm\Models\EmailCampaign;
 use VentureDrake\LaravelCrmFilament\Resources\EmailCampaigns\EmailCampaignResource;
+use VentureDrake\LaravelCrmFilament\Support\CrmTab;
 
 class ListEmailCampaigns extends ListRecords
 {
@@ -20,13 +20,13 @@ class ListEmailCampaigns extends ListRecords
 
     public function getTabs(): array
     {
-        $statusTab = fn (string $label, string $status, ?string $color = null) => Tab::make($label)
+        $statusTab = fn (string $label, string $status, ?string $color = null) => CrmTab::make($label)
             ->modifyQueryUsing(fn (Builder $q) => $q->where('status', $status))
             ->badge(fn () => EmailCampaign::query()->where('status', $status)->count() ?: null)
             ->badgeColor($color);
 
         return [
-            'all' => Tab::make('All'),
+            'all' => CrmTab::make('All'),
             'draft' => $statusTab('Draft', 'draft'),
             'scheduled' => $statusTab('Scheduled', 'scheduled', 'warning'),
             'sending' => $statusTab('Sending', 'sending', 'info'),
