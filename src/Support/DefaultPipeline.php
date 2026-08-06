@@ -14,24 +14,40 @@ class DefaultPipeline
         $table = (new Pipeline)->getTable();
         $hasModelCol = Schema::hasColumn($table, 'model');
         $hasDefaultCol = Schema::hasColumn($table, 'default');
+        $hasTeamCol = Schema::hasColumn($table, 'team_id');
 
-        $query = Pipeline::query();
+        $teamId = DefaultFieldGroup::resolveCurrentTeamId();
 
-        if ($hasModelCol && $hasDefaultCol) {
-            $pipeline = (clone $query)->where('model', $modelClass)->where('default', 1)->first()
-                ?? (clone $query)->where('model', $modelClass)->first()
-                ?? (clone $query)->whereNull('model')->where('default', 1)->first()
-                ?? (clone $query)->whereNull('model')->first()
-                ?? (clone $query)->first();
-        } elseif ($hasModelCol) {
-            $pipeline = (clone $query)->where('model', $modelClass)->first()
-                ?? (clone $query)->whereNull('model')->first()
-                ?? (clone $query)->first();
-        } elseif ($hasDefaultCol) {
-            $pipeline = (clone $query)->where('default', 1)->first()
-                ?? (clone $query)->first();
-        } else {
-            $pipeline = (clone $query)->first();
+        $query = Pipeline::withoutGlobalScopes();
+
+        $pipeline = null;
+        if ($teamId && $hasTeamCol) {
+            $pipeline = (clone $query)->where('team_id', $teamId)
+                ->when($hasModelCol, fn ($q) => $q->where('model', $modelClass))
+                ->first();
+
+            if (! $pipeline) {
+                $pipeline = (clone $query)->where('team_id', $teamId)->first();
+            }
+        }
+
+        if (! $pipeline) {
+            if ($hasModelCol && $hasDefaultCol) {
+                $pipeline = (clone $query)->where('model', $modelClass)->where('default', 1)->first()
+                    ?? (clone $query)->where('model', $modelClass)->first()
+                    ?? (clone $query)->whereNull('model')->where('default', 1)->first()
+                    ?? (clone $query)->whereNull('model')->first()
+                    ?? (clone $query)->first();
+            } elseif ($hasModelCol) {
+                $pipeline = (clone $query)->where('model', $modelClass)->first()
+                    ?? (clone $query)->whereNull('model')->first()
+                    ?? (clone $query)->first();
+            } elseif ($hasDefaultCol) {
+                $pipeline = (clone $query)->where('default', 1)->first()
+                    ?? (clone $query)->first();
+            } else {
+                $pipeline = (clone $query)->first();
+            }
         }
 
         if (! $pipeline) {
@@ -45,6 +61,9 @@ class DefaultPipeline
             if ($hasDefaultCol) {
                 $data['default'] = 1;
             }
+            if ($hasTeamCol && $teamId) {
+                $data['team_id'] = $teamId;
+            }
 
             $pipeline = Pipeline::create($data);
 
@@ -57,15 +76,17 @@ class DefaultPipeline
             ];
 
             foreach ($stages as $stage) {
-                PipelineStage::create([
+                $stageData = [
                     'external_id' => (string) Str::uuid(),
                     'pipeline_id' => $pipeline->id,
                     'name' => $stage['name'],
                     'order' => $stage['order'],
-                ]);
+                ];
+                if ($hasTeamCol && $teamId) {
+                    $stageData['team_id'] = $teamId;
+                }
+                PipelineStage::create($stageData);
             }
-        } elseif ($hasDefaultCol && ! $pipeline->default) {
-            $pipeline->update(['default' => 1]);
         }
 
         return $pipeline;
