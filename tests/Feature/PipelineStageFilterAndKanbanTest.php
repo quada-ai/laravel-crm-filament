@@ -39,9 +39,8 @@ it('scopes stage options in Lead, Deal, and Quote resource table filters to rela
     // Test LeadResource stage filter options
     $leadStageFilter = collect(LeadResource::table(app(\Filament\Tables\Table::class))->getFilters())
         ->firstWhere(fn ($f) => $f->getName() === 'pipeline_stage_id');
-    $getMock = fn ($key) => null;
-    $livewireMock = (object) ['tableFilters' => []];
-    $leadOptions = call_user_func($leadStageFilter->getOptions(...), $getMock, $livewireMock);
+    $livewireMock = new class { public array $tableFilters = []; public function getTableFilterState($name) { return $this->tableFilters[$name] ?? null; } };
+    $leadOptions = call_user_func($leadStageFilter->getOptions(...), $livewireMock);
     expect($leadOptions)->toHaveKey($leadStage->id);
     expect($leadOptions)->not->toHaveKey($dealStage->id);
     expect($leadOptions)->not->toHaveKey($quoteStage->id);
@@ -49,7 +48,7 @@ it('scopes stage options in Lead, Deal, and Quote resource table filters to rela
     // Test DealResource stage filter options
     $dealStageFilter = collect(DealResource::table(app(\Filament\Tables\Table::class))->getFilters())
         ->firstWhere(fn ($f) => $f->getName() === 'pipeline_stage_id');
-    $dealOptions = call_user_func($dealStageFilter->getOptions(...), $getMock, $livewireMock);
+    $dealOptions = call_user_func($dealStageFilter->getOptions(...), $livewireMock);
     expect($dealOptions)->toHaveKey($dealStage->id);
     expect($dealOptions)->not->toHaveKey($leadStage->id);
     expect($dealOptions)->not->toHaveKey($quoteStage->id);
@@ -57,7 +56,7 @@ it('scopes stage options in Lead, Deal, and Quote resource table filters to rela
     // Test QuoteResource stage filter options
     $quoteStageFilter = collect(QuoteResource::table(app(\Filament\Tables\Table::class))->getFilters())
         ->firstWhere(fn ($f) => $f->getName() === 'pipeline_stage_id');
-    $quoteOptions = call_user_func($quoteStageFilter->getOptions(...), $getMock, $livewireMock);
+    $quoteOptions = call_user_func($quoteStageFilter->getOptions(...), $livewireMock);
     expect($quoteOptions)->toHaveKey($quoteStage->id);
     expect($quoteOptions)->not->toHaveKey($leadStage->id);
     expect($quoteOptions)->not->toHaveKey($dealStage->id);
@@ -73,9 +72,12 @@ it('filters stage options dynamically when pipeline_id is selected', function ()
     $leadStageFilter = collect(LeadResource::table(app(\Filament\Tables\Table::class))->getFilters())
         ->firstWhere(fn ($f) => $f->getName() === 'pipeline_stage_id');
 
-    $getMock = fn ($key) => $key === 'pipeline_id' ? $pipelineA->id : null;
-    $livewireMock = (object) ['tableFilters' => []];
-    $options = call_user_func($leadStageFilter->getOptions(...), $getMock, $livewireMock);
+    $livewireMock = new class($pipelineA->id) {
+        public array $tableFilters;
+        public function __construct($id) { $this->tableFilters = ['pipeline_id' => ['value' => $id]]; }
+        public function getTableFilterState($name) { return $this->tableFilters[$name] ?? null; }
+    };
+    $options = call_user_func($leadStageFilter->getOptions(...), $livewireMock);
 
     expect($options)->toHaveKey($stageA->id);
     expect($options)->not->toHaveKey($stageB->id);

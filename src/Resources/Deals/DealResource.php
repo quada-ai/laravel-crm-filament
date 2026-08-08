@@ -255,8 +255,9 @@ class DealResource extends Resource
 
                 Tables\Filters\SelectFilter::make('pipeline_stage_id')
                     ->label(__('laravel-crm-filament::labels.sales.stage'))
-                    ->options(function ($get, $livewire) {
-                        $pipelineId = $get('pipeline_id') ?? data_get($livewire->tableFilters ?? [], 'pipeline_id.value');
+                    ->options(function ($livewire = null) {
+                        $pipelineId = data_get($livewire?->getTableFilterState('pipeline_id'), 'value')
+                            ?? data_get($livewire?->tableFilters ?? [], 'pipeline_id.value');
                         if ($pipelineId) {
                             return PipelineStage::query()
                                 ->where('pipeline_id', $pipelineId)
