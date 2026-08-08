@@ -67,14 +67,14 @@ class DealKanban extends Page
         $stageIds = $stages->pluck('id')->all();
         $defaultStageId = $stages->first()?->id;
 
-        $query = Deal::query();
+        $query = DealResource::getEloquentQuery();
 
         if ($this->statusFilter === 'open') {
-            $query->whereNull('closed_at');
+            $query->whereNull('closed_status')->whereNull('closed_at');
         } elseif ($this->statusFilter === 'won') {
-            $query->where(fn ($q) => $q->whereIn('closed_status', ['won', 'Won'])->orWhere(fn ($q2) => $q2->whereNotNull('closed_at')->where('closed_status', '!=', 'lost')));
+            $query->where('closed_status', 'won');
         } elseif ($this->statusFilter === 'lost') {
-            $query->where(fn ($q) => $q->whereIn('closed_status', ['lost', 'Lost'])->orWhere(fn ($q2) => $q2->whereNotNull('closed_at')->where('closed_status', 'lost')));
+            $query->where('closed_status', 'lost');
         }
 
         if ($this->ownerFilter) {
@@ -103,12 +103,40 @@ class DealKanban extends Page
 
     public function markWon(string $externalId): void
     {
-        $this->closeDeal($externalId, true);
+        $deal = Deal::query()->where('external_id', $externalId)->first();
+        if (! $deal) {
+            return;
+        }
+
+        $wonStage = PipelineStage::query()
+            ->where('pipeline_id', $deal->pipeline_id)
+            ->where(fn ($q) => $q->where('name', 'like', '%won%')->orWhere('name', 'like', '%Won%'))
+            ->first();
+
+        $deal->forceFill([
+            'closed_at' => now(),
+            'closed_status' => 'won',
+            'pipeline_stage_id' => $wonStage?->id ?? $deal->pipeline_stage_id,
+        ])->save();
     }
 
     public function markLost(string $externalId): void
     {
-        $this->closeDeal($externalId, false);
+        $deal = Deal::query()->where('external_id', $externalId)->first();
+        if (! $deal) {
+            return;
+        }
+
+        $lostStage = PipelineStage::query()
+            ->where('pipeline_id', $deal->pipeline_id)
+            ->where(fn ($q) => $q->where('name', 'like', '%lost%')->orWhere('name', 'like', '%Lost%'))
+            ->first();
+
+        $deal->forceFill([
+            'closed_at' => now(),
+            'closed_status' => 'lost',
+            'pipeline_stage_id' => $lostStage?->id ?? $deal->pipeline_stage_id,
+        ])->save();
     }
 
     public function reopen(string $externalId): void
@@ -117,30 +145,11 @@ class DealKanban extends Page
         if (! $deal) {
             return;
         }
+
         $deal->forceFill([
             'closed_at' => null,
             'closed_status' => null,
-        ]);
-        if (Schema::hasColumn($deal->getTable(), 'won')) {
-            $deal->won = null;
-        }
-        $deal->save();
-    }
-
-    protected function closeDeal(string $externalId, bool $won): void
-    {
-        $deal = Deal::query()->where('external_id', $externalId)->first();
-        if (! $deal) {
-            return;
-        }
-        $deal->forceFill([
-            'closed_at' => now(),
-            'closed_status' => $won ? 'won' : 'lost',
-        ]);
-        if (Schema::hasColumn($deal->getTable(), 'won')) {
-            $deal->won = $won;
-        }
-        $deal->save();
+        ])->save();
     }
 
     public function moveDeal(string $externalId, ?int $stageId): void
@@ -149,11 +158,25 @@ class DealKanban extends Page
         if (! $deal) {
             return;
         }
+
         $deal->pipeline_stage_id = $stageId;
         if ($stageId) {
             $stage = PipelineStage::find($stageId);
             $deal->pipeline_id = $stage?->pipeline_id;
+
+            $stageNameLower = strtolower($stage?->name ?? '');
+            if (str_contains($stageNameLower, 'won')) {
+                $deal->closed_at = $deal->closed_at ?? now();
+                $deal->closed_status = 'won';
+            } elseif (str_contains($stageNameLower, 'lost')) {
+                $deal->closed_at = $deal->closed_at ?? now();
+                $deal->closed_status = 'lost';
+            } else {
+                $deal->closed_at = null;
+                $deal->closed_status = null;
+            }
         }
+
         $deal->save();
     }
 
