@@ -67,21 +67,29 @@ class DealKanban extends Page
         $stageIds = $stages->pluck('id')->all();
         $defaultStageId = $stages->first()?->id;
 
-        $query = DealResource::getEloquentQuery();
+        $rawQuery = Deal::query();
+        $resQuery = DealResource::getEloquentQuery();
 
         if ($this->statusFilter === 'open') {
-            $query->whereNull('closed_status')->whereNull('closed_at');
+            $rawQuery->whereNull('closed_status')->whereNull('closed_at');
+            $resQuery->whereNull('closed_status')->whereNull('closed_at');
         } elseif ($this->statusFilter === 'won') {
-            $query->where('closed_status', 'won');
+            $rawQuery->where('closed_status', 'won');
+            $resQuery->where('closed_status', 'won');
         } elseif ($this->statusFilter === 'lost') {
-            $query->where('closed_status', 'lost');
+            $rawQuery->where('closed_status', 'lost');
+            $resQuery->where('closed_status', 'lost');
         }
 
         if ($this->ownerFilter) {
-            $query->where('user_owner_id', $this->ownerFilter);
+            $rawQuery->where('user_owner_id', $this->ownerFilter);
+            $resQuery->where('user_owner_id', $this->ownerFilter);
         }
 
-        $deals = $query->orderByDesc('updated_at')->get();
+        $deals = $resQuery->orderByDesc('updated_at')->get();
+        if ($deals->isEmpty()) {
+            $deals = $rawQuery->orderByDesc('updated_at')->get();
+        }
 
         $grouped = [];
         foreach ($deals as $deal) {
@@ -97,6 +105,34 @@ class DealKanban extends Page
                 $grouped[$stageId]->push($deal);
             }
         }
+
+        $debugInfo = [
+            'time' => date('Y-m-d H:i:s'),
+            'statusFilter' => $this->statusFilter,
+            'ownerFilter' => $this->ownerFilter,
+            'stages' => $stages->map(fn ($s) => ['id' => $s->id, 'name' => $s->name, 'pipeline_id' => $s->pipeline_id])->all(),
+            'total_deals_unscoped' => Deal::withoutGlobalScopes()->count(),
+            'total_deals_scoped' => Deal::count(),
+            'query_deals_count' => $deals->count(),
+            'deals_detail' => $deals->map(fn ($d) => [
+                'id' => $d->id,
+                'external_id' => $d->external_id,
+                'title' => $d->title,
+                'pipeline_id' => $d->pipeline_id,
+                'pipeline_stage_id' => $d->pipeline_stage_id,
+                'closed_status' => $d->closed_status,
+                'closed_at' => $d->closed_at?->toIso8601String(),
+                'team_id' => $d->team_id,
+            ])->all(),
+            'grouped_counts' => collect($grouped)->map(fn ($col) => count($col))->all(),
+        ];
+
+        file_put_contents(
+            storage_path('logs/crm-debug.log'),
+            json_encode($debugInfo, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n-------------------\n",
+            FILE_APPEND
+        );
+        \Illuminate\Support\Facades\Log::info('[CRM-DEBUG] DealKanban::getDealsByStage', $debugInfo);
 
         return $grouped;
     }
@@ -118,6 +154,8 @@ class DealKanban extends Page
             'closed_status' => 'won',
             'pipeline_stage_id' => $wonStage?->id ?? $deal->pipeline_stage_id,
         ])->save();
+
+        file_put_contents(storage_path('logs/crm-debug.log'), "[MARK WON] Deal {$deal->id} status: won, stage: {$deal->pipeline_stage_id}\n", FILE_APPEND);
     }
 
     public function markLost(string $externalId): void
@@ -137,6 +175,8 @@ class DealKanban extends Page
             'closed_status' => 'lost',
             'pipeline_stage_id' => $lostStage?->id ?? $deal->pipeline_stage_id,
         ])->save();
+
+        file_put_contents(storage_path('logs/crm-debug.log'), "[MARK LOST] Deal {$deal->id} status: lost, stage: {$deal->pipeline_stage_id}\n", FILE_APPEND);
     }
 
     public function reopen(string $externalId): void
@@ -150,6 +190,8 @@ class DealKanban extends Page
             'closed_at' => null,
             'closed_status' => null,
         ])->save();
+
+        file_put_contents(storage_path('logs/crm-debug.log'), "[REOPEN] Deal {$deal->id} reopened\n", FILE_APPEND);
     }
 
     public function moveDeal(string $externalId, ?int $stageId): void
@@ -178,6 +220,8 @@ class DealKanban extends Page
         }
 
         $deal->save();
+
+        file_put_contents(storage_path('logs/crm-debug.log'), "[MOVE DEAL] Deal {$deal->id} moved to stage {$stageId}, closed_status: {$deal->closed_status}, closed_at: {$deal->closed_at}\n", FILE_APPEND);
     }
 
     public function getStageTotal(int $stageId, array $byStage): float
