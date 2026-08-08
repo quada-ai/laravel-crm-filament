@@ -20,13 +20,13 @@ class ListEmailCampaigns extends ListRecords
 
     public function getTabs(): array
     {
-        $statusTab = fn (string $label, string $status, ?string $color = null) => CrmTab::make($label)
+        $statusTab = fn (string $label, string $status, ?string $color = null) => CrmTab::make($label, $this)
             ->modifyQueryUsing(fn (Builder $q) => $q->where('status', $status))
             ->badge(fn () => EmailCampaign::query()->where('status', $status)->count() ?: null)
             ->badgeColor($color);
 
         return [
-            'all' => CrmTab::make('All'),
+            'all' => CrmTab::make('All', $this),
             'draft' => $statusTab('Draft', 'draft'),
             'scheduled' => $statusTab('Scheduled', 'scheduled', 'warning'),
             'sending' => $statusTab('Sending', 'sending', 'info'),

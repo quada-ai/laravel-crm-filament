@@ -21,18 +21,18 @@ class ListTasks extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => CrmTab::make('All'),
-            'open' => CrmTab::make('Open')
+            'all' => CrmTab::make('All', $this),
+            'open' => CrmTab::make('Open', $this)
                 ->modifyQueryUsing(fn (Builder $q) => $q->whereNull('completed_at')),
-            'today' => CrmTab::make('Today')
+            'today' => CrmTab::make('Today', $this)
                 ->modifyQueryUsing(fn (Builder $q) => $q->whereNull('completed_at')->whereDate('due_at', today()))
                 ->badge(fn () => Task::query()->whereNull('completed_at')->whereDate('due_at', today())->count() ?: null)
                 ->badgeColor('warning'),
-            'overdue' => CrmTab::make('Overdue')
+            'overdue' => CrmTab::make('Overdue', $this)
                 ->modifyQueryUsing(fn (Builder $q) => $q->whereNull('completed_at')->whereDate('due_at', '<', today()))
                 ->badge(fn () => Task::query()->whereNull('completed_at')->whereDate('due_at', '<', today())->count() ?: null)
                 ->badgeColor('danger'),
-            'completed' => CrmTab::make('Completed')
+            'completed' => CrmTab::make('Completed', $this)
                 ->modifyQueryUsing(fn (Builder $q) => $q->whereNotNull('completed_at')),
         ];
     }
