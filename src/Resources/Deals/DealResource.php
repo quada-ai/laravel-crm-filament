@@ -234,7 +234,7 @@ class DealResource extends Resource
                     ->badge()
                     ->state(function (Deal $record): string {
                         if ($record->closed_at) {
-                            return ucfirst($record->closed_status ?? ($record->won ? 'won' : 'lost'));
+                            return ucfirst($record->closed_status ?? 'closed');
                         }
 
                         return 'Open';
@@ -267,8 +267,8 @@ class DealResource extends Resource
 
                         return match ($data['value']) {
                             'open' => $query->whereNull('closed_at'),
-                            'won' => $query->where(fn ($q) => $q->where('closed_status', 'won')->orWhere('closed_status', 'Won')->orWhere('won', true)),
-                            'lost' => $query->where(fn ($q) => $q->where('closed_status', 'lost')->orWhere('closed_status', 'Lost')->orWhere('won', false)),
+                            'won' => $query->whereIn('closed_status', ['won', 'Won']),
+                            'lost' => $query->whereIn('closed_status', ['lost', 'Lost']),
                             default => $query,
                         };
                     }),

@@ -64,9 +64,9 @@ class DealKanban extends Page
         if ($this->statusFilter === 'open') {
             $query->whereNull('closed_at');
         } elseif ($this->statusFilter === 'won') {
-            $query->where(fn ($q) => $q->where('closed_status', 'won')->orWhere('closed_status', 'Won')->orWhere('won', true));
+            $query->whereIn('closed_status', ['won', 'Won']);
         } elseif ($this->statusFilter === 'lost') {
-            $query->where(fn ($q) => $q->where('closed_status', 'lost')->orWhere('closed_status', 'Lost')->orWhere('won', false));
+            $query->whereIn('closed_status', ['lost', 'Lost']);
         }
 
         if ($this->ownerFilter) {

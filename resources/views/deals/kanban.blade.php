@@ -101,7 +101,7 @@
                         @foreach ($stageDeals as $deal)
                             <div data-deal-id="{{ $deal->external_id }}" class="crm-kanban-card">
                                 <div class="crm-kanban-actions">
-                                    @if ($deal->closed_at || $deal->closed_status || $deal->won !== null)
+                                    @if ($deal->closed_at || $deal->closed_status)
                                         <button type="button" wire:click.stop="reopen('{{ $deal->external_id }}')"
                                                 class="crm-kanban-btn crm-kanban-btn-secondary" title="Reopen deal">Reopen</button>
                                     @else
@@ -115,8 +115,8 @@
                                    class="crm-kanban-card-link">
                                     <div style="display:flex; justify-content:space-between; align-items:center;">
                                         <div class="crm-kanban-card-id">{{ $deal->deal_id }}</div>
-                                        @if ($deal->closed_at || $deal->closed_status || $deal->won !== null)
-                                            @if (strtolower((string) $deal->closed_status) === 'won' || $deal->won)
+                                        @if ($deal->closed_at || $deal->closed_status)
+                                            @if (strtolower((string) $deal->closed_status) === 'won')
                                                 <span class="crm-kanban-badge crm-kanban-badge-success">Won</span>
                                             @else
                                                 <span class="crm-kanban-badge crm-kanban-badge-danger">Lost</span>
