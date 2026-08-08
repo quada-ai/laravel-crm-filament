@@ -75,13 +75,13 @@ class TaskResource extends Resource
 
             Forms\Components\Select::make('user_owner_id')
                 ->label(__('laravel-crm-filament::labels.fields.created_by'))
-                ->relationship('ownerUser', 'name')
+                ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                 ->searchable()
                 ->preload(),
 
             Forms\Components\Select::make('user_assigned_id')
                 ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
-                ->relationship('assignedToUser', 'name')
+                ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                 ->searchable()
                 ->preload(),
         ];
@@ -209,14 +209,14 @@ class TaskResource extends Resource
                 Tables\Filters\SelectFilter::make('user_owner_id')
                     ->label(__('laravel-crm-filament::labels.fields.created_by'))
                     ->multiple()
-                    ->relationship('ownerUser', 'name')
+                    ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                     ->searchable()
                     ->preload(),
 
                 Tables\Filters\SelectFilter::make('user_assigned_id')
                     ->label(__('laravel-crm-filament::labels.fields.assigned_to'))
                     ->multiple()
-                    ->relationship('assignedToUser', 'name')
+                    ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                     ->searchable()
                     ->preload(),
 

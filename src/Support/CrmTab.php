@@ -26,13 +26,11 @@ class CrmTab
             }
         }
 
-        if (method_exists($tab, 'hasContainer') && method_exists($tab, 'container')) {
+        if (method_exists($tab, 'container')) {
             try {
-                if (! $tab->hasContainer()) {
-                    if (class_exists(\Filament\Schemas\Schema::class)) {
-                        $container = \Filament\Schemas\Schema::make($livewire);
-                        $tab->container($container);
-                    }
+                if (class_exists(\Filament\Schemas\Schema::class)) {
+                    $container = \Filament\Schemas\Schema::make($livewire);
+                    $tab->container($container);
                 }
             } catch (\Throwable $e) {
                 // Ignore
