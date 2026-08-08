@@ -223,14 +223,14 @@ class InvoiceResource extends Resource
                 Tables\Filters\SelectFilter::make('user_owner_id')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->multiple()
-                    ->relationship('ownerUser', 'name')
+                    ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                     ->searchable()
                     ->preload(),
 
                 Tables\Filters\SelectFilter::make('labels')
                     ->label(__('laravel-crm-filament::labels.fields.labels'))
                     ->multiple()
-                    ->relationship('labels', 'name')
+                    ->options(fn () => \VentureDrake\LaravelCrm\Models\Label::pluck('name', 'id'))->query(function ($query, array $data) { if (empty($data['values'])) return $query; return $query->whereHas('labels', fn ($q) => $q->whereIn('labels.id', $data['values'])); })
                     ->preload(),
 
                 Tables\Filters\SelectFilter::make('status')
@@ -605,3 +605,4 @@ class InvoiceResource extends Resource
             ->url(static::getUrl('index'));
     }
 }
+

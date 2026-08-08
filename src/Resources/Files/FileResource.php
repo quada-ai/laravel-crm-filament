@@ -75,7 +75,7 @@ class FileResource extends Resource
                     ->options(ParentTypeOptions::all()),
                 Tables\Filters\SelectFilter::make('user_created_id')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
-                    ->relationship('createdByUser', 'name')
+                    ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                     ->searchable()
                     ->preload(),
                 Tables\Filters\Filter::make('created_at')

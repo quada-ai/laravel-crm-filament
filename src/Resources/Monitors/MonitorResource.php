@@ -139,7 +139,7 @@ class MonitorResource extends Resource
 
                     Forms\Components\Select::make('user_owner_id')
                         ->label(__('laravel-crm-filament::labels.fields.owner'))
-                        ->relationship('ownerUser', 'name')
+                        ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                         ->searchable()
                         ->preload(),
 
@@ -222,7 +222,7 @@ class MonitorResource extends Resource
                 Tables\Filters\SelectFilter::make('user_owner_id')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->multiple()
-                    ->relationship('ownerUser', 'name')
+                    ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                     ->searchable()
                     ->preload(),
             ])

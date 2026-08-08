@@ -102,7 +102,7 @@ class PersonResource extends Resource
 
             Forms\Components\Select::make('user_owner_id')
                 ->label(__('laravel-crm-filament::labels.fields.owner'))
-                ->relationship('ownerUser', 'name')
+                ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                 ->searchable()
                 ->preload(),
 

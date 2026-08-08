@@ -72,7 +72,7 @@ class LunchResource extends Resource
                     ->options(ParentTypeOptions::all()),
                 Tables\Filters\SelectFilter::make('user_owner_id')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
-                    ->relationship('ownerUser', 'name')
+                    ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                     ->searchable()
                     ->preload(),
                 Tables\Filters\Filter::make('start_at')
