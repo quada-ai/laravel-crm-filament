@@ -67,18 +67,42 @@ class DealKanban extends Page
         $stageIds = $stages->pluck('id')->all();
         $defaultStageId = $stages->first()?->id;
 
+        $wonStage = $stages->first(fn ($s) => str_contains(strtolower($s->name), 'won'));
+        $lostStage = $stages->first(fn ($s) => str_contains(strtolower($s->name), 'lost'));
+
         $rawQuery = Deal::query();
         $resQuery = DealResource::getEloquentQuery();
 
         if ($this->statusFilter === 'open') {
-            $rawQuery->whereNull('closed_status')->whereNull('closed_at');
-            $resQuery->whereNull('closed_status')->whereNull('closed_at');
+            $filterOpen = function ($q) use ($wonStage, $lostStage) {
+                $q->whereNull('closed_status')->whereNull('closed_at');
+                if ($wonStage) {
+                    $q->where('pipeline_stage_id', '!=', $wonStage->id);
+                }
+                if ($lostStage) {
+                    $q->where('pipeline_stage_id', '!=', $lostStage->id);
+                }
+            };
+            $rawQuery->where($filterOpen);
+            $resQuery->where($filterOpen);
         } elseif ($this->statusFilter === 'won') {
-            $rawQuery->where('closed_status', 'won');
-            $resQuery->where('closed_status', 'won');
+            $filterWon = function ($q) use ($wonStage) {
+                $q->where('closed_status', 'won');
+                if ($wonStage) {
+                    $q->orWhere('pipeline_stage_id', $wonStage->id);
+                }
+            };
+            $rawQuery->where($filterWon);
+            $resQuery->where($filterWon);
         } elseif ($this->statusFilter === 'lost') {
-            $rawQuery->where('closed_status', 'lost');
-            $resQuery->where('closed_status', 'lost');
+            $filterLost = function ($q) use ($lostStage) {
+                $q->where('closed_status', 'lost');
+                if ($lostStage) {
+                    $q->orWhere('pipeline_stage_id', $lostStage->id);
+                }
+            };
+            $rawQuery->where($filterLost);
+            $resQuery->where($filterLost);
         }
 
         if ($this->ownerFilter) {
@@ -93,7 +117,26 @@ class DealKanban extends Page
 
         $grouped = [];
         foreach ($deals as $deal) {
+            $statusLower = strtolower((string) $deal->closed_status);
             $stageId = $deal->pipeline_stage_id;
+
+            // Bi-directional status & stage alignment
+            if ($statusLower === 'won' && $wonStage) {
+                $stageId = $wonStage->id;
+                if ($deal->pipeline_stage_id !== $wonStage->id) {
+                    $deal->forceFill(['pipeline_stage_id' => $wonStage->id])->save();
+                }
+            } elseif ($statusLower === 'lost' && $lostStage) {
+                $stageId = $lostStage->id;
+                if ($deal->pipeline_stage_id !== $lostStage->id) {
+                    $deal->forceFill(['pipeline_stage_id' => $lostStage->id])->save();
+                }
+            } elseif ($wonStage && $stageId == $wonStage->id && $statusLower !== 'won') {
+                $deal->forceFill(['closed_status' => 'won', 'closed_at' => $deal->closed_at ?? now()])->save();
+            } elseif ($lostStage && $stageId == $lostStage->id && $statusLower !== 'lost') {
+                $deal->forceFill(['closed_status' => 'lost', 'closed_at' => $deal->closed_at ?? now()])->save();
+            }
+
             if (! $stageId || ! in_array($stageId, $stageIds)) {
                 $stageId = $defaultStageId;
             }
