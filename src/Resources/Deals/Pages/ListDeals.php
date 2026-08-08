@@ -23,12 +23,12 @@ class ListDeals extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => CrmTab::make(__('laravel-crm-filament::labels.misc.all') ?? 'All', $this),
-            'open' => CrmTab::make(__('laravel-crm-filament::labels.sales.open') ?? 'Open', $this)
+            'all' => CrmTab::make(__('laravel-crm-filament::labels.misc.all'), $this),
+            'open' => CrmTab::make(__('laravel-crm-filament::labels.sales.open'), $this)
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('closed_at')),
-            'won' => CrmTab::make(__('laravel-crm-filament::labels.actions.mark_won') ?? 'Won', $this)
+            'won' => CrmTab::make(__('laravel-crm-filament::labels.actions.won'), $this)
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereIn('closed_status', ['won', 'Won'])),
-            'lost' => CrmTab::make(__('laravel-crm-filament::labels.actions.mark_lost') ?? 'Lost', $this)
+            'lost' => CrmTab::make(__('laravel-crm-filament::labels.actions.lost'), $this)
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereIn('closed_status', ['lost', 'Lost'])),
         ];
     }

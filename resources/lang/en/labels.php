@@ -240,6 +240,7 @@ return [
         'deals' => 'Deals',
         'people' => 'People',
         'organizations' => 'Organizations',
+        'open' => 'Open',
     ],
 
     // Money / orders / lines
@@ -511,6 +512,8 @@ return [
         'mark_paid' => 'Mark paid',
         'record_payment' => 'Record payment',
         'mark_lost' => 'Mark lost',
+        'won' => 'Won',
+        'lost' => 'Lost',
         'resend_to_failed' => 'Resend to failed',
         'back_to_leads' => 'Back to leads',
         'back_to_quotes' => 'Back to quotes',
@@ -574,6 +577,8 @@ return [
         'attribute' => 'Attribute',
         'diff_from_gmt' => 'Diff from GMT',
         'private' => 'Private',
+        'all' => 'All',
+        'open' => 'Open',
     ],
     'status' => [
         'complete' => 'Complete',

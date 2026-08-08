@@ -240,6 +240,7 @@ return [
         'deals' => 'الصفقات',
         'people' => 'الأشخاص',
         'organizations' => 'المنظمات',
+        'open' => 'مفتوحة',
     ],
 
     // Money / orders / lines
@@ -511,6 +512,8 @@ return [
         'mark_paid' => 'تحديد كـ مدفوعة',
         'record_payment' => 'تسجيل دفعة',
         'mark_lost' => 'تحديد كـ خاسرة',
+        'won' => 'رابحة',
+        'lost' => 'خاسرة',
         'resend_to_failed' => 'إعادة الإرسال للفاشلة',
         'back_to_leads' => 'العودة إلى العملاء المحتملين',
         'back_to_quotes' => 'العودة إلى عروض الأسعار',
@@ -574,6 +577,8 @@ return [
         'attribute' => 'خاصية / سمة',
         'diff_from_gmt' => 'الفرق عن توقيت غرينتش',
         'private' => 'خاص',
+        'all' => 'الكل',
+        'open' => 'مفتوحة',
     ],
     'status' => [
         'complete' => 'مكتمل',
