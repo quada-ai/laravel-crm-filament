@@ -44,30 +44,52 @@ class QuoteKanban extends Page
     public function getStages(): Collection
     {
         $pipelineIds = Pipeline::query()
-            ->where('model', Quote::class)
+            ->whereIn('model', [Quote::class, 'Quote', 'quote'])
             ->orWhereNull('model')
             ->pluck('id');
 
-        $query = PipelineStage::query();
-        if ($pipelineIds->isNotEmpty()) {
-            $query->whereIn('pipeline_id', $pipelineIds);
+        $stages = PipelineStage::query()
+            ->when($pipelineIds->isNotEmpty(), fn ($q) => $q->whereIn('pipeline_id', $pipelineIds))
+            ->orderBy('order')
+            ->get();
+
+        if ($stages->isEmpty()) {
+            $stages = PipelineStage::query()->orderBy('order')->get();
         }
 
-        return $query->orderBy('order')->get();
+        return $stages;
     }
 
     public function getQuotesByStage(): array
     {
+        $stages = $this->getStages();
+        $stageIds = $stages->pluck('id')->all();
+        $defaultStageId = $stages->first()?->id;
+
         $quotes = Quote::query()
             ->when($this->statusFilter === 'open', fn ($q) => $q->whereNull('accepted_at')->whereNull('rejected_at'))
             ->when($this->statusFilter === 'accepted', fn ($q) => $q->whereNotNull('accepted_at'))
             ->when($this->statusFilter === 'rejected', fn ($q) => $q->whereNotNull('rejected_at'))
             ->when($this->ownerFilter, fn ($q) => $q->where('user_owner_id', $this->ownerFilter))
-            ->whereNotNull('pipeline_stage_id')
             ->orderByDesc('updated_at')
             ->get();
 
-        return $quotes->groupBy('pipeline_stage_id')->all();
+        $grouped = [];
+        foreach ($quotes as $quote) {
+            $stageId = $quote->pipeline_stage_id;
+            if (! $stageId || ! in_array($stageId, $stageIds)) {
+                $stageId = $defaultStageId;
+            }
+
+            if ($stageId) {
+                if (! isset($grouped[$stageId])) {
+                    $grouped[$stageId] = collect();
+                }
+                $grouped[$stageId]->push($quote);
+            }
+        }
+
+        return $grouped;
     }
 
     public function markAccepted(string $externalId): void

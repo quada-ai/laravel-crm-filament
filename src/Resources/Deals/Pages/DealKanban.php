@@ -45,28 +45,36 @@ class DealKanban extends Page
     public function getStages(): Collection
     {
         $pipelineIds = Pipeline::query()
-            ->where('model', Deal::class)
+            ->whereIn('model', [Deal::class, 'Deal', 'deal'])
             ->orWhereNull('model')
             ->pluck('id');
 
-        $query = PipelineStage::query();
-        if ($pipelineIds->isNotEmpty()) {
-            $query->whereIn('pipeline_id', $pipelineIds);
+        $stages = PipelineStage::query()
+            ->when($pipelineIds->isNotEmpty(), fn ($q) => $q->whereIn('pipeline_id', $pipelineIds))
+            ->orderBy('order')
+            ->get();
+
+        if ($stages->isEmpty()) {
+            $stages = PipelineStage::query()->orderBy('order')->get();
         }
 
-        return $query->orderBy('order')->get();
+        return $stages;
     }
 
     public function getDealsByStage(): array
     {
+        $stages = $this->getStages();
+        $stageIds = $stages->pluck('id')->all();
+        $defaultStageId = $stages->first()?->id;
+
         $query = Deal::query();
 
         if ($this->statusFilter === 'open') {
             $query->whereNull('closed_at');
         } elseif ($this->statusFilter === 'won') {
-            $query->whereIn('closed_status', ['won', 'Won']);
+            $query->where(fn ($q) => $q->whereIn('closed_status', ['won', 'Won'])->orWhere(fn ($q2) => $q2->whereNotNull('closed_at')->where('closed_status', '!=', 'lost')));
         } elseif ($this->statusFilter === 'lost') {
-            $query->whereIn('closed_status', ['lost', 'Lost']);
+            $query->where(fn ($q) => $q->whereIn('closed_status', ['lost', 'Lost'])->orWhere(fn ($q2) => $q2->whereNotNull('closed_at')->where('closed_status', 'lost')));
         }
 
         if ($this->ownerFilter) {
@@ -75,12 +83,14 @@ class DealKanban extends Page
 
         $deals = $query->orderByDesc('updated_at')->get();
 
-        $defaultStage = $this->getStages()->first();
-
         $grouped = [];
         foreach ($deals as $deal) {
-            $stageId = $deal->pipeline_stage_id ?: ($defaultStage?->id ?? 0);
-            if ($stageId > 0) {
+            $stageId = $deal->pipeline_stage_id;
+            if (! $stageId || ! in_array($stageId, $stageIds)) {
+                $stageId = $defaultStageId;
+            }
+
+            if ($stageId) {
                 if (! isset($grouped[$stageId])) {
                     $grouped[$stageId] = collect();
                 }

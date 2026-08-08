@@ -44,20 +44,28 @@ class LeadKanban extends Page
     public function getStages(): Collection
     {
         $pipelineIds = Pipeline::query()
-            ->where('model', Lead::class)
+            ->whereIn('model', [Lead::class, 'Lead', 'lead'])
             ->orWhereNull('model')
             ->pluck('id');
 
-        $query = PipelineStage::query();
-        if ($pipelineIds->isNotEmpty()) {
-            $query->whereIn('pipeline_id', $pipelineIds);
+        $stages = PipelineStage::query()
+            ->when($pipelineIds->isNotEmpty(), fn ($q) => $q->whereIn('pipeline_id', $pipelineIds))
+            ->orderBy('order')
+            ->get();
+
+        if ($stages->isEmpty()) {
+            $stages = PipelineStage::query()->orderBy('order')->get();
         }
 
-        return $query->orderBy('order')->get();
+        return $stages;
     }
 
     public function getLeadsByStage(): array
     {
+        $stages = $this->getStages();
+        $stageIds = $stages->pluck('id')->all();
+        $defaultStageId = $stages->first()?->id;
+
         $leads = Lead::query()
             ->when($this->statusFilter === 'open', fn ($q) => $q->whereNull('converted_at'))
             ->when($this->statusFilter === 'converted', fn ($q) => $q->whereNotNull('converted_at'))
@@ -65,12 +73,14 @@ class LeadKanban extends Page
             ->orderByDesc('updated_at')
             ->get();
 
-        $defaultStage = $this->getStages()->first();
-
         $grouped = [];
         foreach ($leads as $lead) {
-            $stageId = $lead->pipeline_stage_id ?: ($defaultStage?->id ?? 0);
-            if ($stageId > 0) {
+            $stageId = $lead->pipeline_stage_id;
+            if (! $stageId || ! in_array($stageId, $stageIds)) {
+                $stageId = $defaultStageId;
+            }
+
+            if ($stageId) {
                 if (! isset($grouped[$stageId])) {
                     $grouped[$stageId] = collect();
                 }
