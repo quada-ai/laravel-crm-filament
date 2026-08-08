@@ -45,12 +45,15 @@ class QuoteKanban extends Page
     {
         $pipelineIds = Pipeline::query()
             ->where('model', Quote::class)
+            ->orWhereNull('model')
             ->pluck('id');
 
-        return PipelineStage::query()
-            ->whereIn('pipeline_id', $pipelineIds)
-            ->orderBy('order')
-            ->get();
+        $query = PipelineStage::query();
+        if ($pipelineIds->isNotEmpty()) {
+            $query->whereIn('pipeline_id', $pipelineIds);
+        }
+
+        return $query->orderBy('order')->get();
     }
 
     public function getQuotesByStage(): array

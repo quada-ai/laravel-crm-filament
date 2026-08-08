@@ -229,6 +229,23 @@ class DealResource extends Resource
                     ->badge()
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('status')
+                    ->label(__('laravel-crm-filament::labels.sales.status') ?? 'Status')
+                    ->badge()
+                    ->state(function (Deal $record): string {
+                        if ($record->closed_at) {
+                            return ucfirst($record->closed_status ?? ($record->won ? 'won' : 'lost'));
+                        }
+
+                        return 'Open';
+                    })
+                    ->color(fn (string $state): string => match (strtolower($state)) {
+                        'won' => 'success',
+                        'lost' => 'danger',
+                        default => 'info',
+                    })
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('ownerUser.name')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->placeholder(__('laravel-crm-filament::labels.misc.unallocated'))
@@ -236,6 +253,26 @@ class DealResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                Tables\Filters\SelectFilter::make('closed_status')
+                    ->label(__('laravel-crm-filament::labels.sales.status') ?? 'Status')
+                    ->options([
+                        'open' => 'Open',
+                        'won' => 'Won',
+                        'lost' => 'Lost',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (empty($data['value'])) {
+                            return $query;
+                        }
+
+                        return match ($data['value']) {
+                            'open' => $query->whereNull('closed_at'),
+                            'won' => $query->where(fn ($q) => $q->where('closed_status', 'won')->orWhere('closed_status', 'Won')->orWhere('won', true)),
+                            'lost' => $query->where(fn ($q) => $q->where('closed_status', 'lost')->orWhere('closed_status', 'Lost')->orWhere('won', false)),
+                            default => $query,
+                        };
+                    }),
+
                 Tables\Filters\SelectFilter::make('user_owner_id')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->multiple()

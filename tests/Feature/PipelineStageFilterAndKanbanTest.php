@@ -168,3 +168,10 @@ it('includes accepted and rejected quotes in QuoteKanban when statusFilter=all',
     $kanban->reopen($acceptedQuote->external_id);
     expect($acceptedQuote->fresh()->accepted_at)->toBeNull();
 });
+
+it('provides status tabs (All, Open, Won, Lost) on ListDeals page', function () {
+    $listDeals = new \VentureDrake\LaravelCrmFilament\Resources\Deals\Pages\ListDeals();
+    $tabs = $listDeals->getTabs();
+
+    expect($tabs)->toHaveKeys(['all', 'open', 'won', 'lost']);
+});

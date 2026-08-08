@@ -45,6 +45,7 @@ class LeadKanban extends Page
     {
         $pipelineIds = Pipeline::query()
             ->where('model', Lead::class)
+            ->orWhereNull('model')
             ->pluck('id');
 
         $query = PipelineStage::query();

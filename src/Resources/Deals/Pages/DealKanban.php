@@ -46,6 +46,7 @@ class DealKanban extends Page
     {
         $pipelineIds = Pipeline::query()
             ->where('model', Deal::class)
+            ->orWhereNull('model')
             ->pluck('id');
 
         $query = PipelineStage::query();
@@ -58,13 +59,21 @@ class DealKanban extends Page
 
     public function getDealsByStage(): array
     {
-        $deals = Deal::query()
-            ->when($this->statusFilter === 'open', fn ($q) => $q->whereNull('closed_at'))
-            ->when($this->statusFilter === 'won', fn ($q) => $q->where('closed_status', 'won'))
-            ->when($this->statusFilter === 'lost', fn ($q) => $q->where('closed_status', 'lost'))
-            ->when($this->ownerFilter, fn ($q) => $q->where('user_owner_id', $this->ownerFilter))
-            ->orderByDesc('updated_at')
-            ->get();
+        $query = Deal::query();
+
+        if ($this->statusFilter === 'open') {
+            $query->whereNull('closed_at');
+        } elseif ($this->statusFilter === 'won') {
+            $query->where(fn ($q) => $q->where('closed_status', 'won')->orWhere('closed_status', 'Won')->orWhere('won', true));
+        } elseif ($this->statusFilter === 'lost') {
+            $query->where(fn ($q) => $q->where('closed_status', 'lost')->orWhere('closed_status', 'Lost')->orWhere('won', false));
+        }
+
+        if ($this->ownerFilter) {
+            $query->where('user_owner_id', $this->ownerFilter);
+        }
+
+        $deals = $query->orderByDesc('updated_at')->get();
 
         $defaultStage = $this->getStages()->first();
 
