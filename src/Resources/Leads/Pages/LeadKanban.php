@@ -23,6 +23,8 @@ class LeadKanban extends Page
 
     public ?int $ownerFilter = null;
 
+    public ?string $statusFilter = 'all';
+
     protected function getHeaderActions(): array
     {
         return [
@@ -56,7 +58,8 @@ class LeadKanban extends Page
     public function getLeadsByStage(): array
     {
         $leads = Lead::query()
-            ->whereNull('converted_at')
+            ->when($this->statusFilter === 'open', fn ($q) => $q->whereNull('converted_at'))
+            ->when($this->statusFilter === 'converted', fn ($q) => $q->whereNotNull('converted_at'))
             ->when($this->ownerFilter, fn ($q) => $q->where('user_owner_id', $this->ownerFilter))
             ->orderByDesc('updated_at')
             ->get();

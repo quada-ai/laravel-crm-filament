@@ -24,6 +24,8 @@ class DealKanban extends Page
 
     public ?int $ownerFilter = null;
 
+    public ?string $statusFilter = 'all';
+
     protected function getHeaderActions(): array
     {
         return [
@@ -57,7 +59,9 @@ class DealKanban extends Page
     public function getDealsByStage(): array
     {
         $deals = Deal::query()
-            ->whereNull('closed_at')
+            ->when($this->statusFilter === 'open', fn ($q) => $q->whereNull('closed_at'))
+            ->when($this->statusFilter === 'won', fn ($q) => $q->where('closed_status', 'won'))
+            ->when($this->statusFilter === 'lost', fn ($q) => $q->where('closed_status', 'lost'))
             ->when($this->ownerFilter, fn ($q) => $q->where('user_owner_id', $this->ownerFilter))
             ->orderByDesc('updated_at')
             ->get();
@@ -86,6 +90,22 @@ class DealKanban extends Page
     public function markLost(string $externalId): void
     {
         $this->closeDeal($externalId, false);
+    }
+
+    public function reopen(string $externalId): void
+    {
+        $deal = Deal::query()->where('external_id', $externalId)->first();
+        if (! $deal) {
+            return;
+        }
+        $deal->forceFill([
+            'closed_at' => null,
+            'closed_status' => null,
+        ]);
+        if (Schema::hasColumn($deal->getTable(), 'won')) {
+            $deal->won = null;
+        }
+        $deal->save();
     }
 
     protected function closeDeal(string $externalId, bool $won): void

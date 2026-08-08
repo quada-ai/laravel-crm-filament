@@ -27,18 +27,35 @@
         .crm-kanban-btn { font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 0.25rem; border: 0; cursor: pointer; color: #fff; }
         .crm-kanban-btn-success { background: #10b981; } .crm-kanban-btn-success:hover { background: #059669; }
         .crm-kanban-btn-danger  { background: #ef4444; } .crm-kanban-btn-danger:hover  { background: #dc2626; }
+        .crm-kanban-btn-secondary { background: #6b7280; } .crm-kanban-btn-secondary:hover { background: #4b5563; }
+        .crm-kanban-badge { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 0.1rem 0.4rem; border-radius: 0.25rem; line-height: 1.2; text-transform: uppercase; }
+        .crm-kanban-badge-success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .crm-kanban-badge-danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
         .crm-kanban-empty { color: #6b7280; font-size: 0.875rem; text-align: center; padding: 3rem 1rem; grid-column: 1 / -1; }
     </style>
 
-    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
-        <label style="font-size:0.75rem; color:#6b7280;">Owner</label>
-        <select wire:model.live="ownerFilter"
-                style="font-size:0.875rem; padding:0.375rem 0.5rem; border-radius:0.375rem; border:1px solid #d1d5db; background:#fff;">
-            <option value="">Everyone</option>
-            @foreach ($this->getOwners() as $id => $name)
-                <option value="{{ $id }}">{{ $name }}</option>
-            @endforeach
-        </select>
+    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+            <label style="font-size:0.75rem; color:#6b7280;">Owner</label>
+            <select wire:model.live="ownerFilter"
+                    style="font-size:0.875rem; padding:0.375rem 0.5rem; border-radius:0.375rem; border:1px solid #d1d5db; background:#fff;">
+                <option value="">Everyone</option>
+                @foreach ($this->getOwners() as $id => $name)
+                    <option value="{{ $id }}">{{ $name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+            <label style="font-size:0.75rem; color:#6b7280;">Status</label>
+            <select wire:model.live="statusFilter"
+                    style="font-size:0.875rem; padding:0.375rem 0.5rem; border-radius:0.375rem; border:1px solid #d1d5db; background:#fff;">
+                <option value="all">All</option>
+                <option value="open">Open</option>
+                <option value="accepted">Accepted</option>
+                <option value="rejected">Rejected</option>
+            </select>
+        </div>
     </div>
 
     <div
@@ -84,14 +101,26 @@
                         @foreach ($stageQuotes as $quote)
                             <div data-quote-id="{{ $quote->external_id }}" class="crm-kanban-card">
                                 <div class="crm-kanban-actions">
-                                    <button type="button" wire:click.stop="markAccepted('{{ $quote->external_id }}')"
-                                            class="crm-kanban-btn crm-kanban-btn-success" title="Mark accepted">Accept</button>
-                                    <button type="button" wire:click.stop="markRejected('{{ $quote->external_id }}')"
-                                            class="crm-kanban-btn crm-kanban-btn-danger" title="Mark rejected">Reject</button>
+                                    @if ($quote->accepted_at || $quote->rejected_at)
+                                        <button type="button" wire:click.stop="reopen('{{ $quote->external_id }}')"
+                                                class="crm-kanban-btn crm-kanban-btn-secondary" title="Reopen quote">Reopen</button>
+                                    @else
+                                        <button type="button" wire:click.stop="markAccepted('{{ $quote->external_id }}')"
+                                                class="crm-kanban-btn crm-kanban-btn-success" title="Mark accepted">Accept</button>
+                                        <button type="button" wire:click.stop="markRejected('{{ $quote->external_id }}')"
+                                                class="crm-kanban-btn crm-kanban-btn-danger" title="Mark rejected">Reject</button>
+                                    @endif
                                 </div>
                                 <a href="{{ $this::getResource()::getUrl('edit', ['record' => $quote->external_id]) }}"
                                    class="crm-kanban-card-link">
-                                    <div class="crm-kanban-card-id">{{ $quote->quote_id }}</div>
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <div class="crm-kanban-card-id">{{ $quote->quote_id }}</div>
+                                        @if ($quote->accepted_at)
+                                            <span class="crm-kanban-badge crm-kanban-badge-success">Accepted</span>
+                                        @elseif ($quote->rejected_at)
+                                            <span class="crm-kanban-badge crm-kanban-badge-danger">Rejected</span>
+                                        @endif
+                                    </div>
                                     <div class="crm-kanban-card-title">{{ $quote->title }}</div>
                                     @if ($quote->total)
                                         <div class="crm-kanban-card-amount">{{ ($quote->total / 100) }} {{ $quote->currency }}</div>

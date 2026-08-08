@@ -50,18 +50,32 @@
         }
         .crm-kanban-btn-primary { background: #05b3a9; }
         .crm-kanban-btn-primary:hover { background: #047d75; }
+        .crm-kanban-badge { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 0.1rem 0.4rem; border-radius: 0.25rem; line-height: 1.2; text-transform: uppercase; }
+        .crm-kanban-badge-info { background: rgba(5, 179, 169, 0.15); color: #05b3a9; border: 1px solid rgba(5, 179, 169, 0.3); }
         .crm-kanban-empty { color: #6b7280; font-size: 0.875rem; text-align: center; padding: 3rem 1rem; grid-column: 1 / -1; }
     </style>
 
-    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
-        <label style="font-size:0.75rem; color:#6b7280;">Owner</label>
-        <select wire:model.live="ownerFilter"
-                style="font-size:0.875rem; padding:0.375rem 0.5rem; border-radius:0.375rem; border:1px solid #d1d5db; background:#fff;">
-            <option value="">Everyone</option>
-            @foreach ($this->getOwners() as $id => $name)
-                <option value="{{ $id }}">{{ $name }}</option>
-            @endforeach
-        </select>
+    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+            <label style="font-size:0.75rem; color:#6b7280;">Owner</label>
+            <select wire:model.live="ownerFilter"
+                    style="font-size:0.875rem; padding:0.375rem 0.5rem; border-radius:0.375rem; border:1px solid #d1d5db; background:#fff;">
+                <option value="">Everyone</option>
+                @foreach ($this->getOwners() as $id => $name)
+                    <option value="{{ $id }}">{{ $name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+            <label style="font-size:0.75rem; color:#6b7280;">Status</label>
+            <select wire:model.live="statusFilter"
+                    style="font-size:0.875rem; padding:0.375rem 0.5rem; border-radius:0.375rem; border:1px solid #d1d5db; background:#fff;">
+                <option value="all">All</option>
+                <option value="open">Open</option>
+                <option value="converted">Converted</option>
+            </select>
+        </div>
     </div>
 
     <div
@@ -112,16 +126,23 @@
                     <div data-kanban-column data-stage-id="{{ $stage->id }}" class="crm-kanban-list">
                         @foreach ($stageLeads as $lead)
                             <div data-lead-id="{{ $lead->external_id }}" class="crm-kanban-card">
-                                <div class="crm-kanban-actions">
-                                    <button type="button"
-                                            wire:click.stop="convertToDeal('{{ $lead->external_id }}')"
-                                            wire:confirm="Convert this lead into a deal?"
-                                            class="crm-kanban-btn crm-kanban-btn-primary"
-                                            title="Convert to deal">Convert</button>
-                                </div>
+                                @if (! $lead->converted_at)
+                                    <div class="crm-kanban-actions">
+                                        <button type="button"
+                                                wire:click.stop="convertToDeal('{{ $lead->external_id }}')"
+                                                wire:confirm="Convert this lead into a deal?"
+                                                class="crm-kanban-btn crm-kanban-btn-primary"
+                                                title="Convert to deal">Convert</button>
+                                    </div>
+                                @endif
                                 <a href="{{ $this::getResource()::getUrl('edit', ['record' => $lead->external_id]) }}"
                                    class="crm-kanban-card-link">
-                                    <div class="crm-kanban-card-id">{{ $lead->lead_id }}</div>
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <div class="crm-kanban-card-id">{{ $lead->lead_id }}</div>
+                                        @if ($lead->converted_at)
+                                            <span class="crm-kanban-badge crm-kanban-badge-info">Converted</span>
+                                        @endif
+                                    </div>
                                     <div class="crm-kanban-card-title">{{ $lead->title }}</div>
                                     @if ($lead->amount)
                                         <div class="crm-kanban-card-amount">

@@ -44,7 +44,7 @@ function leadTableFilters(): array
 it('registers the four filters in the drawer', function () {
     $names = array_keys(leadTableFilters());
 
-    expect($names)->toContain('user_owner_id', 'labels', 'lead_source_id', 'pipeline_stage_id');
+    expect($names)->toContain('user_owner_id', 'labels', 'lead_source_id', 'pipeline_id', 'pipeline_stage_id');
 });
 
 it('marks owner, labels, and lead_source filters as multi-select', function () {

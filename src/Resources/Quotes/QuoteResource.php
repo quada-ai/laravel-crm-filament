@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use VentureDrake\LaravelCrm\Mail\SendQuote;
+use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Models\Quote;
 use VentureDrake\LaravelCrmFilament\Concerns\Forms\LeadDealContactSection;
@@ -210,9 +211,26 @@ class QuoteResource extends Resource
                     ->options(fn () => \VentureDrake\LaravelCrm\Models\Label::pluck('name', 'id'))->query(function ($query, array $data) { if (empty($data['values'])) return $query; return $query->whereHas('labels', fn ($q) => $q->whereIn('labels.id', $data['values'])); })
                     ->preload(),
 
+                Tables\Filters\SelectFilter::make('pipeline_id')
+                    ->label(__('laravel-crm-filament::labels.sales.pipeline'))
+                    ->options(fn () => Pipeline::query()->where('model', Quote::class)->orWhereNull('model')->orderBy('name')->pluck('name', 'id')),
+
                 Tables\Filters\SelectFilter::make('pipeline_stage_id')
                     ->label(__('laravel-crm-filament::labels.sales.stage'))
-                    ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id')),
+                    ->options(function ($get, $livewire) {
+                        $pipelineId = $get('pipeline_id') ?? data_get($livewire->tableFilters ?? [], 'pipeline_id.value');
+                        if ($pipelineId) {
+                            return PipelineStage::query()
+                                ->where('pipeline_id', $pipelineId)
+                                ->orderBy('order')
+                                ->pluck('name', 'id');
+                        }
+
+                        return PipelineStage::query()
+                            ->whereHas('pipeline', fn ($q) => $q->where('model', Quote::class)->orWhereNull('model'))
+                            ->orderBy('order')
+                            ->pluck('name', 'id');
+                    }),
             ])
             ->recordActions([
                 static::sendActionFactory()

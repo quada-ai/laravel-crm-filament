@@ -23,6 +23,8 @@ class QuoteKanban extends Page
 
     public ?int $ownerFilter = null;
 
+    public ?string $statusFilter = 'all';
+
     protected function getHeaderActions(): array
     {
         return [
@@ -54,8 +56,9 @@ class QuoteKanban extends Page
     public function getQuotesByStage(): array
     {
         $quotes = Quote::query()
-            ->whereNull('accepted_at')
-            ->whereNull('rejected_at')
+            ->when($this->statusFilter === 'open', fn ($q) => $q->whereNull('accepted_at')->whereNull('rejected_at'))
+            ->when($this->statusFilter === 'accepted', fn ($q) => $q->whereNotNull('accepted_at'))
+            ->when($this->statusFilter === 'rejected', fn ($q) => $q->whereNotNull('rejected_at'))
             ->when($this->ownerFilter, fn ($q) => $q->where('user_owner_id', $this->ownerFilter))
             ->whereNotNull('pipeline_stage_id')
             ->orderByDesc('updated_at')
@@ -72,6 +75,18 @@ class QuoteKanban extends Page
     public function markRejected(string $externalId): void
     {
         $this->closeQuote($externalId, false);
+    }
+
+    public function reopen(string $externalId): void
+    {
+        $quote = Quote::query()->where('external_id', $externalId)->first();
+        if (! $quote) {
+            return;
+        }
+        $quote->forceFill([
+            'accepted_at' => null,
+            'rejected_at' => null,
+        ])->save();
     }
 
     protected function closeQuote(string $externalId, bool $accepted): void

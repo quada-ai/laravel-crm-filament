@@ -20,6 +20,7 @@ use Illuminate\Support\Fluent;
 use VentureDrake\LaravelCrm\Models\Lead;
 use VentureDrake\LaravelCrm\Models\LeadSource;
 use VentureDrake\LaravelCrm\Models\LeadStatus;
+use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
 use VentureDrake\LaravelCrm\Services\DealService;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
@@ -259,9 +260,26 @@ class LeadResource extends Resource
                     ->multiple()
                     ->options(fn () => LeadSource::query()->orderBy('name')->pluck('name', 'id')),
 
+                Tables\Filters\SelectFilter::make('pipeline_id')
+                    ->label(__('laravel-crm-filament::labels.sales.pipeline'))
+                    ->options(fn () => Pipeline::query()->where('model', Lead::class)->orWhereNull('model')->orderBy('name')->pluck('name', 'id')),
+
                 Tables\Filters\SelectFilter::make('pipeline_stage_id')
                     ->label(__('laravel-crm-filament::labels.sales.stage'))
-                    ->options(fn () => PipelineStage::query()->orderBy('order')->pluck('name', 'id')),
+                    ->options(function ($get, $livewire) {
+                        $pipelineId = $get('pipeline_id') ?? data_get($livewire->tableFilters ?? [], 'pipeline_id.value');
+                        if ($pipelineId) {
+                            return PipelineStage::query()
+                                ->where('pipeline_id', $pipelineId)
+                                ->orderBy('order')
+                                ->pluck('name', 'id');
+                        }
+
+                        return PipelineStage::query()
+                            ->whereHas('pipeline', fn ($q) => $q->where('model', Lead::class)->orWhereNull('model'))
+                            ->orderBy('order')
+                            ->pluck('name', 'id');
+                    }),
             ])
             ->recordActions([
                 static::convertAction()
