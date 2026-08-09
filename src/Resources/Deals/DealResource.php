@@ -288,7 +288,7 @@ class DealResource extends Resource
                 Tables\Filters\SelectFilter::make('labels')
                     ->label(__('laravel-crm-filament::labels.fields.labels'))
                     ->multiple()
-                    ->options(fn () => \VentureDrake\LaravelCrm\Models\Label::pluck('name', 'id'))->query(function ($query, array $data) { if (empty($data['values'])) return $query; return $query->whereHas('labels', fn ($q) => $q->whereIn('labels.id', $data['values'])); })
+                    ->options(fn () => \VentureDrake\LaravelCrm\Models\Label::pluck('name', 'id'))->query(function ($query, array $data) { if (empty($data['values'])) return $query; return $query->whereHas('labels', fn ($q) => $q->whereIn('crm_labels.id', $data['values'])); })
                     ->preload(),
 
                 Tables\Filters\SelectFilter::make('pipeline_id')
