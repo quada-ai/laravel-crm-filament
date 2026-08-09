@@ -32,11 +32,6 @@ class ViewInvoice extends ViewRecord
                 ->button()
                 ->label(__('laravel-crm-filament::labels.actions.pay'))
                 ->color('gray'),
-            $this->invoicePortalAction()
-                ->button()
-                ->hiddenLabel()
-                ->icon('heroicon-m-arrow-top-right-on-square')
-                ->color('gray'),
             $this->invoiceDownloadPdfAction()
                 ->button()
                 ->hiddenLabel()

@@ -30,7 +30,6 @@ class EditInvoice extends EditRecord
                 ->icon('heroicon-m-eye'),
             $this->invoiceSendAction(),
             $this->invoiceDownloadPdfAction(),
-            $this->invoicePortalAction(),
             Actions\DeleteAction::make()
                 ->button()
                 ->hiddenLabel()

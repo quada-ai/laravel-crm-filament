@@ -267,11 +267,6 @@ class InvoiceResource extends Resource
                     ->label(__('laravel-crm-filament::labels.actions.pay'))
                     ->color('gray')
                     ->hidden(fn (Invoice $record): bool => (int) ($record->getAttributes()['amount_paid'] ?? 0) > 0),
-                static::invoicePortalActionFactory()
-                    ->button()
-                    ->hiddenLabel()
-                    ->icon('heroicon-m-arrow-top-right-on-square')
-                    ->color('gray'),
                 static::downloadInvoicePdfActionFactory()
                     ->button()
                     ->hiddenLabel()
