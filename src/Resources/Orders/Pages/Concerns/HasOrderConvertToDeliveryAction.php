@@ -23,8 +23,8 @@ trait HasOrderConvertToDeliveryAction
             ->icon('heroicon-o-truck')
             ->color('success')
             ->requiresConfirmation()
-            ->modalHeading('Create delivery from order')
-            ->modalDescription('Pre-fills the full ordered quantity for every line item.')
+            ->modalHeading(__('laravel-crm-filament::labels.actions.create_delivery_from_order'))
+            ->modalDescription(__('laravel-crm-filament::labels.actions.create_delivery_from_order_desc'))
             ->action(function (Order $record, DeliveryService $deliveryService): void {
                 $payload = $this->buildDeliveryPayloadFromOrder($record);
 
@@ -37,11 +37,11 @@ trait HasOrderConvertToDeliveryAction
                 $url = DeliveryResource::getUrl('view', ['record' => $delivery]);
 
                 Notification::make()
-                    ->title('Delivery ' . $delivery->delivery_id . ' created')
-                    ->body('Order converted to delivery.')
+                    ->title(__('laravel-crm-filament::labels.actions.delivery_created', ['id' => $delivery->delivery_id]))
+                    ->body(__('laravel-crm-filament::labels.actions.order_converted_to_delivery'))
                     ->success()
                     ->actions([
-                        \Filament\Notifications\Actions\Action::make('open')
+                        \Filament\Actions\Action::make('open')
                             ->label(__('laravel-crm-filament::labels.actions.open_delivery'))
                             ->url($url),
                     ])

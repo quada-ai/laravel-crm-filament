@@ -26,12 +26,12 @@ class ListEmailCampaigns extends ListRecords
             ->badgeColor($color);
 
         return [
-            'all' => CrmTab::make('All', $this),
-            'draft' => $statusTab('Draft', 'draft'),
-            'scheduled' => $statusTab('Scheduled', 'scheduled', 'warning'),
-            'sending' => $statusTab('Sending', 'sending', 'info'),
-            'sent' => $statusTab('Sent', 'sent', 'success'),
-            'failed' => $statusTab('Failed', 'failed', 'danger'),
+            'all' => CrmTab::make(__('laravel-crm-filament::labels.misc.all'), $this),
+            'draft' => $statusTab(__('laravel-crm-filament::labels.campaign.status_draft'), 'draft'),
+            'scheduled' => $statusTab(__('laravel-crm-filament::labels.campaign.status_scheduled'), 'scheduled', 'warning'),
+            'sending' => $statusTab(__('laravel-crm-filament::labels.campaign.status_sending'), 'sending', 'info'),
+            'sent' => $statusTab(__('laravel-crm-filament::labels.campaign.status_sent'), 'sent', 'success'),
+            'failed' => $statusTab(__('laravel-crm-filament::labels.campaign.status_failed'), 'failed', 'danger'),
         ];
     }
 }

@@ -23,8 +23,8 @@ trait HasOrderConvertToInvoiceAction
             ->icon('heroicon-o-receipt-percent')
             ->color('success')
             ->requiresConfirmation()
-            ->modalHeading('Convert order to invoice')
-            ->modalDescription('Creates a new invoice from this order with all line items.')
+            ->modalHeading(__('laravel-crm-filament::labels.actions.convert_order_to_invoice'))
+            ->modalDescription(__('laravel-crm-filament::labels.actions.convert_order_to_invoice_desc'))
             ->visible(fn (Order $record): bool => $record->invoices()->count() === 0)
             ->action(function (Order $record, InvoiceService $invoiceService): void {
                 $payload = $this->buildInvoicePayloadFromOrder($record);
@@ -38,11 +38,11 @@ trait HasOrderConvertToInvoiceAction
                 $url = InvoiceResource::getUrl('view', ['record' => $invoice]);
 
                 Notification::make()
-                    ->title('Invoice ' . $invoice->invoice_id . ' created')
-                    ->body('Order converted successfully.')
+                    ->title(__('laravel-crm-filament::labels.actions.invoice_created', ['id' => $invoice->invoice_id]))
+                    ->body(__('laravel-crm-filament::labels.actions.order_converted_to_invoice'))
                     ->success()
                     ->actions([
-                        \Filament\Notifications\Actions\Action::make('open')
+                        \Filament\Actions\Action::make('open')
                             ->label(__('laravel-crm-filament::labels.actions.open_invoice'))
                             ->url($url),
                     ])

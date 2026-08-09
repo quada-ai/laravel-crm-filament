@@ -24,8 +24,8 @@ trait HasPurchaseOrderSendAction
             ->label(__('laravel-crm-filament::labels.actions.send_purchase_order'))
             ->icon('heroicon-o-paper-airplane')
             ->color('primary')
-            ->modalHeading('Send purchase order')
-            ->modalSubmitActionLabel('Send')
+            ->modalHeading(__('laravel-crm-filament::labels.actions.send_purchase_order'))
+            ->modalSubmitActionLabel(__('laravel-crm-filament::labels.actions.send'))
             ->schema(fn (PurchaseOrder $record): array => [
                 TextInput::make('to')
                     ->label(__('laravel-crm-filament::labels.campaign.to'))
@@ -44,7 +44,7 @@ trait HasPurchaseOrderSendAction
                 $this->dispatchPurchaseOrder($record, $data);
 
                 Notification::make()
-                    ->title('Purchase order sent')
+                    ->title(__('laravel-crm-filament::labels.actions.purchase_order_sent'))
                     ->success()
                     ->send();
             });

@@ -83,15 +83,15 @@ class EmailCampaignResource extends Resource
                         ->content(new HtmlString(static::placeholdersPanelHtml())),
                 ]),
             Section::make('Send')
-                ->heading('Send')
+                ->heading(__('laravel-crm-filament::labels.actions.send'))
                 ->columns(2)
                 ->columnSpanFull()
                 ->schema([
                     Forms\Components\Radio::make('send_mode')
-                        ->label('Send')
+                        ->label(__('laravel-crm-filament::labels.actions.send'))
                         ->options([
-                            'send_now' => 'Send now',
-                            'schedule_send' => 'Schedule send',
+                            'send_now' => __('laravel-crm-filament::labels.actions.send_now'),
+                            'schedule_send' => __('laravel-crm-filament::labels.actions.schedule'),
                         ])
                         ->default('send_now')
                         ->dehydrated(false)
@@ -207,12 +207,12 @@ class EmailCampaignResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draft',
-                        'scheduled' => 'Scheduled',
-                        'sending' => 'Sending',
-                        'sent' => 'Sent',
-                        'cancelled' => 'Cancelled',
-                        'failed' => 'Failed',
+                        'draft' => __('laravel-crm-filament::labels.campaign.status_draft'),
+                        'scheduled' => __('laravel-crm-filament::labels.campaign.status_scheduled'),
+                        'sending' => __('laravel-crm-filament::labels.campaign.status_sending'),
+                        'sent' => __('laravel-crm-filament::labels.campaign.status_sent'),
+                        'cancelled' => __('laravel-crm-filament::labels.campaign.status_cancelled'),
+                        'failed' => __('laravel-crm-filament::labels.campaign.status_failed'),
                     ]),
             ])
             ->recordActions([

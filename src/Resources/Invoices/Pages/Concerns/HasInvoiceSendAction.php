@@ -23,8 +23,8 @@ trait HasInvoiceSendAction
             ->label(__('laravel-crm-filament::labels.actions.send_invoice'))
             ->icon('heroicon-o-paper-airplane')
             ->color('primary')
-            ->modalHeading('Send invoice')
-            ->modalSubmitActionLabel('Send')
+            ->modalHeading(__('laravel-crm-filament::labels.actions.send_invoice'))
+            ->modalSubmitActionLabel(__('laravel-crm-filament::labels.actions.send'))
             ->schema(fn (Invoice $record): array => [
                 TextInput::make('to')
                     ->label(__('laravel-crm-filament::labels.campaign.to'))
@@ -44,7 +44,7 @@ trait HasInvoiceSendAction
                 $this->dispatchInvoice($record, $data);
 
                 Notification::make()
-                    ->title('Invoice sent')
+                    ->title(__('laravel-crm-filament::labels.actions.invoice_sent'))
                     ->success()
                     ->send();
             });

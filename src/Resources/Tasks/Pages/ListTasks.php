@@ -21,18 +21,18 @@ class ListTasks extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all' => CrmTab::make('All', $this),
-            'open' => CrmTab::make('Open', $this)
+            'all' => CrmTab::make(__('laravel-crm-filament::labels.misc.all'), $this),
+            'open' => CrmTab::make(__('laravel-crm-filament::labels.sales.open'), $this)
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('completed_at')),
-            'today' => CrmTab::make('Today', $this)
+            'today' => CrmTab::make(__('laravel-crm-filament::labels.misc.today'), $this)
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('completed_at')->whereDate('due_at', today()))
                 ->badge(fn () => Task::query()->whereNull('completed_at')->whereDate('due_at', today())->count() ?: null)
                 ->badgeColor('warning'),
-            'overdue' => CrmTab::make('Overdue', $this)
+            'overdue' => CrmTab::make(__('laravel-crm-filament::labels.money.overdue'), $this)
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('completed_at')->whereDate('due_at', '<', today()))
                 ->badge(fn () => Task::query()->whereNull('completed_at')->whereDate('due_at', '<', today())->count() ?: null)
                 ->badgeColor('danger'),
-            'completed' => CrmTab::make('Completed', $this)
+            'completed' => CrmTab::make(__('laravel-crm-filament::labels.misc.completed'), $this)
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNotNull('completed_at')),
         ];
     }

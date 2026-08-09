@@ -24,8 +24,8 @@ trait HasOrderConvertToPurchaseOrderAction
             ->icon('heroicon-o-clipboard-document-list')
             ->color('success')
             ->requiresConfirmation()
-            ->modalHeading('Create purchase order from order')
-            ->modalDescription('Copies line items using each product\'s supplier price (or unit price as fallback).')
+            ->modalHeading(__('laravel-crm-filament::labels.actions.create_purchase_order_from_order'))
+            ->modalDescription(__('laravel-crm-filament::labels.actions.create_purchase_order_from_order_desc'))
             ->action(function (Order $record, PurchaseOrderService $purchaseOrderService): void {
                 $payload = $this->buildPurchaseOrderPayloadFromOrder($record);
 
@@ -38,11 +38,11 @@ trait HasOrderConvertToPurchaseOrderAction
                 $url = PurchaseOrderResource::getUrl('view', ['record' => $purchaseOrder]);
 
                 Notification::make()
-                    ->title('Purchase order ' . $purchaseOrder->purchase_order_id . ' created')
-                    ->body('Order converted to purchase order.')
+                    ->title(__('laravel-crm-filament::labels.actions.purchase_order_created', ['id' => $purchaseOrder->purchase_order_id]))
+                    ->body(__('laravel-crm-filament::labels.actions.order_converted_to_purchase_order'))
                     ->success()
                     ->actions([
-                        \Filament\Notifications\Actions\Action::make('open')
+                        \Filament\Actions\Action::make('open')
                             ->label(__('laravel-crm-filament::labels.actions.open_purchase_order'))
                             ->url($url),
                     ])
@@ -69,13 +69,21 @@ trait HasOrderConvertToPurchaseOrderAction
             ];
         }
 
+        $deliveryAddressId = null;
+        if ($record->organization && ($addr = $record->organization->getPrimaryAddress())) {
+            $deliveryAddressId = $addr->id;
+        } elseif ($record->person && ($addr = $record->person->getPrimaryAddress())) {
+            $deliveryAddressId = $addr->id;
+        }
+
         return [
             'order_id' => $record->id,
             'reference' => $record->reference,
             'issue_date' => now(),
             'delivery_date' => now()->addDays(14),
             'currency' => $record->currency,
-            'delivery_type' => 'collect',
+            'delivery_type' => $deliveryAddressId ? 'deliver' : 'pickup',
+            'delivery_address' => $deliveryAddressId,
             'delivery_instructions' => null,
             'terms' => null,
             'user_owner_id' => $record->user_owner_id,

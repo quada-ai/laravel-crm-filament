@@ -23,8 +23,8 @@ trait HasQuoteSendAction
             ->label(__('laravel-crm-filament::labels.actions.send_quote'))
             ->icon('heroicon-o-paper-airplane')
             ->color('primary')
-            ->modalHeading('Send quote')
-            ->modalSubmitActionLabel('Send')
+            ->modalHeading(__('laravel-crm-filament::labels.actions.send_quote'))
+            ->modalSubmitActionLabel(__('laravel-crm-filament::labels.actions.send'))
             ->schema(fn (Quote $record): array => [
                 TextInput::make('to')
                     ->label(__('laravel-crm-filament::labels.campaign.to'))
@@ -44,7 +44,7 @@ trait HasQuoteSendAction
                 $this->dispatchQuote($record, $data);
 
                 Notification::make()
-                    ->title('Quote sent')
+                    ->title(__('laravel-crm-filament::labels.actions.quote_sent'))
                     ->success()
                     ->send();
             });

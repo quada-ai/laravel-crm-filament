@@ -25,8 +25,8 @@ trait HasQuoteConvertToOrderAction
             ->icon('heroicon-o-arrow-right-circle')
             ->color('success')
             ->requiresConfirmation()
-            ->modalHeading('Convert quote to order')
-            ->modalDescription('Creates a new order with the same line items and marks this quote as accepted.')
+            ->modalHeading(__('laravel-crm-filament::labels.actions.convert_quote_to_order'))
+            ->modalDescription(__('laravel-crm-filament::labels.actions.convert_quote_to_order_desc'))
             ->visible(fn (Quote $record): bool => $record->accepted_at !== null && $record->orders()->count() === 0)
             ->action(function (Quote $record, OrderService $orderService): void {
                 $payload = $this->buildOrderPayloadFromQuote($record);
@@ -45,11 +45,11 @@ trait HasQuoteConvertToOrderAction
                 $url = OrderResource::getUrl('view', ['record' => $order]);
 
                 Notification::make()
-                    ->title('Order ' . $order->order_id . ' created')
-                    ->body('Quote converted successfully.')
+                    ->title(__('laravel-crm-filament::labels.actions.order_created', ['id' => $order->order_id]))
+                    ->body(__('laravel-crm-filament::labels.actions.quote_converted_to_order'))
                     ->success()
                     ->actions([
-                        \Filament\Notifications\Actions\Action::make('open')
+                        \Filament\Actions\Action::make('open')
                             ->label(__('laravel-crm-filament::labels.actions.open_order'))
                             ->url($url),
                     ])
