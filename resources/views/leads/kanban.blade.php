@@ -53,16 +53,23 @@
         .crm-kanban-badge { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 0.1rem 0.4rem; border-radius: 0.25rem; line-height: 1.2; text-transform: uppercase; }
         .crm-kanban-badge-info { background: rgba(5, 179, 169, 0.15); color: #05b3a9; border: 1px solid rgba(5, 179, 169, 0.3); }
         .crm-kanban-empty { color: #6b7280; font-size: 0.875rem; text-align: center; padding: 3rem 1rem; grid-column: 1 / -1; }
-        .crm-kanban-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-        .crm-kanban-toolbar label { font-size: 0.75rem; color: #6b7280; }
-        html.dark .crm-kanban-toolbar label, .dark .crm-kanban-toolbar label { color: #9ca3af; }
-        .crm-kanban-toolbar select { font-size: 0.875rem; padding: 0.375rem 0.5rem; border-radius: 0.375rem; border: 1px solid #d1d5db; background: #fff; color: #111827; }
-        .crm-kanban-toolbar select option { background: #fff; color: #111827; }
-        html.dark .crm-kanban-toolbar select, .dark .crm-kanban-toolbar select { background: rgb(31, 41, 55) !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #fff !important; }
-        html.dark .crm-kanban-toolbar select option, .dark .crm-kanban-toolbar select option { background: rgb(31, 41, 55) !important; color: #fff !important; }
+        .crm-calendar-toolbar {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .crm-calendar-toolbar label {
+            font-size: 0.75rem; color: #6b7280;
+        }
+        .crm-calendar-toolbar select {
+            font-size: 0.875rem; padding: 0.375rem 0.5rem;
+            border-radius: 0.375rem; border: 1px solid #d1d5db; background: #fff;
+        }
+        html.dark .crm-calendar-toolbar select {
+            background: rgb(31, 41, 55); border-color: rgba(255, 255, 255, 0.12); color: #fff;
+        }
     </style>
 
-    <div class="crm-kanban-toolbar">
+    <div class="crm-calendar-toolbar">
         <div style="display:flex; align-items:center; gap:0.5rem;">
             <label>Owner</label>
             <select wire:model.live="ownerFilter">
