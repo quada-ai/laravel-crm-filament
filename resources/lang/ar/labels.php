@@ -458,6 +458,9 @@ return [
         'save_changes' => 'حفظ التغييرات',
         'cancel' => 'إلغاء',
         'close' => 'إغلاق',
+        'edit' => 'تعديل',
+        'delete' => 'حذف',
+        'complete' => 'إكمال',
         'close_conversation' => 'إغلاق المحادثة',
         'bulk_close' => 'إغلاق جماعي',
         'reply' => 'رد',
@@ -978,5 +981,9 @@ return [
         'sms_campaign_sends_over_time' => 'الإرسال بمرور الوقت',
         'sms_campaign_stats' => 'إحصائيات حملة الرسائل النصية',
         'sms_campaign_top_urls' => 'الروابط الأكثر نقرًا',
+    ],
+    'status' => [
+        'complete' => 'مكتمل',
+        'pending' => 'قيد الانتظار',
     ],
 ];

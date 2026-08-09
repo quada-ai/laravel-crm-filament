@@ -100,7 +100,7 @@
                                 @click="open = false"
                                 class="crm-card-dropdown-item"
                                 role="menuitem"
-                            >Edit</button>
+                            >{{ __('laravel-crm-filament::labels.actions.edit') }}</button>
                             <button
                                 type="button"
                                 wire:click="deleteNote({{ $note->id }})"
@@ -108,7 +108,7 @@
                                 @click="open = false"
                                 class="crm-card-dropdown-item crm-card-dropdown-item--danger"
                                 role="menuitem"
-                            >Delete</button>
+                            >{{ __('laravel-crm-filament::labels.actions.delete') }}</button>
                         </div>
                     </div>
                 </div>

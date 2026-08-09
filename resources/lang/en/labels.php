@@ -458,6 +458,9 @@ return [
         'save_changes' => 'Save changes',
         'cancel' => 'Cancel',
         'close' => 'Close',
+        'edit' => 'Edit',
+        'delete' => 'Delete',
+        'complete' => 'Complete',
         'close_conversation' => 'Close conversation',
         'bulk_close' => 'Bulk close',
         'reply' => 'Reply',
@@ -978,5 +981,9 @@ return [
         'sms_campaign_sends_over_time' => 'Sends Over Time',
         'sms_campaign_stats' => 'SMS Campaign Statistics',
         'sms_campaign_top_urls' => 'Top Clicked Links',
+    ],
+    'status' => [
+        'complete' => 'Complete',
+        'pending' => 'Pending',
     ],
 ];

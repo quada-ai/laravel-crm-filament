@@ -206,6 +206,19 @@
         }
         .crm-card-dropdown-item:hover { background: var(--crm-card-pill-bg); }
         .crm-card-dropdown-item--danger { color: var(--crm-card-danger); }
+        [dir="rtl"] .crm-card-dropdown-menu,
+        html[dir="rtl"] .crm-card-dropdown-menu,
+        html[dir="ar"] .crm-card-dropdown-menu,
+        body[dir="rtl"] .crm-card-dropdown-menu {
+            left: 0;
+            right: auto;
+        }
+        [dir="rtl"] .crm-card-dropdown-item,
+        html[dir="rtl"] .crm-card-dropdown-item,
+        html[dir="ar"] .crm-card-dropdown-item,
+        body[dir="rtl"] .crm-card-dropdown-item {
+            text-align: right;
+        }
         .crm-card-card-title {
             font-size: 1.0625rem;
             font-weight: 700;
