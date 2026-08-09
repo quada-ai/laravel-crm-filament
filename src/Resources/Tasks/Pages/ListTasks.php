@@ -28,7 +28,7 @@ class ListTasks extends ListRecords
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('completed_at')->whereDate('due_at', today()))
                 ->badge(fn () => Task::query()->whereNull('completed_at')->whereDate('due_at', today())->count() ?: null)
                 ->badgeColor('warning'),
-            'overdue' => CrmTab::make(__('laravel-crm-filament::labels.money.overdue'), $this)
+            'overdue' => CrmTab::make(__('laravel-crm-filament::labels.misc.overdue'), $this)
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('completed_at')->whereDate('due_at', '<', today()))
                 ->badge(fn () => Task::query()->whereNull('completed_at')->whereDate('due_at', '<', today())->count() ?: null)
                 ->badgeColor('danger'),
