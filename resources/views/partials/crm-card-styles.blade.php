@@ -118,6 +118,8 @@
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             transition: box-shadow 75ms, border-color 75ms;
         }
+        select.crm-card-noted-at option { background-color: #ffffff; color: #111827; }
+        html.dark select.crm-card-noted-at option, .dark select.crm-card-noted-at option { background-color: rgb(31, 41, 55) !important; color: #ffffff !important; }
         .crm-card-noted-at:focus {
             outline: none;
             border-color: var(--crm-card-primary);

@@ -9,10 +9,14 @@
         }
         .crm-calendar-toolbar select {
             font-size: 0.875rem; padding: 0.375rem 0.5rem;
-            border-radius: 0.375rem; border: 1px solid #d1d5db; background: #fff;
+            border-radius: 0.375rem; border: 1px solid #d1d5db; background: #fff; color: #111827;
         }
-        html.dark .crm-calendar-toolbar select {
-            background: rgb(31, 41, 55); border-color: rgba(255, 255, 255, 0.12); color: #fff;
+        .crm-calendar-toolbar select option { background: #fff; color: #111827; }
+        html.dark .crm-calendar-toolbar select, .dark .crm-calendar-toolbar select {
+            background: rgb(31, 41, 55) !important; border-color: rgba(255, 255, 255, 0.12) !important; color: #fff !important;
+        }
+        html.dark .crm-calendar-toolbar select option, .dark .crm-calendar-toolbar select option {
+            background: rgb(31, 41, 55) !important; color: #fff !important;
         }
         .crm-calendar-types {
             display: flex; align-items: center; gap: 0.5rem;

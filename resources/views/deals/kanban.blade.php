@@ -32,13 +32,16 @@
         .crm-kanban-badge-success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
         .crm-kanban-badge-danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
         .crm-kanban-empty { color: #6b7280; font-size: 0.875rem; text-align: center; padding: 3rem 1rem; grid-column: 1 / -1; }
+        .crm-filter-select { font-size: 0.875rem; padding: 0.375rem 0.5rem; border-radius: 0.375rem; border: 1px solid #d1d5db; background-color: #fff; color: #111827; }
+        .crm-filter-select option { background-color: #fff; color: #111827; }
+        html.dark .crm-filter-select, .dark .crm-filter-select { background-color: rgb(31, 41, 55) !important; border-color: rgba(255, 255, 255, 0.15) !important; color: #fff !important; }
+        html.dark .crm-filter-select option, .dark .crm-filter-select option { background-color: rgb(31, 41, 55) !important; color: #fff !important; }
     </style>
 
     <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem; flex-wrap:wrap;">
         <div style="display:flex; align-items:center; gap:0.5rem;">
             <label style="font-size:0.75rem; color:#6b7280;">Owner</label>
-            <select wire:model.live="ownerFilter"
-                    style="font-size:0.875rem; padding:0.375rem 0.5rem; border-radius:0.375rem; border:1px solid #d1d5db; background:#fff;">
+            <select wire:model.live="ownerFilter" class="crm-filter-select">
                 <option value="">Everyone</option>
                 @foreach ($this->getOwners() as $id => $name)
                     <option value="{{ $id }}">{{ $name }}</option>
@@ -48,8 +51,7 @@
 
         <div style="display:flex; align-items:center; gap:0.5rem;">
             <label style="font-size:0.75rem; color:#6b7280;">Status</label>
-            <select wire:model.live="statusFilter"
-                    style="font-size:0.875rem; padding:0.375rem 0.5rem; border-radius:0.375rem; border:1px solid #d1d5db; background:#fff;">
+            <select wire:model.live="statusFilter" class="crm-filter-select">
                 <option value="all">All</option>
                 <option value="open">Open</option>
                 <option value="won">Won</option>
