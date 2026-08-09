@@ -986,4 +986,11 @@ return [
         'complete' => 'Complete',
         'pending' => 'Pending',
     ],
+    'misc' => [
+        'all' => 'All',
+        'today' => 'Today',
+        'overdue' => 'Overdue',
+        'completed' => 'Completed',
+        'open' => 'Open',
+    ],
 ];

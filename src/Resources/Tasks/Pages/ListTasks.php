@@ -22,7 +22,7 @@ class ListTasks extends ListRecords
     {
         return [
             'all' => CrmTab::make(__('laravel-crm-filament::labels.misc.all'), $this),
-            'open' => CrmTab::make(__('laravel-crm-filament::labels.sales.open'), $this)
+            'open' => CrmTab::make(__('laravel-crm-filament::labels.misc.open'), $this)
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('completed_at')),
             'today' => CrmTab::make(__('laravel-crm-filament::labels.misc.today'), $this)
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('completed_at')->whereDate('due_at', today()))
