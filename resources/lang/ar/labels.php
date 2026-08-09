@@ -241,6 +241,7 @@ return [
         'people' => 'الأشخاص',
         'organizations' => 'المنظمات',
         'open' => 'مفتوحة',
+        'status' => 'الحالة',
     ],
 
     // Money / orders / lines

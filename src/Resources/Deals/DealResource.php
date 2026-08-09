@@ -230,14 +230,19 @@ class DealResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('status')
-                    ->label(__('laravel-crm-filament::labels.sales.status') ?? 'Status')
+                    ->label(__('laravel-crm-filament::labels.sales.status'))
                     ->badge()
                     ->state(function (Deal $record): string {
-                        if ($record->closed_at) {
-                            return ucfirst($record->closed_status ?? 'closed');
+                        if ($record->closed_at || $record->closed_status) {
+                            return strtolower((string) $record->closed_status) === 'won' ? 'won' : 'lost';
                         }
 
-                        return 'Open';
+                        return 'open';
+                    })
+                    ->formatStateUsing(fn (string $state): string => match (strtolower($state)) {
+                        'won' => __('laravel-crm-filament::labels.actions.won'),
+                        'lost' => __('laravel-crm-filament::labels.actions.lost'),
+                        default => __('laravel-crm-filament::labels.sales.open'),
                     })
                     ->color(fn (string $state): string => match (strtolower($state)) {
                         'won' => 'success',
@@ -254,11 +259,11 @@ class DealResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('closed_status')
-                    ->label(__('laravel-crm-filament::labels.sales.status') ?? 'Status')
+                    ->label(__('laravel-crm-filament::labels.sales.status'))
                     ->options([
-                        'open' => 'Open',
-                        'won' => 'Won',
-                        'lost' => 'Lost',
+                        'open' => __('laravel-crm-filament::labels.sales.open'),
+                        'won' => __('laravel-crm-filament::labels.actions.won'),
+                        'lost' => __('laravel-crm-filament::labels.actions.lost'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         if (empty($data['value'])) {

@@ -241,6 +241,7 @@ return [
         'people' => 'People',
         'organizations' => 'Organizations',
         'open' => 'Open',
+        'status' => 'Status',
     ],
 
     // Money / orders / lines
