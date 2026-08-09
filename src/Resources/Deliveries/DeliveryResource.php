@@ -248,11 +248,6 @@ class DeliveryResource extends Resource
                     ->button()
                     ->hiddenLabel()
                     ->icon('heroicon-m-arrow-down-tray'),
-                static::deliveryPortalActionFactory()
-                    ->button()
-                    ->hiddenLabel()
-                    ->icon('heroicon-m-arrow-top-right-on-square')
-                    ->color('gray'),
                 Actions\ViewAction::make()
                     ->button()
                     ->hiddenLabel(),
@@ -432,14 +427,15 @@ class DeliveryResource extends Resource
         ];
 
         $relativeDir = 'laravel-crm/delivery/' . $record->id;
-        Storage::makeDirectory($relativeDir);
-
         $filename = 'delivery-' . strtolower((string) ($record->delivery_id ?? $record->external_id)) . '.pdf';
         $pdfRelative = 'app/' . $relativeDir . '/' . $filename;
+        $fullPath = storage_path($pdfRelative);
+
+        \Illuminate\Support\Facades\File::ensureDirectoryExists(dirname($fullPath));
 
         Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
             ->loadView('laravel-crm::deliveries.pdf', $data)
-            ->save(storage_path($pdfRelative));
+            ->save($fullPath);
 
         return $pdfRelative;
     }

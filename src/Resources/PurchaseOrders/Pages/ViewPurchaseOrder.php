@@ -28,11 +28,6 @@ class ViewPurchaseOrder extends ViewRecord
                 ->button()
                 ->hiddenLabel()
                 ->icon('heroicon-m-arrow-down-tray'),
-            $this->purchaseOrderPortalAction()
-                ->button()
-                ->hiddenLabel()
-                ->icon('heroicon-m-arrow-top-right-on-square')
-                ->color('gray'),
             Actions\EditAction::make()
                 ->button()
                 ->hiddenLabel()

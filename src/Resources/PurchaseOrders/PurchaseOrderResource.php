@@ -210,11 +210,6 @@ class PurchaseOrderResource extends Resource
                     ->button()
                     ->hiddenLabel()
                     ->icon('heroicon-m-arrow-down-tray'),
-                static::purchaseOrderPortalActionFactory()
-                    ->button()
-                    ->hiddenLabel()
-                    ->icon('heroicon-m-arrow-top-right-on-square')
-                    ->color('gray'),
                 Actions\ViewAction::make()
                     ->button()
                     ->hiddenLabel(),
@@ -420,19 +415,25 @@ class PurchaseOrderResource extends Resource
         $data = [
             'purchaseOrder' => $record,
             'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
+            'email' => optional($record->person)->getPrimaryEmail(),
+            'phone' => optional($record->person)->getPrimaryPhone(),
+            'address' => optional($record->person)->getPrimaryAddress(),
+            'organization_address' => optional($record->organization)->getPrimaryAddress(),
             'fromName' => $settings->get('organization_name'),
             'logo' => $settings->get('logo_file'),
+            'taxName' => $settings->get('tax_name', 'Tax'),
         ];
 
         $relativeDir = 'laravel-crm/purchaseorder/' . $record->id;
-        Storage::makeDirectory($relativeDir);
-
         $filename = 'purchase-order-' . strtolower((string) ($record->purchase_order_id ?? $record->external_id)) . '.pdf';
         $pdfRelative = 'app/' . $relativeDir . '/' . $filename;
+        $fullPath = storage_path($pdfRelative);
+
+        \Illuminate\Support\Facades\File::ensureDirectoryExists(dirname($fullPath));
 
         Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
             ->loadView('laravel-crm::purchase-orders.pdf', $data)
-            ->save(storage_path($pdfRelative));
+            ->save($fullPath);
 
         return $pdfRelative;
     }

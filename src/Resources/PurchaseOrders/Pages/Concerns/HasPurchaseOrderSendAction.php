@@ -99,8 +99,13 @@ trait HasPurchaseOrderSendAction
         return [
             'purchaseOrder' => $record,
             'dateFormat' => $settings->get('date_format', config('laravel-crm.date_format')),
+            'email' => optional($record->person)->getPrimaryEmail(),
+            'phone' => optional($record->person)->getPrimaryPhone(),
+            'address' => optional($record->person)->getPrimaryAddress(),
+            'organization_address' => optional($record->organization)->getPrimaryAddress(),
             'fromName' => $settings->get('organization_name'),
             'logo' => $settings->get('logo_file'),
+            'taxName' => $settings->get('tax_name', 'Tax'),
         ];
     }
 }
