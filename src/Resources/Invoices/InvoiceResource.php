@@ -528,7 +528,11 @@ class InvoiceResource extends Resource
             ->label(__('laravel-crm-filament::labels.actions.preview_portal'))
             ->icon('heroicon-o-arrow-top-right-on-square')
             ->color('primary')
-            ->url(fn (Invoice $record): string => url('p/invoices/' . $record->external_id))
+            ->url(fn (Invoice $record): string => URL::temporarySignedRoute(
+                'laravel-crm.portal.invoices.show',
+                now()->addDays(30),
+                ['invoice' => $record],
+            ))
             ->openUrlInNewTab();
     }
 
@@ -587,14 +591,15 @@ class InvoiceResource extends Resource
         ];
 
         $relativeDir = 'laravel-crm/invoice/' . $record->id;
-        Storage::makeDirectory($relativeDir);
-
         $filename = 'invoice-' . strtolower((string) ($record->invoice_id ?? $record->external_id)) . '.pdf';
         $pdfRelative = 'app/' . $relativeDir . '/' . $filename;
+        $fullPath = storage_path($pdfRelative);
+
+        \Illuminate\Support\Facades\File::ensureDirectoryExists(dirname($fullPath));
 
         Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
             ->loadView('laravel-crm::invoices.pdf', $data)
-            ->save(storage_path($pdfRelative));
+            ->save($fullPath);
 
         return $pdfRelative;
     }

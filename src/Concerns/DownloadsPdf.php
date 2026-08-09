@@ -31,13 +31,14 @@ trait DownloadsPdf
         array $data,
     ): string {
         $relativeDir = 'laravel-crm/' . $type . '/' . $record->id;
-        Storage::makeDirectory($relativeDir);
-
         $pdfRelative = 'app/' . $relativeDir . '/' . $this->pdfFilename($record, $type, $prefix);
+        $fullPath = storage_path($pdfRelative);
+
+        \Illuminate\Support\Facades\File::ensureDirectoryExists(dirname($fullPath));
 
         Pdf::setOption(['fontDir' => public_path('vendor/laravel-crm/fonts')])
             ->loadView($view, $data)
-            ->save(storage_path($pdfRelative));
+            ->save($fullPath);
 
         return $pdfRelative;
     }
