@@ -470,13 +470,21 @@ class OrderResource extends Resource
             ];
         }
 
+        $deliveryAddressId = null;
+        if ($record->organization && ($addr = $record->organization->getPrimaryAddress())) {
+            $deliveryAddressId = $addr->id;
+        } elseif ($record->person && ($addr = $record->person->getPrimaryAddress())) {
+            $deliveryAddressId = $addr->id;
+        }
+
         return [
             'order_id' => $record->id,
             'reference' => $record->reference,
             'issue_date' => now(),
             'delivery_date' => now()->addDays(14),
             'currency' => $record->currency,
-            'delivery_type' => 'deliver',
+            'delivery_type' => $deliveryAddressId ? 'deliver' : 'pickup',
+            'delivery_address' => $deliveryAddressId,
             'delivery_instructions' => null,
             'terms' => null,
             'user_owner_id' => $record->user_owner_id,
