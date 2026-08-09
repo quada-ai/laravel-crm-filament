@@ -69,6 +69,10 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             __DIR__ . '/../resources/lang',
             'laravel-crm-filament',
         );
+
+        if (is_dir(__DIR__ . '/../database/migrations')) {
+            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        }
     }
 
     public function packageBooted(): void
@@ -266,6 +270,12 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
                 $this->publishes([
                     __DIR__ . '/../resources/views' => resource_path('views/vendor/laravel-crm-filament'),
                 ], 'laravel-crm-filament-views');
+            }
+
+            if ($files->isDirectory(__DIR__ . '/../database/migrations')) {
+                $this->publishes([
+                    __DIR__ . '/../database/migrations' => database_path('migrations'),
+                ], 'laravel-crm-filament-migrations');
             }
 
             if ($files->isDirectory(__DIR__ . '/../stubs')) {

@@ -30,6 +30,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists(config('laravel-crm.db_table_prefix') . 'invoice_payments');
+        Schema::dropIfExists(config('laravel-crm.db_table_prefix', 'crm_') . 'invoice_payments');
     }
 };
