@@ -581,6 +581,9 @@ class InvoiceResource extends Resource
             'organization_address' => optional($record->organization)->getPrimaryAddress(),
             'fromName' => $settings->get('organization_name'),
             'logo' => $settings->get('logo_file'),
+            'contactDetails' => $settings->get('invoice_contact_details'),
+            'taxName' => $settings->get('tax_name', 'Tax'),
+            'paymentInstructions' => $settings->get('invoice_payment_instructions'),
         ];
 
         $relativeDir = 'laravel-crm/invoice/' . $record->id;

@@ -77,6 +77,20 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        // Ensure public portal routes (/p/invoices/{external_id}, /p/quotes/{external_id}, etc.)
+        // are loaded under the `p` prefix and `web` middleware group, even when
+        // LARAVEL_CRM_USER_INTERFACE is false in .env.
+        $portalRoutesFile = base_path('vendor/venturedrake/laravel-crm/src/Http/portal-routes.php');
+        if (file_exists($portalRoutesFile)) {
+            \Illuminate\Support\Facades\Route::group([
+                'domain' => null,
+                'prefix' => 'p',
+                'middleware' => ['web'],
+            ], function () use ($portalRoutesFile) {
+                $this->loadRoutesFrom($portalRoutesFile);
+            });
+        }
+
         // Fix core HasCrmFields.php:21 crash: when BelongsToTeamsScope is active,
         // $fieldModel->field returns null because the related Field row belongs
         // to a different team_id. Pre-load the relation without scopes so the
