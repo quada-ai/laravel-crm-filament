@@ -41,12 +41,20 @@ trait HasInvoiceSendAction
                     ->label(__('laravel-crm-filament::labels.campaign.send_me_a_copy')),
             ])
             ->action(function (array $data, Invoice $record): void {
-                $this->dispatchInvoice($record, $data);
+                try {
+                    $this->dispatchInvoice($record, $data);
 
-                Notification::make()
-                    ->title(__('laravel-crm-filament::labels.actions.invoice_sent'))
-                    ->success()
-                    ->send();
+                    Notification::make()
+                        ->title(__('laravel-crm-filament::labels.actions.invoice_sent'))
+                        ->success()
+                        ->send();
+                } catch (\Throwable $e) {
+                    Notification::make()
+                        ->title('Failed to send invoice email')
+                        ->body($e->getMessage())
+                        ->danger()
+                        ->send();
+                }
             });
     }
 
@@ -73,7 +81,7 @@ trait HasInvoiceSendAction
 
         $pdfPath = $this->generateInvoicePdf($record);
 
-        Mail::send(new SendInvoice([
+        Mail::to($data['to'])->send(new SendInvoice([
             'to' => $data['to'],
             'subject' => $data['subject'],
             'message' => $data['message'],

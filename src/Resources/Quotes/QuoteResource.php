@@ -345,12 +345,20 @@ class QuoteResource extends Resource
                     ->label(__('laravel-crm-filament::labels.campaign.send_me_a_copy')),
             ])
             ->action(function (array $data, Quote $record): void {
-                static::dispatchQuoteSend($record, $data);
+                try {
+                    static::dispatchQuoteSend($record, $data);
 
-                Notification::make()
-                    ->title('Quote sent')
-                    ->success()
-                    ->send();
+                    Notification::make()
+                        ->title(__('laravel-crm-filament::labels.actions.quote_sent') ?? 'Quote sent')
+                        ->success()
+                        ->send();
+                } catch (\Throwable $e) {
+                    Notification::make()
+                        ->title('Failed to send quote email')
+                        ->body($e->getMessage())
+                        ->danger()
+                        ->send();
+                }
             });
     }
 
@@ -394,7 +402,7 @@ class QuoteResource extends Resource
 
         $pdfPath = static::renderQuotePdfToDisk($record);
 
-        Mail::send(new SendQuote([
+        Mail::to($data['to'])->send(new SendQuote([
             'to' => $data['to'],
             'subject' => $data['subject'],
             'message' => $data['message'],

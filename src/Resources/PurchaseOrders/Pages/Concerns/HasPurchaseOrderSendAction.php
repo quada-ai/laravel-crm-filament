@@ -41,12 +41,20 @@ trait HasPurchaseOrderSendAction
                     ->label(__('laravel-crm-filament::labels.campaign.send_me_a_copy')),
             ])
             ->action(function (array $data, PurchaseOrder $record): void {
-                $this->dispatchPurchaseOrder($record, $data);
+                try {
+                    $this->dispatchPurchaseOrder($record, $data);
 
-                Notification::make()
-                    ->title(__('laravel-crm-filament::labels.actions.purchase_order_sent'))
-                    ->success()
-                    ->send();
+                    Notification::make()
+                        ->title(__('laravel-crm-filament::labels.actions.purchase_order_sent'))
+                        ->success()
+                        ->send();
+                } catch (\Throwable $e) {
+                    Notification::make()
+                        ->title('Failed to send purchase order email')
+                        ->body($e->getMessage())
+                        ->danger()
+                        ->send();
+                }
             });
     }
 
@@ -71,7 +79,7 @@ trait HasPurchaseOrderSendAction
 
         $pdfPath = $this->generatePurchaseOrderPdf($record);
 
-        Mail::send(new SendPurchaseOrder([
+        Mail::to($data['to'])->send(new SendPurchaseOrder([
             'to' => $data['to'],
             'subject' => $data['subject'],
             'message' => $data['message'],

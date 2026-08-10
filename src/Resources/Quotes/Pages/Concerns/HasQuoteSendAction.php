@@ -41,12 +41,20 @@ trait HasQuoteSendAction
                     ->label(__('laravel-crm-filament::labels.campaign.send_me_a_copy')),
             ])
             ->action(function (array $data, Quote $record): void {
-                $this->dispatchQuote($record, $data);
+                try {
+                    $this->dispatchQuote($record, $data);
 
-                Notification::make()
-                    ->title(__('laravel-crm-filament::labels.actions.quote_sent'))
-                    ->success()
-                    ->send();
+                    Notification::make()
+                        ->title(__('laravel-crm-filament::labels.actions.quote_sent'))
+                        ->success()
+                        ->send();
+                } catch (\Throwable $e) {
+                    Notification::make()
+                        ->title('Failed to send quote email')
+                        ->body($e->getMessage())
+                        ->danger()
+                        ->send();
+                }
             });
     }
 
@@ -73,7 +81,7 @@ trait HasQuoteSendAction
 
         $pdfPath = $this->generateQuotePdf($record);
 
-        Mail::send(new SendQuote([
+        Mail::to($data['to'])->send(new SendQuote([
             'to' => $data['to'],
             'subject' => $data['subject'],
             'message' => $data['message'],
