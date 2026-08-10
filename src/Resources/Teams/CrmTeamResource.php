@@ -38,6 +38,16 @@ class CrmTeamResource extends Resource
 
     protected static ?int $navigationSort = 60;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
+
     public static function getNavigationBadge(): ?string
     {
         $count = Team::query()->count();
