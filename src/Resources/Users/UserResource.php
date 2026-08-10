@@ -42,6 +42,16 @@ class UserResource extends Resource
 
     protected static ?int $navigationSort = 50;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
+
     public static function getNavigationBadge(): ?string
     {
         $model = static::getModel();
