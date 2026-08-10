@@ -16,6 +16,16 @@ class Updates extends Page
 
     protected static ?int $navigationSort = 200;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canAccess(): bool
+    {
+        return false;
+    }
+
     public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
     {
         return __('laravel-crm-filament::labels.pages.updates.title');

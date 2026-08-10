@@ -40,6 +40,16 @@ class ChatConversationResource extends Resource
 
     protected static ?int $navigationSort = 20;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
+
     /**
      * Status enum mirror for the conversations table. Matches the core
      * migration's enum: open | pending | closed. "pending" is the

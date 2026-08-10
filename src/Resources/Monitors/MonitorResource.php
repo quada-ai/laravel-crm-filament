@@ -45,6 +45,16 @@ class MonitorResource extends Resource
 
     protected static ?int $navigationSort = 90;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
+
     public static function getNavigationBadge(): ?string
     {
         $count = Monitor::query()->count();

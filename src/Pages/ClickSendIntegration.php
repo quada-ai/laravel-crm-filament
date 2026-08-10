@@ -56,6 +56,11 @@ class ClickSendIntegration extends Page implements HasForms
         return false;
     }
 
+    public static function canAccess(): bool
+    {
+        return false;
+    }
+
     protected string $view = 'laravel-crm-filament::clicksend';
 
     public const KEYS = [

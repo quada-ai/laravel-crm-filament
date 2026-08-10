@@ -26,6 +26,16 @@ class Integrations extends Page implements HasForms
 
     protected static ?int $navigationSort = 110;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canAccess(): bool
+    {
+        return false;
+    }
+
     protected string $view = 'laravel-crm-filament::integrations';
 
     public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable

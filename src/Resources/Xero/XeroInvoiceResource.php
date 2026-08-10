@@ -33,6 +33,16 @@ class XeroInvoiceResource extends Resource
 
     protected static ?int $navigationSort = 93;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return false;
+    }
+
     public static function getNavigationLabel(): string
     {
         return __('laravel-crm-filament::labels.xero.invoices');
