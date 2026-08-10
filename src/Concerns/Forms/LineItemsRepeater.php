@@ -140,7 +140,7 @@ class LineItemsRepeater
         if ($priceField === 'unit_price') {
             $productId = $get('id');
             $rate = self::resolveTaxRate($productId !== null ? (int) $productId : null);
-            $set('tax_amount', $amount * ($rate / 100));
+            $set('tax_amount', $amount * ((float) $rate / 100.0));
         }
     }
 
