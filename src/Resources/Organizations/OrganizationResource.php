@@ -107,7 +107,7 @@ class OrganizationResource extends Resource
 
             Forms\Components\Select::make('user_owner_id')
                 ->label(__('laravel-crm-filament::labels.fields.owner'))
-                ->options(fn () => User::query()->orderBy('name')->pluck('name', 'id'))
+                ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                 ->searchable()
                 ->preload(),
 

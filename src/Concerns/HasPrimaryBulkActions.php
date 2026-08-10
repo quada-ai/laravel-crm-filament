@@ -185,12 +185,6 @@ trait HasPrimaryBulkActions
      */
     protected static function primaryBulkActionOwnerOptions(): array
     {
-        $userClass = config('auth.providers.users.model');
-
-        if (! $userClass || ! class_exists($userClass)) {
-            return [];
-        }
-
-        return $userClass::query()->orderBy('name')->pluck('name', 'id')->all();
+        return \VentureDrake\LaravelCrmFilament\Support\UserOptions::get();
     }
 }

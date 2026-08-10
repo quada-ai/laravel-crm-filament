@@ -63,9 +63,7 @@ class CalendarPage extends Page
 
     public function getOwners(): Collection
     {
-        $userClass = config('auth.providers.users.model');
-
-        return $userClass::query()->orderBy('name')->pluck('name', 'id');
+        return collect(\VentureDrake\LaravelCrmFilament\Support\UserOptions::get());
     }
 
     /**
