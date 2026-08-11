@@ -12,6 +12,11 @@ class LunchesRelationManager extends RelationManager
 
     protected static ?string $title = 'Lunches';
 
+    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    {
+        return __('laravel-crm-filament::labels.resources.lunch.plural') ?? 'Lunches';
+    }
+
     public function isReadOnly(): bool
     {
         return true;

@@ -22,6 +22,11 @@ class FilesRelationManager extends RelationManager
 
     protected static ?string $title = 'Files';
 
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('laravel-crm-filament::labels.resources.file.plural') ?? 'Files';
+    }
+
     public function form(Schema $schema): Schema
     {
         $disk = config('laravel-crm.upload_disk', 'public');

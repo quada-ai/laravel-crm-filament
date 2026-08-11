@@ -359,6 +359,7 @@ return [
         'event' => 'الحدث',
         'user' => 'المستخدم',
         'changes' => 'التغييرات',
+        'no_activity_yet' => 'لا يوجد نشاط بعد.',
     ],
 
     // Integrations page — per-integration descriptions surfaced on the Settings page
@@ -608,6 +609,10 @@ return [
         'private' => 'خاص',
         'all' => 'الكل',
         'open' => 'مفتوحة',
+        'today' => 'اليوم',
+        'overdue' => 'المتأخرة',
+        'completed' => 'المكتملة',
+        'no_activity_yet' => 'لا يوجد نشاط بعد.',
     ],
     'status' => [
         'complete' => 'مكتمل',
@@ -981,16 +986,5 @@ return [
         'sms_campaign_sends_over_time' => 'الإرسال بمرور الوقت',
         'sms_campaign_stats' => 'إحصائيات حملة الرسائل النصية',
         'sms_campaign_top_urls' => 'الروابط الأكثر نقرًا',
-    ],
-    'status' => [
-        'complete' => 'مكتمل',
-        'pending' => 'قيد الانتظار',
-    ],
-    'misc' => [
-        'all' => 'الكل',
-        'today' => 'اليوم',
-        'overdue' => 'المتأخرة',
-        'completed' => 'المكتملة',
-        'open' => 'مفتوحة',
     ],
 ];

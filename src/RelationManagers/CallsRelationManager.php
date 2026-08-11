@@ -20,6 +20,11 @@ class CallsRelationManager extends RelationManager
 
     protected static ?string $title = 'Calls';
 
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('laravel-crm-filament::labels.resources.call.plural') ?? 'Calls';
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema->components([

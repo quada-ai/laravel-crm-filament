@@ -359,6 +359,7 @@ return [
         'event' => 'Event',
         'user' => 'User',
         'changes' => 'Changes',
+        'no_activity_yet' => 'No activity yet.',
     ],
 
     // Integrations page — per-integration descriptions surfaced on the Settings page
@@ -608,6 +609,10 @@ return [
         'private' => 'Private',
         'all' => 'All',
         'open' => 'Open',
+        'today' => 'Today',
+        'overdue' => 'Overdue',
+        'completed' => 'Completed',
+        'no_activity_yet' => 'No activity yet.',
     ],
     'status' => [
         'complete' => 'Complete',
@@ -981,16 +986,5 @@ return [
         'sms_campaign_sends_over_time' => 'Sends Over Time',
         'sms_campaign_stats' => 'SMS Campaign Statistics',
         'sms_campaign_top_urls' => 'Top Clicked Links',
-    ],
-    'status' => [
-        'complete' => 'Complete',
-        'pending' => 'Pending',
-    ],
-    'misc' => [
-        'all' => 'All',
-        'today' => 'Today',
-        'overdue' => 'Overdue',
-        'completed' => 'Completed',
-        'open' => 'Open',
     ],
 ];

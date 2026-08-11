@@ -68,7 +68,7 @@
         @forelse ($activityRows as $i => $activity)
             @include('laravel-crm-filament::crm-activity', ['activity' => $activity, 'last' => $loop->last])
         @empty
-            <div class="crm-card-empty">No activity yet.</div>
+            <div class="crm-card-empty">{{ __('laravel-crm-filament::labels.audit.no_activity_yet') }}</div>
         @endforelse
     </div>
 @endif

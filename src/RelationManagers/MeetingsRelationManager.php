@@ -20,6 +20,11 @@ class MeetingsRelationManager extends RelationManager
 
     protected static ?string $title = 'Meetings';
 
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('laravel-crm-filament::labels.resources.meeting.plural') ?? 'Meetings';
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema->components([

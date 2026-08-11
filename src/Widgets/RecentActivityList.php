@@ -36,7 +36,7 @@ class RecentActivityList extends TableWidget
             ])
             ->paginated([10, 25])
             ->defaultPaginationPageOption(10)
-            ->emptyStateHeading('No activity yet');
+            ->emptyStateHeading(__('laravel-crm-filament::labels.audit.no_activity_yet'));
     }
 
     protected static function describeAction(?string $recordableType, $row): string
