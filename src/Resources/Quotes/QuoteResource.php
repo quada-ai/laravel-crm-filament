@@ -77,7 +77,7 @@ class QuoteResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Quote::query()->whereNull('accepted_at')->whereNull('rejected_at')->count();
+        $count = static::getEloquentQuery()->whereNull('accepted_at')->whereNull('rejected_at')->count();
 
         return $count > 0 ? (string) $count : null;
     }

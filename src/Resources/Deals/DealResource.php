@@ -68,7 +68,7 @@ class DealResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Deal::query()->whereNull('closed_at')->count();
+        $count = static::getEloquentQuery()->whereNull('closed_at')->count();
 
         return $count > 0 ? (string) $count : null;
     }

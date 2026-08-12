@@ -30,4 +30,18 @@ trait UsesExternalIdRouting
 
         return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters, $configuration);
     }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if ($tenant = \Filament\Facades\Filament::getTenant()) {
+            $model = $query->getModel();
+            if (\Illuminate\Support\Facades\Schema::hasColumn($model->getTable(), 'tenant_id')) {
+                $query->where($model->getTable() . '.tenant_id', $tenant->getKey());
+            }
+        }
+
+        return $query;
+    }
 }

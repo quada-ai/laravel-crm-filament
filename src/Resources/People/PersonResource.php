@@ -16,6 +16,10 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ChatbotIntegration;
+use App\Models\Conversation;
+use Filament\Forms\Components\FileUpload;
+use Filament\Notifications\Notification;
 use VentureDrake\LaravelCrm\Models\Person;
 use VentureDrake\LaravelCrmFilament\Concerns\ContactFieldsSchema;
 use VentureDrake\LaravelCrmFilament\Concerns\ExportsCsv;
@@ -61,9 +65,20 @@ class PersonResource extends Resource
 
     protected static ?int $navigationSort = 30;
 
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if ($tenant = \Filament\Facades\Filament::getTenant()) {
+            $query->where($query->getModel()->getTable() . '.tenant_id', $tenant->getKey());
+        }
+
+        return $query;
+    }
+
     public static function getNavigationBadge(): ?string
     {
-        $count = Person::query()->count();
+        $count = static::getEloquentQuery()->count();
 
         return $count > 0 ? (string) $count : null;
     }
@@ -76,27 +91,61 @@ class PersonResource extends Resource
     public static function form(Schema $schema): Schema
     {
         $components = [
+
             Grid::make(2)->schema([
-                Forms\Components\TextInput::make('first_name')->maxLength(255),
-                Forms\Components\TextInput::make('last_name')->maxLength(255),
+                Forms\Components\TextInput::make('first_name')
+                    ->label(__('laravel-crm-filament::labels.fields.first_name'))
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('last_name')
+                    ->label(__('laravel-crm-filament::labels.fields.last_name'))
+                    ->maxLength(255),
             ]),
 
             Grid::make(2)->schema([
-                Forms\Components\TextInput::make('middle_name')->maxLength(255),
-                Forms\Components\TextInput::make('maiden_name')->maxLength(255),
+                Forms\Components\TextInput::make('middle_name')
+                    ->label(__('laravel-crm-filament::labels.fields.middle_name'))
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('maiden_name')
+                    ->label(__('laravel-crm-filament::labels.fields.maiden_name'))
+                    ->maxLength(255),
+            ]),
+
+            Grid::make(2)->schema([
+                Forms\Components\TextInput::make('company_name')
+                    ->label(__('filament.resources.contacts.fields.company_name'))
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('business_field')
+                    ->label(__('filament.resources.contacts.fields.business_field'))
+                    ->maxLength(255),
+            ]),
+
+            Grid::make(2)->schema([
+                Forms\Components\TextInput::make('telegram_username')
+                    ->label(__('filament.resources.contacts.fields.telegram_username'))
+                    ->prefix('@')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('external_id')
+                    ->label(__('filament.resources.contacts.fields.external_id'))
+                    ->maxLength(255),
             ]),
 
             Grid::make(3)->schema([
-                Forms\Components\TextInput::make('title')->maxLength(50),
-                Forms\Components\Select::make('gender')->options([
-                    'male' => 'Male',
-                    'female' => 'Female',
-                    'other' => 'Other',
-                ]),
-                Forms\Components\DatePicker::make('birthday'),
+                Forms\Components\TextInput::make('title')
+                    ->label(__('laravel-crm-filament::labels.fields.title'))
+                    ->maxLength(50),
+                Forms\Components\Select::make('gender')
+                    ->label(__('laravel-crm-filament::labels.fields.gender'))
+                    ->options([
+                        'male' => __('laravel-crm-filament::labels.gender.male'),
+                        'female' => __('laravel-crm-filament::labels.gender.female'),
+                        'other' => __('laravel-crm-filament::labels.gender.other'),
+                    ]),
+                Forms\Components\DatePicker::make('birthday')
+                    ->label(__('laravel-crm-filament::labels.fields.birthday')),
             ]),
 
             Forms\Components\Textarea::make('description')
+                ->label(__('laravel-crm-filament::labels.fields.description'))
                 ->rows(3)
                 ->columnSpanFull(),
 
@@ -126,8 +175,87 @@ class PersonResource extends Resource
 
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('profile_avatar')
+                    ->label(__('filament.resources.contacts.fields.profile_avatar') ?? 'Avatar')
+                    ->circular()
+                    ->disk('public')
+                    ->state(fn (Person $record): ?string => $record->profile_avatar_url)
+                    ->defaultImageUrl(fn () => asset('images/default-avatar.png')),
+
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('laravel-crm-filament::labels.fields.name'))
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        if (blank($search)) {
+                            return $query;
+                        }
+
+                        $term = mb_strtolower(trim((string) $search));
+                        $terms = array_filter(explode(' ', $term));
+                        $tenantId = \Filament\Facades\Filament::getTenant()?->id;
+
+                        $dbQuery = \Illuminate\Support\Facades\DB::table('crm_people')
+                            ->whereNull('deleted_at');
+                        if ($tenantId) {
+                            $dbQuery->where('tenant_id', $tenantId);
+                        }
+
+                        // Fast SQL pre-filter for non-encrypted columns
+                        $sqlMatchingIds = (clone $dbQuery)
+                            ->where(function ($q) use ($term) {
+                                $q->where('phone', 'like', "%{$term}%")
+                                  ->orWhere('email', 'like', "%{$term}%")
+                                  ->orWhere('company_name', 'like', "%{$term}%")
+                                  ->orWhere('business_field', 'like', "%{$term}%")
+                                  ->orWhere('telegram_username', 'like', "%{$term}%")
+                                  ->orWhere('external_id', 'like', "%{$term}%");
+                            })
+                            ->pluck('id')
+                            ->toArray();
+
+                        // Raw DB fetch for name decryption without Eloquent model overhead
+                        $rawPeople = $dbQuery
+                            ->select(['id', 'first_name', 'middle_name', 'last_name', 'maiden_name'])
+                            ->get();
+
+                        $decryptedMatchingIds = [];
+
+                        foreach ($rawPeople as $person) {
+                            if (in_array($person->id, $sqlMatchingIds)) {
+                                continue;
+                            }
+
+                            $firstName = $person->first_name ? self::decryptVal($person->first_name) : '';
+                            $middleName = $person->middle_name ? self::decryptVal($person->middle_name) : '';
+                            $lastName = $person->last_name ? self::decryptVal($person->last_name) : '';
+                            $maidenName = $person->maiden_name ? self::decryptVal($person->maiden_name) : '';
+
+                            $fullName = mb_strtolower(trim("{$firstName} {$middleName} {$lastName} {$maidenName}"));
+
+                            if (empty($fullName)) {
+                                continue;
+                            }
+
+                            if (str_contains($fullName, $term)) {
+                                $decryptedMatchingIds[] = $person->id;
+                                continue;
+                            }
+
+                            $allMatch = true;
+                            foreach ($terms as $w) {
+                                if (!str_contains($fullName, $w)) {
+                                    $allMatch = false;
+                                    break;
+                                }
+                            }
+                            if ($allMatch && !empty($terms)) {
+                                $decryptedMatchingIds[] = $person->id;
+                            }
+                        }
+
+                        $allIds = array_unique(array_merge($sqlMatchingIds, $decryptedMatchingIds));
+
+                        return $query->whereIn($query->getModel()->getQualifiedKeyName(), $allIds);
+                    })
                     ->limit(40),
 
                 Tables\Columns\TextColumn::make('labels.name')
@@ -147,11 +275,27 @@ class PersonResource extends Resource
 
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('laravel-crm-filament::labels.fields.email'))
-                    ->state(fn($record) => $record?->getPrimaryEmail()?->address),
+                    ->state(fn($record) => $record?->email ?: $record?->getPrimaryEmail()?->address),
 
                 Tables\Columns\TextColumn::make('phone')
                     ->label(__('laravel-crm-filament::labels.fields.phone'))
-                    ->state(fn($record) => $record?->getPrimaryPhone()?->number),
+                    ->state(fn($record) => $record?->phone ?: $record?->getPrimaryPhone()?->number),
+
+                Tables\Columns\TextColumn::make('company_name')
+                    ->label(__('filament.resources.contacts.fields.company_name') ?? 'Company')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('business_field')
+                    ->label(__('filament.resources.contacts.fields.business_field') ?? 'Business Field')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('telegram_username')
+                    ->label(__('filament.resources.contacts.fields.telegram_username') ?? 'Telegram')
+                    ->formatStateUsing(fn ($state) => $state ? '@' . ltrim($state, '@') : null)
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('open_deals_count')
                     ->label(__('laravel-crm-filament::labels.fields.open_deals'))
@@ -197,7 +341,16 @@ class PersonResource extends Resource
 
                 if ($encrypted) {
                     $accessor = HasEncryptedSearch::modifyQuery(
-                        fn($r) => trim(($r->first_name ?? '') . ' ' . ($r->last_name ?? ''))
+                        fn($r) => trim(implode(' ', array_filter([
+                            $r->first_name ?? null,
+                            $r->middle_name ?? null,
+                            $r->last_name ?? null,
+                            $r->maiden_name ?? null,
+                            $r->company_name ?? null,
+                            $r->phone ?? null,
+                            $r->email ?? null,
+                            $r->telegram_username ?? null,
+                        ])))
                     );
                     $accessor($query);
                 }
@@ -205,6 +358,133 @@ class PersonResource extends Resource
                 return $query;
             })
             ->recordActions([
+                Action::make('startChat')
+                    ->label(__('filament.resources.contacts.actions.start_chat') ?? 'Start Chat')
+                    ->modalSubmitActionLabel(__('filament.resources.contacts.actions.start_chat') ?? 'Start Chat')
+                    ->icon('heroicon-o-chat-bubble-left-right')
+                    ->color('primary')
+                    ->form(function (Person $record) {
+                        $tenantId = \Filament\Facades\Filament::getTenant()?->id;
+                        if (!$tenantId) {
+                            return [];
+                        }
+
+                        $integrations = ChatbotIntegration::with('chatbot')
+                            ->where('tenant_id', $tenantId)
+                            ->where('channel_type', '!=', 'web')
+                            ->get();
+
+                        $options = [];
+                        foreach ($integrations as $integration) {
+                            $channel = ucfirst($integration->channel_type);
+                            $detail = '';
+                            try {
+                                $creds = $integration->credentials;
+                                if ($integration->channel_type === 'whatsapp') {
+                                    $phone = $creds['display_phone_number']
+                                        ?? $creds['phone_number']
+                                        ?? $creds['phone']
+                                        ?? $creds['phone_number_id']
+                                        ?? null;
+                                    $detail = $phone ? "({$phone})" : '';
+                                } elseif ($integration->channel_type === 'telegram') {
+                                    $detail = !empty($creds['bot_username']) ? "(@{$creds['bot_username']})" : '';
+                                }
+                            } catch (\Throwable $e) {
+                                $detail = '';
+                            }
+
+                            $botName = $integration->chatbot?->name;
+                            $labelParts = array_filter([$channel, $detail, $botName ? "[{$botName}]" : null]);
+                            $options[$integration->id] = implode(' ', $labelParts);
+                        }
+
+                        return [
+                            Forms\Components\Select::make('integration_id')
+                                ->label(__('filament.resources.contacts.fields.select_integration') ?? 'Select Integration')
+                                ->options($options)
+                                ->required()
+                                ->helperText(empty($options) ? __('filament.resources.contacts.helpers.no_integrations') ?? 'No integrations found' : null),
+                        ];
+                    })
+                    ->action(function (Person $record, array $data) {
+                        $tenant = \Filament\Facades\Filament::getTenant();
+                        if (!$tenant) {
+                            return;
+                        }
+
+                        $integration = ChatbotIntegration::find($data['integration_id']);
+                        if (!$integration) {
+                            Notification::make()
+                                ->title('Integration not found')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        $conversation = Conversation::where('tenant_id', $tenant->id)
+                            ->where('contact_id', $record->id)
+                            ->where(function ($q) use ($integration) {
+                                $q->where('metadata->integration_id', $integration->id)
+                                  ->orWhere('metadata->integration_id', (string) $integration->id)
+                                  ->orWhere(function ($subQ) use ($integration) {
+                                      $subQ->whereNull('metadata->integration_id')
+                                           ->where('channel', $integration->channel_type);
+                                  });
+                            })
+                            ->where('status', 'open')
+                            ->first();
+
+                        if (!$conversation) {
+                            $contactPhone = $record->phone ?: $record->getPrimaryPhone()?->number;
+
+                            if ($integration->channel_type === 'whatsapp') {
+                                $phone = preg_replace('/[^0-9]/', '', (string) $contactPhone);
+
+                                if (empty($phone)) {
+                                    Notification::make()
+                                        ->title(__('filament.resources.contacts.notifications.no_whatsapp_title') ?? 'No WhatsApp')
+                                        ->body(__('filament.resources.contacts.notifications.invalid_phone_body') ?? 'Invalid Phone Number')
+                                        ->danger()
+                                        ->send();
+                                    return;
+                                }
+                            }
+
+                            $externalUserId = match ($integration->channel_type) {
+                                'whatsapp' => $contactPhone ? preg_replace('/[^0-9]/', '', $contactPhone) : ($record->external_id ?? (string) $record->id),
+                                default => $record->external_id ?? $contactPhone ?? $record->email ?? (string) $record->id,
+                            };
+
+                            $integrationPhone = null;
+                            if ($integration->channel_type === 'whatsapp') {
+                                $creds = $integration->credentials;
+                                $integrationPhone = $creds['display_phone_number'] ?? $creds['phone_number'] ?? $creds['phone'] ?? null;
+                            }
+
+                            $conversation = Conversation::create([
+                                'tenant_id' => $tenant->id,
+                                'chatbot_id' => $integration->chatbot_id,
+                                'contact_id' => $record->id,
+                                'external_user_id' => $externalUserId,
+                                'channel' => $integration->channel_type,
+                                'status' => 'open',
+                                'is_escalated' => true,
+                                'assigned_to' => auth()->id(),
+                                'metadata' => array_filter([
+                                    'integration_id' => $integration->id,
+                                    'integration_phone' => $integrationPhone,
+                                ]),
+                            ]);
+                        }
+
+                        return redirect()->to(
+                            route('filament.agent.pages.chat', [
+                                'tenant' => $tenant->id,
+                                'conversation' => $conversation->id,
+                            ])
+                        );
+                    }),
                 Actions\ViewAction::make()
                     ->button()
                     ->hiddenLabel(),
@@ -373,7 +653,15 @@ class PersonResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
+        $relations = [];
+
+        if (class_exists(\App\Filament\Agent\Resources\Contacts\RelationManagers\ConversationsRelationManager::class)) {
+            $relations[] = \App\Filament\Agent\Resources\Contacts\RelationManagers\ConversationsRelationManager::class;
+        } elseif (class_exists('VentureDrake\LaravelCrmFilament\RelationManagers\ConversationsRelationManager')) {
+            $relations[] = 'VentureDrake\LaravelCrmFilament\RelationManagers\ConversationsRelationManager';
+        }
+
+        return array_merge($relations, [
             CrmActivitiesRelationManager::class,
             CrmNotesRelationManager::class,
             CrmTasksRelationManager::class,
@@ -381,7 +669,7 @@ class PersonResource extends Resource
             CrmMeetingsRelationManager::class,
             CrmLunchesRelationManager::class,
             CrmFilesRelationManager::class,
-        ];
+        ]);
     }
 
     public static function getGloballySearchableAttributes(): array
@@ -430,5 +718,18 @@ class PersonResource extends Resource
             ->icon('heroicon-o-arrow-left')
             ->color('gray')
             ->url(static::getUrl('index'));
+    }
+
+    protected static function decryptVal(?string $val): string
+    {
+        if (empty($val)) {
+            return '';
+        }
+
+        try {
+            return \Illuminate\Support\Facades\Crypt::decrypt($val);
+        } catch (\Throwable $e) {
+            return $val;
+        }
     }
 }

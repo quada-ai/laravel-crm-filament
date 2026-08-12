@@ -63,7 +63,7 @@ class ChatConversationResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = ChatConversation::query()->where('status', 'open')->count();
+        $count = static::getEloquentQuery()->where('status', 'open')->count();
 
         return $count > 0 ? (string) $count : null;
     }

@@ -71,7 +71,7 @@ class LeadResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Lead::query()->whereNull('converted_at')->count();
+        $count = static::getEloquentQuery()->whereNull('converted_at')->count();
 
         return $count > 0 ? (string) $count : null;
     }

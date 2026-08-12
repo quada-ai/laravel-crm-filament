@@ -48,7 +48,7 @@ class TaskResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Task::query()->whereNull('completed_at')->count();
+        $count = static::getEloquentQuery()->whereNull('completed_at')->count();
 
         return $count > 0 ? (string) $count : null;
     }

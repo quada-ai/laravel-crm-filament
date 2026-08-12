@@ -82,7 +82,7 @@ class InvoiceResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Invoice::query()->whereNull('fully_paid_at')->count();
+        $count = static::getEloquentQuery()->whereNull('fully_paid_at')->count();
 
         return $count > 0 ? (string) $count : null;
     }
