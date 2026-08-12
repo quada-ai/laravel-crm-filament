@@ -124,6 +124,25 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
                         }
                     }
                 }
+
+                $ref = new \ReflectionClass($schedule);
+                if ($ref->hasProperty('events')) {
+                    $prop = $ref->getProperty('events');
+                    $prop->setAccessible(true);
+                    $events = $prop->getValue($schedule);
+
+                    $filteredEvents = array_values(array_filter($events, function ($event) use ($disabledCommands) {
+                        foreach ($disabledCommands as $cmd) {
+                            if (str_contains((string) $event->command, $cmd) || str_contains((string) $event->description, $cmd)) {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }));
+
+                    $prop->setValue($schedule, $filteredEvents);
+                }
             });
         }
 
