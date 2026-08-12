@@ -103,6 +103,30 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             }
         });
 
+        if ($this->app->runningInConsole()) {
+            $this->app->booted(function () {
+                if (! $this->app->bound(\Illuminate\Console\Scheduling\Schedule::class)) {
+                    return;
+                }
+
+                $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+                $disabledCommands = [
+                    'laravelcrm:reminders',
+                    'laravelcrm:email-campaigns-dispatch',
+                    'laravelcrm:sms-campaigns-dispatch',
+                    'laravelcrm:monitor-check',
+                ];
+
+                foreach ($schedule->events() as $event) {
+                    foreach ($disabledCommands as $cmd) {
+                        if (str_contains((string) $event->command, $cmd) || str_contains((string) $event->description, $cmd)) {
+                            $event->skip(fn () => true);
+                        }
+                    }
+                }
+            });
+        }
+
         // Apply consistent gray styling to every EditAction across the panel,
         // so Edit pills match the gray Back-to-index pill.
         EditAction::configureUsing(fn (EditAction $action) => $action->color('gray'));
