@@ -54,19 +54,13 @@ class ApplyCrmGeneralSettings
             DatePicker::configureUsing(fn (DatePicker $component) => $component->displayFormat($dateFormat));
             DateTimePicker::configureUsing(fn (DateTimePicker $component) => $component->displayFormat($dateTimeFormat));
 
-            // 5. Guarantee default Pipeline, Stages, and FieldGroups exist in database (cached per team/tenant)
-            $teamId = \VentureDrake\LaravelCrmFilament\Support\DefaultFieldGroup::resolveCurrentTeamId() ?? 'global';
-            $cacheKey = 'laravel_crm_defaults_ensured_' . $teamId;
-
-            if (! \Illuminate\Support\Facades\Cache::has($cacheKey)) {
-                try {
-                    \VentureDrake\LaravelCrmFilament\Support\DefaultPipeline::ensureFor(\VentureDrake\LaravelCrm\Models\Deal::class);
-                    \VentureDrake\LaravelCrmFilament\Support\DefaultPipeline::ensureFor(\VentureDrake\LaravelCrm\Models\Lead::class);
-                    \VentureDrake\LaravelCrmFilament\Support\DefaultFieldGroup::ensureAll();
-                    \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addDay());
-                } catch (\Throwable $e) {
-                    // Ignore if DB not migrated yet
-                }
+            // 5. Guarantee default Pipeline, Stages, and FieldGroups exist in database
+            try {
+                \VentureDrake\LaravelCrmFilament\Support\DefaultPipeline::ensureFor(\VentureDrake\LaravelCrm\Models\Deal::class);
+                \VentureDrake\LaravelCrmFilament\Support\DefaultPipeline::ensureFor(\VentureDrake\LaravelCrm\Models\Lead::class);
+                \VentureDrake\LaravelCrmFilament\Support\DefaultFieldGroup::ensureAll();
+            } catch (\Throwable $e) {
+                // Ignore if DB not migrated yet
             }
         }
 

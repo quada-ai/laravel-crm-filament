@@ -52,7 +52,13 @@ class MonitorResponseTimeChart extends ChartWidget
             ->orderBy('checked_at')
             ->get(['response_time', 'checked_at']);
 
-        $buckets = $this->buildBuckets($start, $end, $bucket, $format, ['values' => []]);
+        $buckets = [];
+        $cursor = $start->copy();
+
+        while ($cursor->lte($end)) {
+            $buckets[$cursor->copy()->getTimestamp()] = ['label' => $cursor->format($format), 'values' => []];
+            $cursor = $this->advanceCursor($cursor, $bucket);
+        }
 
         foreach ($checks as $check) {
             $key = $this->bucketKey($check->checked_at, $start, $bucket);
@@ -110,15 +116,6 @@ class MonitorResponseTimeChart extends ChartWidget
             ->where('type', 'uptime')
             ->min('checked_at') : null;
 
-        if (! $earliest) {
-            return $now->copy()->subMonths(12);
-        }
-
-        $parsed = Carbon::parse($earliest);
-        if ($parsed->year < 2000) {
-            return $now->copy()->subMonths(12);
-        }
-
-        return $this->clampStartDate($parsed, $now);
+        return $earliest ? Carbon::parse($earliest) : $now->copy()->subMonth();
     }
 }

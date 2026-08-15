@@ -30,10 +30,18 @@ class LeadsVsDealsChart extends ChartWidget
     protected function getData(): array
     {
         [$start, $end, $bucket, $format] = $this->chartRange();
-        $buckets = $this->buildBuckets($start, $end, $bucket, $format, [
-            'leads' => 0,
-            'deals' => 0,
-        ]);
+
+        $buckets = [];
+        $cursor = $start->copy();
+
+        while ($cursor->lte($end)) {
+            $buckets[$cursor->copy()->getTimestamp()] = [
+                'label' => $cursor->format($format),
+                'leads' => 0,
+                'deals' => 0,
+            ];
+            $cursor = $this->advanceCursor($cursor, $bucket);
+        }
 
         $leads = Lead::query()
             ->whereBetween('created_at', [$start, $end])
@@ -94,19 +102,12 @@ class LeadsVsDealsChart extends ChartWidget
         $candidates = array_filter([$earliestLead, $earliestDeal]);
 
         if (empty($candidates)) {
-            return $now->copy()->subMonths(12);
+            return $now->copy()->subMonth();
         }
 
-        $earliest = collect($candidates)
+        return collect($candidates)
             ->map(fn ($ts) => Carbon::parse($ts))
-            ->filter(fn (Carbon $date) => $date->year >= 2000)
             ->sort()
             ->first();
-
-        if (! $earliest) {
-            return $now->copy()->subMonths(12);
-        }
-
-        return $this->clampStartDate($earliest, $now);
     }
 }

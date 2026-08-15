@@ -45,7 +45,13 @@ class FeatureViewsChart extends ChartWidget
             ->orderBy('viewed_at')
             ->get(['viewed_at']);
 
-        $buckets = $this->buildBuckets($start, $end, $bucket, $format, ['count' => 0]);
+        $buckets = [];
+        $cursor = $start->copy();
+
+        while ($cursor->lte($end)) {
+            $buckets[$cursor->copy()->getTimestamp()] = ['label' => $cursor->format($format), 'count' => 0];
+            $cursor = $this->advanceCursor($cursor, $bucket);
+        }
 
         foreach ($views as $view) {
             $key = $this->bucketKey(Carbon::parse($view->viewed_at), $start, $bucket);
@@ -84,15 +90,6 @@ class FeatureViewsChart extends ChartWidget
             ->where('feature_id', $feature->id)
             ->min('viewed_at') : null;
 
-        if (! $earliest) {
-            return $now->copy()->subMonths(12);
-        }
-
-        $parsed = Carbon::parse($earliest);
-        if ($parsed->year < 2000) {
-            return $now->copy()->subMonths(12);
-        }
-
-        return $this->clampStartDate($parsed, $now);
+        return $earliest ? Carbon::parse($earliest) : $now->copy()->subMonth();
     }
 }

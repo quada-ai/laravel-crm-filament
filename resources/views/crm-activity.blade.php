@@ -61,9 +61,7 @@
         @php
             $activityRows = $this->getOwnerRecord()
                 ->timelineActivities()
-                ->with(['causeable', 'recordable'])
                 ->orderBy('created_at', 'desc')
-                ->limit(50)
                 ->get();
         @endphp
 

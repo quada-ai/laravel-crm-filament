@@ -30,10 +30,18 @@ class MonthlyRevenueChart extends ChartWidget
     protected function getData(): array
     {
         [$start, $end, $bucket, $format] = $this->chartRange();
-        $buckets = $this->buildBuckets($start, $end, $bucket, $format, [
-            'invoices' => 0,
-            'orders' => 0,
-        ]);
+
+        $buckets = [];
+        $cursor = $start->copy();
+
+        while ($cursor->lte($end)) {
+            $buckets[$cursor->copy()->getTimestamp()] = [
+                'label' => $cursor->format($format),
+                'invoices' => 0,
+                'orders' => 0,
+            ];
+            $cursor = $this->advanceCursor($cursor, $bucket);
+        }
 
         $paidInvoices = Invoice::query()
             ->whereNotNull('fully_paid_at')
@@ -109,14 +117,9 @@ class MonthlyRevenueChart extends ChartWidget
 
         $earliest = collect($candidates)
             ->map(fn ($ts) => Carbon::parse($ts))
-            ->filter(fn (Carbon $date) => $date->year >= 2000)
             ->sort()
             ->first();
 
-        if (! $earliest) {
-            return $now->copy()->subMonths(12);
-        }
-
-        return $this->clampStartDate($earliest, $now);
+        return $earliest;
     }
 }
