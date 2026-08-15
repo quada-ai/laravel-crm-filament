@@ -68,7 +68,9 @@ class ActivityFeed extends Page
 
     public function getActivities(): LengthAwarePaginator
     {
-        $query = Activity::query()->latest();
+        $query = Activity::query()
+            ->with(['causeable', 'recordable'])
+            ->latest();
 
         if ($this->scope === 'mine') {
             $query->where('causeable_id', auth()->id())

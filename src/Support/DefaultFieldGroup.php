@@ -9,6 +9,16 @@ use VentureDrake\LaravelCrm\Models\FieldGroup;
 
 class DefaultFieldGroup
 {
+    /** @var array<string, bool> */
+    protected static array $columnsCache = [];
+
+    protected static function hasColumn(string $table, string $column): bool
+    {
+        $key = "{$table}.{$column}";
+
+        return static::$columnsCache[$key] ??= Schema::hasColumn($table, $column);
+    }
+
     public static function resolveCurrentTeamId(): ?int
     {
         if (class_exists(\Filament\Facades\Filament::class)) {
@@ -41,11 +51,11 @@ class DefaultFieldGroup
     public static function ensureFor(string $modelClass): FieldGroup
     {
         $table = (new FieldGroup)->getTable();
-        $hasModelCol = Schema::hasColumn($table, 'model');
-        $hasDefaultCol = Schema::hasColumn($table, 'default');
-        $hasSystemCol = Schema::hasColumn($table, 'system');
-        $hasHandleCol = Schema::hasColumn($table, 'handle');
-        $hasTeamCol = Schema::hasColumn($table, 'team_id');
+        $hasModelCol = static::hasColumn($table, 'model');
+        $hasDefaultCol = static::hasColumn($table, 'default');
+        $hasSystemCol = static::hasColumn($table, 'system');
+        $hasHandleCol = static::hasColumn($table, 'handle');
+        $hasTeamCol = static::hasColumn($table, 'team_id');
 
         $teamId = static::resolveCurrentTeamId();
 

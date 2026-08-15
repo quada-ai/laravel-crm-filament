@@ -45,13 +45,7 @@ class FeatureVotesChart extends ChartWidget
             ->orderBy('created_at')
             ->get(['created_at']);
 
-        $buckets = [];
-        $cursor = $start->copy();
-
-        while ($cursor->lte($end)) {
-            $buckets[$cursor->copy()->getTimestamp()] = ['label' => $cursor->format($format), 'count' => 0];
-            $cursor = $this->advanceCursor($cursor, $bucket);
-        }
+        $buckets = $this->buildBuckets($start, $end, $bucket, $format, ['count' => 0]);
 
         foreach ($votes as $vote) {
             $key = $this->bucketKey(Carbon::parse($vote->created_at), $start, $bucket);
@@ -90,6 +84,15 @@ class FeatureVotesChart extends ChartWidget
             ->where('feature_id', $feature->id)
             ->min('created_at') : null;
 
-        return $earliest ? Carbon::parse($earliest) : $now->copy()->subMonth();
+        if (! $earliest) {
+            return $now->copy()->subMonths(12);
+        }
+
+        $parsed = Carbon::parse($earliest);
+        if ($parsed->year < 2000) {
+            return $now->copy()->subMonths(12);
+        }
+
+        return $this->clampStartDate($parsed, $now);
     }
 }

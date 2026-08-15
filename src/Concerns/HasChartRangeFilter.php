@@ -54,7 +54,47 @@ trait HasChartRangeFilter
 
     protected function allTimeStart(CarbonInterface $now): CarbonInterface
     {
-        return $now->copy()->subMonth();
+        return $now->copy()->subMonths(12);
+    }
+
+    protected function clampStartDate(CarbonInterface $date, CarbonInterface $now, int $maxYearsBack = 5): CarbonInterface
+    {
+        $floor = $now->copy()->subYears($maxYearsBack)->startOfYear();
+
+        if ($date->lt($floor) || $date->year < 2000) {
+            return $floor;
+        }
+
+        return $date;
+    }
+
+    /**
+     * Build time buckets safely with an iteration safeguard to prevent runaway loops.
+     *
+     * @param array<string, mixed> $template
+     * @return array<int, array<string, mixed>>
+     */
+    protected function buildBuckets(
+        CarbonInterface $start,
+        CarbonInterface $end,
+        string $bucket,
+        string $format,
+        array $template = [],
+        int $maxIterations = 500
+    ): array {
+        $buckets = [];
+        $cursor = $start->copy();
+        $iterations = 0;
+
+        while ($cursor->lte($end) && $iterations++ < $maxIterations) {
+            $buckets[$cursor->copy()->getTimestamp()] = array_merge(
+                ['label' => $cursor->format($format)],
+                $template
+            );
+            $cursor = $this->advanceCursor($cursor, $bucket);
+        }
+
+        return $buckets;
     }
 
     protected function advanceCursor(CarbonInterface $cursor, string $bucket): CarbonInterface

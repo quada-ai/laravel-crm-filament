@@ -9,12 +9,22 @@ use VentureDrake\LaravelCrm\Models\PipelineStage;
 
 class DefaultPipeline
 {
+    /** @var array<string, bool> */
+    protected static array $columnsCache = [];
+
+    protected static function hasColumn(string $table, string $column): bool
+    {
+        $key = "{$table}.{$column}";
+
+        return static::$columnsCache[$key] ??= Schema::hasColumn($table, $column);
+    }
+
     public static function ensureFor(string $modelClass): Pipeline
     {
         $table = (new Pipeline)->getTable();
-        $hasModelCol = Schema::hasColumn($table, 'model');
-        $hasDefaultCol = Schema::hasColumn($table, 'default');
-        $hasTeamCol = Schema::hasColumn($table, 'team_id');
+        $hasModelCol = static::hasColumn($table, 'model');
+        $hasDefaultCol = static::hasColumn($table, 'default');
+        $hasTeamCol = static::hasColumn($table, 'team_id');
 
         $teamId = DefaultFieldGroup::resolveCurrentTeamId();
 
