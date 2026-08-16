@@ -26,8 +26,6 @@ class TaxRateResource extends Resource
 
     protected static ?string $model = TaxRate::class;
 
-    protected static bool $isScopedToTenant = false;
-
     protected static ?string $slug = 'tax-rates';
 
     protected static ?string $recordTitleAttribute = 'name';

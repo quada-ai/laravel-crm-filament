@@ -86,6 +86,7 @@ class ProductResource extends Resource
                     ->options(fn () => ProductCategory::query()->orderBy('name')->pluck('name', 'id'))
                     ->searchable()
                     ->preload()
+                    ->nullable()
                     ->createOptionForm([
                         Forms\Components\TextInput::make('name')
                             ->label(__('laravel-crm-filament::labels.fields.name'))
@@ -120,7 +121,8 @@ class ProductResource extends Resource
                     ->label(__('laravel-crm-filament::labels.money.tax_rate'))
                     ->options(fn () => TaxRate::query()->orderBy('name')->pluck('name', 'id'))
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->nullable(),
             ]),
 
             Grid::make(2)->schema([
