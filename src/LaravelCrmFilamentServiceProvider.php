@@ -140,6 +140,24 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
         \VentureDrake\LaravelCrm\Models\DealProduct::saving($sanitizeLineItem);
         \VentureDrake\LaravelCrm\Models\DealProduct::creating($sanitizeLineItem);
 
+        // Prevent TypeError: Unsupported operand types: string / int in core CRM services
+        // (OrderService, QuoteService, InvoiceService, PurchaseOrderService) when tax_rate setting is empty string.
+        \VentureDrake\LaravelCrm\Models\Setting::retrieved(function ($setting) {
+            if ($setting->name === 'tax_rate') {
+                if ($setting->value === '' || $setting->value === null || ! is_numeric($setting->value)) {
+                    $setting->value = '0';
+                }
+            }
+        });
+
+        \VentureDrake\LaravelCrm\Models\Setting::saving(function ($setting) {
+            if ($setting->name === 'tax_rate') {
+                if ($setting->value === '' || $setting->value === null || ! is_numeric($setting->value)) {
+                    $setting->value = '0';
+                }
+            }
+        });
+
         if ($this->app->runningInConsole()) {
             $this->app->booted(function () {
                 if (! $this->app->bound(\Illuminate\Console\Scheduling\Schedule::class)) {
