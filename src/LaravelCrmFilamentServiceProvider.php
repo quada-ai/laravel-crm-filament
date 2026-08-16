@@ -103,6 +103,53 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             }
         });
 
+        // Prevent MySQL 1366 Incorrect decimal value: '' errors triggered by
+        // core observers (e.g. ProductObserver setting tax_rate to empty string from Settings).
+        Product::saving(function ($product) {
+            if ($product->tax_rate === '' || ($product->tax_rate !== null && ! is_numeric($product->tax_rate))) {
+                $product->tax_rate = null;
+            }
+            if ($product->tax_rate_id === '') {
+                $product->tax_rate_id = null;
+            }
+            if ($product->product_category_id === '') {
+                $product->product_category_id = null;
+            }
+            if ($product->user_owner_id === '') {
+                $product->user_owner_id = null;
+            }
+        });
+
+        \VentureDrake\LaravelCrm\Models\QuoteProduct::saving(function ($item) {
+            if ($item->tax_rate === '' || ($item->tax_rate !== null && ! is_numeric($item->tax_rate))) {
+                $item->tax_rate = null;
+            }
+        });
+
+        \VentureDrake\LaravelCrm\Models\OrderProduct::saving(function ($item) {
+            if ($item->tax_rate === '' || ($item->tax_rate !== null && ! is_numeric($item->tax_rate))) {
+                $item->tax_rate = null;
+            }
+        });
+
+        \VentureDrake\LaravelCrm\Models\InvoiceLine::saving(function ($item) {
+            if ($item->tax_rate === '' || ($item->tax_rate !== null && ! is_numeric($item->tax_rate))) {
+                $item->tax_rate = null;
+            }
+        });
+
+        \VentureDrake\LaravelCrm\Models\PurchaseOrderLine::saving(function ($item) {
+            if ($item->tax_rate === '' || ($item->tax_rate !== null && ! is_numeric($item->tax_rate))) {
+                $item->tax_rate = null;
+            }
+        });
+
+        \VentureDrake\LaravelCrm\Models\DealProduct::saving(function ($item) {
+            if ($item->tax_rate === '' || ($item->tax_rate !== null && ! is_numeric($item->tax_rate))) {
+                $item->tax_rate = null;
+            }
+        });
+
         if ($this->app->runningInConsole()) {
             $this->app->booted(function () {
                 if (! $this->app->bound(\Illuminate\Console\Scheduling\Schedule::class)) {
