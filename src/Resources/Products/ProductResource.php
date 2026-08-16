@@ -116,7 +116,16 @@ class ProductResource extends Resource
                     ->label(__('laravel-crm-filament::labels.fields.currency'))
                     ->options(fn () => \VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\currencies())
                     ->searchable()
-                    ->default(config('laravel-crm.default_currency', 'USD')),
+                    ->required()
+                    ->default(function () {
+                        try {
+                            return \VentureDrake\LaravelCrm\Models\Setting::currency()
+                                ?? \VentureDrake\LaravelCrm\Models\Setting::where('name', 'currency')->first()?->value
+                                ?? config('laravel-crm.default_currency', 'USD');
+                        } catch (\Throwable $e) {
+                            return config('laravel-crm.default_currency', 'USD');
+                        }
+                    }),
                 Forms\Components\Select::make('tax_rate_id')
                     ->label(__('laravel-crm-filament::labels.money.tax_rate'))
                     ->options(fn () => TaxRate::query()->orderBy('name')->pluck('name', 'id'))
