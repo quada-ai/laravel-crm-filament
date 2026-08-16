@@ -96,7 +96,7 @@ trait HasOrderConvertToPurchaseOrderAction
     private function resolveSupplierUnitPrice(?int $productId, ?int $orderProductPriceCents): float
     {
         if ($productId && $product = Product::find($productId)) {
-            $price = $product->getDefaultPrice();
+            $price = \VentureDrake\LaravelCrmFilament\Resources\Products\ProductResource::getDefaultPriceRecord($product);
 
             if ($price && $price->cost_per_unit) {
                 return $price->cost_per_unit / 100;

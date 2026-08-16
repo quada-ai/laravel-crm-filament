@@ -6,7 +6,6 @@ use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use VentureDrake\LaravelCrm\Models\Product;
-use VentureDrake\LaravelCrm\Models\TaxRate;
 use VentureDrake\LaravelCrm\Services\ProductService;
 use VentureDrake\LaravelCrmFilament\Resources\Products\ProductResource;
 use VentureDrake\LaravelCrmFilament\Support\FormPayload;
@@ -36,9 +35,26 @@ class EditProduct extends EditRecord
 
         $data['product_category'] = $product->product_category_id;
 
-        $defaultPrice = $product->getDefaultPrice();
+        // Safely get default price — Product::getDefaultPrice() calls
+        // Setting::currency()->value which crashes when no Setting record exists.
+        try {
+            $currency = config('laravel-crm.default_currency', 'USD');
+            $settingModel = \VentureDrake\LaravelCrm\Models\Setting::query()
+                ->where('name', 'currency')
+                ->first();
+            if ($settingModel && $settingModel->value) {
+                $currency = $settingModel->value;
+            }
+
+            $defaultPrice = $product->productPrices()
+                ->where('currency', $currency)
+                ->first();
+        } catch (\Throwable $e) {
+            $defaultPrice = $product->productPrices()->first();
+        }
+
         if ($defaultPrice) {
-            $data['unit_price'] = $defaultPrice->price !== null ? $defaultPrice->price / 100 : null;
+            $data['unit_price'] = $defaultPrice->unit_price !== null ? $defaultPrice->unit_price / 100 : null;
             $data['currency'] = $defaultPrice->currency ?: $data['currency'] ?? config('laravel-crm.default_currency', 'USD');
         }
 
@@ -47,26 +63,7 @@ class EditProduct extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        if (! empty($data['tax_rate_id'])) {
-            $taxRate = TaxRate::find($data['tax_rate_id']);
-            $data['tax_rate'] = $taxRate?->rate;
-        } else {
-            $data['tax_rate_id'] = null;
-            $data['tax_rate'] = null;
-        }
-
-        if (empty($data['product_category'])) {
-            $data['product_category'] = null;
-        }
-
-        if (empty($data['currency'])) {
-            try {
-                $setting = \VentureDrake\LaravelCrm\Models\Setting::where('name', 'currency')->first();
-                $data['currency'] = (string) ($setting?->value ?: config('laravel-crm.default_currency', 'USD'));
-            } catch (\Throwable $e) {
-                $data['currency'] = (string) config('laravel-crm.default_currency', 'USD');
-            }
-        }
+        $data = CreateProduct::sanitizeProductData($data);
 
         /** @var Product $record */
         app(ProductService::class)->update($record, FormPayload::wrap($data));
