@@ -104,8 +104,8 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
         });
 
         // Prevent MySQL 1366 Incorrect decimal value: '' errors triggered by
-        // core observers (e.g. ProductObserver setting tax_rate to empty string from Settings).
-        Product::saving(function ($product) {
+        // core observers (ProductObserver::creating sets tax_rate to empty string from Settings).
+        $sanitizeProduct = function ($product) {
             if ($product->tax_rate === '' || ($product->tax_rate !== null && ! is_numeric($product->tax_rate))) {
                 $product->tax_rate = null;
             }
@@ -118,37 +118,27 @@ class LaravelCrmFilamentServiceProvider extends PackageServiceProvider
             if ($product->user_owner_id === '') {
                 $product->user_owner_id = null;
             }
-        });
+        };
 
-        \VentureDrake\LaravelCrm\Models\QuoteProduct::saving(function ($item) {
+        Product::saving($sanitizeProduct);
+        Product::creating($sanitizeProduct);
+
+        $sanitizeLineItem = function ($item) {
             if ($item->tax_rate === '' || ($item->tax_rate !== null && ! is_numeric($item->tax_rate))) {
                 $item->tax_rate = null;
             }
-        });
+        };
 
-        \VentureDrake\LaravelCrm\Models\OrderProduct::saving(function ($item) {
-            if ($item->tax_rate === '' || ($item->tax_rate !== null && ! is_numeric($item->tax_rate))) {
-                $item->tax_rate = null;
-            }
-        });
-
-        \VentureDrake\LaravelCrm\Models\InvoiceLine::saving(function ($item) {
-            if ($item->tax_rate === '' || ($item->tax_rate !== null && ! is_numeric($item->tax_rate))) {
-                $item->tax_rate = null;
-            }
-        });
-
-        \VentureDrake\LaravelCrm\Models\PurchaseOrderLine::saving(function ($item) {
-            if ($item->tax_rate === '' || ($item->tax_rate !== null && ! is_numeric($item->tax_rate))) {
-                $item->tax_rate = null;
-            }
-        });
-
-        \VentureDrake\LaravelCrm\Models\DealProduct::saving(function ($item) {
-            if ($item->tax_rate === '' || ($item->tax_rate !== null && ! is_numeric($item->tax_rate))) {
-                $item->tax_rate = null;
-            }
-        });
+        \VentureDrake\LaravelCrm\Models\QuoteProduct::saving($sanitizeLineItem);
+        \VentureDrake\LaravelCrm\Models\QuoteProduct::creating($sanitizeLineItem);
+        \VentureDrake\LaravelCrm\Models\OrderProduct::saving($sanitizeLineItem);
+        \VentureDrake\LaravelCrm\Models\OrderProduct::creating($sanitizeLineItem);
+        \VentureDrake\LaravelCrm\Models\InvoiceLine::saving($sanitizeLineItem);
+        \VentureDrake\LaravelCrm\Models\InvoiceLine::creating($sanitizeLineItem);
+        \VentureDrake\LaravelCrm\Models\PurchaseOrderLine::saving($sanitizeLineItem);
+        \VentureDrake\LaravelCrm\Models\PurchaseOrderLine::creating($sanitizeLineItem);
+        \VentureDrake\LaravelCrm\Models\DealProduct::saving($sanitizeLineItem);
+        \VentureDrake\LaravelCrm\Models\DealProduct::creating($sanitizeLineItem);
 
         if ($this->app->runningInConsole()) {
             $this->app->booted(function () {
