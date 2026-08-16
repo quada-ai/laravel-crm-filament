@@ -117,13 +117,12 @@ class ProductResource extends Resource
                     ->options(fn () => \VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\currencies())
                     ->searchable()
                     ->required()
-                    ->default(function () {
+                    ->default(function (): string {
                         try {
-                            return \VentureDrake\LaravelCrm\Models\Setting::currency()
-                                ?? \VentureDrake\LaravelCrm\Models\Setting::where('name', 'currency')->first()?->value
-                                ?? config('laravel-crm.default_currency', 'USD');
+                            $setting = \VentureDrake\LaravelCrm\Models\Setting::where('name', 'currency')->first();
+                            return (string) ($setting?->value ?: config('laravel-crm.default_currency', 'USD'));
                         } catch (\Throwable $e) {
-                            return config('laravel-crm.default_currency', 'USD');
+                            return (string) config('laravel-crm.default_currency', 'USD');
                         }
                     }),
                 Forms\Components\Select::make('tax_rate_id')

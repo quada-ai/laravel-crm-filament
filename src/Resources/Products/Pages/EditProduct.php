@@ -61,11 +61,10 @@ class EditProduct extends EditRecord
 
         if (empty($data['currency'])) {
             try {
-                $data['currency'] = \VentureDrake\LaravelCrm\Models\Setting::currency()
-                    ?? \VentureDrake\LaravelCrm\Models\Setting::where('name', 'currency')->first()?->value
-                    ?? config('laravel-crm.default_currency', 'USD');
+                $setting = \VentureDrake\LaravelCrm\Models\Setting::where('name', 'currency')->first();
+                $data['currency'] = (string) ($setting?->value ?: config('laravel-crm.default_currency', 'USD'));
             } catch (\Throwable $e) {
-                $data['currency'] = config('laravel-crm.default_currency', 'USD');
+                $data['currency'] = (string) config('laravel-crm.default_currency', 'USD');
             }
         }
 
