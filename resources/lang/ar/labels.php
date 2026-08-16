@@ -17,6 +17,8 @@ return [
         'number' => 'الرقم',
         'reference' => 'المرجع',
         'currency' => 'العملة',
+        'purchase_account' => 'حساب المشتريات',
+        'sales_account' => 'حساب المبيعات',
         'name' => 'الاسم',
         'description' => 'الوصف',
         'file' => 'الملف',

@@ -33,6 +33,8 @@ class EditProduct extends EditRecord
         /** @var Product $product */
         $product = $this->record;
 
+        $data['product_category'] = $product->product_category_id;
+
         $defaultPrice = $product->getDefaultPrice();
         if ($defaultPrice) {
             $data['unit_price'] = $defaultPrice->price !== null ? $defaultPrice->price / 100 : null;

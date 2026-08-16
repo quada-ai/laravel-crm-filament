@@ -16,6 +16,8 @@ return [
         'number' => 'Número',
         'reference' => 'Referencia',
         'currency' => 'Moneda',
+        'purchase_account' => 'Cuenta de compras',
+        'sales_account' => 'Cuenta de ventas',
         'name' => 'Nombre',
         'description' => 'Descripción',
         'file' => 'Archivo',

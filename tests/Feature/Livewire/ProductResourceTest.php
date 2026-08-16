@@ -47,3 +47,22 @@ it('persists a new Product to the database', function () {
 it('routes Product records by external_id', function () {
     expect(ProductResource::getRecordRouteKeyName())->toBe('external_id');
 });
+
+it('wires a product_category Select onto the Product form', function () {
+    $source = file_get_contents((new ReflectionClass(ProductResource::class))->getFileName());
+    expect($source)->toContain("Forms\\Components\\Select::make('product_category')");
+    expect($source)->toContain('ProductCategory::query()');
+});
+
+it('wires a currency Select onto the Product form', function () {
+    $source = file_get_contents((new ReflectionClass(ProductResource::class))->getFileName());
+    expect($source)->toContain("Forms\\Components\\Select::make('currency')");
+    expect($source)->toContain('SelectOptions\currencies()');
+});
+
+it('populates product_category on the EditProduct form before fill', function () {
+    $source = file_get_contents((new ReflectionClass(\VentureDrake\LaravelCrmFilament\Resources\Products\Pages\EditProduct::class))->getFileName());
+    expect($source)->toContain("\$data['product_category'] = \$product->product_category_id;");
+});
+
+

@@ -48,7 +48,7 @@ it('Details section contains the ten TextEntries in screenshot order', function 
         "TextEntry::make('description')",
         '->columnSpanFull()',
         "TextEntry::make('ownerUser.name')",
-        "->placeholder('Unallocated')",
+        "labels.misc.unallocated",
     ];
 
     $cursor = 0;

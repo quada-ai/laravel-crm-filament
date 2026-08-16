@@ -14,7 +14,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Ramsey\Uuid\Uuid;
 use VentureDrake\LaravelCrm\Models\Product;
+use VentureDrake\LaravelCrm\Models\ProductCategory;
 use VentureDrake\LaravelCrm\Models\TaxRate;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFieldEntries;
 use VentureDrake\LaravelCrmFilament\Concerns\HasCrmCustomFields;
@@ -67,6 +69,7 @@ class ProductResource extends Resource
         $components = [
             Grid::make(2)->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label(__('laravel-crm-filament::labels.fields.name'))
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('code')
@@ -78,9 +81,29 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('barcode')
                     ->label(__('laravel-crm-filament::labels.money.barcode'))
                     ->maxLength(100),
-                Forms\Components\TextInput::make('product_category')
-                    ->maxLength(255),
+                Forms\Components\Select::make('product_category')
+                    ->label(__('laravel-crm-filament::labels.fields.category'))
+                    ->options(fn () => ProductCategory::query()->orderBy('name')->pluck('name', 'id'))
+                    ->searchable()
+                    ->preload()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('laravel-crm-filament::labels.fields.name'))
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('description')
+                            ->label(__('laravel-crm-filament::labels.fields.description'))
+                            ->rows(2),
+                    ])
+                    ->createOptionUsing(function (array $data): int {
+                        return ProductCategory::create([
+                            'external_id' => (string) Uuid::uuid4(),
+                            'name' => $data['name'],
+                            'description' => $data['description'] ?? null,
+                        ])->id;
+                    }),
                 Forms\Components\TextInput::make('unit')
+                    ->label(__('laravel-crm-filament::labels.fields.unit'))
                     ->maxLength(50),
             ]),
 
@@ -88,23 +111,29 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('unit_price')
                     ->label(__('laravel-crm-filament::labels.money.unit_price'))
                     ->numeric(),
-                Forms\Components\TextInput::make('currency')
-                    ->maxLength(3)
+                Forms\Components\Select::make('currency')
+                    ->label(__('laravel-crm-filament::labels.fields.currency'))
+                    ->options(fn () => \VentureDrake\LaravelCrm\Http\Helpers\SelectOptions\currencies())
+                    ->searchable()
                     ->default(config('laravel-crm.default_currency', 'USD')),
                 Forms\Components\Select::make('tax_rate_id')
                     ->label(__('laravel-crm-filament::labels.money.tax_rate'))
                     ->options(fn () => TaxRate::query()->orderBy('name')->pluck('name', 'id'))
-                    ->searchable(),
+                    ->searchable()
+                    ->preload(),
             ]),
 
             Grid::make(2)->schema([
                 Forms\Components\TextInput::make('purchase_account')
+                    ->label(__('laravel-crm-filament::labels.fields.purchase_account'))
                     ->maxLength(50),
                 Forms\Components\TextInput::make('sales_account')
+                    ->label(__('laravel-crm-filament::labels.fields.sales_account'))
                     ->maxLength(50),
             ]),
 
             Forms\Components\Textarea::make('description')
+                ->label(__('laravel-crm-filament::labels.fields.description'))
                 ->rows(3)
                 ->columnSpanFull(),
 
@@ -137,6 +166,7 @@ class ProductResource extends Resource
             ]))
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('laravel-crm-filament::labels.fields.name'))
                     ->sortable()
                     ->searchable(),
 
@@ -184,6 +214,7 @@ class ProductResource extends Resource
                     ->toggleable(),
 
                 Tables\Columns\IconColumn::make('active')
+                    ->label(__('laravel-crm-filament::labels.fields.active'))
                     ->boolean()
                     ->toggleable(),
 
@@ -238,26 +269,35 @@ class ProductResource extends Resource
                     TextEntry::make('code')
                         ->label(__('laravel-crm-filament::labels.money.sku')),
 
-                    TextEntry::make('barcode'),
+                    TextEntry::make('barcode')
+                        ->label(__('laravel-crm-filament::labels.money.barcode')),
 
-                    TextEntry::make('purchase_account'),
+                    TextEntry::make('purchase_account')
+                        ->label(__('laravel-crm-filament::labels.fields.purchase_account')),
 
-                    TextEntry::make('sales_account'),
+                    TextEntry::make('sales_account')
+                        ->label(__('laravel-crm-filament::labels.fields.sales_account')),
 
-                    TextEntry::make('unit'),
+                    TextEntry::make('unit')
+                        ->label(__('laravel-crm-filament::labels.fields.unit')),
 
-                    TextEntry::make('taxRate.name'),
+                    TextEntry::make('taxRate.name')
+                        ->label(__('laravel-crm-filament::labels.money.tax')),
 
                     TextEntry::make('taxRate.rate')
+                        ->label(__('laravel-crm-filament::labels.money.tax_rate'))
                         ->suffix('%'),
 
-                    TextEntry::make('productCategory.name'),
+                    TextEntry::make('productCategory.name')
+                        ->label(__('laravel-crm-filament::labels.fields.category')),
 
                     TextEntry::make('description')
+                        ->label(__('laravel-crm-filament::labels.fields.description'))
                         ->columnSpanFull(),
 
                     TextEntry::make('ownerUser.name')
-                        ->placeholder('Unallocated'),
+                        ->label(__('laravel-crm-filament::labels.fields.owner'))
+                        ->placeholder(__('laravel-crm-filament::labels.misc.unallocated')),
                 ], $record ? static::crmCustomFieldEntries($record, false) : [])),
 
             Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))

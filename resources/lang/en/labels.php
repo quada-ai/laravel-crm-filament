@@ -17,6 +17,8 @@ return [
         'number' => 'Number',
         'reference' => 'Reference',
         'currency' => 'Currency',
+        'purchase_account' => 'Purchase account',
+        'sales_account' => 'Sales account',
         'name' => 'Name',
         'description' => 'Description',
         'file' => 'File',
