@@ -30,8 +30,6 @@ class PipelineStageResource extends Resource
 
     protected static ?string $model = PipelineStage::class;
 
-    protected static bool $isScopedToTenant = false;
-
     protected static ?string $slug = 'pipeline-stages';
 
     protected static ?string $recordTitleAttribute = 'name';

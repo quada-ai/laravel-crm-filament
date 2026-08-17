@@ -27,8 +27,6 @@ class LeadStatusResource extends Resource
 
     protected static ?string $model = LeadStatus::class;
 
-    protected static bool $isScopedToTenant = false;
-
     protected static ?string $slug = 'lead-statuses';
 
     protected static ?string $recordTitleAttribute = 'name';

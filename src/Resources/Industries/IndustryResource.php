@@ -24,9 +24,23 @@ class IndustryResource extends Resource
 
     protected static ?string $model = Industry::class;
 
-    protected static bool $isScopedToTenant = false;
-
     protected static ?string $slug = 'industries';
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if ($tenant = \Filament\Facades\Filament::getTenant()) {
+            $model = $query->getModel();
+            if (\Illuminate\Support\Facades\Schema::hasColumn($model->getTable(), 'tenant_id')) {
+                $query->where($model->getTable() . '.tenant_id', $tenant->getKey());
+            } elseif (\Illuminate\Support\Facades\Schema::hasColumn($model->getTable(), 'team_id')) {
+                $query->where($model->getTable() . '.team_id', $tenant->getKey());
+            }
+        }
+
+        return $query;
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

@@ -34,7 +34,28 @@ class UserResource extends Resource
 
     protected static ?string $slug = 'users';
 
-    protected static bool $isScopedToTenant = false;
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if ($tenant = \Filament\Facades\Filament::getTenant()) {
+            if (method_exists($tenant, 'users')) {
+                return $tenant->users()->getQuery();
+            }
+
+            $model = $query->getModel();
+            $table = $model->getTable();
+            if (\Illuminate\Support\Facades\Schema::hasColumn($table, 'tenant_id')) {
+                $query->where($table . '.tenant_id', $tenant->getKey());
+            } elseif (\Illuminate\Support\Facades\Schema::hasColumn($table, 'team_id')) {
+                $query->where($table . '.team_id', $tenant->getKey());
+            } elseif (\Illuminate\Support\Facades\Schema::hasColumn($table, 'current_crm_team_id')) {
+                $query->where($table . '.current_crm_team_id', $tenant->getKey());
+            }
+        }
+
+        return $query;
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

@@ -39,6 +39,8 @@ trait UsesExternalIdRouting
             $model = $query->getModel();
             if (\Illuminate\Support\Facades\Schema::hasColumn($model->getTable(), 'tenant_id')) {
                 $query->where($model->getTable() . '.tenant_id', $tenant->getKey());
+            } elseif (\Illuminate\Support\Facades\Schema::hasColumn($model->getTable(), 'team_id')) {
+                $query->where($model->getTable() . '.team_id', $tenant->getKey());
             }
         }
 

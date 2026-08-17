@@ -33,6 +33,18 @@ class CreateUser extends CreateRecord
         $this->phonesPayload = $data['phones'] ?? [];
         $this->addressesPayload = $data['addresses'] ?? [];
 
+        if ($tenant = \Filament\Facades\Filament::getTenant()) {
+            $model = static::getModel();
+            $table = (new $model)->getTable();
+            if (\Illuminate\Support\Facades\Schema::hasColumn($table, 'tenant_id')) {
+                $data['tenant_id'] ??= $tenant->getKey();
+            } elseif (\Illuminate\Support\Facades\Schema::hasColumn($table, 'team_id')) {
+                $data['team_id'] ??= $tenant->getKey();
+            } elseif (\Illuminate\Support\Facades\Schema::hasColumn($table, 'current_crm_team_id')) {
+                $data['current_crm_team_id'] ??= $tenant->getKey();
+            }
+        }
+
         unset($data['role_id'], $data['crm_team_ids'], $data['phones'], $data['addresses']);
 
         return $data;
@@ -51,6 +63,16 @@ class CreateUser extends CreateRecord
 
         if (method_exists($record, 'crmTeams')) {
             $record->crmTeams()->sync($this->crmTeamIds);
+        }
+
+        if ($tenant = \Filament\Facades\Filament::getTenant()) {
+            if (method_exists($tenant, 'users') && method_exists($tenant->users(), 'attach')) {
+                try {
+                    $tenant->users()->syncWithoutDetaching([$record->getKey()]);
+                } catch (\Throwable) {
+                    // Ignore if not pivot-based
+                }
+            }
         }
 
         UserResource::syncMorphRows($record, 'phones', $this->phonesPayload, Phone::class, ['number', 'type']);
