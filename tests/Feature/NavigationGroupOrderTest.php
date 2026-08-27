@@ -18,7 +18,7 @@ it('pins the navigation group order end-to-end on the panel', function () {
         fn ($group) => $group instanceof \Filament\Navigation\NavigationGroup ? $group->getLabel() : $group,
         array_values($groups),
     );
-    expect($labels)->toBe(['Activity', 'Marketing', 'Sales', 'Contacts', 'Roadmap', 'Monitoring', 'Catalog', 'Settings']);
+    expect($labels)->toBe(['Sales', 'Contacts', 'Activity', 'Marketing', 'Catalog', 'Monitoring', 'Roadmap', 'Integrations', 'Settings']);
 });
 
 it('resolves translated navigation group order when switching to arabic locale', function () {
@@ -34,7 +34,7 @@ it('resolves translated navigation group order when switching to arabic locale',
         array_values($groups),
     );
 
-    expect($labels)->toBe(['النشاط', 'التسويق', 'المبيعات', 'جهات الاتصال', 'خارطة الطريق', 'المراقبة', 'الكتالوج', 'الإعدادات']);
+    expect($labels)->toBe(['المبيعات', 'جهات الاتصال', 'النشاط', 'التسويق', 'الكتالوج', 'المراقبة', 'خارطة الطريق', 'التكاملات', 'الإعدادات']);
 });
 
 it('declares the navigationGroups call in LaravelCrmPlugin source', function () {

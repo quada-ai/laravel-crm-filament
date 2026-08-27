@@ -437,16 +437,19 @@ class LaravelCrmPlugin implements Plugin
 
         // Pin the visible nav-group order end-to-end. Any groups not listed here
         // (e.g. Integrations from the Xero mirrors) render after the pinned sequence.
-        $panel->navigationGroups([
-            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.activity')),
-            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.marketing')),
-            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.sales')),
-            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.contacts')),
-            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.roadmap')),
-            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.monitoring')),
-            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.catalog')),
-            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.settings')),
-        ]);
+        if (empty($panel->getNavigationGroups())) {
+            $panel->navigationGroups([
+                NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.sales')),
+                NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.contacts')),
+                NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.activity')),
+                NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.marketing')),
+                NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.catalog')),
+                NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.monitoring')),
+                NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.roadmap')),
+                NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.integrations')),
+                NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.settings')),
+            ]);
+        }
 
         $pages = $this->customPages ?? [
             ActivityFeed::class,
