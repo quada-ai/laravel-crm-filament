@@ -3,6 +3,7 @@
 namespace VentureDrake\LaravelCrmFilament;
 
 use Filament\Contracts\Plugin;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use VentureDrake\LaravelCrmFilament\Pages\ActivityFeed;
 use VentureDrake\LaravelCrmFilament\Pages\CalendarPage;
@@ -437,14 +438,14 @@ class LaravelCrmPlugin implements Plugin
         // Pin the visible nav-group order end-to-end. Any groups not listed here
         // (e.g. Integrations from the Xero mirrors) render after the pinned sequence.
         $panel->navigationGroups([
-            __('laravel-crm-filament::labels.navigation.groups.activity'),
-            __('laravel-crm-filament::labels.navigation.groups.marketing'),
-            __('laravel-crm-filament::labels.navigation.groups.sales'),
-            __('laravel-crm-filament::labels.navigation.groups.contacts'),
-            __('laravel-crm-filament::labels.navigation.groups.roadmap'),
-            __('laravel-crm-filament::labels.navigation.groups.monitoring'),
-            __('laravel-crm-filament::labels.navigation.groups.catalog'),
-            __('laravel-crm-filament::labels.navigation.groups.settings'),
+            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.activity')),
+            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.marketing')),
+            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.sales')),
+            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.contacts')),
+            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.roadmap')),
+            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.monitoring')),
+            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.catalog')),
+            NavigationGroup::make()->label(fn () => __('laravel-crm-filament::labels.navigation.groups.settings')),
         ]);
 
         $pages = $this->customPages ?? [

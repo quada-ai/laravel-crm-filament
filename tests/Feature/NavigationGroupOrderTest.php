@@ -14,21 +14,41 @@ it('pins the navigation group order end-to-end on the panel', function () {
     $groups = $panel->getNavigationGroups();
 
     expect($groups)->toBeArray();
-    expect(array_values($groups))->toBe(['Activity', 'Marketing', 'Sales', 'Contacts', 'Roadmap', 'Monitoring', 'Catalog', 'Settings']);
+    $labels = array_map(
+        fn ($group) => $group instanceof \Filament\Navigation\NavigationGroup ? $group->getLabel() : $group,
+        array_values($groups),
+    );
+    expect($labels)->toBe(['Activity', 'Marketing', 'Sales', 'Contacts', 'Roadmap', 'Monitoring', 'Catalog', 'Settings']);
+});
+
+it('resolves translated navigation group order when switching to arabic locale', function () {
+    $plugin = LaravelCrmPlugin::make();
+    $panel = Panel::make()->id('nav-group-order-ar')->default();
+    $plugin->register($panel);
+
+    app()->setLocale('ar');
+
+    $groups = $panel->getNavigationGroups();
+    $labels = array_map(
+        fn ($group) => $group instanceof \Filament\Navigation\NavigationGroup ? $group->getLabel() : $group,
+        array_values($groups),
+    );
+
+    expect($labels)->toBe(['النشاط', 'التسويق', 'المبيعات', 'جهات الاتصال', 'خارطة الطريق', 'المراقبة', 'الكتالوج', 'الإعدادات']);
 });
 
 it('declares the navigationGroups call in LaravelCrmPlugin source', function () {
     $source = file_get_contents((new ReflectionClass(LaravelCrmPlugin::class))->getFileName());
 
     expect($source)->toContain('$panel->navigationGroups([')
-        ->toContain("'Activity',")
-        ->toContain("'Marketing',")
-        ->toContain("'Sales',")
-        ->toContain("'Contacts',")
-        ->toContain("'Roadmap',")
-        ->toContain("'Monitoring',")
-        ->toContain("'Catalog',")
-        ->toContain("'Settings',");
+        ->toContain('navigation.groups.activity')
+        ->toContain('navigation.groups.marketing')
+        ->toContain('navigation.groups.sales')
+        ->toContain('navigation.groups.contacts')
+        ->toContain('navigation.groups.roadmap')
+        ->toContain('navigation.groups.monitoring')
+        ->toContain('navigation.groups.catalog')
+        ->toContain('navigation.groups.settings');
 });
 
 it('does not call discoverClusters in LaravelCrmPlugin source (regression guard)', function () {
