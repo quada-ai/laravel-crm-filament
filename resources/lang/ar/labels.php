@@ -679,6 +679,13 @@ return [
     // Pipeline stages
     'stages' => [
         'lead_in' => 'عميل محتمل وارد',
+        'contacted' => 'تم التواصل',
+        'new' => 'جديد',
+        'appointment_scheduled' => 'تمت جدولة موعد',
+        'qualified_to_buy' => 'مؤهل للشراء',
+        'presentation_scheduled' => 'تمت جدولة عرض تقديمي',
+        'decision_maker_bought_in' => 'موافقة صاحب القرار',
+        'contract_sent' => 'تم إرسال العقد',
         'pending' => 'قيد الانتظار',
         'prospect' => 'عميل محتمل',
         'qualified' => 'مؤهل',
@@ -693,7 +700,12 @@ return [
         'accepted' => 'مقبول',
         'declined' => 'مرفوض',
         'paid' => 'مدفوع',
+        'overdue' => 'متأخرة',
         'complete' => 'مكتمل',
+        'in_progress' => 'قيد التنفيذ',
+        'in_transit' => 'قيد النقل',
+        'delivered' => 'تم التوصيل',
+        'received' => 'تم الاستلام',
         'cancelled' => 'ملغى',
     ],
 

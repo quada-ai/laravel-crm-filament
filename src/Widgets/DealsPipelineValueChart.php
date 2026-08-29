@@ -33,27 +33,12 @@ class DealsPipelineValueChart extends ChartWidget
 
     protected function getData(): array
     {
-        $pipelineIds = Pipeline::query()
-            ->whereIn('model', [Deal::class, 'Deal', 'deal'])
-            ->pluck('id');
-
-        if ($pipelineIds->isEmpty()) {
-            $defaultPipeline = DefaultPipeline::ensureFor(Deal::class);
-            $pipelineIds = collect([$defaultPipeline->id]);
-        }
+        $pipeline = DefaultPipeline::ensureFor(Deal::class);
 
         $stages = PipelineStage::query()
-            ->whereIn('pipeline_id', $pipelineIds)
+            ->where('pipeline_id', $pipeline->id)
             ->orderBy('order')
             ->get();
-
-        if ($stages->isEmpty()) {
-            $defaultPipeline = DefaultPipeline::ensureFor(Deal::class);
-            $stages = PipelineStage::query()
-                ->where('pipeline_id', $defaultPipeline->id)
-                ->orderBy('order')
-                ->get();
-        }
 
         $values = $stages->map(function ($stage) {
             $sumCents = (int) Deal::query()
@@ -65,7 +50,7 @@ class DealsPipelineValueChart extends ChartWidget
         })->all();
 
         $labels = $stages->map(function ($stage) {
-            $key = 'laravel-crm-filament::labels.stages.' . Str::snake($stage->name);
+            $key = 'laravel-crm-filament::labels.stages.' . Str::snake(str_replace('-', ' ', $stage->name));
             $trans = __($key);
 
             return ($trans !== $key) ? $trans : __($stage->name);

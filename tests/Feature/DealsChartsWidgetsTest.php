@@ -234,10 +234,11 @@ it('LeadsByStageChart getData() filters stages to Lead pipeline and prevents dup
         ->and($data['datasets'][0]['label'])->toBe(__('laravel-crm-filament::labels.dashboard.open_leads'));
 });
 
-it('LeadsByStageChart translates stage labels when locale is changed', function () {
+it('LeadsByStageChart translates stage labels including Contacted when locale is changed', function () {
     $leadPipeline = Pipeline::create(['name' => 'Lead Pipeline', 'model' => Lead::class, 'order' => 0]);
     PipelineStage::create(['name' => 'Lead In', 'pipeline_id' => $leadPipeline->id, 'order' => 1]);
-    PipelineStage::create(['name' => 'Pending', 'pipeline_id' => $leadPipeline->id, 'order' => 2]);
+    PipelineStage::create(['name' => 'Contacted', 'pipeline_id' => $leadPipeline->id, 'order' => 2]);
+    PipelineStage::create(['name' => 'Pending', 'pipeline_id' => $leadPipeline->id, 'order' => 3]);
 
     app()->setLocale('ar');
 
@@ -245,7 +246,31 @@ it('LeadsByStageChart translates stage labels when locale is changed', function 
     $method->setAccessible(true);
     $data = $method->invoke(new \VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart);
 
-    expect($data['labels'])->toBe(['عميل محتمل وارد', 'قيد الانتظار']);
+    expect($data['labels'])->toBe(['عميل محتمل وارد', 'تم التواصل', 'قيد الانتظار']);
 
     app()->setLocale('en');
+});
+
+it('LeadsByStageChart attributes unassigned leads to default stage and configures integer Y-axis scale', function () {
+    $leadPipeline = Pipeline::create(['name' => 'Lead Pipeline', 'model' => Lead::class, 'order' => 0]);
+    $stageA = PipelineStage::create(['name' => 'Lead In', 'pipeline_id' => $leadPipeline->id, 'order' => 1]);
+    $stageB = PipelineStage::create(['name' => 'Contacted', 'pipeline_id' => $leadPipeline->id, 'order' => 2]);
+
+    Lead::create(['title' => 'L_null', 'pipeline_stage_id' => null]);
+    Lead::create(['title' => 'L_unmapped', 'pipeline_stage_id' => 99999]);
+    Lead::create(['title' => 'L_contacted', 'pipeline_stage_id' => $stageB->id]);
+
+    $dataMethod = new ReflectionMethod(\VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart::class, 'getData');
+    $dataMethod->setAccessible(true);
+    $data = $dataMethod->invoke(new \VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart);
+
+    // Both null and unmapped fall into default stage (Lead In) -> 2, Contacted -> 1
+    expect($data['datasets'][0]['data'])->toBe([2, 1]);
+
+    $optsMethod = new ReflectionMethod(\VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart::class, 'getOptions');
+    $optsMethod->setAccessible(true);
+    $options = $optsMethod->invoke(new \VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart);
+
+    expect($options['scales']['y']['ticks']['precision'])->toBe(0)
+        ->and($options['scales']['y']['beginAtZero'])->toBeTrue();
 });

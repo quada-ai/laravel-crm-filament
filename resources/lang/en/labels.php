@@ -679,6 +679,13 @@ return [
     // Pipeline stages
     'stages' => [
         'lead_in' => 'Lead In',
+        'contacted' => 'Contacted',
+        'new' => 'New',
+        'appointment_scheduled' => 'Appointment Scheduled',
+        'qualified_to_buy' => 'Qualified to Buy',
+        'presentation_scheduled' => 'Presentation Scheduled',
+        'decision_maker_bought_in' => 'Decision Maker Bought-In',
+        'contract_sent' => 'Contract Sent',
         'pending' => 'Pending',
         'prospect' => 'Prospect',
         'qualified' => 'Qualified',
@@ -693,7 +700,12 @@ return [
         'accepted' => 'Accepted',
         'declined' => 'Declined',
         'paid' => 'Paid',
+        'overdue' => 'Overdue',
         'complete' => 'Complete',
+        'in_progress' => 'In Progress',
+        'in_transit' => 'In Transit',
+        'delivered' => 'Delivered',
+        'received' => 'Received',
         'cancelled' => 'Cancelled',
     ],
 

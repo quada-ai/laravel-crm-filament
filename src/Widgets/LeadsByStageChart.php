@@ -20,37 +20,34 @@ class LeadsByStageChart extends ChartWidget
 
     protected function getData(): array
     {
-        $pipelineIds = Pipeline::query()
-            ->whereIn('model', [Lead::class, 'Lead', 'lead'])
-            ->pluck('id');
-
-        if ($pipelineIds->isEmpty()) {
-            $defaultPipeline = DefaultPipeline::ensureFor(Lead::class);
-            $pipelineIds = collect([$defaultPipeline->id]);
-        }
+        $pipeline = DefaultPipeline::ensureFor(Lead::class);
 
         $stages = PipelineStage::query()
-            ->whereIn('pipeline_id', $pipelineIds)
+            ->where('pipeline_id', $pipeline->id)
             ->orderBy('order')
             ->get();
 
-        if ($stages->isEmpty()) {
-            $defaultPipeline = DefaultPipeline::ensureFor(Lead::class);
-            $stages = PipelineStage::query()
-                ->where('pipeline_id', $defaultPipeline->id)
-                ->orderBy('order')
-                ->get();
+        $stageIds = $stages->pluck('id')->all();
+        $defaultStageId = $stages->first()?->id;
+
+        $leads = Lead::query()
+            ->whereNull('converted_at')
+            ->get(['id', 'pipeline_stage_id']);
+
+        $counts = [];
+        foreach ($leads as $lead) {
+            $stageId = $lead->pipeline_stage_id;
+            if (! $stageId || ! in_array($stageId, $stageIds)) {
+                $stageId = $defaultStageId;
+            }
+
+            if ($stageId) {
+                $counts[$stageId] = ($counts[$stageId] ?? 0) + 1;
+            }
         }
 
-        $counts = Lead::query()
-            ->whereNull('converted_at')
-            ->whereIn('pipeline_stage_id', $stages->pluck('id'))
-            ->selectRaw('pipeline_stage_id, COUNT(*) as total')
-            ->groupBy('pipeline_stage_id')
-            ->pluck('total', 'pipeline_stage_id');
-
         $labels = $stages->map(function ($stage) {
-            $key = 'laravel-crm-filament::labels.stages.' . Str::snake($stage->name);
+            $key = 'laravel-crm-filament::labels.stages.' . Str::snake(str_replace('-', ' ', $stage->name));
             $trans = __($key);
 
             return ($trans !== $key) ? $trans : __($stage->name);
@@ -71,5 +68,20 @@ class LeadsByStageChart extends ChartWidget
     protected function getType(): string
     {
         return 'bar';
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                    'ticks' => [
+                        'precision' => 0,
+                        'stepSize' => 1,
+                    ],
+                ],
+            ],
+        ];
     }
 }
