@@ -3,8 +3,11 @@
 namespace VentureDrake\LaravelCrmFilament\Widgets;
 
 use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Str;
 use VentureDrake\LaravelCrm\Models\Deal;
+use VentureDrake\LaravelCrm\Models\Pipeline;
 use VentureDrake\LaravelCrm\Models\PipelineStage;
+use VentureDrake\LaravelCrmFilament\Support\DefaultPipeline;
 
 class DealsPipelineValueChart extends ChartWidget
 {
@@ -30,7 +33,27 @@ class DealsPipelineValueChart extends ChartWidget
 
     protected function getData(): array
     {
-        $stages = PipelineStage::query()->orderBy('order')->get();
+        $pipelineIds = Pipeline::query()
+            ->whereIn('model', [Deal::class, 'Deal', 'deal'])
+            ->pluck('id');
+
+        if ($pipelineIds->isEmpty()) {
+            $defaultPipeline = DefaultPipeline::ensureFor(Deal::class);
+            $pipelineIds = collect([$defaultPipeline->id]);
+        }
+
+        $stages = PipelineStage::query()
+            ->whereIn('pipeline_id', $pipelineIds)
+            ->orderBy('order')
+            ->get();
+
+        if ($stages->isEmpty()) {
+            $defaultPipeline = DefaultPipeline::ensureFor(Deal::class);
+            $stages = PipelineStage::query()
+                ->where('pipeline_id', $defaultPipeline->id)
+                ->orderBy('order')
+                ->get();
+        }
 
         $values = $stages->map(function ($stage) {
             $sumCents = (int) Deal::query()
@@ -41,6 +64,13 @@ class DealsPipelineValueChart extends ChartWidget
             return $sumCents / 100;
         })->all();
 
+        $labels = $stages->map(function ($stage) {
+            $key = 'laravel-crm-filament::labels.stages.' . Str::snake($stage->name);
+            $trans = __($key);
+
+            return ($trans !== $key) ? $trans : __($stage->name);
+        })->all();
+
         return [
             'datasets' => [
                 [
@@ -49,7 +79,7 @@ class DealsPipelineValueChart extends ChartWidget
                     'backgroundColor' => '#05b3a9',
                 ],
             ],
-            'labels' => $stages->pluck('name')->all(),
+            'labels' => $labels,
         ];
     }
 

@@ -71,7 +71,7 @@ class OrderResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'order_id';
 
-    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?int $navigationSort = 51;
 
@@ -100,7 +100,7 @@ class OrderResource extends Resource
             'stage' => false,
             'owner' => true,
             'labels' => true,
-            'labelsField' => fn () => static::labelsField(),
+            'labelsField' => fn() => static::labelsField(),
             'customFields' => static::crmCustomFieldsSection(Order::class),
         ]);
 
@@ -145,7 +145,7 @@ class OrderResource extends Resource
 
                 Tables\Columns\TextColumn::make('quote.quote_id')
                     ->label(__('laravel-crm-filament::labels.money.quote'))
-                    ->url(fn ($record) => $record->quote
+                    ->url(fn($record) => $record->quote
                         ? QuoteResource::getUrl('view', ['record' => $record->quote])
                         : null)
                     ->color('primary')
@@ -166,19 +166,19 @@ class OrderResource extends Resource
 
                 Tables\Columns\TextColumn::make('subtotal')
                     ->label(__('laravel-crm-filament::labels.money.subtotal'))
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('tax')
                     ->label(__('laravel-crm-filament::labels.money.tax'))
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('laravel-crm-filament::labels.money.total'))
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
@@ -191,14 +191,17 @@ class OrderResource extends Resource
                 Tables\Filters\SelectFilter::make('user_owner_id')
                     ->label(__('laravel-crm-filament::labels.fields.owner'))
                     ->multiple()
-                    ->options(fn () => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
+                    ->options(fn() => \VentureDrake\LaravelCrmFilament\Support\UserOptions::get())
                     ->searchable()
                     ->preload(),
 
                 Tables\Filters\SelectFilter::make('labels')
                     ->label(__('laravel-crm-filament::labels.fields.labels'))
                     ->multiple()
-                    ->options(fn () => \VentureDrake\LaravelCrm\Models\Label::pluck('name', 'id'))->query(function ($query, array $data) { if (empty($data['values'])) return $query; return $query->whereHas('labels', fn ($q) => $q->whereIn('crm_labels.id', $data['values'])); })
+                    ->options(fn() => \VentureDrake\LaravelCrm\Models\Label::pluck('name', 'id'))->query(function ($query, array $data) {
+                        if (empty($data['values']))
+                            return $query;
+                        return $query->whereHas('labels', fn($q) => $q->whereIn('crm_labels.id', $data['values'])); })
                     ->preload(),
             ])
             ->recordActions([
@@ -260,7 +263,7 @@ class OrderResource extends Resource
     {
         return $schema->components([
             Section::make(__('laravel-crm-filament::labels.sections.details'))
-                ->schema(fn (?Order $record) => array_merge([
+                ->schema(fn(?Order $record) => array_merge([
                     TextEntry::make('created_at')
                         ->label(__('laravel-crm-filament::labels.fields.created'))
                         ->since(),
@@ -277,21 +280,21 @@ class OrderResource extends Resource
 
                     TextEntry::make('quote.quote_id')
                         ->label(__('laravel-crm-filament::labels.money.quote'))
-                        ->url(fn ($record) => $record?->quote
+                        ->url(fn($record) => $record?->quote
                             ? QuoteResource::getUrl('view', ['record' => $record->quote])
                             : null),
 
                     TextEntry::make('subtotal')
                         ->label(__('laravel-crm-filament::labels.money.subtotal'))
-                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
 
                     TextEntry::make('tax')
                         ->label(__('laravel-crm-filament::labels.money.tax'))
-                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
 
                     TextEntry::make('total')
                         ->label(__('laravel-crm-filament::labels.money.total'))
-                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
 
                     TextEntry::make('labels.name')
                         ->label(__('laravel-crm-filament::labels.fields.labels'))
@@ -306,27 +309,27 @@ class OrderResource extends Resource
                 ->schema([
                     TextEntry::make('person.name')
                         ->label(__('laravel-crm-filament::labels.fields.contact'))
-                        ->state(fn ($record) => LeadDealContactSection::personLabel($record?->person))
-                        ->url(fn ($record) => $record?->person
+                        ->state(fn($record) => LeadDealContactSection::personLabel($record?->person))
+                        ->url(fn($record) => $record?->person
                             ? PersonResource::getUrl('view', ['record' => $record->person])
                             : null),
 
                     TextEntry::make('organization.name')
                         ->label(__('laravel-crm-filament::labels.fields.organization'))
-                        ->url(fn ($record) => $record?->organization
+                        ->url(fn($record) => $record?->organization
                             ? OrganizationResource::getUrl('view', ['record' => $record->organization])
                             : null),
                 ]),
 
             Section::make(__('laravel-crm-filament::labels.sections.custom_fields'))
-                ->schema(fn (?Order $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
+                ->schema(fn(?Order $record) => $record ? static::crmCustomFieldEntries($record, true) : [])
                 ->hidden(function ($record): bool {
-                    if (! $record instanceof Order) {
+                    if (!$record instanceof Order) {
                         return true;
                     }
 
-                    return ! $record->fields()
-                        ->whereHas('field', fn ($q) => $q->whereNotNull('field_group_id'))
+                    return !$record->fields()
+                        ->whereHas('field', fn($q) => $q->whereNotNull('field_group_id'))
                         ->exists();
                 }),
 

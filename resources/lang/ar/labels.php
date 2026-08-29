@@ -57,6 +57,7 @@ return [
         'color' => 'اللون',
         'active' => 'نشط',
         'system' => 'النظام',
+        'unassigned' => 'غير معين',
         'handle' => 'المعرف البرمجي',
         'required' => 'مطلوب',
         'default' => 'افتراضي',
@@ -324,6 +325,12 @@ return [
         'ip' => 'عنوان IP',
         'top_urls' => 'أعلى الروابط',
         'unique_recipients' => 'المستلمون الفريدون',
+        'recent_campaign_performance' => 'أداء الحملات الأخيرة',
+        'sends_over_time' => 'الإرسال بمرور الوقت',
+        'sends' => 'الإرسالات',
+        'open_rate_percent' => 'معدل الفتح (%)',
+        'click_rate_percent' => 'معدل النقر (%)',
+        'no_url_clicks_yet' => 'لا توجد نقرات على الروابط بعد',
     ],
 
     // Chat
@@ -362,6 +369,12 @@ return [
         'user' => 'المستخدم',
         'changes' => 'التغييرات',
         'no_activity_yet' => 'لا يوجد نشاط بعد.',
+        'logged_a_note' => 'سجّل ملاحظة',
+        'created_a_task' => 'أنشأ مهمة',
+        'logged_a_call' => 'سجّل مكالمة',
+        'scheduled_a_meeting' => 'جدول اجتماعاً',
+        'scheduled_lunch' => 'جدول غداء عمل',
+        'logged_activity' => 'سجّل نشاطاً',
     ],
 
     // Integrations page — per-integration descriptions surfaced on the Settings page
@@ -649,6 +662,10 @@ return [
         'paid_invoices' => 'الفواتير المدفوعة',
         'orders' => 'الطلبات',
         'pipeline_by_stage_deals' => 'المسار حسب المرحلة (الصفقات)',
+        'pipeline_by_stage_leads' => 'المسار حسب المرحلة (العملاء المحتملون)',
+        'leads_by_pipeline_stage' => 'العملاء المحتملون حسب مرحلة المسار',
+        'open_leads' => 'عملاء محتملون مفتوحون',
+        'recent_activity' => 'النشاط الأخير',
         'leads_vs_deals' => 'العملاء المحتملون مقابل الصفقات',
         'deal_status_distribution' => 'توزيع حالات الصفقات',
         'status_open' => 'مفتوحة',
@@ -657,6 +674,27 @@ return [
         'upcoming_tasks' => 'المهام القادمة',
         'overdue_n' => ':count متأخرة',
         'no_upcoming_tasks' => 'لا توجد مهام قادمة',
+    ],
+
+    // Pipeline stages
+    'stages' => [
+        'lead_in' => 'عميل محتمل وارد',
+        'pending' => 'قيد الانتظار',
+        'prospect' => 'عميل محتمل',
+        'qualified' => 'مؤهل',
+        'proposal_sent' => 'تم إرسال العرض',
+        'negotiation' => 'تفاوض',
+        'closed_won' => 'مغلقة بربح',
+        'closed_lost' => 'مغلقة بخسارة',
+        'won' => 'رابحة',
+        'lost' => 'خاسرة',
+        'draft' => 'مسودة',
+        'sent' => 'مرسل',
+        'accepted' => 'مقبول',
+        'declined' => 'مرفوض',
+        'paid' => 'مدفوع',
+        'complete' => 'مكتمل',
+        'cancelled' => 'ملغى',
     ],
 
     // Navigation groups

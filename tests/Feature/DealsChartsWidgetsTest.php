@@ -195,3 +195,57 @@ it('DealStatusDoughnutChart counts open/won/lost deals via closed_status semanti
     expect($data['datasets'][0]['data'][1])->toBe(1); // won (in window)
     expect($data['datasets'][0]['data'][2])->toBe(2); // lost
 });
+
+// ----------------------------------------------------------------------------
+// LeadsByStageChart
+// ----------------------------------------------------------------------------
+
+it('LeadsByStageChart getHeading() resolves the dashboard.leads_by_pipeline_stage key', function () {
+    expect((new \VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart)->getHeading())
+        ->toBe(__('laravel-crm-filament::labels.dashboard.leads_by_pipeline_stage'));
+});
+
+it('LeadsByStageChart getData() filters stages to Lead pipeline and prevents duplicated stages from other pipelines', function () {
+    $leadPipeline = Pipeline::create(['name' => 'Lead Pipeline', 'model' => Lead::class, 'order' => 0]);
+    $leadStageA = PipelineStage::create(['name' => 'Lead In', 'pipeline_id' => $leadPipeline->id, 'order' => 1]);
+    $leadStageB = PipelineStage::create(['name' => 'Pending', 'pipeline_id' => $leadPipeline->id, 'order' => 2]);
+
+    $quotePipeline = Pipeline::create(['name' => 'Quote Pipeline', 'model' => 'Quote', 'order' => 1]);
+    PipelineStage::create(['name' => 'Draft', 'pipeline_id' => $quotePipeline->id, 'order' => 1]);
+    PipelineStage::create(['name' => 'Sent', 'pipeline_id' => $quotePipeline->id, 'order' => 2]);
+
+    $orderPipeline = Pipeline::create(['name' => 'Order Pipeline', 'model' => 'Order', 'order' => 2]);
+    PipelineStage::create(['name' => 'Draft', 'pipeline_id' => $orderPipeline->id, 'order' => 1]);
+    PipelineStage::create(['name' => 'Sent', 'pipeline_id' => $orderPipeline->id, 'order' => 2]);
+
+    Lead::create(['title' => 'L1', 'pipeline_stage_id' => $leadStageA->id]);
+    Lead::create(['title' => 'L2', 'pipeline_stage_id' => $leadStageA->id]);
+    Lead::create(['title' => 'L3', 'pipeline_stage_id' => $leadStageB->id]);
+    Lead::create(['title' => 'L4', 'pipeline_stage_id' => $leadStageB->id, 'converted_at' => now()]); // Converted excluded
+
+    $method = new ReflectionMethod(\VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart::class, 'getData');
+    $method->setAccessible(true);
+    $data = $method->invoke(new \VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart);
+
+    expect($data['labels'])->toBe(['Lead In', 'Pending'])
+        ->and($data['labels'])->not->toContain('Draft')
+        ->and($data['labels'])->not->toContain('Sent')
+        ->and($data['datasets'][0]['data'])->toBe([2, 1])
+        ->and($data['datasets'][0]['label'])->toBe(__('laravel-crm-filament::labels.dashboard.open_leads'));
+});
+
+it('LeadsByStageChart translates stage labels when locale is changed', function () {
+    $leadPipeline = Pipeline::create(['name' => 'Lead Pipeline', 'model' => Lead::class, 'order' => 0]);
+    PipelineStage::create(['name' => 'Lead In', 'pipeline_id' => $leadPipeline->id, 'order' => 1]);
+    PipelineStage::create(['name' => 'Pending', 'pipeline_id' => $leadPipeline->id, 'order' => 2]);
+
+    app()->setLocale('ar');
+
+    $method = new ReflectionMethod(\VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart::class, 'getData');
+    $method->setAccessible(true);
+    $data = $method->invoke(new \VentureDrake\LaravelCrmFilament\Widgets\LeadsByStageChart);
+
+    expect($data['labels'])->toBe(['عميل محتمل وارد', 'قيد الانتظار']);
+
+    app()->setLocale('en');
+});

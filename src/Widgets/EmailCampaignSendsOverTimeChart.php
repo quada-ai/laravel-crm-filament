@@ -8,11 +8,14 @@ use VentureDrake\LaravelCrm\Models\EmailCampaignRecipient;
 
 class EmailCampaignSendsOverTimeChart extends ChartWidget
 {
-    protected ?string $heading = 'Sends over time';
-
     protected int | string | array $columnSpan = 'full';
 
     public ?EmailCampaign $record = null;
+
+    public function getHeading(): ?string
+    {
+        return __('laravel-crm-filament::labels.campaign.sends_over_time');
+    }
 
     public function getDisplayedRecord(): ?EmailCampaign
     {
@@ -54,7 +57,7 @@ class EmailCampaignSendsOverTimeChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Sends',
+                    'label' => __('laravel-crm-filament::labels.campaign.sends'),
                     'data' => array_values($buckets),
                     'borderColor' => '#05b3a9',
                     'backgroundColor' => 'rgba(5,179,169,0.2)',

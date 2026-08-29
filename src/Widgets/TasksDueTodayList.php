@@ -32,7 +32,7 @@ class TasksDueTodayList extends TableWidget
             ->columns([
                 Tables\Columns\TextColumn::make('name')->limit(60)->wrap(),
                 Tables\Columns\TextColumn::make('due_at')->dateTime()->label(__('laravel-crm-filament::labels.money.due')),
-                Tables\Columns\TextColumn::make('assignedToUser.name')->label(__('laravel-crm-filament::labels.fields.assignee'))->placeholder('Unassigned'),
+                Tables\Columns\TextColumn::make('assignedToUser.name')->label(__('laravel-crm-filament::labels.fields.assignee'))->placeholder(__('laravel-crm-filament::labels.fields.unassigned')),
                 Tables\Columns\TextColumn::make('taskable_type')
                     ->label(__('laravel-crm-filament::labels.fields.linked_to'))
                     ->formatStateUsing(fn ($state) => class_basename($state ?? '')),

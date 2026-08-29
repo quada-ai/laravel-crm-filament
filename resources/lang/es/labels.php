@@ -56,6 +56,7 @@ return [
         'color' => 'Color',
         'active' => 'Activo',
         'system' => 'Sistema',
+        'unassigned' => 'Sin asignar',
         'handle' => 'Handle',
         'required' => 'Requerido',
         'default' => 'Predeterminado',
@@ -317,6 +318,12 @@ return [
         'ip' => 'IP',
         'top_urls' => 'URLs más clicadas',
         'unique_recipients' => 'Destinatarios únicos',
+        'recent_campaign_performance' => 'Rendimiento de campañas recientes',
+        'sends_over_time' => 'Envíos a lo largo del tiempo',
+        'sends' => 'Envíos',
+        'open_rate_percent' => 'Tasa de apertura (%)',
+        'click_rate_percent' => 'Tasa de clics (%)',
+        'no_url_clicks_yet' => 'No hay clics en URL todavía',
     ],
 
     'chat' => [
@@ -352,6 +359,13 @@ return [
         'event' => 'Evento',
         'user' => 'Usuario',
         'changes' => 'Cambios',
+        'no_activity_yet' => 'Aún no hay actividad.',
+        'logged_a_note' => 'registró una nota',
+        'created_a_task' => 'creó una tarea',
+        'logged_a_call' => 'registró una llamada',
+        'scheduled_a_meeting' => 'programó una reunión',
+        'scheduled_lunch' => 'programó un almuerzo',
+        'logged_activity' => 'registró una actividad',
     ],
 
     'sections' => [
@@ -599,6 +613,10 @@ return [
         'paid_invoices' => 'Facturas pagadas',
         'orders' => 'Pedidos',
         'pipeline_by_stage_deals' => 'Pipeline por etapa (negocios)',
+        'pipeline_by_stage_leads' => 'Pipeline por etapa (prospectos)',
+        'leads_by_pipeline_stage' => 'Prospectos por etapa del pipeline',
+        'open_leads' => 'Prospectos abiertos',
+        'recent_activity' => 'Actividad reciente',
         'leads_vs_deals' => 'Prospectos vs negocios',
         'deal_status_distribution' => 'Distribución de estados de negocios',
         'status_open' => 'Abierto',
@@ -607,6 +625,27 @@ return [
         'upcoming_tasks' => 'Tareas próximas',
         'overdue_n' => ':count atrasadas',
         'no_upcoming_tasks' => 'Sin tareas próximas',
+    ],
+
+    // Pipeline stages
+    'stages' => [
+        'lead_in' => 'Prospecto entrante',
+        'pending' => 'Pendiente',
+        'prospect' => 'Prospecto',
+        'qualified' => 'Calificado',
+        'proposal_sent' => 'Propuesta enviada',
+        'negotiation' => 'Negociación',
+        'closed_won' => 'Cerrada ganada',
+        'closed_lost' => 'Cerrada perdida',
+        'won' => 'Ganada',
+        'lost' => 'Perdida',
+        'draft' => 'Borrador',
+        'sent' => 'Enviado',
+        'accepted' => 'Aceptado',
+        'declined' => 'Rechazado',
+        'paid' => 'Pagado',
+        'complete' => 'Completado',
+        'cancelled' => 'Cancelado',
     ],
 
     // Navigation groups

@@ -57,6 +57,7 @@ return [
         'color' => 'Color',
         'active' => 'Active',
         'system' => 'System',
+        'unassigned' => 'Unassigned',
         'handle' => 'Handle',
         'required' => 'Required',
         'default' => 'Default',
@@ -324,6 +325,12 @@ return [
         'ip' => 'IP',
         'top_urls' => 'Top URLs',
         'unique_recipients' => 'Unique recipients',
+        'recent_campaign_performance' => 'Recent campaign performance',
+        'sends_over_time' => 'Sends over time',
+        'sends' => 'Sends',
+        'open_rate_percent' => 'Open rate (%)',
+        'click_rate_percent' => 'Click rate (%)',
+        'no_url_clicks_yet' => 'No URL clicks yet',
     ],
 
     // Chat
@@ -362,6 +369,12 @@ return [
         'user' => 'User',
         'changes' => 'Changes',
         'no_activity_yet' => 'No activity yet.',
+        'logged_a_note' => 'logged a note',
+        'created_a_task' => 'created a task',
+        'logged_a_call' => 'logged a call',
+        'scheduled_a_meeting' => 'scheduled a meeting',
+        'scheduled_lunch' => 'scheduled lunch',
+        'logged_activity' => 'logged activity',
     ],
 
     // Integrations page — per-integration descriptions surfaced on the Settings page
@@ -649,6 +662,10 @@ return [
         'paid_invoices' => 'Paid invoices',
         'orders' => 'Orders',
         'pipeline_by_stage_deals' => 'Pipeline by stage (deals)',
+        'pipeline_by_stage_leads' => 'Pipeline by stage (leads)',
+        'leads_by_pipeline_stage' => 'Leads by pipeline stage',
+        'open_leads' => 'Open leads',
+        'recent_activity' => 'Recent activity',
         'leads_vs_deals' => 'Leads vs deals',
         'deal_status_distribution' => 'Deal status distribution',
         'status_open' => 'Open',
@@ -657,6 +674,27 @@ return [
         'upcoming_tasks' => 'Upcoming tasks',
         'overdue_n' => ':count overdue',
         'no_upcoming_tasks' => 'No upcoming tasks',
+    ],
+
+    // Pipeline stages
+    'stages' => [
+        'lead_in' => 'Lead In',
+        'pending' => 'Pending',
+        'prospect' => 'Prospect',
+        'qualified' => 'Qualified',
+        'proposal_sent' => 'Proposal Sent',
+        'negotiation' => 'Negotiation',
+        'closed_won' => 'Closed Won',
+        'closed_lost' => 'Closed Lost',
+        'won' => 'Won',
+        'lost' => 'Lost',
+        'draft' => 'Draft',
+        'sent' => 'Sent',
+        'accepted' => 'Accepted',
+        'declined' => 'Declined',
+        'paid' => 'Paid',
+        'complete' => 'Complete',
+        'cancelled' => 'Cancelled',
     ],
 
     // Navigation groups

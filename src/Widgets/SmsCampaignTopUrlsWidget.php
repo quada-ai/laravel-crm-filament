@@ -45,7 +45,7 @@ class SmsCampaignTopUrlsWidget extends TableWidget
             // already deterministic for our purposes.
             ->defaultKeySort(false)
             ->paginated([5, 10, 25])
-            ->emptyStateHeading('No URL clicks yet');
+            ->emptyStateHeading(__('laravel-crm-filament::labels.campaign.no_url_clicks_yet'));
     }
 
     protected function getQuery(): Builder

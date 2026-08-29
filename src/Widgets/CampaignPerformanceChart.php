@@ -7,9 +7,12 @@ use VentureDrake\LaravelCrm\Models\EmailCampaign;
 
 class CampaignPerformanceChart extends ChartWidget
 {
-    protected ?string $heading = 'Recent campaign performance';
-
     protected int | string | array $columnSpan = 1;
+
+    public function getHeading(): ?string
+    {
+        return __('laravel-crm-filament::labels.campaign.recent_campaign_performance');
+    }
 
     protected function getData(): array
     {
@@ -24,12 +27,12 @@ class CampaignPerformanceChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Open rate (%)',
+                    'label' => __('laravel-crm-filament::labels.campaign.open_rate_percent'),
                     'data' => $campaigns->map(fn (EmailCampaign $c) => $c->openRate())->all(),
                     'backgroundColor' => '#05b3a9',
                 ],
                 [
-                    'label' => 'Click rate (%)',
+                    'label' => __('laravel-crm-filament::labels.campaign.click_rate_percent'),
                     'data' => $campaigns->map(fn (EmailCampaign $c) => $c->clickRate())->all(),
                     'backgroundColor' => '#6505B3',
                 ],

@@ -14,6 +14,11 @@ class RecentActivityList extends TableWidget
 
     protected int | string | array $columnSpan = 'full';
 
+    public function getHeading(): ?string
+    {
+        return __('laravel-crm-filament::labels.dashboard.recent_activity');
+    }
+
     public function table(Table $table): Table
     {
         return $table
@@ -26,7 +31,7 @@ class RecentActivityList extends TableWidget
                     ->since(),
                 Tables\Columns\TextColumn::make('causeable.name')
                     ->label(__('laravel-crm-filament::labels.fields.user'))
-                    ->placeholder('System'),
+                    ->placeholder(__('laravel-crm-filament::labels.fields.system')),
                 Tables\Columns\TextColumn::make('recordable_type')
                     ->label(__('laravel-crm-filament::labels.fields.action'))
                     ->formatStateUsing(fn (?string $state, $record) => static::describeAction($state, $record)),
@@ -42,12 +47,12 @@ class RecentActivityList extends TableWidget
     protected static function describeAction(?string $recordableType, $row): string
     {
         $verb = match (class_basename($recordableType ?? '')) {
-            'Note' => 'logged a note',
-            'Task' => 'created a task',
-            'Call' => 'logged a call',
-            'Meeting' => 'scheduled a meeting',
-            'Lunch' => 'scheduled lunch',
-            default => 'logged activity',
+            'Note' => __('laravel-crm-filament::labels.audit.logged_a_note'),
+            'Task' => __('laravel-crm-filament::labels.audit.created_a_task'),
+            'Call' => __('laravel-crm-filament::labels.audit.logged_a_call'),
+            'Meeting' => __('laravel-crm-filament::labels.audit.scheduled_a_meeting'),
+            'Lunch' => __('laravel-crm-filament::labels.audit.scheduled_lunch'),
+            default => __('laravel-crm-filament::labels.audit.logged_activity'),
         };
 
         return $verb;

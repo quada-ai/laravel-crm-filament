@@ -56,6 +56,7 @@ return [
         'color' => 'Couleur',
         'active' => 'Actif',
         'system' => 'Système',
+        'unassigned' => 'Non assigné',
         'handle' => 'Handle',
         'required' => 'Requis',
         'default' => 'Par défaut',
@@ -317,6 +318,12 @@ return [
         'ip' => 'IP',
         'top_urls' => 'URLs les plus cliquées',
         'unique_recipients' => 'Destinataires uniques',
+        'recent_campaign_performance' => 'Performances des campagnes récentes',
+        'sends_over_time' => 'Envois au fil du temps',
+        'sends' => 'Envois',
+        'open_rate_percent' => "Taux d'ouverture (%)",
+        'click_rate_percent' => 'Taux de clics (%)',
+        'no_url_clicks_yet' => "Aucun clic sur l'URL pour le moment",
     ],
 
     'chat' => [
@@ -352,6 +359,13 @@ return [
         'event' => 'Événement',
         'user' => 'Utilisateur',
         'changes' => 'Modifications',
+        'no_activity_yet' => 'Aucune activité pour le moment.',
+        'logged_a_note' => 'a enregistré une note',
+        'created_a_task' => 'a créé une tâche',
+        'logged_a_call' => 'a enregistré un appel',
+        'scheduled_a_meeting' => 'a planifié une réunion',
+        'scheduled_lunch' => 'a planifié un déjeuner',
+        'logged_activity' => 'a enregistré une activité',
     ],
 
     'sections' => [
@@ -599,6 +613,10 @@ return [
         'paid_invoices' => 'Factures payées',
         'orders' => 'Commandes',
         'pipeline_by_stage_deals' => 'Pipeline par étape (affaires)',
+        'pipeline_by_stage_leads' => 'Pipeline par étape (prospects)',
+        'leads_by_pipeline_stage' => 'Prospects par étape du pipeline',
+        'open_leads' => 'Prospects ouverts',
+        'recent_activity' => 'Activité récente',
         'leads_vs_deals' => 'Prospects vs affaires',
         'deal_status_distribution' => 'Répartition des statuts d\'affaire',
         'status_open' => 'Ouvert',
@@ -607,6 +625,27 @@ return [
         'upcoming_tasks' => 'Tâches à venir',
         'overdue_n' => ':count en retard',
         'no_upcoming_tasks' => 'Aucune tâche à venir',
+    ],
+
+    // Pipeline stages
+    'stages' => [
+        'lead_in' => 'Prospect entrant',
+        'pending' => 'En attente',
+        'prospect' => 'Prospect',
+        'qualified' => 'Qualifié',
+        'proposal_sent' => 'Proposition envoyée',
+        'negotiation' => 'Négociation',
+        'closed_won' => 'Gagnée',
+        'closed_lost' => 'Perdue',
+        'won' => 'Gagnée',
+        'lost' => 'Perdue',
+        'draft' => 'Brouillon',
+        'sent' => 'Envoyé',
+        'accepted' => 'Accepté',
+        'declined' => 'Refusé',
+        'paid' => 'Payé',
+        'complete' => 'Terminé',
+        'cancelled' => 'Annulé',
     ],
 
     // Navigation groups

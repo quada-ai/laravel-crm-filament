@@ -27,7 +27,7 @@ class ViewOrder extends ViewRecord
                 ->label(__('laravel-crm-filament::labels.actions.delivery')),
             $this->orderConvertToPurchaseOrderAction()
                 ->label(__('laravel-crm-filament::labels.actions.purchase_order')),
-            $this->downloadPdfAction(fn (Order $record) => $this->streamPdfDownload(
+            $this->downloadPdfAction(fn(Order $record) => $this->streamPdfDownload(
                 $record,
                 'order',
                 'order',
@@ -64,7 +64,7 @@ class ViewOrder extends ViewRecord
         ];
     }
 
-    public function getTitle(): string | Htmlable
+    public function getTitle(): string|Htmlable
     {
         return $this->record?->title ?? parent::getTitle();
     }

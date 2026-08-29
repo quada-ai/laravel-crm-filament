@@ -48,7 +48,7 @@ class EditOrder extends EditRecord
             : null;
 
         $data['products'] = $order->orderProducts
-            ->map(fn ($line) => [
+            ->map(fn($line) => [
                 'order_product_id' => $line->id,
                 'id' => $line->product_id,
                 'quantity' => $line->quantity,

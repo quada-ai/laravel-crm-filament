@@ -28,6 +28,9 @@ class CreateOrder extends CreateRecord
         $data['addresses'] = OrderAddressTabs::fromFormData($data);
 
         $record = app(OrderService::class)->create(FormPayload::wrap($data), $person, $organization);
+        if (!empty($data['title'])) {
+            $record->update(['title' => $data['title']]);
+        }
         OrderResource::saveCrmCustomFields($data, $record);
 
         return $record;
