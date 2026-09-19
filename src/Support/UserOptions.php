@@ -15,56 +15,57 @@ class UserOptions
             return [];
         }
 
+        $table = (new $userModelClass)->getTable();
         $tenant = Filament::getTenant();
 
         if ($tenant) {
             if (method_exists($tenant, 'users')) {
                 $query = $tenant->users();
 
-                if (Schema::hasColumn((new $userModelClass)->getTable(), 'role')) {
-                    $query->where(function ($q) {
-                        $q->where('users.role', '!=', 'admin')
-                            ->orWhereNull('users.role');
+                if (Schema::hasColumn($table, 'role')) {
+                    $query->where(function ($q) use ($table) {
+                        $q->where("{$table}.role", '!=', 'admin')
+                            ->orWhereNull("{$table}.role");
                     });
                 }
 
-                return $query->orderBy('name')->pluck('name', 'users.id')->toArray();
+                return $query->orderBy("{$table}.name")->pluck("{$table}.name", "{$table}.id")->toArray();
             }
 
             $tenantId = $tenant->getKey();
             $query = $userModelClass::query();
 
-            if (Schema::hasColumn((new $userModelClass)->getTable(), 'role')) {
-                $query->where(function ($q) {
-                    $q->where('role', '!=', 'admin')
-                        ->orWhereNull('role');
+            if (Schema::hasColumn($table, 'role')) {
+                $query->where(function ($q) use ($table) {
+                    $q->where("{$table}.role", '!=', 'admin')
+                        ->orWhereNull("{$table}.role");
                 });
             }
 
-            if (Schema::hasColumn((new $userModelClass)->getTable(), 'current_crm_team_id')) {
+            if (Schema::hasColumn($table, 'current_crm_team_id')) {
                 return $query->where('current_crm_team_id', $tenantId)
-                    ->orderBy('name')
-                    ->pluck('name', 'id')
+                    ->orderBy("{$table}.name")
+                    ->pluck("{$table}.name", "{$table}.id")
                     ->toArray();
             }
 
-            if (Schema::hasColumn((new $userModelClass)->getTable(), 'team_id')) {
+            if (Schema::hasColumn($table, 'team_id')) {
                 return $query->where('team_id', $tenantId)
-                    ->orderBy('name')
-                    ->pluck('name', 'id')
+                    ->orderBy("{$table}.name")
+                    ->pluck("{$table}.name", "{$table}.id")
                     ->toArray();
             }
         }
 
         $query = $userModelClass::query();
 
-        if (Schema::hasColumn((new $userModelClass)->getTable(), 'role')) {
-            $query->where(function ($q) {
-                $q->where('role', '!=', 'admin')
-                    ->orWhereNull('role');
+        if (Schema::hasColumn($table, 'role')) {
+            $query->where(function ($q) use ($table) {
+                $q->where("{$table}.role", '!=', 'admin')
+                    ->orWhereNull("{$table}.role");
             });
         }
 
-        return $query->orderBy('name')->pluck('name', 'id')->toArray();
+        return $query->orderBy("{$table}.name")->pluck("{$table}.name", "{$table}.id")->toArray();
     }
 }
