@@ -36,7 +36,15 @@ class MoneyTotalsRow
                 Forms\Components\TextInput::make('discount')
                     ->label(__('laravel-crm-filament::labels.money.discount'))
                     ->numeric()
-                    ->inlineLabel(),
+                    ->inlineLabel()
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function ($state, $get, $set) {
+                        $subTotal = (float) ($get('sub_total') ?? 0);
+                        $discount = (float) ($state ?? 0);
+                        $tax = (float) ($get('tax') ?? 0);
+                        $adjustment = (float) ($get('adjustment') ?? 0);
+                        $set('total', max(0, $subTotal - $discount + $tax + $adjustment));
+                    }),
                 Forms\Components\TextInput::make('tax')
                     ->label(__('laravel-crm-filament::labels.money.tax'))
                     ->numeric()
@@ -45,7 +53,15 @@ class MoneyTotalsRow
                 Forms\Components\TextInput::make('adjustment')
                     ->label(__('laravel-crm-filament::labels.money.adjustment'))
                     ->numeric()
-                    ->inlineLabel(),
+                    ->inlineLabel()
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function ($state, $get, $set) {
+                        $subTotal = (float) ($get('sub_total') ?? 0);
+                        $discount = (float) ($get('discount') ?? 0);
+                        $tax = (float) ($get('tax') ?? 0);
+                        $adjustment = (float) ($state ?? 0);
+                        $set('total', max(0, $subTotal - $discount + $tax + $adjustment));
+                    }),
                 Forms\Components\TextInput::make('total')
                     ->label(__('laravel-crm-filament::labels.money.total'))
                     ->numeric()

@@ -37,7 +37,7 @@ class LineItemsRepeater
             Forms\Components\TextInput::make($priceField)
                 ->label(__('laravel-crm-filament::labels.money.unit_price'))
                 ->numeric()
-                ->live()
+                ->live(onBlur: true)
                 ->afterStateUpdated(function ($state, $get, $set) use ($priceField) {
                     self::recalcRow($get, $set, $priceField);
                     self::recalcFormTotals($get, $set);
@@ -46,7 +46,7 @@ class LineItemsRepeater
                 ->numeric()
                 ->default(1)
                 ->minValue(0)
-                ->live()
+                ->live(onBlur: true)
                 ->afterStateUpdated(function ($state, $get, $set) use ($priceField) {
                     self::recalcRow($get, $set, $priceField);
                     self::recalcFormTotals($get, $set);
@@ -77,31 +77,48 @@ class LineItemsRepeater
                     ->searchable()
                     ->live()
                     ->afterStateUpdated(function ($state, $get, $set) use ($priceField) {
-                        $product = Product::find($state);
+                        $product = $state ? Product::find($state) : null;
                         if ($product) {
-                            // Bypass Product::getDefaultPrice() which crashes when
-                            // Setting::currency() returns null (Property [value] does
-                            // not exist on Eloquent builder). Replicate its logic safely.
-                            $currency = config('laravel-crm.default_currency', 'USD');
+                            // 1. Check currency on the current form first
+                            $formCurrency = $get('../../currency') ?? $get('../../../currency') ?? $get('currency');
+
+                            // 2. Fall back to setting or config
+                            $currency = $formCurrency ?: config('laravel-crm.default_currency', 'USD');
                             try {
-                                $settingModel = \VentureDrake\LaravelCrm\Models\Setting::query()
-                                    ->where('name', 'currency')
-                                    ->first();
-                                if ($settingModel && $settingModel->value) {
-                                    $currency = $settingModel->value;
+                                if (! $formCurrency) {
+                                    $settingModel = \VentureDrake\LaravelCrm\Models\Setting::query()
+                                        ->where('name', 'currency')
+                                        ->first();
+                                    if ($settingModel && $settingModel->value) {
+                                        $currency = $settingModel->value;
+                                    }
                                 }
                             } catch (\Throwable $e) {
                                 // fall back to config default
                             }
 
+                            // 3. Match price by currency
                             $price = $product->productPrices()
                                 ->where('currency', $currency)
                                 ->first();
 
-                            $unitPrice = $price && isset($price->unit_price) ? (float) $price->unit_price : 0;
-                            $set($priceField, $unitPrice / 100);
+                            // 4. Fall back to first available price if no exact currency match
+                            if (! $price) {
+                                $price = $product->productPrices()->first();
+                            }
+
+                            $unitPrice = $price && isset($price->unit_price) ? (float) $price->unit_price / 100 : 0;
+                            $set($priceField, $unitPrice);
+
+                            if (! $get('quantity')) {
+                                $set('quantity', 1);
+                            }
+
+                            if (! $get('comments') && ! empty($product->description)) {
+                                $set('comments', $product->description);
+                            }
                         }
-                        self::recalcRow($get, $set, $priceField);
+                        self::recalcRow($get, $set, $priceField, $unitPrice ?? null);
                         self::recalcFormTotals($get, $set);
                     }),
                 Grid::make($row2Cols)->schema($row2Fields),
@@ -113,6 +130,9 @@ class LineItemsRepeater
             ->addActionLabel(__('laravel-crm-filament::labels.actions.add_line_item'))
             ->defaultItems(0)
             ->reorderable()
+            ->live()
+            ->deleteAction(fn ($action) => $action->after(fn ($get, $set) => self::recalcFormTotals($get, $set)))
+            ->reorderAction(fn ($action) => $action->after(fn ($get, $set) => self::recalcFormTotals($get, $set)))
             ->columnSpanFull();
     }
 
@@ -125,14 +145,14 @@ class LineItemsRepeater
      * Order / Invoice / PurchaseOrder), `tax_amount = amount * rate / 100`
      * using the resolved rate from resolveTaxRate(). Deal uses `price` and
      * does not carry a tax_amount column, so the tax branch is skipped.
-     *
-     * Does NOT trigger form-level totals recalculation — that lives on a
-     * subsequent story.
      */
-    private static function recalcRow($get, $set, string $priceField): void
+    private static function recalcRow($get, $set, string $priceField, ?float $unitPrice = null): void
     {
-        $unitPrice = (float) $get($priceField);
-        $quantity = (float) $get('quantity');
+        if ($unitPrice === null) {
+            $unitPrice = (float) ($get($priceField) ?? 0);
+        }
+        $rawQty = $get('quantity');
+        $quantity = $rawQty !== null && $rawQty !== '' ? (float) $rawQty : 1.0;
 
         $amount = $unitPrice * $quantity;
         $set('amount', $amount);
@@ -147,32 +167,38 @@ class LineItemsRepeater
     /**
      * Aggregate sibling rows up to the form-level `sub_total`, `tax`, and
      * `total` fields. Designed to be called from inside a row field's
-     * reactive `afterStateUpdated` closure, where Filament's relative
-     * paths resolve as follows:
-     *   ../../        → the rows array keyed by row UUID
-     *   ../../../X    → the form-level field X (sub_total / tax / total)
-     *
-     * Mirrors core CRM's LiveQuoteItems::calculateAmounts (lines 155-161)
-     * exactly: sums each row's `amount` into sub_total, each row's
-     * `tax_amount` into tax, and writes total = sub_total + tax.
-     * Discount and adjustment are NOT included — those are applied
-     * server-side at save by the various *Service::create/update methods.
+     * reactive `afterStateUpdated` closure.
      */
     private static function recalcFormTotals($get, $set): void
     {
-        $rows = $get('../../') ?? [];
+        // Resolve products rows array defensively across different relative paths
+        $raw = $get('../../products') ?? $get('../products') ?? $get('../../') ?? $get('../') ?? [];
+        $rows = isset($raw['products']) && is_array($raw['products']) ? $raw['products'] : (is_array($raw) ? $raw : []);
 
         $subTotal = 0.0;
         $tax = 0.0;
 
         foreach ($rows as $row) {
-            $subTotal += (float) ($row['amount'] ?? 0);
-            $tax += (float) ($row['tax_amount'] ?? 0);
+            if (is_array($row)) {
+                $unit = (float) ($row['unit_price'] ?? $row['price'] ?? 0);
+                $qty = isset($row['quantity']) && $row['quantity'] !== '' ? (float) $row['quantity'] : 1.0;
+                $rowAmount = isset($row['amount']) && (float) $row['amount'] > 0 ? (float) $row['amount'] : ($unit * $qty);
+                $subTotal += $rowAmount;
+                $tax += (float) ($row['tax_amount'] ?? 0);
+            }
         }
 
-        $set('../../../sub_total', $subTotal);
-        $set('../../../tax', $tax);
-        $set('../../../total', $subTotal + $tax);
+        $discount = (float) ($get('../../discount') ?? $get('../../../discount') ?? $get('discount') ?? 0);
+        $adjustment = (float) ($get('../../adjustment') ?? $get('../../../adjustment') ?? $get('adjustment') ?? 0);
+        $total = max(0, $subTotal - $discount + $tax + $adjustment);
+
+        // Update form-level totals across both relative depths (supporting both statePath-prefixed and root schemas)
+        foreach (['../../', '../../../'] as $prefix) {
+            $set($prefix . 'sub_total', $subTotal);
+            $set($prefix . 'tax', $tax);
+            $set($prefix . 'total', $total);
+            $set($prefix . 'amount', $subTotal); // For Deals
+        }
     }
 
     /**

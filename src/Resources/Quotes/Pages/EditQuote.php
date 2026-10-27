@@ -46,6 +46,10 @@ class EditQuote extends EditRecord
         /** @var Quote $quote */
         $quote = $this->record;
 
+        if (isset($data['subtotal']) && ! isset($data['sub_total'])) {
+            $data['sub_total'] = $data['subtotal'];
+        }
+
         foreach (['sub_total', 'discount', 'tax', 'total'] as $field) {
             $value = $data[$field] ?? null;
             if ($value !== null) {
