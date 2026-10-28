@@ -31,6 +31,9 @@ use VentureDrake\LaravelCrm\Models\TaxRate;
  */
 class LineItemsRepeater
 {
+    private static ?float $cachedDefaultTaxRate = null;
+    private static ?string $cachedDefaultCurrency = null;
+
     public static function products(string $fkColumn = 'deal_product_id', string $priceField = 'price'): Forms\Components\Repeater
     {
         $row2Fields = [
@@ -75,39 +78,37 @@ class LineItemsRepeater
                     ->label(__('laravel-crm-filament::labels.money.product'))
                     ->options(fn () => Product::query()->where('active', true)->orderBy('name')->pluck('name', 'id'))
                     ->searchable()
+                    ->preload()
                     ->live()
                     ->afterStateUpdated(function ($state, $get, $set) use ($priceField) {
-                        $product = $state ? Product::find($state) : null;
+                        $product = $state ? Product::with(['productPrices', 'taxRate'])->find($state) : null;
+                        $unitPrice = 0.0;
                         if ($product) {
                             // 1. Check currency on the current form first
                             $formCurrency = $get('../../currency') ?? $get('../../../currency') ?? $get('currency');
 
-                            // 2. Fall back to setting or config
-                            $currency = $formCurrency ?: config('laravel-crm.default_currency', 'USD');
-                            try {
-                                if (! $formCurrency) {
-                                    $settingModel = \VentureDrake\LaravelCrm\Models\Setting::query()
-                                        ->where('name', 'currency')
-                                        ->first();
-                                    if ($settingModel && $settingModel->value) {
-                                        $currency = $settingModel->value;
+                            // 2. Fall back to cached setting or config
+                            if ($formCurrency) {
+                                $currency = $formCurrency;
+                            } else {
+                                if (self::$cachedDefaultCurrency === null) {
+                                    try {
+                                        self::$cachedDefaultCurrency = \VentureDrake\LaravelCrm\Models\Setting::query()
+                                            ->where('name', 'currency')
+                                            ->value('value');
+                                    } catch (\Throwable $e) {
+                                        self::$cachedDefaultCurrency = null;
                                     }
                                 }
-                            } catch (\Throwable $e) {
-                                // fall back to config default
+                                $currency = self::$cachedDefaultCurrency ?: config('laravel-crm.default_currency', 'USD');
                             }
 
-                            // 3. Match price by currency
-                            $price = $product->productPrices()
-                                ->where('currency', $currency)
-                                ->first();
+                            // 3. Match price by currency from eager-loaded relation
+                            $price = $product->productPrices
+                                ->firstWhere('currency', $currency)
+                                ?? $product->productPrices->first();
 
-                            // 4. Fall back to first available price if no exact currency match
-                            if (! $price) {
-                                $price = $product->productPrices()->first();
-                            }
-
-                            $unitPrice = $price && isset($price->unit_price) ? (float) $price->unit_price / 100 : 0;
+                            $unitPrice = $price && isset($price->unit_price) ? (float) $price->unit_price / 100 : 0.0;
                             $set($priceField, $unitPrice);
 
                             if (! $get('quantity')) {
@@ -118,7 +119,7 @@ class LineItemsRepeater
                                 $set('comments', $product->description);
                             }
                         }
-                        self::recalcRow($get, $set, $priceField, $unitPrice ?? null);
+                        self::recalcRow($get, $set, $priceField, $unitPrice, $product);
                         self::recalcFormTotals($get, $set);
                     }),
                 Grid::make($row2Cols)->schema($row2Fields),
@@ -130,7 +131,6 @@ class LineItemsRepeater
             ->addActionLabel(__('laravel-crm-filament::labels.actions.add_line_item'))
             ->defaultItems(0)
             ->reorderable()
-            ->live()
             ->deleteAction(fn ($action) => $action->after(fn ($get, $set) => self::recalcFormTotals($get, $set)))
             ->reorderAction(fn ($action) => $action->after(fn ($get, $set) => self::recalcFormTotals($get, $set)))
             ->columnSpanFull();
@@ -138,15 +138,8 @@ class LineItemsRepeater
 
     /**
      * Recompute a single row's `amount` (and `tax_amount` when applicable).
-     *
-     * Mirrors the per-row math in core CRM's LiveQuoteItems::calculateAmounts()
-     * (lines 148-150): `amount = unit_price * quantity` — the line subtotal
-     * does NOT include tax. When the price field is `unit_price` (Quote /
-     * Order / Invoice / PurchaseOrder), `tax_amount = amount * rate / 100`
-     * using the resolved rate from resolveTaxRate(). Deal uses `price` and
-     * does not carry a tax_amount column, so the tax branch is skipped.
      */
-    private static function recalcRow($get, $set, string $priceField, ?float $unitPrice = null): void
+    private static function recalcRow($get, $set, string $priceField, ?float $unitPrice = null, ?Product $product = null): void
     {
         if ($unitPrice === null) {
             $unitPrice = (float) ($get($priceField) ?? 0);
@@ -158,8 +151,7 @@ class LineItemsRepeater
         $set('amount', $amount);
 
         if ($priceField === 'unit_price') {
-            $productId = $get('id');
-            $rate = self::resolveTaxRate($productId !== null ? (int) $productId : null);
+            $rate = self::resolveTaxRate($product, $product ? null : ($get('id') !== null ? (int) $get('id') : null));
             $set('tax_amount', $amount * ((float) $rate / 100.0));
         }
     }
@@ -200,36 +192,39 @@ class LineItemsRepeater
     }
 
     /**
-     * Resolve the tax rate to apply to a line item, mirroring the fallback
-     * chain in core CRM's LiveQuoteItems::calculateAmounts() (lines 133-143):
-     *   1. $product->taxRate?->rate   (TaxRate relation on Product)
-     *   2. $product->tax_rate          (legacy scalar column on Product)
-     *   3. TaxRate::where('default', 1)->first()?->rate
-     *   4. app('laravel-crm.settings')->get('tax_rate')?->value
-     *   5. 0.0
+     * Resolve the tax rate to apply to a line item with memory caching to avoid schema reflection.
      */
-    private static function resolveTaxRate(?int $productId): float
+    private static function resolveTaxRate(?Product $product = null, ?int $productId = null): float
     {
-        if ($productId !== null) {
-            $product = Product::find($productId);
+        if ($product === null && $productId !== null) {
+            $product = Product::with('taxRate')->find($productId);
+        }
 
-            if ($product) {
-                $taxRate = $product->taxRate;
-                if ($taxRate instanceof \Illuminate\Database\Eloquent\Builder) {
-                    $taxRate = $taxRate->first();
-                }
-                if ($taxRate && isset($taxRate->rate)) {
-                    return (float) $taxRate->rate;
-                }
+        if ($product) {
+            $taxRate = $product->taxRate;
+            if ($taxRate instanceof \Illuminate\Database\Eloquent\Builder) {
+                $taxRate = $taxRate->first();
+            }
+            if ($taxRate && isset($taxRate->rate)) {
+                return (float) $taxRate->rate;
             }
 
-            if ($product && $product->tax_rate) {
+            if ($product->tax_rate) {
                 return (float) $product->tax_rate;
             }
         }
 
-        if (\Illuminate\Support\Facades\Schema::hasColumn((new TaxRate)->getTable(), 'default') && $default = TaxRate::where('default', 1)->first()) {
-            return (float) $default->rate;
+        if (self::$cachedDefaultTaxRate !== null) {
+            return self::$cachedDefaultTaxRate;
+        }
+
+        try {
+            $default = TaxRate::where('default', 1)->first();
+            if ($default && isset($default->rate)) {
+                return self::$cachedDefaultTaxRate = (float) $default->rate;
+            }
+        } catch (\Throwable $e) {
+            // Ignore if column or table not present
         }
 
         try {
@@ -237,19 +232,19 @@ class LineItemsRepeater
             if (method_exists($settingService, 'get')) {
                 $setting = $settingService->get('tax_rate');
                 if (is_numeric($setting)) {
-                    return (float) $setting;
+                    return self::$cachedDefaultTaxRate = (float) $setting;
                 }
                 if ($setting instanceof \Illuminate\Database\Eloquent\Builder) {
                     $setting = $setting->first();
                 }
                 if (is_object($setting) && isset($setting->value)) {
-                    return (float) $setting->value;
+                    return self::$cachedDefaultTaxRate = (float) $setting->value;
                 }
             }
         } catch (\Throwable $e) {
             // Ignore settings lookup failures
         }
 
-        return 0.0;
+        return self::$cachedDefaultTaxRate = 0.0;
     }
 }

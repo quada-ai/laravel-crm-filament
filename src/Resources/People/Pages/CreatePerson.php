@@ -15,6 +15,9 @@ class CreatePerson extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         $record = app(PersonService::class)->create(FormPayload::wrap($data));
+        if (array_key_exists('organization_id', $data)) {
+            $record->update(['organization_id' => $data['organization_id']]);
+        }
         if (isset($data['labels'])) {
             $record->labels()->sync($data['labels']);
         }

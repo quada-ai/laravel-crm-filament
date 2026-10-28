@@ -110,7 +110,42 @@ class PersonResource extends Resource
                     ->maxLength(255),
             ]),
 
-            Grid::make(2)->schema([
+            Grid::make(3)->schema([
+                Forms\Components\Select::make('organization_id')
+                    ->label(__('laravel-crm-filament::labels.fields.organization') ?: 'Organization')
+                    ->relationship('organization', 'name', modifyQueryUsing: function ($query) {
+                        $tenant = \Filament\Facades\Filament::getTenant();
+                        if ($tenant) {
+                            $query->where(function ($q) use ($tenant) {
+                                $q->where('team_id', $tenant->id)->orWhereNull('team_id');
+                            });
+                        }
+                        return $query;
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('laravel-crm-filament::labels.fields.name') ?: 'Name')
+                            ->required()
+                            ->maxLength(255),
+                    ])
+                    ->createOptionUsing(function (array $data): int {
+                        $request = new \Illuminate\Support\Fluent([
+                            'organization_name' => $data['name'] ?? null,
+                            'user_owner_id' => auth()->id(),
+                        ]);
+
+                        $org = app(\VentureDrake\LaravelCrm\Services\OrganizationService::class)->createFromRelated($request);
+                        $tenant = \Filament\Facades\Filament::getTenant();
+                        if ($tenant && empty($org->team_id)) {
+                            $org->update(['team_id' => $tenant->id]);
+                        }
+
+                        return (int) $org->getKey();
+                    }),
+
                 Forms\Components\TextInput::make('company_name')
                     ->label(__('filament.resources.contacts.fields.company_name'))
                     ->maxLength(255),
@@ -280,6 +315,12 @@ class PersonResource extends Resource
                 Tables\Columns\TextColumn::make('phone')
                     ->label(__('laravel-crm-filament::labels.fields.phone'))
                     ->state(fn($record) => $record?->phone ?: $record?->getPrimaryPhone()?->number),
+
+                Tables\Columns\TextColumn::make('organization.name')
+                    ->label(__('laravel-crm-filament::labels.fields.organization') ?: 'Organization')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('company_name')
                     ->label(__('filament.resources.contacts.fields.company_name') ?? 'Company')
@@ -556,6 +597,14 @@ class PersonResource extends Resource
 
             TextEntry::make('birthday')
                 ->label(__('laravel-crm-filament::labels.fields.birthday')),
+
+            TextEntry::make('organization.name')
+                ->label(__('laravel-crm-filament::labels.fields.organization') ?: 'Organization')
+                ->visible(fn ($record) => !empty($record?->organization?->name)),
+
+            TextEntry::make('company_name')
+                ->label(__('filament.resources.contacts.fields.company_name') ?? 'Company')
+                ->visible(fn ($record) => !empty($record?->company_name)),
 
             TextEntry::make('description')
                 ->label(__('laravel-crm-filament::labels.fields.description'))

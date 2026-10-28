@@ -62,6 +62,9 @@ class EditPerson extends EditRecord
     {
         /** @var Person $record */
         app(PersonService::class)->update($record, FormPayload::wrap($data));
+        if (array_key_exists('organization_id', $data)) {
+            $record->update(['organization_id' => $data['organization_id']]);
+        }
         if (isset($data['labels'])) {
             $record->labels()->sync($data['labels']);
         }
