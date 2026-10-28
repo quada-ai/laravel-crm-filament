@@ -192,13 +192,11 @@ class LineItemsRepeater
         $adjustment = (float) ($get('../../adjustment') ?? $get('../../../adjustment') ?? $get('adjustment') ?? 0);
         $total = max(0, $subTotal - $discount + $tax + $adjustment);
 
-        // Update form-level totals across both relative depths (supporting both statePath-prefixed and root schemas)
-        foreach (['../../', '../../../'] as $prefix) {
-            $set($prefix . 'sub_total', $subTotal);
-            $set($prefix . 'tax', $tax);
-            $set($prefix . 'total', $total);
-            $set($prefix . 'amount', $subTotal); // For Deals
-        }
+        $set('../../sub_total', $subTotal);
+        $set('../../tax', $tax);
+        $set('../../total', $total);
+        $set('../../amount', $subTotal);
+        $set('../../../amount', $subTotal);
     }
 
     /**

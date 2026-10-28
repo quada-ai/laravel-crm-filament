@@ -70,6 +70,24 @@ class EditInvoice extends EditRecord
             ])
             ->all();
 
+        if (empty($data['sub_total']) && ! empty($data['products'])) {
+            $sub = 0;
+            $tax = 0;
+            foreach ($data['products'] as $p) {
+                $sub += (float) ($p['amount'] ?? 0);
+                $tax += (float) ($p['tax_amount'] ?? 0);
+            }
+            $data['sub_total'] = $sub;
+            if (empty($data['tax'])) {
+                $data['tax'] = $tax;
+            }
+            if (empty($data['total'])) {
+                $discount = (float) ($data['discount'] ?? 0);
+                $adjustment = (float) ($data['adjustment'] ?? 0);
+                $data['total'] = max(0, $sub - $discount + $tax + $adjustment);
+            }
+        }
+
         return InvoiceResource::loadCrmCustomFieldsInto($data, $this->getRecord());
     }
 

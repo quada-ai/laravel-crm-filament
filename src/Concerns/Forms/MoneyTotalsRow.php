@@ -32,7 +32,8 @@ class MoneyTotalsRow
                     ->label(__('laravel-crm-filament::labels.money.subtotal'))
                     ->numeric()
                     ->inlineLabel()
-                    ->readOnly(),
+                    ->readOnly()
+                    ->live(),
                 Forms\Components\TextInput::make('discount')
                     ->label(__('laravel-crm-filament::labels.money.discount'))
                     ->numeric()
@@ -49,7 +50,8 @@ class MoneyTotalsRow
                     ->label(__('laravel-crm-filament::labels.money.tax'))
                     ->numeric()
                     ->inlineLabel()
-                    ->readOnly(),
+                    ->readOnly()
+                    ->live(),
                 Forms\Components\TextInput::make('adjustment')
                     ->label(__('laravel-crm-filament::labels.money.adjustment'))
                     ->numeric()
@@ -66,7 +68,8 @@ class MoneyTotalsRow
                     ->label(__('laravel-crm-filament::labels.money.total'))
                     ->numeric()
                     ->inlineLabel()
-                    ->readOnly(),
+                    ->readOnly()
+                    ->live(),
             ]),
         ]);
     }
