@@ -178,7 +178,7 @@ class PurchaseOrderResource extends Resource
 
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('laravel-crm-filament::labels.money.amount'))
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100)
                     ->sortable(),
 
                 Tables\Columns\IconColumn::make('sent')
@@ -275,7 +275,7 @@ class PurchaseOrderResource extends Resource
 
                     TextEntry::make('total')
                         ->label(__('laravel-crm-filament::labels.money.amount'))
-                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100),
 
                     TextEntry::make('terms')
                         ->label(__('laravel-crm-filament::labels.fields.terms'))

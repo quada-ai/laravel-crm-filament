@@ -483,7 +483,7 @@ class DealResource extends Resource
 
                     TextEntry::make('amount')
                         ->label(__('laravel-crm-filament::labels.money.value'))
-                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100),
 
                     TextEntry::make('expected_close')
                         ->label(__('laravel-crm-filament::labels.sales.expected_close'))

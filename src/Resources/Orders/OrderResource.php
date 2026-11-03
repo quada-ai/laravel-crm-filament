@@ -166,19 +166,19 @@ class OrderResource extends Resource
 
                 Tables\Columns\TextColumn::make('subtotal')
                     ->label(__('laravel-crm-filament::labels.money.subtotal'))
-                    ->money(fn($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100)
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('tax')
                     ->label(__('laravel-crm-filament::labels.money.tax'))
-                    ->money(fn($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100)
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('laravel-crm-filament::labels.money.total'))
-                    ->money(fn($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100)
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('ownerUser.name')
@@ -286,15 +286,15 @@ class OrderResource extends Resource
 
                     TextEntry::make('subtotal')
                         ->label(__('laravel-crm-filament::labels.money.subtotal'))
-                        ->money(fn($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100),
 
                     TextEntry::make('tax')
                         ->label(__('laravel-crm-filament::labels.money.tax'))
-                        ->money(fn($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100),
 
                     TextEntry::make('total')
                         ->label(__('laravel-crm-filament::labels.money.total'))
-                        ->money(fn($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100),
 
                     TextEntry::make('labels.name')
                         ->label(__('laravel-crm-filament::labels.fields.labels'))

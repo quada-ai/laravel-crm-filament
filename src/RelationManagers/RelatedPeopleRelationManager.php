@@ -6,11 +6,13 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use VentureDrake\LaravelCrm\Models\Contact;
 use VentureDrake\LaravelCrm\Models\Person;
+use VentureDrake\LaravelCrmFilament\Concerns\Forms\SalesDetailsSection;
 use VentureDrake\LaravelCrmFilament\Resources\People\PersonResource;
 
 class RelatedPeopleRelationManager extends RelationManager
@@ -26,9 +28,11 @@ class RelatedPeopleRelationManager extends RelationManager
                 ->label(__('laravel-crm-filament::labels.fields.contact'))
                 ->options(function () {
                     $ownerId = $this->getOwnerRecord()?->id;
+                    $tenant = \Filament\Facades\Filament::getTenant();
 
                     return Person::query()
                         ->when($ownerId, fn ($q) => $q->where('id', '!=', $ownerId))
+                        ->when($tenant, fn ($q) => $q->where(fn ($sub) => $sub->where('team_id', $tenant->id)->orWhere('tenant_id', $tenant->id)->orWhereNull('team_id')))
                         ->orderBy('first_name')
                         ->get()
                         ->mapWithKeys(fn (Person $person) => [
@@ -39,7 +43,56 @@ class RelatedPeopleRelationManager extends RelationManager
                 })
                 ->searchable()
                 ->preload()
-                ->required(),
+                ->required()
+                ->createOptionForm([
+                    Grid::make(2)->schema([
+                        Forms\Components\TextInput::make('first_name')
+                            ->label(__('laravel-crm-filament::labels.fields.first_name') ?: 'First name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('last_name')
+                            ->label(__('laravel-crm-filament::labels.fields.last_name') ?: 'Last name')
+                            ->maxLength(255),
+                    ]),
+                    Grid::make(2)->schema([
+                        Forms\Components\Select::make('organization_id')
+                            ->label(__('laravel-crm-filament::labels.fields.organization') ?: 'Organization')
+                            ->relationship('organization', 'name', modifyQueryUsing: function ($query) {
+                                $tenant = \Filament\Facades\Filament::getTenant();
+                                if ($tenant) {
+                                    $query->where(function ($q) use ($tenant) {
+                                        $q->where('team_id', $tenant->id)->orWhereNull('team_id');
+                                    });
+                                }
+
+                                return $query;
+                            })
+                            ->searchable()
+                            ->preload()
+                            ->nullable()
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->label(__('laravel-crm-filament::labels.fields.name') ?: 'Name')
+                                    ->required()
+                                    ->maxLength(255),
+                            ])
+                            ->createOptionUsing(fn (array $data): int => SalesDetailsSection::createOrganizationFromModal($data)),
+                        Forms\Components\TextInput::make('company_name')
+                            ->label(__('filament.resources.contacts.fields.company_name') ?: 'Company Name')
+                            ->maxLength(255),
+                    ]),
+                    Grid::make(2)->schema([
+                        Forms\Components\TextInput::make('phone')
+                            ->label(__('laravel-crm-filament::labels.fields.phone') ?: 'Phone')
+                            ->tel()
+                            ->maxLength(50),
+                        Forms\Components\TextInput::make('email')
+                            ->label(__('laravel-crm-filament::labels.fields.email') ?: 'Email')
+                            ->email()
+                            ->maxLength(255),
+                    ]),
+                ])
+                ->createOptionUsing(fn (array $data): int => SalesDetailsSection::createPersonFromModal($data)),
         ]);
     }
 
@@ -49,94 +102,83 @@ class RelatedPeopleRelationManager extends RelationManager
             ->recordTitleAttribute('id')
             ->columns([
                 Tables\Columns\TextColumn::make('related_name')
-                    ->label(__('laravel-crm-filament::labels.fields.name'))
-                    ->state(function (Contact $record): ?string {
-                        $person = $record->entityable;
+                    ->label(__('laravel-crm-filament::labels.fields.contact'))
+                    ->state(fn (Contact $record) => $record->entityable?->name ?? '—')
+                    ->url(fn (Contact $record) => $record->entityable instanceof Person
+                        ? PersonResource::getUrl('view', ['record' => $record->entityable])
+                        : null),
 
-                        if (! $person instanceof Person) {
-                            return null;
-                        }
+                Tables\Columns\TextColumn::make('related_email')
+                    ->label(__('laravel-crm-filament::labels.fields.email'))
+                    ->state(fn (Contact $record) => $record->entityable instanceof Person
+                        ? $record->entityable->getPrimaryEmail()?->address
+                        : null)
+                    ->placeholder('—'),
 
-                        return trim(($person->first_name ?? '') . ' ' . ($person->last_name ?? ''));
-                    })
-                    ->url(function (Contact $record): ?string {
-                        $person = $record->entityable;
-
-                        if (! $person instanceof Person) {
-                            return null;
-                        }
-
-                        return PersonResource::getUrl('view', ['record' => $person]);
-                    })
-                    ->color('primary'),
+                Tables\Columns\TextColumn::make('related_phone')
+                    ->label(__('laravel-crm-filament::labels.fields.phone'))
+                    ->state(fn (Contact $record) => $record->entityable instanceof Person
+                        ? $record->entityable->getPrimaryPhone()?->number
+                        : null)
+                    ->placeholder('—'),
             ])
             ->headerActions([
                 Actions\CreateAction::make()
-                    ->authorize(fn (): bool => true)
-                    ->icon('heroicon-m-plus')
-                    ->color('gray')
-                    ->hiddenLabel()
-                    ->tooltip(__('laravel-crm-filament::labels.actions.add_person'))
+                    ->label(__('laravel-crm-filament::labels.actions.add_person'))
                     ->modalHeading(__('laravel-crm-filament::labels.actions.add_person'))
-                    ->modalSubmitActionLabel('Link')
-                    ->createAnother(false)
                     ->using(function (array $data): Contact {
-                        /** @var Person $owner */
                         $owner = $this->getOwnerRecord();
+                        $target = Person::findOrFail($data['person_id']);
 
-                        $related = Person::findOrFail($data['person_id']);
+                        $tenant = \Filament\Facades\Filament::getTenant();
+                        $tenantId = $tenant?->id;
+                        if (! $tenantId && auth()->user()) {
+                            $tenantId = auth()->user()->current_tenant_id ?? auth()->user()->tenant_id;
+                        }
 
-                        // Forward link: owner -> related
-                        $contact = $owner->contacts()->create([
-                            'entityable_type' => $related->getMorphClass(),
-                            'entityable_id' => $related->id,
+                        $contactA = Contact::firstOrCreate([
+                            'team_id' => $tenantId,
+                            'contactable_type' => $owner->getMorphClass(),
+                            'contactable_id' => $owner->id,
+                            'entityable_type' => $target->getMorphClass(),
+                            'entityable_id' => $target->id,
                         ]);
 
-                        // Reciprocal link: related -> owner
-                        $related->contacts()->firstOrCreate([
+                        Contact::firstOrCreate([
+                            'team_id' => $tenantId,
+                            'contactable_type' => $target->getMorphClass(),
+                            'contactable_id' => $target->id,
                             'entityable_type' => $owner->getMorphClass(),
                             'entityable_id' => $owner->id,
                         ]);
 
+                        return $contactA;
+                    })
+                    ->successNotification(
                         Notification::make()
-                            ->title(__('laravel-crm-filament::labels.notifications.related_contact_added'))
+                            ->title(__('laravel-crm-filament::labels.notifications.person_added'))
                             ->success()
-                            ->send();
-
-                        return $contact;
-                    }),
+                    ),
             ])
-            ->recordActions([
+            ->actions([
                 Actions\DeleteAction::make()
-                    ->authorize(fn (): bool => true)
-                    ->icon('heroicon-m-x-mark')
-                    ->hiddenLabel()
-                    ->tooltip('Remove')
-                    ->color('danger')
+                    ->label(__('laravel-crm-filament::labels.actions.remove'))
+                    ->modalHeading(__('laravel-crm-filament::labels.actions.remove_person'))
                     ->using(function (Contact $record): void {
-                        /** @var Person $owner */
-                        $owner = $this->getOwnerRecord();
-                        $relatedType = $record->entityable_type;
-                        $relatedId = $record->entityable_id;
-
-                        // Delete forward link
-                        $record->delete();
-
-                        // Delete reciprocal link
                         Contact::query()
-                            ->where('contactable_type', $relatedType)
-                            ->where('contactable_id', $relatedId)
-                            ->where('entityable_type', $owner->getMorphClass())
-                            ->where('entityable_id', $owner->id)
-                            ->get()
-                            ->each
+                            ->where('contactable_type', $record->entityable_type)
+                            ->where('contactable_id', $record->entityable_id)
+                            ->where('entityable_type', $record->contactable_type)
+                            ->where('entityable_id', $record->contactable_id)
                             ->delete();
 
+                        $record->delete();
+                    })
+                    ->successNotification(
                         Notification::make()
-                            ->title(__('laravel-crm-filament::labels.notifications.related_contact_removed'))
+                            ->title(__('laravel-crm-filament::labels.notifications.person_removed'))
                             ->success()
-                            ->send();
-                    }),
+                    ),
             ]);
     }
 }
