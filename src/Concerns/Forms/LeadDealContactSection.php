@@ -13,14 +13,7 @@ use VentureDrake\LaravelCrm\Services\PersonService;
 
 /**
  * Shared "Contact" and "Organization" left-column Sections used by Lead +
- * Deal create/edit forms to mirror the core CRM /crm/leads/create layout.
- *
- * Each Section exposes a single searchable Select (person_id /
- * organization_id) with an inline `createOptionForm` modal that mirrors
- * the field set of core's `PersonService::createFromRelated` /
- * `OrganizationService::createFromRelated`. The modal persists a fresh
- * Person / Organization through those services and returns its id so the
- * parent Select binds cleanly.
+ * Deal create/edit forms to mirror the core CRM layout.
  */
 class LeadDealContactSection
 {
@@ -44,62 +37,77 @@ class LeadDealContactSection
             ->schema([
                 Forms\Components\Select::make('person_id')
                     ->label(__('laravel-crm-filament::labels.fields.contact'))
-                    ->relationship('person', 'first_name')
-                    ->getOptionLabelFromRecordUsing(fn (Person $r) => trim(($r->first_name ?? '') . ' ' . ($r->last_name ?? '')))
-                    ->searchable(['first_name', 'last_name', 'middle_name', 'maiden_name'])
+                    ->relationship('person', 'first_name', modifyQueryUsing: function ($query) {
+                        $tenant = \Filament\Facades\Filament::getTenant();
+                        if ($tenant) {
+                            $query->where(function ($q) use ($tenant) {
+                                $q->where('team_id', $tenant->id)
+                                    ->orWhere('tenant_id', $tenant->id)
+                                    ->orWhereNull('team_id');
+                            });
+                        }
+
+                        return $query;
+                    })
+                    ->getOptionLabelFromRecordUsing(function (Person $r) {
+                        $name = trim(($r->first_name ?? '') . ' ' . ($r->last_name ?? ''));
+                        if (!empty($r->phone)) {
+                            $name .= ' (' . $r->phone . ')';
+                        }
+                        return $name ?: ('#' . $r->id);
+                    })
+                    ->searchable(['first_name', 'last_name', 'middle_name', 'maiden_name', 'phone', 'email', 'company_name'])
                     ->preload()
                     ->nullable()
                     ->createOptionForm([
                         Grid::make(2)->schema([
                             Forms\Components\TextInput::make('first_name')
+                                ->label(__('laravel-crm-filament::labels.fields.first_name') ?: 'First Name')
                                 ->required()
                                 ->maxLength(255),
                             Forms\Components\TextInput::make('last_name')
+                                ->label(__('laravel-crm-filament::labels.fields.last_name') ?: 'Last Name')
+                                ->maxLength(255),
+                        ]),
+                        Grid::make(2)->schema([
+                            Forms\Components\Select::make('organization_id')
+                                ->label(__('laravel-crm-filament::labels.fields.organization') ?: 'Organization')
+                                ->relationship('organization', 'name', modifyQueryUsing: function ($query) {
+                                    $tenant = \Filament\Facades\Filament::getTenant();
+                                    if ($tenant) {
+                                        $query->where(function ($q) use ($tenant) {
+                                            $q->where('team_id', $tenant->id)->orWhereNull('team_id');
+                                        });
+                                    }
+
+                                    return $query;
+                                })
+                                ->searchable()
+                                ->preload()
+                                ->nullable()
+                                ->createOptionForm([
+                                    Forms\Components\TextInput::make('name')
+                                        ->label(__('laravel-crm-filament::labels.fields.name') ?: 'Name')
+                                        ->required()
+                                        ->maxLength(255),
+                                ])
+                                ->createOptionUsing(fn (array $data): int => SalesDetailsSection::createOrganizationFromModal($data)),
+                            Forms\Components\TextInput::make('company_name')
+                                ->label(__('filament.resources.contacts.fields.company_name') ?: 'Company Name')
                                 ->maxLength(255),
                         ]),
                         Grid::make(2)->schema([
                             Forms\Components\TextInput::make('phone')
+                                ->label(__('laravel-crm-filament::labels.fields.phone') ?: 'Phone')
                                 ->tel()
                                 ->maxLength(50),
-                            Forms\Components\Select::make('phone_type')
-                                ->options([
-                                    'work' => 'Work',
-                                    'home' => 'Home',
-                                    'mobile' => 'Mobile',
-                                    'fax' => 'Fax',
-                                    'other' => 'Other',
-                                ])
-                                ->default('mobile'),
-                        ]),
-                        Grid::make(2)->schema([
                             Forms\Components\TextInput::make('email')
+                                ->label(__('laravel-crm-filament::labels.fields.email') ?: 'Email')
                                 ->email()
                                 ->maxLength(255),
-                            Forms\Components\Select::make('email_type')
-                                ->options([
-                                    'work' => 'Work',
-                                    'home' => 'Home',
-                                    'other' => 'Other',
-                                ])
-                                ->default('work'),
                         ]),
                     ])
-                    ->createOptionUsing(function (array $data): int {
-                        $request = new Fluent([
-                            'person_name' => trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? '')),
-                            'phone' => $data['phone'] ?? null,
-                            'phone_type' => $data['phone_type'] ?? null,
-                            'phone_primary' => true,
-                            'email' => $data['email'] ?? null,
-                            'email_type' => $data['email_type'] ?? null,
-                            'email_primary' => true,
-                            'user_owner_id' => auth()->id(),
-                        ]);
-
-                        $person = app(PersonService::class)->createFromRelated($request);
-
-                        return (int) $person->getKey();
-                    }),
+                    ->createOptionUsing(fn (array $data): int => SalesDetailsSection::createPersonFromModal($data)),
             ]);
     }
 
@@ -109,7 +117,16 @@ class LeadDealContactSection
             ->schema([
                 Forms\Components\Select::make('organization_id')
                     ->label(__('laravel-crm-filament::labels.fields.organization'))
-                    ->relationship('organization', 'name')
+                    ->relationship('organization', 'name', modifyQueryUsing: function ($query) {
+                        $tenant = \Filament\Facades\Filament::getTenant();
+                        if ($tenant) {
+                            $query->where(function ($q) use ($tenant) {
+                                $q->where('team_id', $tenant->id)->orWhereNull('team_id');
+                            });
+                        }
+
+                        return $query;
+                    })
                     ->searchable(['name'])
                     ->preload()
                     ->nullable()
@@ -143,23 +160,7 @@ class LeadDealContactSection
                                 ->maxLength(100),
                         ]),
                     ])
-                    ->createOptionUsing(function (array $data): int {
-                        $request = new Fluent([
-                            'organization_name' => $data['name'] ?? null,
-                            'line1' => $data['line1'] ?? null,
-                            'line2' => $data['line2'] ?? null,
-                            'line3' => $data['line3'] ?? null,
-                            'suburb' => $data['city'] ?? null,
-                            'state' => $data['state'] ?? null,
-                            'code' => $data['code'] ?? null,
-                            'country' => $data['country'] ?? null,
-                            'user_owner_id' => auth()->id(),
-                        ]);
-
-                        $org = app(OrganizationService::class)->createFromRelated($request);
-
-                        return (int) $org->getKey();
-                    }),
+                    ->createOptionUsing(fn (array $data): int => SalesDetailsSection::createOrganizationFromModal($data)),
             ]);
     }
 }

@@ -17,31 +17,6 @@ use VentureDrake\LaravelCrm\Services\PersonService;
  * Shared "Details" left-column Section used by Quote, Order, Invoice, and
  * PurchaseOrder create/edit forms. Person + Organization Selects are
  * always present; remaining scalar fields toggle via `$opts`.
- *
- * Supported $opts keys:
- *   title             bool    Render TextInput 'title' (required)
- *   description       bool    Render Textarea 'description' (5 rows)
- *   reference         bool    Render TextInput 'reference'
- *   currency          bool    Render TextInput 'currency'
- *   issueDateKey      string  Form field name for the issue date (e.g.
- *                              'issue_at' for Quote, 'issue_date' for
- *                              Invoice/PO). Null disables the field.
- *   expiryDateKey     string  Same idea for the trailing date (e.g.
- *                              'expire_at', 'due_date', 'delivery_date').
- *                              Null disables.
- *   terms             bool    Render Textarea 'terms' (5 rows)
- *   stage             bool    Render Select 'pipeline_stage_id'
- *   owner             bool    Render Select 'user_owner_id'
- *   labels            bool    Render the `labelsField()` static
- *                              (passed in via $opts['labelsField'] callback)
- *   labelsField       callable Returns the Select for labels (since
- *                              `labelsField()` is on the calling
- *                              Resource trait, not here)
- *   customFields      ?Section Optional custom fields Section to append
- *   orderLink         bool    Render Select 'order_id' first (Invoice/PO
- *                              link back to a parent Order)
- *
- * The Section's "Details" heading is the localised string.
  */
 class SalesDetailsSection
 {
@@ -161,46 +136,222 @@ class SalesDetailsSection
             ->schema($components);
     }
 
+    public static function createPersonFromModal(array $data): int
+    {
+        $tenant = \Filament\Facades\Filament::getTenant();
+        $tenantId = $tenant?->id;
+
+        if (! $tenantId && request()->header('referer')) {
+            $refererPath = parse_url(request()->header('referer'), PHP_URL_PATH);
+            $refParts = explode('/', ltrim((string) $refererPath, '/'));
+            if (count($refParts) >= 2 && ($refParts[0] === 'agent' || $refParts[0] === 'agentCRM') && is_numeric($refParts[1])) {
+                $tenantId = (int) $refParts[1];
+            }
+        }
+
+        if (! $tenantId) {
+            $routeTenant = request()->route('tenant');
+            $tenantId = $routeTenant instanceof \Illuminate\Database\Eloquent\Model ? $routeTenant->getKey() : $routeTenant;
+        }
+
+        if (! $tenantId && auth()->user()) {
+            $tenantId = auth()->user()->current_tenant_id ?? auth()->user()->tenant_id;
+        }
+
+        if (! empty($tenantId) && is_numeric($tenantId)) {
+            $tenantId = (int) $tenantId;
+        }
+
+        $firstName = trim((string) ($data['first_name'] ?? ''));
+        $lastName = trim((string) ($data['last_name'] ?? ''));
+        $phone = !empty($data['phone']) ? trim((string) $data['phone']) : null;
+        $email = !empty($data['email']) ? trim((string) $data['email']) : null;
+        $companyName = !empty($data['company_name']) ? trim((string) $data['company_name']) : null;
+        $organizationId = !empty($data['organization_id']) ? (int) $data['organization_id'] : null;
+        $userId = auth()->id() ?: 1;
+
+        $person = Person::create([
+            'external_id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
+            'first_name' => $firstName,
+            'last_name' => $lastName ?: null,
+            'user_owner_id' => $userId,
+            'user_created_id' => $userId,
+            'tenant_id' => $tenantId,
+            'team_id' => $tenantId,
+            'company_name' => $companyName,
+            'organization_id' => $organizationId,
+            'phone' => $phone,
+            'email' => $email,
+            'source' => 'manual',
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('crm_people')
+            ->where('id', $person->id)
+            ->update(array_filter([
+                'tenant_id' => $tenantId,
+                'team_id' => $tenantId,
+                'company_name' => $companyName,
+                'organization_id' => $organizationId,
+                'phone' => $phone,
+                'email' => $email,
+                'source' => 'manual',
+                'user_owner_id' => $userId,
+                'user_created_id' => $userId,
+            ], fn ($v) => !is_null($v)));
+
+        if ($phone) {
+            $person->phones()->create([
+                'external_id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
+                'number' => $phone,
+                'type' => 'mobile',
+                'primary' => 1,
+            ]);
+        }
+
+        if ($email) {
+            $person->emails()->create([
+                'external_id' => \Ramsey\Uuid\Uuid::uuid4()->toString(),
+                'address' => $email,
+                'type' => 'work',
+                'primary' => 1,
+            ]);
+        }
+
+        if ($organizationId && ($org = Organization::find($organizationId))) {
+            app(PersonService::class)->linkToOrganization($person, $org);
+        }
+
+        return (int) $person->getKey();
+    }
+
+    public static function createOrganizationFromModal(array $data): int
+    {
+        $tenant = \Filament\Facades\Filament::getTenant();
+        $tenantId = $tenant?->id;
+
+        if (! $tenantId && request()->header('referer')) {
+            $refererPath = parse_url(request()->header('referer'), PHP_URL_PATH);
+            $refParts = explode('/', ltrim((string) $refererPath, '/'));
+            if (count($refParts) >= 2 && ($refParts[0] === 'agent' || $refParts[0] === 'agentCRM') && is_numeric($refParts[1])) {
+                $tenantId = (int) $refParts[1];
+            }
+        }
+
+        if (! $tenantId && auth()->user()) {
+            $tenantId = auth()->user()->current_tenant_id ?? auth()->user()->tenant_id;
+        }
+
+        $request = new Fluent([
+            'organization_name' => $data['name'] ?? null,
+            'line1' => $data['line1'] ?? null,
+            'suburb' => $data['city'] ?? null,
+            'country' => $data['country'] ?? null,
+            'user_owner_id' => auth()->id() ?: 1,
+        ]);
+
+        $org = app(OrganizationService::class)->createFromRelated($request);
+        if ($tenantId) {
+            \Illuminate\Support\Facades\DB::table('crm_organizations')
+                ->where('id', $org->id)
+                ->update([
+                    'team_id' => $tenantId,
+                ]);
+        }
+
+        return (int) $org->getKey();
+    }
+
     protected static function personSelect(): Forms\Components\Select
     {
         return Forms\Components\Select::make('person_id')
             ->label(__('laravel-crm-filament::labels.fields.contact'))
-            ->relationship('person', 'first_name')
-            ->getOptionLabelFromRecordUsing(fn (Person $r) => trim(($r->first_name ?? '') . ' ' . ($r->last_name ?? '')))
-            ->searchable(['first_name', 'last_name', 'middle_name', 'maiden_name'])
+            ->relationship('person', 'first_name', modifyQueryUsing: function ($query) {
+                $tenant = \Filament\Facades\Filament::getTenant();
+                if ($tenant) {
+                    $query->where(function ($q) use ($tenant) {
+                        $q->where('team_id', $tenant->id)
+                            ->orWhere('tenant_id', $tenant->id)
+                            ->orWhereNull('team_id');
+                    });
+                }
+
+                return $query;
+            })
+            ->getOptionLabelFromRecordUsing(function (Person $r) {
+                $name = trim(($r->first_name ?? '') . ' ' . ($r->last_name ?? ''));
+                if (!empty($r->phone)) {
+                    $name .= ' (' . $r->phone . ')';
+                }
+                return $name ?: ('#' . $r->id);
+            })
+            ->searchable(['first_name', 'last_name', 'middle_name', 'maiden_name', 'phone', 'email', 'company_name'])
             ->preload()
             ->nullable()
             ->createOptionForm([
                 Grid::make(2)->schema([
-                    Forms\Components\TextInput::make('first_name')->required()->maxLength(255),
-                    Forms\Components\TextInput::make('last_name')->maxLength(255),
+                    Forms\Components\TextInput::make('first_name')
+                        ->label(__('laravel-crm-filament::labels.fields.first_name') ?: 'First name')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('last_name')
+                        ->label(__('laravel-crm-filament::labels.fields.last_name') ?: 'Last name')
+                        ->maxLength(255),
                 ]),
-                Forms\Components\TextInput::make('email')->email()->maxLength(255),
-                Forms\Components\TextInput::make('phone')->tel()->maxLength(50),
+                Grid::make(2)->schema([
+                    Forms\Components\Select::make('organization_id')
+                        ->label(__('laravel-crm-filament::labels.fields.organization') ?: 'Organization')
+                        ->relationship('organization', 'name', modifyQueryUsing: function ($query) {
+                            $tenant = \Filament\Facades\Filament::getTenant();
+                            if ($tenant) {
+                                $query->where(function ($q) use ($tenant) {
+                                    $q->where('team_id', $tenant->id)->orWhereNull('team_id');
+                                });
+                            }
+
+                            return $query;
+                        })
+                        ->searchable()
+                        ->preload()
+                        ->nullable()
+                        ->createOptionForm([
+                            Forms\Components\TextInput::make('name')
+                                ->label(__('laravel-crm-filament::labels.fields.name') ?: 'Name')
+                                ->required()
+                                ->maxLength(255),
+                        ])
+                        ->createOptionUsing(fn (array $data): int => self::createOrganizationFromModal($data)),
+                    Forms\Components\TextInput::make('company_name')
+                        ->label(__('filament.resources.contacts.fields.company_name') ?: 'Company Name')
+                        ->maxLength(255),
+                ]),
+                Grid::make(2)->schema([
+                    Forms\Components\TextInput::make('phone')
+                        ->label(__('laravel-crm-filament::labels.fields.phone') ?: 'Phone')
+                        ->tel()
+                        ->maxLength(50),
+                    Forms\Components\TextInput::make('email')
+                        ->label(__('laravel-crm-filament::labels.fields.email') ?: 'Email')
+                        ->email()
+                        ->maxLength(255),
+                ]),
             ])
-            ->createOptionUsing(function (array $data): int {
-                $request = new Fluent([
-                    'person_name' => trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? '')),
-                    'phone' => $data['phone'] ?? null,
-                    'phone_type' => 'mobile',
-                    'phone_primary' => true,
-                    'email' => $data['email'] ?? null,
-                    'email_type' => 'work',
-                    'email_primary' => true,
-                    'user_owner_id' => auth()->id(),
-                ]);
-
-                $person = app(PersonService::class)->createFromRelated($request);
-
-                return (int) $person->getKey();
-            });
+            ->createOptionUsing(fn (array $data): int => self::createPersonFromModal($data));
     }
 
     protected static function organizationSelect(): Forms\Components\Select
     {
         return Forms\Components\Select::make('organization_id')
             ->label(__('laravel-crm-filament::labels.fields.organization'))
-            ->relationship('organization', 'name')
+            ->relationship('organization', 'name', modifyQueryUsing: function ($query) {
+                $tenant = \Filament\Facades\Filament::getTenant();
+                if ($tenant) {
+                    $query->where(function ($q) use ($tenant) {
+                        $q->where('team_id', $tenant->id)->orWhereNull('team_id');
+                    });
+                }
+
+                return $query;
+            })
             ->searchable(['name'])
             ->preload()
             ->nullable()
@@ -218,19 +369,7 @@ class SalesDetailsSection
                         ->maxLength(100),
                 ]),
             ])
-            ->createOptionUsing(function (array $data): int {
-                $request = new Fluent([
-                    'organization_name' => $data['name'] ?? null,
-                    'line1' => $data['line1'] ?? null,
-                    'suburb' => $data['city'] ?? null,
-                    'country' => $data['country'] ?? null,
-                    'user_owner_id' => auth()->id(),
-                ]);
-
-                $org = app(OrganizationService::class)->createFromRelated($request);
-
-                return (int) $org->getKey();
-            });
+            ->createOptionUsing(fn (array $data): int => self::createOrganizationFromModal($data));
     }
 
     protected static function orderSelect(): Forms\Components\Select

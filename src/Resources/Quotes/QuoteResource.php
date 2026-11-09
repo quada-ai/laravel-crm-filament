@@ -171,7 +171,7 @@ class QuoteResource extends Resource
 
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('laravel-crm-filament::labels.money.total'))
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100)
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('issue_at')
@@ -546,7 +546,7 @@ class QuoteResource extends Resource
 
                     TextEntry::make('total')
                         ->label(__('laravel-crm-filament::labels.money.total'))
-                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100),
 
                     TextEntry::make('issue_at')
                         ->label(__('laravel-crm-filament::labels.money.issue_date'))

@@ -369,7 +369,7 @@ class LeadResource extends Resource
 
                     TextEntry::make('amount')
                         ->label(__('laravel-crm-filament::labels.money.value'))
-                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100),
 
                     TextEntry::make('description')
                         ->label(__('laravel-crm-filament::labels.fields.description'))

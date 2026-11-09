@@ -176,7 +176,7 @@ class InvoiceResource extends Resource
 
                 Tables\Columns\TextColumn::make('total')
                     ->label(__('laravel-crm-filament::labels.money.total'))
-                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'))
+                    ->money(fn ($record) => $record->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100)
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('fully_paid_at')
@@ -415,15 +415,15 @@ class InvoiceResource extends Resource
 
                     TextEntry::make('total')
                         ->label(__('laravel-crm-filament::labels.money.total'))
-                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100),
 
                     TextEntry::make('amount_paid')
                         ->label(__('laravel-crm-filament::labels.money.amount_paid'))
-                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100),
 
                     TextEntry::make('amount_due')
                         ->label(__('laravel-crm-filament::labels.money.amount_due'))
-                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD')),
+                        ->money(fn ($record) => $record?->currency ?: config('laravel-crm.default_currency', 'USD'), divideBy: 100),
 
                     TextEntry::make('fully_paid_at')
                         ->label(__('laravel-crm-filament::labels.xero.fully_paid_at'))
