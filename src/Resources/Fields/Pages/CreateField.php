@@ -15,6 +15,12 @@ class CreateField extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
+        $tenantId = class_exists(\Filament\Facades\Filament::class) ? \Filament\Facades\Filament::getTenant()?->id : null;
+        if ($tenantId) {
+            $data['tenant_id'] = $tenantId;
+            $data['team_id'] = $tenantId;
+        }
+
         $models = $data['models'] ?? [];
         $options = $data['options'] ?? [];
         unset($data['models'], $data['options']);
@@ -23,19 +29,29 @@ class CreateField extends CreateRecord
         $field = Field::create($data);
 
         foreach ($models as $modelClass) {
-            FieldModel::create([
+            $modelData = [
                 'field_id' => $field->id,
                 'model' => $modelClass,
-            ]);
+            ];
+            if ($tenantId) {
+                $modelData['tenant_id'] = $tenantId;
+                $modelData['team_id'] = $tenantId;
+            }
+            FieldModel::create($modelData);
         }
 
         foreach ($options as $option) {
-            FieldOption::create([
+            $optData = [
                 'field_id' => $field->id,
                 'label' => $option['label'] ?? null,
                 'value' => $option['value'] ?? null,
                 'order' => $option['order'] ?? 0,
-            ]);
+            ];
+            if ($tenantId) {
+                $optData['tenant_id'] = $tenantId;
+                $optData['team_id'] = $tenantId;
+            }
+            FieldOption::create($optData);
         }
 
         return $field;

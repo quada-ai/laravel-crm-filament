@@ -47,6 +47,10 @@ class FieldGroupResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function ($query) {
+                $tenantId = class_exists(\Filament\Facades\Filament::class) ? \Filament\Facades\Filament::getTenant()?->id : null;
+                return $query->when($tenantId, fn ($q) => $q->where(fn ($sq) => $sq->where('tenant_id', $tenantId)->orWhere('team_id', $tenantId)));
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\IconColumn::make('system')

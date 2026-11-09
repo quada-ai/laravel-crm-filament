@@ -40,6 +40,8 @@ class EditField extends EditRecord
 
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        $tenantId = class_exists(\Filament\Facades\Filament::class) ? \Filament\Facades\Filament::getTenant()?->id : null;
+
         $models = $data['models'] ?? [];
         $options = $data['options'] ?? [];
         unset($data['models'], $data['options']);
@@ -53,18 +55,28 @@ class EditField extends EditRecord
             $record->fieldModels()->where('model', $stale)->delete();
         }
         foreach (array_diff($models, $existingModels) as $fresh) {
-            FieldModel::create(['field_id' => $record->id, 'model' => $fresh]);
+            $fmData = ['field_id' => $record->id, 'model' => $fresh];
+            if ($tenantId) {
+                $fmData['tenant_id'] = $tenantId;
+                $fmData['team_id'] = $tenantId;
+            }
+            FieldModel::create($fmData);
         }
 
         // Replace FieldOptions wholesale (Filament Repeater is array-of-arrays without IDs).
         $record->fieldOptions()->delete();
         foreach ($options as $option) {
-            FieldOption::create([
+            $optData = [
                 'field_id' => $record->id,
                 'label' => $option['label'] ?? null,
                 'value' => $option['value'] ?? null,
                 'order' => $option['order'] ?? 0,
-            ]);
+            ];
+            if ($tenantId) {
+                $optData['tenant_id'] = $tenantId;
+                $optData['team_id'] = $tenantId;
+            }
+            FieldOption::create($optData);
         }
 
         return $record->refresh();

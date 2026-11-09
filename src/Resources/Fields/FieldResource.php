@@ -88,7 +88,13 @@ class FieldResource extends Resource
                     ->live(),
                 Forms\Components\Select::make('field_group_id')
                     ->label(__('laravel-crm-filament::labels.fields.group'))
-                    ->options(fn () => FieldGroup::query()->orderBy('name')->pluck('name', 'id'))
+                    ->options(function () {
+                        $tenantId = class_exists(\Filament\Facades\Filament::class) ? \Filament\Facades\Filament::getTenant()?->id : null;
+                        return FieldGroup::query()
+                            ->when($tenantId, fn ($q) => $q->where(fn ($sq) => $sq->where('tenant_id', $tenantId)->orWhere('team_id', $tenantId)))
+                            ->orderBy('name')
+                            ->pluck('name', 'id');
+                    })
                     ->searchable(),
                 Forms\Components\TextInput::make('default')->maxLength(255),
             ])->columnSpanFull(),
@@ -120,7 +126,11 @@ class FieldResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with('fieldModels'))
+            ->modifyQueryUsing(function ($query) {
+                $tenantId = class_exists(\Filament\Facades\Filament::class) ? \Filament\Facades\Filament::getTenant()?->id : null;
+                return $query->with('fieldModels')
+                    ->when($tenantId, fn ($q) => $q->where(fn ($sq) => $sq->where('tenant_id', $tenantId)->orWhere('team_id', $tenantId)));
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('type')->badge()->sortable(),
                 Tables\Columns\TextColumn::make('fieldGroup.name')

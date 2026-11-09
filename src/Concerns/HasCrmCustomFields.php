@@ -29,8 +29,17 @@ trait HasCrmCustomFields
 {
     public static function crmCustomFieldsSection(string $modelClass): ?Section
     {
+        $tenantId = class_exists(\Filament\Facades\Filament::class) ? \Filament\Facades\Filament::getTenant()?->id : null;
+
         $fields = FieldModel::query()
             ->where('model', $modelClass)
+            ->when($tenantId, function ($q) use ($tenantId) {
+                $q->where(function ($sub) use ($tenantId) {
+                    $sub->where('tenant_id', $tenantId)
+                        ->orWhere('team_id', $tenantId)
+                        ->orWhereHas('field', fn ($fq) => $fq->where('tenant_id', $tenantId)->orWhere('team_id', $tenantId));
+                });
+            })
             ->with(['field.fieldOptions'])
             ->get()
             ->pluck('field')
@@ -103,11 +112,24 @@ trait HasCrmCustomFields
             return;
         }
 
+        $tenantId = class_exists(\Filament\Facades\Filament::class) ? \Filament\Facades\Filament::getTenant()?->id : null;
+
         foreach ($values as $fieldId => $value) {
             if (is_array($value)) {
                 $value = json_encode(array_values(array_filter($value, fn ($v) => $v !== null && $v !== '')));
             } elseif (is_bool($value)) {
                 $value = $value ? '1' : '0';
+            }
+
+            $updateData = ['value' => $value];
+            if ($tenantId) {
+                $fvTable = (new FieldValue)->getTable();
+                if (\Illuminate\Support\Facades\Schema::hasColumn($fvTable, 'tenant_id')) {
+                    $updateData['tenant_id'] = $tenantId;
+                }
+                if (\Illuminate\Support\Facades\Schema::hasColumn($fvTable, 'team_id')) {
+                    $updateData['team_id'] = $tenantId;
+                }
             }
 
             FieldValue::updateOrCreate(
@@ -116,7 +138,7 @@ trait HasCrmCustomFields
                     'field_valueable_type' => get_class($record),
                     'field_valueable_id' => $record->id,
                 ],
-                ['value' => $value],
+                $updateData,
             );
         }
     }
